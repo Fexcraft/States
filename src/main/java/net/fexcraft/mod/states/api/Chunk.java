@@ -1,11 +1,13 @@
 package net.fexcraft.mod.states.api;
 
 import java.io.File;
+import java.util.List;
 import java.util.UUID;
 
 import com.google.gson.JsonObject;
 
 import net.fexcraft.mod.states.States;
+import net.minecraft.util.ResourceLocation;
 
 public interface Chunk {
 	
@@ -36,5 +38,9 @@ public interface Chunk {
 	public UUID getCreator();
 	
 	public long getChanged();
+	
+	public void setChanged(long new_change);
+	
+	public List<ResourceLocation> getLinkedChunks();
 
 }

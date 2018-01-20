@@ -1,17 +1,21 @@
 package net.fexcraft.mod.states.impl;
 
 import java.io.File;
+import java.util.List;
 import java.util.UUID;
 
+import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 
 import net.fexcraft.mod.lib.util.json.JsonUtil;
+import net.fexcraft.mod.lib.util.lang.ArrayList;
 import net.fexcraft.mod.lib.util.math.Time;
 import net.fexcraft.mod.states.States;
 import net.fexcraft.mod.states.api.Chunk;
 import net.fexcraft.mod.states.api.District;
 import net.fexcraft.mod.states.util.Config;
 import net.fexcraft.mod.states.util.StateUtil;
+import net.minecraft.util.ResourceLocation;
 
 public class GenericChunk implements Chunk {
 
@@ -20,6 +24,7 @@ public class GenericChunk implements Chunk {
 	private int x, z;
 	private long created, changed;
 	private UUID creator;
+	private ArrayList<ResourceLocation> linked;
 	
 	public GenericChunk(int x, int z){
 		this.x = x; this.z = z;
@@ -29,6 +34,7 @@ public class GenericChunk implements Chunk {
 		created = JsonUtil.getIfExists(obj, "created", Time.getDate()).longValue();
 		creator = UUID.fromString(obj.has("creator") ? obj.get("creator").getAsString() : States.CONSOLE_UUID);
 		changed = JsonUtil.getIfExists(obj, "changed", Time.getDate()).longValue();
+		linked = JsonUtil.jsonArrayToResourceLocationArray(JsonUtil.getIfExists(obj, "linked", new JsonArray()).getAsJsonArray());
 	}
 
 	@Override
@@ -90,6 +96,16 @@ public class GenericChunk implements Chunk {
 	@Override
 	public long getChanged(){
 		return changed;
+	}
+
+	@Override
+	public void setChanged(long new_change){
+		changed = new_change;
+	}
+
+	@Override
+	public List<ResourceLocation> getLinkedChunks(){
+		return linked;
 	}
 
 }

@@ -47,11 +47,13 @@ public class WorldEvents {
 	}
 	
 	@SubscribeEvent
-	public static void onWorldLoad(WorldEvent.Unload event){
+	public static void onWorldUnload(WorldEvent.Unload event){
 		if(event.getWorld().provider.getDimension() != 0){
 			return;
 		}
-		//TODO save
+		States.DISTRICTS.values().forEach(elm -> {
+			elm.save();
+		});
 	}
 	
 }

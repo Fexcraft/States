@@ -1,11 +1,14 @@
 package net.fexcraft.mod.states.impl;
 
 import java.io.File;
+import java.util.List;
 import java.util.UUID;
 
+import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 
 import net.fexcraft.mod.lib.util.json.JsonUtil;
+import net.fexcraft.mod.lib.util.lang.ArrayList;
 import net.fexcraft.mod.lib.util.math.Time;
 import net.fexcraft.mod.states.States;
 import net.fexcraft.mod.states.api.District;
@@ -17,6 +20,7 @@ public class GenericDistrict implements District {
 	private DistrictType type;
 	private long created, changed;
 	private UUID creator;
+	private ArrayList<Integer> neighbors;
 	
 	public GenericDistrict(int id){
 		this.id = id;
@@ -25,6 +29,7 @@ public class GenericDistrict implements District {
 		created = JsonUtil.getIfExists(obj, "created", Time.getDate()).longValue();
 		creator = UUID.fromString(obj.has("creator") ? obj.get("creator").getAsString() : States.CONSOLE_UUID);
 		changed = JsonUtil.getIfExists(obj, "changed", Time.getDate()).longValue();
+		neighbors = JsonUtil.jsonArrayToIntegerArray(JsonUtil.getIfExists(obj, "neighbords", new JsonArray()).getAsJsonArray());
 	}
 
 	@Override
@@ -75,6 +80,16 @@ public class GenericDistrict implements District {
 	@Override
 	public long getChanged(){
 		return changed;
+	}
+
+	@Override
+	public List<Integer> getNeighbors(){
+		return neighbors;
+	}
+
+	@Override
+	public void setChanged(long new_change){
+		changed = new_change;
 	}
 
 }

@@ -1,6 +1,7 @@
 package net.fexcraft.mod.states.api;
 
 import java.io.File;
+import java.util.List;
 import java.util.UUID;
 
 import com.google.gson.JsonObject;
@@ -32,5 +33,9 @@ public interface District {
 	public UUID getCreator();
 	
 	public long getChanged();
+	
+	public List<Integer> getNeighbors();
+	
+	public void setChanged(long new_change);
 
 }

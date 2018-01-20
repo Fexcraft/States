@@ -33,17 +33,17 @@ public class GenericChunk implements Chunk {
 
 	@Override
 	public int xCoord(){
-		return 0;
+		return x;
 	}
 
 	@Override
 	public int zCoord(){
-		return 0;
+		return z;
 	}
 
 	@Override
 	public long getPrice(){
-		return 0;
+		return price;
 	}
 
 	@Override

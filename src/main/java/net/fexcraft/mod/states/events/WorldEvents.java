@@ -1,6 +1,13 @@
 package net.fexcraft.mod.states.events;
 
+import com.google.gson.JsonObject;
+
+import net.fexcraft.mod.lib.util.json.JsonUtil;
+import net.fexcraft.mod.lib.util.math.Time;
 import net.fexcraft.mod.states.States;
+import net.fexcraft.mod.states.api.District;
+import net.fexcraft.mod.states.api.DistrictType;
+import net.fexcraft.mod.states.impl.GenericDistrict;
 import net.minecraftforge.event.world.WorldEvent;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
@@ -14,10 +21,28 @@ public class WorldEvents {
 			return;
 		}
 		if(!States.DISTRICTS.containsKey(-1)){
-			//TODO add wilderness district
+			if(!District.getDistrictFile(-1).exists()){
+				JsonObject object = new JsonObject();
+				object.addProperty("id", -1);
+				object.addProperty("type", DistrictType.WILDERNESS.name());
+				object.addProperty("created", Time.getDate());
+				object.addProperty("creator", States.CONSOLE_UUID);
+				object.addProperty("changed", Time.getDate());
+				JsonUtil.write(District.getDistrictFile(-1), object);
+			}
+			States.DISTRICTS.put(-1, new GenericDistrict(-1));
 		}
 		if(!States.DISTRICTS.containsKey(0)){
-			//TODO add default district
+			if(!District.getDistrictFile(0).exists()){
+				JsonObject object = new JsonObject();
+				object.addProperty("id", 0);
+				object.addProperty("type", DistrictType.MUNICIPIAL.name());
+				object.addProperty("created", Time.getDate());
+				object.addProperty("creator", States.DEF_UUID);
+				object.addProperty("changed", Time.getDate());
+				JsonUtil.write(District.getDistrictFile(0), object);
+			}
+			States.DISTRICTS.put(0, new GenericDistrict(0));
 		}
 	}
 	

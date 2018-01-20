@@ -1,6 +1,7 @@
 package net.fexcraft.mod.states.api;
 
 import java.io.File;
+import java.util.UUID;
 
 import com.google.gson.JsonObject;
 
@@ -29,5 +30,11 @@ public interface Chunk {
 	public JsonObject toJsonObject();
 	
 	public District getDistrict();
+	
+	public long getCreated();
+	
+	public UUID getCreator();
+	
+	public long getChanged();
 
 }

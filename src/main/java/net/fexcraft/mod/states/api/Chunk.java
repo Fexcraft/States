@@ -27,5 +27,7 @@ public interface Chunk {
 	public void save();
 	
 	public JsonObject toJsonObject();
+	
+	public District getDistrict();
 
 }

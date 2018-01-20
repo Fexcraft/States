@@ -12,6 +12,9 @@ public class ChunkEvents {
 	
 	@SubscribeEvent
 	public static void onLoad(ChunkEvent.Load event){
+		if(event.getWorld().provider.getDimension() != 0){
+			return;
+		}
 		int x = event.getChunk().x, z = event.getChunk().z;
 		if(!States.CHUNKS.contains(x, z)){
 			States.CHUNKS.put(x, z, new GenericChunk(x, z));
@@ -20,6 +23,9 @@ public class ChunkEvents {
 	
 	@SubscribeEvent
 	public static void onUnload(ChunkEvent.Unload event){
+		if(event.getWorld().provider.getDimension() != 0){
+			return;
+		}
 		int x = event.getChunk().x, z = event.getChunk().z;
 		if(States.CHUNKS.contains(x, z)){
 			Chunk chunk = States.CHUNKS.remove(x, z);

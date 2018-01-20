@@ -7,10 +7,13 @@ import com.google.gson.JsonObject;
 import net.fexcraft.mod.lib.util.json.JsonUtil;
 import net.fexcraft.mod.lib.util.math.Time;
 import net.fexcraft.mod.states.api.Chunk;
+import net.fexcraft.mod.states.api.District;
 import net.fexcraft.mod.states.util.Config;
+import net.fexcraft.mod.states.util.StateUtil;
 
 public class GenericChunk implements Chunk {
 
+	private District district;
 	private long price;
 	private int x, z;
 	
@@ -18,6 +21,7 @@ public class GenericChunk implements Chunk {
 		this.x = x; this.z = z;
 		JsonObject obj = JsonUtil.get(getChunkFile());
 		price = JsonUtil.getIfExists(obj, "price", Config.DEFAULT_CHUNK_PRICE).longValue();
+		district = StateUtil.getDistrict(JsonUtil.getIfExists(obj, "district", -1).intValue());
 	}
 
 	@Override
@@ -45,9 +49,7 @@ public class GenericChunk implements Chunk {
 		JsonObject obj = toJsonObject();
 		obj.addProperty("last_save", Time.getDate());
 		File file = getChunkFile();
-		if(!file.getParentFile().exists()){
-			file.getParentFile().mkdirs();
-		}
+		if(!file.getParentFile().exists()){ file.getParentFile().mkdirs(); }
 		JsonUtil.write(file, obj);
 	}
 
@@ -58,6 +60,11 @@ public class GenericChunk implements Chunk {
 		obj.addProperty("z", z);
 		obj.addProperty("price", price);
 		return obj;
+	}
+
+	@Override
+	public District getDistrict(){
+		return district;
 	}
 
 }

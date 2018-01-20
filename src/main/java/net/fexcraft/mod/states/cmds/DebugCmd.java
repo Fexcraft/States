@@ -30,6 +30,8 @@ public class DebugCmd extends CommandBase {
 		if(args.length == 0){
 			Print.chat(sender, "&7/st-debug chunk");
 			Print.chat(sender, "&7/st-debug chunks");
+			Print.chat(sender, "&7/st-debug district");
+			Print.chat(sender, "&7/st-debug districts");
 			return;
 		}
 		if(sender instanceof EntityPlayer == false){
@@ -48,6 +50,18 @@ public class DebugCmd extends CommandBase {
 			}
 			case "ck": case "chunk":{
 				Print.chat(sender, JsonUtil.setPrettyPrinting(chunk.toJsonObject()));
+				return;
+			}
+			case "district":{
+				Print.chat(sender, JsonUtil.setPrettyPrinting(chunk.getDistrict().toJsonObject()));
+				return;
+			}
+			case "districts":{
+				States.DISTRICTS.values().forEach((elm) -> {
+					Print.log(elm.toJsonObject().toString());
+				});
+				Print.chat(sender, "&Districts loaded: &a" + States.CHUNKS.size());
+				Print.chat(sender, "Districts JSON's printed into console.");
 				return;
 			}
 		}

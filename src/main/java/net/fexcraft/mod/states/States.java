@@ -1,11 +1,13 @@
 package net.fexcraft.mod.states;
 
 import java.io.File;
+import java.util.TreeMap;
 
 import com.google.common.collect.TreeBasedTable;
 
 import net.fexcraft.mod.lib.util.common.Static;
 import net.fexcraft.mod.states.api.Chunk;
+import net.fexcraft.mod.states.api.District;
 import net.fexcraft.mod.states.util.Config;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.event.FMLInitializationEvent;
@@ -19,6 +21,7 @@ public class States {
 	public static final String MODID = "states";
 	//
 	public static final TreeBasedTable<Integer, Integer, Chunk> CHUNKS = TreeBasedTable.create();
+	public static final TreeMap<Integer, District> DISTRICTS = new TreeMap<Integer, District>();
 	
 	@Mod.EventHandler
 	public void preInit(FMLPreInitializationEvent event){

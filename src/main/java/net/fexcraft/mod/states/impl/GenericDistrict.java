@@ -133,4 +133,9 @@ public class GenericDistrict implements District {
 		manager = uuid;
 	}
 
+	@Override
+	public void setType(DistrictType new_type){
+		type = new_type;
+	}
+
 }

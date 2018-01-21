@@ -24,6 +24,8 @@ public interface District {
 	
 	public DistrictType getType();
 	
+	public void setType(DistrictType new_type);
+	
 	public JsonObject toJsonObject();
 
 	public void save();

@@ -52,5 +52,9 @@ public interface Municipality {
 	public void setMayor(UUID uuid);
 	
 	public List<UUID> getCouncil();
+	
+	public MunicipalityType getType();
+	
+	public void updateType();
 
 }

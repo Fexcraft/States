@@ -3,6 +3,9 @@ package net.fexcraft.mod.states.util;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
+
+import net.fexcraft.mod.lib.util.json.JsonUtil;
+import net.fexcraft.mod.states.api.MunicipalityType;
 import net.minecraftforge.common.config.ConfigElement;
 import net.minecraftforge.common.config.Configuration;
 import net.minecraftforge.fml.client.config.IConfigElement;
@@ -40,6 +43,11 @@ public class Config {
 	
 	private static void refresh(){
 		DEFAULT_CHUNK_PRICE = config.getInt("default_chunk_price", DEFAULT_CAT, 100000, 0, Integer.MAX_VALUE, "Default price for unclaimed chunks. (1000 == 1F$)");
+		{
+			String[] arr = config.getStringList("municipality_types", DEFAULT_CAT, MunicipalityType.DEFAULTS, "Municipality Sizes");
+			MunicipalityType.clearEntries();
+			for(String str : arr){ new MunicipalityType(JsonUtil.getFromString(str).getAsJsonObject()); }
+		}
 	}
 	
 }

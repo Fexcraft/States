@@ -15,6 +15,7 @@ import net.fexcraft.mod.lib.util.math.Time;
 import net.fexcraft.mod.states.States;
 import net.fexcraft.mod.states.api.District;
 import net.fexcraft.mod.states.api.Municipality;
+import net.fexcraft.mod.states.api.MunicipalityType;
 import net.fexcraft.mod.states.util.StateUtil;
 
 public class GenericMunicipality implements Municipality {
@@ -27,6 +28,7 @@ public class GenericMunicipality implements Municipality {
 	private ArrayList<Integer> neighbors;
 	private ArrayList<District> districts;
 	private ArrayList<UUID> citizen, council;
+	private MunicipalityType type;
 	
 	public GenericMunicipality(int id){
 		this.id = id;
@@ -46,6 +48,7 @@ public class GenericMunicipality implements Municipality {
 		}
 		citizen = JsonUtil.jsonArrayToUUIDArray(JsonUtil.getIfExists(obj, "citizen", new JsonArray()).getAsJsonArray());
 		council = JsonUtil.jsonArrayToUUIDArray(JsonUtil.getIfExists(obj, "council", new JsonArray()).getAsJsonArray());
+		type = MunicipalityType.getType(this);
 	}
 
 	@Override
@@ -150,6 +153,17 @@ public class GenericMunicipality implements Municipality {
 	@Override
 	public List<UUID> getCouncil(){
 		return council;
+	}
+
+	@Override
+	public MunicipalityType getType(){
+		return type;
+	}
+	
+	/** Use this method when e.g. after updating the citizen list of a Municipality.*/
+	@Override
+	public void updateType(){
+		type = MunicipalityType.getType(this);
 	}
 
 }

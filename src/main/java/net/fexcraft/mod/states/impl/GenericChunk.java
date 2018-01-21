@@ -108,4 +108,9 @@ public class GenericChunk implements Chunk {
 		return linked;
 	}
 
+	@Override
+	public void setDistrict(District dis){
+		district = dis;
+	}
+
 }

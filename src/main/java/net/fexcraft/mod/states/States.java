@@ -8,6 +8,7 @@ import com.google.common.collect.TreeBasedTable;
 import net.fexcraft.mod.lib.util.common.Static;
 import net.fexcraft.mod.states.api.Chunk;
 import net.fexcraft.mod.states.api.District;
+import net.fexcraft.mod.states.api.Municipality;
 import net.fexcraft.mod.states.util.Config;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.event.FMLInitializationEvent;
@@ -22,9 +23,11 @@ public class States {
 	//
 	public static final TreeBasedTable<Integer, Integer, Chunk> CHUNKS = TreeBasedTable.create();
 	public static final TreeMap<Integer, District> DISTRICTS = new TreeMap<Integer, District>();
+	public static final TreeMap<Integer, Municipality> MUNICIPALITIES = new TreeMap<Integer, Municipality>();
 	//
 	public static final String DEF_UUID = "66e70cb7-1d96-487c-8255-5c2d7a2b6a0e";
 	public static final String CONSOLE_UUID = "f78a4d8d-d51b-4b39-98a3-230f2de0c670";
+	public static File SAVE_PATH;
 	
 	@Mod.EventHandler
 	public void preInit(FMLPreInitializationEvent event){
@@ -43,6 +46,13 @@ public class States {
 	
 	public static final File getWorldDirectory(){
 		return Static.getServer().getEntityWorld().getSaveHandler().getWorldDirectory();
+	}
+	
+	public static final File getSaveDirectory(){
+		if(SAVE_PATH != null){
+			return SAVE_PATH;
+		}
+		return SAVE_PATH = new File(Static.getServer().getEntityWorld().getSaveHandler().getWorldDirectory(), "states/");
 	}
 
 }

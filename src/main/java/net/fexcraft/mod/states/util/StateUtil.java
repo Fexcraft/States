@@ -3,7 +3,9 @@ package net.fexcraft.mod.states.util;
 import net.fexcraft.mod.states.States;
 import net.fexcraft.mod.states.api.Chunk;
 import net.fexcraft.mod.states.api.District;
+import net.fexcraft.mod.states.api.Municipality;
 import net.fexcraft.mod.states.impl.GenericDistrict;
+import net.fexcraft.mod.states.impl.GenericMunicipality;
 import net.minecraft.entity.player.EntityPlayer;
 
 public class StateUtil {
@@ -23,6 +25,18 @@ public class StateUtil {
 			return district;
 		}
 		else return States.DISTRICTS.get(-1);
+	}
+
+	public static Municipality getMunicipality(int value){
+		if(States.MUNICIPALITIES.containsKey(value)){
+			return States.MUNICIPALITIES.get(value);
+		}
+		if(Municipality.getMunicipalityFile(value).exists()){
+			Municipality municipality = new GenericMunicipality(value);
+			States.MUNICIPALITIES.put(value, municipality);
+			return municipality;
+		}
+		else return States.MUNICIPALITIES.get(-1);
 	}
 
 }

@@ -20,7 +20,7 @@ public interface Chunk {
 	public void setPrice(long new_price);
 	
 	public default File getChunkFile(){
-		return new File(States.getWorldDirectory(), "chunks/" + getChunkRegion() + "/" + this.xCoord() + "_" + this.zCoord() + ".json");
+		return new File(States.getSaveDirectory(), "chunks/" + getChunkRegion() + "/" + this.xCoord() + "_" + this.zCoord() + ".json");
 	}
 
 	public default String getChunkRegion(){
@@ -32,6 +32,8 @@ public interface Chunk {
 	public JsonObject toJsonObject();
 	
 	public District getDistrict();
+	
+	public void setDistrict(District dis);
 	
 	public long getCreated();
 	

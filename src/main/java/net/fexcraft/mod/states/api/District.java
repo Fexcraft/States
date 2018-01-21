@@ -19,7 +19,7 @@ public interface District {
 	}
 
 	public static File getDistrictFile(int value){
-		return new File(States.getWorldDirectory(), "districts/" + value + ".json");
+		return new File(States.getSaveDirectory(), "districts/" + value + ".json");
 	}
 	
 	public DistrictType getType();
@@ -37,5 +37,17 @@ public interface District {
 	public List<Integer> getNeighbors();
 	
 	public void setChanged(long new_change);
+	
+	public String getName();
+	
+	public void setName(String new_name);
+	
+	public Municipality getMunicipality();
+	
+	public void setMunicipality(Municipality mun);
+	
+	public UUID getManager();
+	
+	public void setManager(UUID uuid);
 
 }

@@ -8,8 +8,10 @@ import net.fexcraft.mod.states.States;
 import net.fexcraft.mod.states.api.District;
 import net.fexcraft.mod.states.api.DistrictType;
 import net.fexcraft.mod.states.api.Municipality;
+import net.fexcraft.mod.states.api.State;
 import net.fexcraft.mod.states.impl.GenericDistrict;
 import net.fexcraft.mod.states.impl.GenericMunicipality;
+import net.fexcraft.mod.states.impl.GenericState;
 import net.minecraftforge.event.world.WorldEvent;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
@@ -21,6 +23,34 @@ public class WorldEvents {
 	public static void onWorldLoad(WorldEvent.Load event){
 		if(event.getWorld().provider.getDimension() != 0){
 			return;
+		}
+		if(!States.STATES.containsKey(-1)){
+			if(!State.getStateFile(-1).exists()){
+				JsonObject object = new JsonObject();
+				object.addProperty("id", -1);
+				object.addProperty("created", Time.getDate());
+				object.addProperty("creator", States.CONSOLE_UUID);
+				object.addProperty("changed", Time.getDate());
+				object.addProperty("name", "Neutral Territory");
+				object.addProperty("leader", States.CONSOLE_UUID);
+				object.addProperty("capital", -1);
+				JsonUtil.write(State.getStateFile(-1), object);
+			}
+			States.STATES.put(-1, new GenericState(-1));
+		}
+		if(!States.STATES.containsKey(0)){
+			if(!State.getStateFile(0).exists()){
+				JsonObject object = new JsonObject();
+				object.addProperty("id", 0);
+				object.addProperty("created", Time.getDate());
+				object.addProperty("creator", States.CONSOLE_UUID);
+				object.addProperty("changed", Time.getDate());
+				object.addProperty("name", "Testaria");
+				object.addProperty("leader", States.CONSOLE_UUID);
+				object.addProperty("capital", 0);
+				JsonUtil.write(State.getStateFile(0), object);
+			}
+			States.STATES.put(0, new GenericState(0));
 		}
 		if(!States.MUNICIPALITIES.containsKey(-1)){
 			if(!Municipality.getMunicipalityFile(-1).exists()){

@@ -32,6 +32,10 @@ public class DebugCmd extends CommandBase {
 			Print.chat(sender, "&7/st-debug chunks");
 			Print.chat(sender, "&7/st-debug district");
 			Print.chat(sender, "&7/st-debug districts");
+			Print.chat(sender, "&7/st-debug municipality");
+			Print.chat(sender, "&7/st-debug municipalities");
+			Print.chat(sender, "&7/st-debug state");
+			Print.chat(sender, "&7/st-debug states");
 			return;
 		}
 		if(sender instanceof EntityPlayer == false){
@@ -60,8 +64,32 @@ public class DebugCmd extends CommandBase {
 				States.DISTRICTS.values().forEach((elm) -> {
 					Print.log(elm.toJsonObject().toString());
 				});
-				Print.chat(sender, "&Districts loaded: &a" + States.CHUNKS.size());
+				Print.chat(sender, "&9Districts loaded: &a" + States.DISTRICTS.size());
 				Print.chat(sender, "Districts JSON's printed into console.");
+				return;
+			}
+			case "municipality":{
+				Print.chat(sender, JsonUtil.setPrettyPrinting(chunk.getDistrict().getMunicipality().toJsonObject()));
+				return;
+			}
+			case "municipalities":{
+				States.MUNICIPALITIES.values().forEach((elm) -> {
+					Print.log(elm.toJsonObject().toString());
+				});
+				Print.chat(sender, "&9Municipalities loaded: &a" + States.MUNICIPALITIES.size());
+				Print.chat(sender, "Municipality JSON's printed into console.");
+				return;
+			}
+			case "state":{
+				Print.chat(sender, JsonUtil.setPrettyPrinting(chunk.getDistrict().getMunicipality().getState().toJsonObject()));
+				return;
+			}
+			case "states":{
+				States.STATES.values().forEach((elm) -> {
+					Print.log(elm.toJsonObject().toString());
+				});
+				Print.chat(sender, "&9States loaded: &a" + States.STATES.size());
+				Print.chat(sender, "State JSON's printed into console.");
 				return;
 			}
 		}

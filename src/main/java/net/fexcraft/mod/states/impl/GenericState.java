@@ -12,39 +12,31 @@ import net.fexcraft.mod.fsmm.util.AccountManager;
 import net.fexcraft.mod.lib.util.json.JsonUtil;
 import net.fexcraft.mod.lib.util.lang.ArrayList;
 import net.fexcraft.mod.lib.util.math.Time;
-import net.fexcraft.mod.states.States;
-import net.fexcraft.mod.states.api.Municipality;
-import net.fexcraft.mod.states.api.MunicipalityType;
 import net.fexcraft.mod.states.api.State;
-import net.fexcraft.mod.states.util.StateUtil;
 
-public class GenericMunicipality implements Municipality {
+public class GenericState implements State {
 	
-	private int id;
+	private int id, capital;
 	private String name;
 	private long created, changed;
-	private UUID creator, mayor;
+	private UUID creator, leader;
 	private Account account;
-	private ArrayList<Integer> neighbors, districts;
-	private ArrayList<UUID> citizen, council;
-	private MunicipalityType type;
-	private State state;
-	
-	public GenericMunicipality(int id){
-		this.id = id;
-		JsonObject obj = JsonUtil.get(this.getMunicipalityFile());
-		name = JsonUtil.getIfExists(obj, "name", "Unnamed Place");
+	private ArrayList<Integer> neighbors, municipalities;
+	private ArrayList<UUID> council;
+
+	public GenericState(int value){
+		id = value;
+		JsonObject obj = JsonUtil.get(this.getStateFile());
+		name = JsonUtil.getIfExists(obj, "name", "Unnamed State");
 		created = JsonUtil.getIfExists(obj, "created", Time.getDate()).longValue();
-		creator = UUID.fromString(obj.has("creator") ? obj.get("creator").getAsString() : States.CONSOLE_UUID);
 		changed = JsonUtil.getIfExists(obj, "changed", Time.getDate()).longValue();
-		account = AccountManager.INSTANCE.getAccount("municipality", id + "", true);
-		mayor = obj.has("mayor") ? UUID.fromString(obj.get("mayor").getAsString()) : null;
+		creator = obj.has("creator") ? UUID.fromString("creator") : null;
+		leader = obj.has("leader") ? UUID.fromString("leader") : null;
+		account = AccountManager.INSTANCE.getAccount("state", id + "");
+		capital = JsonUtil.getIfExists(obj, "capital", -1).intValue();
 		neighbors = JsonUtil.jsonArrayToIntegerArray(JsonUtil.getIfExists(obj, "neighbors", new JsonArray()).getAsJsonArray());
-		districts = JsonUtil.jsonArrayToIntegerArray(JsonUtil.getIfExists(obj, "districts", new JsonArray()).getAsJsonArray());
-		citizen = JsonUtil.jsonArrayToUUIDArray(JsonUtil.getIfExists(obj, "citizen", new JsonArray()).getAsJsonArray());
+		municipalities = JsonUtil.jsonArrayToIntegerArray(JsonUtil.getIfExists(obj, "municipalities", new JsonArray()).getAsJsonArray());
 		council = JsonUtil.jsonArrayToUUIDArray(JsonUtil.getIfExists(obj, "council", new JsonArray()).getAsJsonArray());
-		type = MunicipalityType.getType(this);
-		state = StateUtil.getState(JsonUtil.getIfExists(obj, "state", -1).intValue());
 	}
 
 	@Override
@@ -55,12 +47,11 @@ public class GenericMunicipality implements Municipality {
 		obj.addProperty("created", created);
 		obj.addProperty("creator", creator.toString());
 		obj.addProperty("changed", changed);
-		if(!(mayor == null)){ obj.addProperty("mayor", mayor.toString()); }
+		if(!(leader == null)){ obj.addProperty("leader", leader.toString()); }
 		obj.add("neighbors", JsonUtil.getArrayFromIntegerList(neighbors));
-		obj.add("districts", JsonUtil.getArrayFromIntegerList(districts));
-		obj.add("citizen", JsonUtil.getArrayFromUUIDList(citizen));
+		obj.add("municipalities", JsonUtil.getArrayFromIntegerList(municipalities));
+		obj.addProperty("capital", capital);
 		obj.add("council", JsonUtil.getArrayFromUUIDList(council));
-		obj.addProperty("state", state.getId());
 		return obj;
 	}
 
@@ -68,7 +59,7 @@ public class GenericMunicipality implements Municipality {
 	public void save(){
 		JsonObject obj = toJsonObject();
 		obj.addProperty("last_save", Time.getDate());
-		File file = getMunicipalityFile();
+		File file = getStateFile();
 		if(!file.getParentFile().exists()){ file.getParentFile().mkdirs(); }
 		JsonUtil.write(file, obj);
 		//
@@ -91,8 +82,8 @@ public class GenericMunicipality implements Municipality {
 	}
 
 	@Override
-	public boolean isCapital(){
-		return this.getState().getCapitalId() == this.getId();
+	public boolean isUnionCapital(){
+		return false;//TODO
 	}
 
 	@Override
@@ -101,13 +92,13 @@ public class GenericMunicipality implements Municipality {
 	}
 
 	@Override
-	public List<Integer> getNeighbors(){
-		return neighbors;
+	public List<Integer> getMunicipalities(){
+		return municipalities;
 	}
 
 	@Override
-	public List<Integer> getDistricts(){
-		return districts;
+	public List<Integer> getNeighbors(){
+		return neighbors;
 	}
 
 	@Override
@@ -126,23 +117,18 @@ public class GenericMunicipality implements Municipality {
 	}
 
 	@Override
-	public List<UUID> getCitizen(){
-		return citizen;
-	}
-
-	@Override
 	public Account getAccount(){
 		return account;
 	}
 
 	@Override
-	public UUID getMayor(){
-		return mayor;
+	public UUID getLeader(){
+		return leader;
 	}
 
 	@Override
-	public void setMayor(UUID uuid){
-		mayor = uuid;
+	public void setLeader(UUID uuid){
+		leader = uuid;
 	}
 
 	@Override
@@ -151,24 +137,13 @@ public class GenericMunicipality implements Municipality {
 	}
 
 	@Override
-	public MunicipalityType getType(){
-		return type;
+	public int getCapitalId(){
+		return capital;
+	}
+
+	@Override
+	public void setCapitalId(int id){
+		capital = id;
 	}
 	
-	/** Use this method when e.g. after updating the citizen list of a Municipality.*/
-	@Override
-	public void updateType(){
-		type = MunicipalityType.getType(this);
-	}
-
-	@Override
-	public State getState(){
-		return state;
-	}
-
-	@Override
-	public void setState(State new_state){
-		state = new_state;
-	}
-
 }

@@ -4,8 +4,10 @@ import net.fexcraft.mod.states.States;
 import net.fexcraft.mod.states.api.Chunk;
 import net.fexcraft.mod.states.api.District;
 import net.fexcraft.mod.states.api.Municipality;
+import net.fexcraft.mod.states.api.State;
 import net.fexcraft.mod.states.impl.GenericDistrict;
 import net.fexcraft.mod.states.impl.GenericMunicipality;
+import net.fexcraft.mod.states.impl.GenericState;
 import net.minecraft.entity.player.EntityPlayer;
 
 public class StateUtil {
@@ -37,6 +39,18 @@ public class StateUtil {
 			return municipality;
 		}
 		else return States.MUNICIPALITIES.get(-1);
+	}
+
+	public static State getState(int value){
+		if(States.STATES.containsKey(value)){
+			return States.STATES.get(value);
+		}
+		if(State.getStateFile(value).exists()){
+			State state = new GenericState(value);
+			States.STATES.put(value, state);
+			return state;
+		}
+		else return States.STATES.get(-1);
 	}
 
 }

@@ -9,7 +9,7 @@ import com.google.gson.JsonObject;
 import net.fexcraft.mod.fsmm.api.Account;
 import net.fexcraft.mod.states.States;
 
-public interface Municipality {
+public interface State {
 	
 	public int getId();
 	
@@ -17,23 +17,21 @@ public interface Municipality {
 	
 	public void setName(String new_name);
 	
-	public boolean isCapital();
+	public boolean isUnionCapital();
 	
-	public default File getMunicipalityFile(){
-		return getMunicipalityFile(this.getId());
+	public default File getStateFile(){
+		return getStateFile(this.getId());
 	}
 
-	public static File getMunicipalityFile(int value){
-		return new File(States.getSaveDirectory(), "municipalitites/" + value + ".json");
+	public static File getStateFile(int value){
+		return new File(States.getSaveDirectory(), "states/" + value + ".json");
 	}
 	
 	public void setChanged(long new_change);
 	
-	public List<UUID> getCitizen();
+	public List<Integer> getMunicipalities();
 	
 	public List<Integer> getNeighbors();
-	
-	public List<Integer> getDistricts();
 	
 	public long getCreated();
 	
@@ -47,18 +45,15 @@ public interface Municipality {
 	
 	public Account getAccount();
 	
-	public UUID getMayor();
+	public UUID getLeader();
 	
-	public void setMayor(UUID uuid);
+	public void setLeader(UUID uuid);
 	
+	/** */
 	public List<UUID> getCouncil();
 	
-	public MunicipalityType getType();
+	public int getCapitalId();
 	
-	public void updateType();
-	
-	public State getState();
-	
-	public void setState(State new_state);
+	public void setCapitalId(int id);
 
 }

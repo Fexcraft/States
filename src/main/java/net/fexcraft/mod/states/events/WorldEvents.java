@@ -43,10 +43,10 @@ public class WorldEvents {
 				JsonObject object = new JsonObject();
 				object.addProperty("id", 0);
 				object.addProperty("created", Time.getDate());
-				object.addProperty("creator", States.CONSOLE_UUID);
+				object.addProperty("creator", States.DEF_UUID);
 				object.addProperty("changed", Time.getDate());
 				object.addProperty("name", "Testaria");
-				object.addProperty("leader", States.CONSOLE_UUID);
+				object.addProperty("leader", States.DEF_UUID);
 				object.addProperty("capital", 0);
 				JsonUtil.write(State.getStateFile(0), object);
 			}

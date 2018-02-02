@@ -29,7 +29,7 @@ public class GuiHandler implements IGuiHandler{
 		//return new GeneralGui(ID, player, world, x, y, z);
 		switch(ID){
 			case 0:{
-				return new WelcomeGui();
+				return new WelcomeGui(player, world, x, y, z);
 			}
 		}
 		return null;

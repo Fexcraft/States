@@ -2,21 +2,35 @@ package net.fexcraft.mod.states.guis;
 
 import net.fexcraft.mod.lib.network.PacketHandler;
 import net.fexcraft.mod.lib.network.packet.PacketNBTTagCompound;
+import net.fexcraft.mod.states.util.ImageUtil;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiButton;
 import net.minecraft.client.gui.inventory.GuiContainer;
 import net.minecraft.client.renderer.GlStateManager;
+import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.ResourceLocation;
+import net.minecraft.util.math.BlockPos;
+import net.minecraft.world.World;
+import net.minecraft.world.chunk.Chunk;
 
 public class WelcomeGui extends GuiContainer {
 
 	public static final  ResourceLocation texture = new ResourceLocation("states:textures/gui/welcome.png");
 	private Button[] buttons = new Button[9];
+	private ResourceLocation[] rss = new ResourceLocation[7 * 7];
 	
-	public WelcomeGui(){
+	public WelcomeGui(EntityPlayer player, World world, int x, int y, int z){
 		super(new PlaceholderContainer());
 		xSize = 256; ySize = 200;
+		//
+		Chunk chunk = world.getChunkFromBlockCoords(new BlockPos(x, y, z));
+		int i = 0;
+		for(int j = -3; j < 4; j++){
+			for(int k = -3; k < 4; k++){
+				rss[i++] = ImageUtil.getTempChunkImage(world, chunk.x + j, chunk.z + k);
+			}
+		}
 	}
 
 	@Override
@@ -31,6 +45,12 @@ public class WelcomeGui extends GuiContainer {
 		//
 		for(Button button : buttons){
 			button.drawButton(mc, mouseX, mouseY, partialTicks);
+		}
+		for(int i = 0; i < 7; i++){
+			for(int j = 0; j < 7; j++){
+				this.mc.getTextureManager().bindTexture(rss[(i * 7) + j]);
+				this.drawTexturedModalRect(this.guiLeft + 119 + (i * 18), this.guiTop + 62 + (j * 18), 0, 0, 16, 16);
+			}
 		}
 	}
 	

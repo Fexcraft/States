@@ -2,11 +2,15 @@ package net.fexcraft.mod.states.guis;
 
 import net.fexcraft.mod.lib.network.PacketHandler;
 import net.fexcraft.mod.lib.network.packet.PacketNBTTagCompound;
+import net.fexcraft.mod.lib.util.common.Print;
 import net.fexcraft.mod.states.util.ImageUtil;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiButton;
 import net.minecraft.client.gui.inventory.GuiContainer;
+import net.minecraft.client.renderer.BufferBuilder;
 import net.minecraft.client.renderer.GlStateManager;
+import net.minecraft.client.renderer.Tessellator;
+import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.ResourceLocation;
@@ -49,7 +53,19 @@ public class WelcomeGui extends GuiContainer {
 		for(int i = 0; i < 7; i++){
 			for(int j = 0; j < 7; j++){
 				this.mc.getTextureManager().bindTexture(rss[(i * 7) + j]);
-				this.drawTexturedModalRect(this.guiLeft + 119 + (i * 18), this.guiTop + 62 + (j * 18), 0, 0, 16, 16);
+				//this.drawTexturedModalRect(this.guiLeft + 119 + (i * 18), this.guiTop + 62 + (j * 18), 0, 0, 16, 16);
+				//
+				int x = this.guiLeft + 119 + (i * 18);
+				int y = this.guiTop + 62 + (j * 18);
+				//
+		        Tessellator tessellator = Tessellator.getInstance();
+		        BufferBuilder bufferbuilder = tessellator.getBuffer();
+		        bufferbuilder.begin(7, DefaultVertexFormats.POSITION_TEX);
+		        bufferbuilder.pos((double)(x + 0), (double)(y + 16), (double)this.zLevel).tex((double)((float)(0 + 0) * 0.00390625F), (double)((float)(0 + 256) * 0.00390625F)).endVertex();
+		        bufferbuilder.pos((double)(x + 16), (double)(y + 16), (double)this.zLevel).tex((double)((float)(0 + 256) * 0.00390625F), (double)((float)(0 + 256) * 0.00390625F)).endVertex();
+		        bufferbuilder.pos((double)(x + 16), (double)(y + 0), (double)this.zLevel).tex((double)((float)(0 + 256) * 0.00390625F), (double)((float)(0 + 0) * 0.00390625F)).endVertex();
+		        bufferbuilder.pos((double)(x + 0), (double)(y + 0), (double)this.zLevel).tex((double)((float)(0 + 0) * 0.00390625F), (double)((float)(0 + 0) * 0.00390625F)).endVertex();
+		        tessellator.draw();
 			}
 		}
 	}
@@ -60,6 +76,7 @@ public class WelcomeGui extends GuiContainer {
 		buttonList.clear();
 		for(int i = 0; i < 9; i++){
 			buttonList.add(buttons[i] = new Button(i, this.guiLeft + 9, this.guiTop + 48 + (i * 16), 100, 14, " - - - - - "));
+			buttons[i].enabled = buttons[i].visible = true;
 		}
 		buttons[0].displayString = "Chunk View";
 		buttons[1].displayString = "Districts";
@@ -74,6 +91,7 @@ public class WelcomeGui extends GuiContainer {
 	
 	@Override
 	public void actionPerformed(GuiButton button){
+		Print.debug(button, button.id);
 		if(button.id >= 9){
 			return;
 		}
@@ -81,6 +99,7 @@ public class WelcomeGui extends GuiContainer {
 		compound.setString("target_listener", "states:gui");
 		compound.setInteger("from", 0);
 		compound.setInteger("button", button.id);
+		Print.debug(compound);
 		PacketHandler.getInstance().sendToServer(new PacketNBTTagCompound(compound));
 	}
 	

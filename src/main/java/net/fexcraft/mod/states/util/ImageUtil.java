@@ -7,7 +7,6 @@ import java.io.IOException;
 import javax.annotation.Nullable;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.renderer.texture.ITextureObject;
 import net.minecraft.client.renderer.texture.SimpleTexture;
 import net.minecraft.client.renderer.texture.TextureUtil;
 import net.minecraft.client.resources.IResourceManager;
@@ -20,9 +19,8 @@ public class ImageUtil {
 
 	public static ResourceLocation getTempChunkImage(World world, int i, int j){
 		ResourceLocation rs = new ResourceLocation("states:temp/geo_chunk_" + i + "_" + j);
-		ITextureObject object = Minecraft.getMinecraft().renderEngine.getTexture(rs);
-		if(object == null){
-        	Minecraft.getMinecraft().renderEngine.loadTexture(rs, object = new TempChunkTexture(world, rs, i, j));
+		if(Minecraft.getMinecraft().renderEngine.getTexture(rs) == null){
+        	Minecraft.getMinecraft().renderEngine.loadTexture(rs, new TempChunkTexture(world, rs, i, j));
 		}
 		return rs;
 	}

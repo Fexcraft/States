@@ -31,6 +31,9 @@ public class GuiHandler implements IGuiHandler{
 			case 0:{
 				return new WelcomeGui(player, world, x, y, z);
 			}
+			case 1:{
+				return new AreaView(player, world, x, y, z);
+			}
 		}
 		return null;
 	}

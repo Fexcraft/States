@@ -3,6 +3,7 @@ package net.fexcraft.mod.states.events;
 import net.fexcraft.mod.states.States;
 import net.fexcraft.mod.states.api.Chunk;
 import net.fexcraft.mod.states.impl.GenericChunk;
+import net.fexcraft.mod.states.util.ImageCache;
 import net.minecraftforge.event.world.ChunkEvent;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
@@ -33,6 +34,7 @@ public class ChunkEvents {
 				chunk.save();
 			}
 		}
+		ImageCache.update(event.getWorld(), event.getChunk(), "unload", "surface");
 	}
 
 }

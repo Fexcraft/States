@@ -78,7 +78,7 @@ public class WelcomeGui extends GuiContainer {
 			buttonList.add(buttons[i] = new Button(i, this.guiLeft + 9, this.guiTop + 48 + (i * 16), 100, 14, " - - - - - "));
 			buttons[i].enabled = buttons[i].visible = true;
 		}
-		buttons[0].displayString = "Chunk View";
+		buttons[0].displayString = "Area View";
 		buttons[1].displayString = "Districts";
 		buttons[2].displayString = "Municipalities";
 		buttons[3].displayString = "States";

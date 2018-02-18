@@ -5,6 +5,7 @@ import java.awt.image.BufferedImage;
 import java.io.IOException;
 
 import javax.annotation.Nullable;
+
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.texture.SimpleTexture;
@@ -23,6 +24,10 @@ public class ImageUtil {
         	Minecraft.getMinecraft().renderEngine.loadTexture(rs, new TempChunkTexture(world, rs, i, j));
 		}
 		return rs;
+	}
+
+	public static void load(ResourceLocation texture, BufferedImage image) {
+		Minecraft.getMinecraft().renderEngine.loadTexture(texture, new TempTexture(texture, image));
 	}
 	
 	public static class TempChunkTexture extends SimpleTexture {
@@ -84,6 +89,36 @@ public class ImageUtil {
 	    public int getGlTextureId(){
 	        //this.checkTextureUploaded();
 	        return super.getGlTextureId();
+	    }
+		
+	}
+	
+	public static class TempTexture extends SimpleTexture {
+		
+	    @Nullable
+	    private BufferedImage bufferedImage;
+
+		public TempTexture(ResourceLocation texture, BufferedImage image){
+			super(texture);
+			this.bufferedImage = image;
+		}
+		
+		@Override
+		public void loadTexture(IResourceManager resourceManager){
+	        if(this.bufferedImage != null){
+                if(this.textureLocation != null){
+                    this.deleteGlTexture();
+                }
+                TextureUtil.uploadTextureImage(super.getGlTextureId(), this.bufferedImage);
+            }
+	        return;
+	        /*StringBuilder str = new StringBuilder();
+			for(int i = 0; i < bufferedImage.getWidth(); i++){
+				for(int j = 0; j < bufferedImage.getHeight(); j++){
+					str.append(bufferedImage.getRGB(i, j) + (j == (bufferedImage.getHeight() - 1) ? "_" : ","));
+				}
+			}
+			Print.debug(str);*/
 	    }
 		
 	}

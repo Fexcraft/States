@@ -5,6 +5,7 @@ import java.util.TreeMap;
 
 import com.google.common.collect.TreeBasedTable;
 
+import net.fexcraft.mod.lib.network.PacketHandler;
 import net.fexcraft.mod.lib.network.handlers.NBTTagCompoundPacketHandler;
 import net.fexcraft.mod.lib.util.common.Static;
 import net.fexcraft.mod.states.api.Chunk;
@@ -14,6 +15,8 @@ import net.fexcraft.mod.states.api.State;
 import net.fexcraft.mod.states.guis.GuiHandler;
 import net.fexcraft.mod.states.guis.Listener;
 import net.fexcraft.mod.states.guis.Receiver;
+import net.fexcraft.mod.states.packets.ImagePacket;
+import net.fexcraft.mod.states.packets.ImagePacketHandler;
 import net.fexcraft.mod.states.util.Config;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.event.FMLInitializationEvent;
@@ -53,6 +56,9 @@ public class States {
 	public void postInit(FMLPostInitializationEvent event){
 		NBTTagCompoundPacketHandler.addListener(Side.SERVER, new Listener());
 		NBTTagCompoundPacketHandler.addListener(Side.CLIENT, new Receiver());
+		//
+		PacketHandler.getInstance().registerMessage(ImagePacketHandler.Client.class, ImagePacket.class, 29910, Side.CLIENT);
+		PacketHandler.getInstance().registerMessage(ImagePacketHandler.Server.class, ImagePacket.class, 29911, Side.SERVER);
 	}
 	
 	public static final File getWorldDirectory(){

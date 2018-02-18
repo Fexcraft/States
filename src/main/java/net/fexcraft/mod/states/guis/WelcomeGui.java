@@ -90,6 +90,14 @@ public class WelcomeGui extends GuiContainer {
 	}
 	
 	@Override
+    public void onGuiClosed(){
+        super.onGuiClosed();
+        for(ResourceLocation rs : rss){
+        	mc.getTextureManager().deleteTexture(rs);
+        }
+    }
+	
+	@Override
 	public void actionPerformed(GuiButton button){
 		Print.debug(button, button.id);
 		if(button.id >= 9){

@@ -41,7 +41,7 @@ public class MunicipalityType implements Comparable<MunicipalityType>{
 
 	@Override
 	public int compareTo(MunicipalityType o){
-		return o.requred_citizen > this.requred_citizen ? 1 : o.requred_citizen < this.requred_citizen ? -1 : 0;
+		return -(o.requred_citizen > this.requred_citizen ? 1 : o.requred_citizen < this.requred_citizen ? -1 : 0);
 	}
 	
 	public static final void clearEntries(){
@@ -58,6 +58,8 @@ public class MunicipalityType implements Comparable<MunicipalityType>{
 				break;
 			}
 		}
+		//Print.debug(TYPES);
+		//Static.stop();
 		return type;
 	}
 	
@@ -75,6 +77,11 @@ public class MunicipalityType implements Comparable<MunicipalityType>{
 	
 	public final boolean obtainableType(){
 		return obtainable;
+	}
+	
+	@Override
+	public String toString(){
+		return "[citizen:" + requred_citizen + ",districts:" + district_limit + ", title:\"" + title + "\",obtainable:" + obtainable + "]";
 	}
 	
 }

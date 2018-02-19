@@ -34,8 +34,9 @@ public class ChunkEvents {
 				chunk.save();
 			}
 		}
+		//
 		ImageCache.update(event.getWorld(), event.getChunk(), "unload", "surface");
-		ImageCache.update(event.getWorld(), event.getChunk(), "unload", "surface_states");
+		/*ImageCache.update(event.getWorld(), event.getChunk(), "unload", "surface_states");
 		ImageCache.update(event.getWorld(), event.getChunk(), "unload", "states");
 		ImageCache.update(event.getWorld(), event.getChunk(), "unload", "surface_municipalities");
 		ImageCache.update(event.getWorld(), event.getChunk(), "unload", "municipalities");
@@ -43,7 +44,7 @@ public class ChunkEvents {
 		ImageCache.update(event.getWorld(), event.getChunk(), "unload", "districts");
 		ImageCache.update(event.getWorld(), event.getChunk(), "unload", "commercial");
 		ImageCache.update(event.getWorld(), event.getChunk(), "unload", "chunk_types");
-		ImageCache.update(event.getWorld(), event.getChunk(), "unload", "biomemap");
+		ImageCache.update(event.getWorld(), event.getChunk(), "unload", "biomemap");*/
 	}
 
 }

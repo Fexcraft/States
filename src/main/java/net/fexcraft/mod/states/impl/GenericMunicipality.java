@@ -61,6 +61,7 @@ public class GenericMunicipality implements Municipality {
 		obj.add("citizen", JsonUtil.getArrayFromUUIDList(citizen));
 		obj.add("council", JsonUtil.getArrayFromUUIDList(council));
 		obj.addProperty("state", state.getId());
+		obj.addProperty("balance", account.getBalance());
 		return obj;
 	}
 

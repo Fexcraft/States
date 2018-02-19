@@ -37,7 +37,9 @@ public interface Chunk {
 	
 	public long getCreated();
 	
-	public UUID getCreator();
+	public UUID getClaimer();
+
+	public void setClaimer(UUID id);
 	
 	public long getChanged();
 	

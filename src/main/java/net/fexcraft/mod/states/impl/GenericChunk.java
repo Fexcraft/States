@@ -72,6 +72,7 @@ public class GenericChunk implements Chunk {
 		obj.addProperty("x", x);
 		obj.addProperty("z", z);
 		obj.addProperty("price", price);
+		obj.addProperty("district", district.getId());
 		obj.addProperty("created", created);
 		obj.addProperty("creator", creator.toString());
 		obj.addProperty("changed", changed);
@@ -89,8 +90,13 @@ public class GenericChunk implements Chunk {
 	}
 
 	@Override
-	public UUID getCreator(){
+	public UUID getClaimer(){
 		return creator;
+	}
+
+	@Override
+	public void setClaimer(UUID id){
+		creator = UUID.fromString(id.toString());
 	}
 
 	@Override

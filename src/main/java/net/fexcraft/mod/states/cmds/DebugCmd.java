@@ -1,5 +1,6 @@
 package net.fexcraft.mod.states.cmds;
 
+import net.fexcraft.mod.fsmm.util.Config;
 import net.fexcraft.mod.lib.api.common.fCommand;
 import net.fexcraft.mod.lib.util.common.Print;
 import net.fexcraft.mod.lib.util.json.JsonUtil;
@@ -36,6 +37,7 @@ public class DebugCmd extends CommandBase {
 			Print.chat(sender, "&7/st-debug municipalities");
 			Print.chat(sender, "&7/st-debug state");
 			Print.chat(sender, "&7/st-debug states");
+			Print.chat(sender, "&7/st-debug serveraccount");
 			return;
 		}
 		if(sender instanceof EntityPlayer == false){
@@ -90,6 +92,10 @@ public class DebugCmd extends CommandBase {
 				});
 				Print.chat(sender, "&9States loaded: &a" + States.STATES.size());
 				Print.chat(sender, "State JSON's printed into console.");
+				return;
+			}
+			case "serveraccount":{
+				Print.chat(sender, "&9Server Account Balance: " + Config.getWorthAsString(States.SERVERACCOUNT.getBalance()));
 				return;
 			}
 		}

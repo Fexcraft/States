@@ -17,6 +17,10 @@ public class StateUtil {
 		return States.CHUNKS.get(chunk.x, chunk.z);
 	}
 
+	public static Chunk getChunk(int x, int z){
+		return  States.CHUNKS.get(x, z);
+	}
+
 	public static District getDistrict(int value){
 		if(States.DISTRICTS.containsKey(value)){
 			return States.DISTRICTS.get(value);

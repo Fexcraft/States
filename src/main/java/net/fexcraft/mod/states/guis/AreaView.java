@@ -5,6 +5,9 @@ import net.fexcraft.mod.lib.network.packet.PacketNBTTagCompound;
 import net.fexcraft.mod.lib.util.common.Print;
 import net.minecraft.client.gui.GuiButton;
 import net.minecraft.client.gui.inventory.GuiContainer;
+import net.minecraft.client.renderer.BufferBuilder;
+import net.minecraft.client.renderer.Tessellator;
+import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.ResourceLocation;
@@ -41,7 +44,15 @@ public class AreaView extends GuiContainer {
 		this.mc.getTextureManager().bindTexture(map_texture);
 		int x = this.guiLeft + 11;
 		int y = this.guiTop + 11;
-		this.drawTexturedModalRect(x, y, 0, 0, 128, 128);
+		//this.drawTexturedModalRect(x, y, 0, 0, 128, 128);
+        Tessellator tessellator = Tessellator.getInstance();
+        BufferBuilder bufferbuilder = tessellator.getBuffer();
+        bufferbuilder.begin(7, DefaultVertexFormats.POSITION_TEX);
+        bufferbuilder.pos((double)(x +   0), (double)(y + 128), (double)this.zLevel).tex((double)((float)(0 +   0) * 0.00390625F), (double)((float)(0 + 256) * 0.00390625F)).endVertex();
+        bufferbuilder.pos((double)(x + 128), (double)(y + 128), (double)this.zLevel).tex((double)((float)(0 + 256) * 0.00390625F), (double)((float)(0 + 256) * 0.00390625F)).endVertex();
+        bufferbuilder.pos((double)(x + 128), (double)(y +   0), (double)this.zLevel).tex((double)((float)(0 + 256) * 0.00390625F), (double)((float)(0 +   0) * 0.00390625F)).endVertex();
+        bufferbuilder.pos((double)(x +   0), (double)(y +   0), (double)this.zLevel).tex((double)((float)(0 +   0) * 0.00390625F), (double)((float)(0 +   0) * 0.00390625F)).endVertex();
+        tessellator.draw();
 	}
 	
 	@Override

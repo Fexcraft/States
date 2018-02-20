@@ -64,7 +64,7 @@ public class DebugCmd extends CommandBase {
 			}
 			case "districts":{
 				States.DISTRICTS.values().forEach((elm) -> {
-					Print.log(elm.toJsonObject().toString());
+					Print.log(JsonUtil.setPrettyPrinting(elm.toJsonObject()));
 				});
 				Print.chat(sender, "&9Districts loaded: &a" + States.DISTRICTS.size());
 				Print.chat(sender, "Districts JSON's printed into console.");
@@ -76,7 +76,7 @@ public class DebugCmd extends CommandBase {
 			}
 			case "municipalities":{
 				States.MUNICIPALITIES.values().forEach((elm) -> {
-					Print.log(elm.toJsonObject().toString());
+					Print.log(JsonUtil.setPrettyPrinting(elm.toJsonObject()));
 				});
 				Print.chat(sender, "&9Municipalities loaded: &a" + States.MUNICIPALITIES.size());
 				Print.chat(sender, "Municipality JSON's printed into console.");
@@ -88,7 +88,7 @@ public class DebugCmd extends CommandBase {
 			}
 			case "states":{
 				States.STATES.values().forEach((elm) -> {
-					Print.log(elm.toJsonObject().toString());
+					Print.log(JsonUtil.setPrettyPrinting(elm.toJsonObject()));
 				});
 				Print.chat(sender, "&9States loaded: &a" + States.STATES.size());
 				Print.chat(sender, "State JSON's printed into console.");

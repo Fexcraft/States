@@ -25,7 +25,7 @@ public class AreaView extends GuiContainer {
 	public AreaView(EntityPlayer player, World world, int x, int y, int z){
 		super(new PlaceholderContainer());
 		xSize = 150; ySize = 200;
-		view_mode = "surface";
+		view_mode = "surface_states";
 		//
 		Chunk chunk = world.getChunkFromBlockCoords(new BlockPos(x, y, z));
 		requestRegion(this.x = chunk.x, this.z = chunk.z);

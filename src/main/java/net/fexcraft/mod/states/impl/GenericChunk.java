@@ -7,6 +7,7 @@ import java.util.UUID;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 
+import net.fexcraft.mod.lib.util.common.Static;
 import net.fexcraft.mod.lib.util.json.JsonUtil;
 import net.fexcraft.mod.lib.util.lang.ArrayList;
 import net.fexcraft.mod.lib.util.math.Time;
@@ -14,8 +15,10 @@ import net.fexcraft.mod.states.States;
 import net.fexcraft.mod.states.api.Chunk;
 import net.fexcraft.mod.states.api.District;
 import net.fexcraft.mod.states.util.Config;
+import net.fexcraft.mod.states.util.ImageCache;
 import net.fexcraft.mod.states.util.StateUtil;
 import net.minecraft.util.ResourceLocation;
+import net.minecraft.world.World;
 
 public class GenericChunk implements Chunk {
 
@@ -26,7 +29,7 @@ public class GenericChunk implements Chunk {
 	private UUID creator;
 	private ArrayList<ResourceLocation> linked;
 	
-	public GenericChunk(int x, int z){
+	public GenericChunk(int x, int z, boolean create){
 		this.x = x; this.z = z;
 		JsonObject obj = JsonUtil.get(getChunkFile());
 		price = JsonUtil.getIfExists(obj, "price", Config.DEFAULT_CHUNK_PRICE).longValue();
@@ -35,6 +38,17 @@ public class GenericChunk implements Chunk {
 		creator = UUID.fromString(obj.has("creator") ? obj.get("creator").getAsString() : States.CONSOLE_UUID);
 		changed = JsonUtil.getIfExists(obj, "changed", Time.getDate()).longValue();
 		linked = JsonUtil.jsonArrayToResourceLocationArray(JsonUtil.getIfExists(obj, "linked", new JsonArray()).getAsJsonArray());
+		if(!getChunkFile().exists()){
+			save();
+			if(create){
+				World world = Static.getServer().getWorld(0);
+				ImageCache.update(world, world.getChunkFromChunkCoords(x, z), "create", "all");
+			}
+		}
+	}
+
+	public GenericChunk(int x2, int z2){
+		this(x2, z2, true);
 	}
 
 	@Override

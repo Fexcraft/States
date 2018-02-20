@@ -1,5 +1,8 @@
 package net.fexcraft.mod.states.events;
 
+import java.io.File;
+
+import net.fexcraft.mod.lib.util.json.JsonUtil;
 import net.fexcraft.mod.states.States;
 import net.fexcraft.mod.states.api.Chunk;
 import net.fexcraft.mod.states.impl.GenericChunk;
@@ -31,20 +34,14 @@ public class ChunkEvents {
 		if(States.CHUNKS.contains(x, z)){
 			Chunk chunk = States.CHUNKS.remove(x, z);
 			if(!(chunk == null)){
+				File file = chunk.getChunkFile();
+				boolean matches = file.exists() && JsonUtil.get(file).get("changed").getAsLong() == chunk.getChanged();
 				chunk.save();
+				if(!matches){
+					ImageCache.update(event.getWorld(), event.getChunk(), "unload", "all");
+				}
 			}
 		}
-		//
-		ImageCache.update(event.getWorld(), event.getChunk(), "unload", "surface");
-		/*ImageCache.update(event.getWorld(), event.getChunk(), "unload", "surface_states");
-		ImageCache.update(event.getWorld(), event.getChunk(), "unload", "states");
-		ImageCache.update(event.getWorld(), event.getChunk(), "unload", "surface_municipalities");
-		ImageCache.update(event.getWorld(), event.getChunk(), "unload", "municipalities");
-		ImageCache.update(event.getWorld(), event.getChunk(), "unload", "surface_districts");
-		ImageCache.update(event.getWorld(), event.getChunk(), "unload", "districts");
-		ImageCache.update(event.getWorld(), event.getChunk(), "unload", "commercial");
-		ImageCache.update(event.getWorld(), event.getChunk(), "unload", "chunk_types");
-		ImageCache.update(event.getWorld(), event.getChunk(), "unload", "biomemap");*/
 	}
 
 }

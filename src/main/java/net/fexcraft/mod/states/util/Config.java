@@ -15,6 +15,7 @@ public class Config {
 	
 	public static File CONFIG_PATH;
 	public static long DEFAULT_CHUNK_PRICE;
+	public static int MAP_UPDATES_PER_TICK;
 	//
 	public static final String DEFAULT_CAT = "Default Settings";
 	//
@@ -48,6 +49,7 @@ public class Config {
 			MunicipalityType.clearEntries();
 			for(String str : arr){ new MunicipalityType(JsonUtil.getFromString(str).getAsJsonObject()); }
 		}
+		MAP_UPDATES_PER_TICK = config.getInt("map_updates_per_tick", DEFAULT_CAT, 1, 0, 128, "Max amount of Map updates per Server Tick.");
 	}
 	
 }

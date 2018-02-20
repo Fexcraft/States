@@ -66,8 +66,8 @@ public class States {
 		PacketHandler.getInstance().registerMessage(ImagePacketHandler.Client.class, ImagePacket.class, 29910, Side.CLIENT);
 		PacketHandler.getInstance().registerMessage(ImagePacketHandler.Server.class, ImagePacket.class, 29911, Side.SERVER);
 		//
-		PermManager.add(ADMIN_PERM, PermissionNode.Type.BOOLEAN, false, true);
 		PermManager.setEnabled(MODID);
+		PermManager.add(ADMIN_PERM, PermissionNode.Type.BOOLEAN, false, true);
 		//
 		SERVERACCOUNT = AccountManager.INSTANCE.getAccount("server", "states", true);
 	}

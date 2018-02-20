@@ -3,12 +3,14 @@ package net.fexcraft.mod.states.cmds;
 import net.fexcraft.mod.fsmm.util.AccountManager;
 import net.fexcraft.mod.fsmm.util.Config;
 import net.fexcraft.mod.lib.api.common.fCommand;
+import net.fexcraft.mod.lib.perms.PermManager;
 import net.fexcraft.mod.lib.util.common.Print;
 import net.fexcraft.mod.lib.util.common.Static;
 import net.fexcraft.mod.lib.util.math.Time;
 import net.fexcraft.mod.states.States;
 import net.fexcraft.mod.states.api.Chunk;
 import net.fexcraft.mod.states.api.District;
+import net.fexcraft.mod.states.util.ImageCache;
 import net.fexcraft.mod.states.util.StateUtil;
 import net.minecraft.command.CommandBase;
 import net.minecraft.command.CommandException;
@@ -41,6 +43,7 @@ public class ChunkCmd extends CommandBase {
 			Print.chat(sender, "&7/ck set <args>");
 			Print.chat(sender, "&7/ck link <args>");
 			Print.chat(sender, "&7/ck whitelist <args>");
+			Print.chat(sender, "&7/ck update <option:range> [admin-only]");
 			return;
 		}
 		if(sender instanceof EntityPlayer == false){
@@ -62,7 +65,7 @@ public class ChunkCmd extends CommandBase {
 					Print.chat(sender, "&7District not found. (" + disid + ");");
 					return;
 				}
-				boolean can = true;//(district.getManager() != null && district.getManager().equals(player.getGameProfile().getId())) || district.getMunicipality().getMayor().equals(player.getGameProfile().getId()) || PermManager.getPlayerPerms(player).hasPermission(States.ADMIN_PERM);
+				boolean can = true;//(district.getManager() != null && district.getManager().equals(player.getGameProfile().getId())) || (district.getMunicipality().getMayor() != null && district.getMunicipality().getMayor().equals(player.getGameProfile().getId())) || PermManager.getPlayerPerms(player).hasPermission(States.ADMIN_PERM);
 				if(can){
 					if(range > 3){
 						Print.chat(sender, "Invalid range, setting to \"3\"!");
@@ -75,12 +78,15 @@ public class ChunkCmd extends CommandBase {
 							return;
 						}
 						if(chunk.getDistrict().getId() < 0){
-							AccountManager.INSTANCE.getBank(district.getMunicipality().getAccount().getBankId()).processTransfer(sender, district.getMunicipality().getAccount(), chunk.getPrice(), States.SERVERACCOUNT);
+							if(chunk.getPrice() > 0 && !AccountManager.INSTANCE.getBank(district.getMunicipality().getAccount().getBankId()).processTransfer(sender, district.getMunicipality().getAccount(), chunk.getPrice(), States.SERVERACCOUNT)){
+								return;
+							}
 							chunk.setDistrict(district);
 							chunk.setClaimer(player.getGameProfile().getId());
 							chunk.setChanged(Time.getDate());
 							chunk.setPrice(0);
 							chunk.save();
+							ImageCache.update(player.world, player.world.getChunkFromChunkCoords(chunk.xCoord(), chunk.zCoord()), "claim", "all");
 							Print.chat(sender, "&7Chunk Claimed. (" + district.getId() + ");");
 						}
 						else{
@@ -110,18 +116,22 @@ public class ChunkCmd extends CommandBase {
 									str += "&b#";
 									continue;
 								}
-								AccountManager.INSTANCE.getBank(district.getMunicipality().getAccount().getBankId()).processTransfer(sender, district.getMunicipality().getAccount(), chunk.getPrice(), States.SERVERACCOUNT);
+								if(chunk.getPrice() > 0 && !AccountManager.INSTANCE.getBank(district.getMunicipality().getAccount().getBankId()).processTransfer(sender, district.getMunicipality().getAccount(), chunk.getPrice(), States.SERVERACCOUNT)){
+									str += "&3#";
+									continue;
+								}
 								ck.setDistrict(district);
 								ck.setClaimer(player.getGameProfile().getId());
 								ck.setChanged(Time.getDate());
 								ck.setPrice(0);
 								ck.save();
+								ImageCache.update(player.world, player.world.getChunkFromChunkCoords(ck.xCoord(), ck.zCoord()), "claim", "all");
 								//Print.chat(sender, "&7Chunk at " + x + "x, " + z + "z &2claimed&7!");
 								str += "&2#";
 							}
 							Print.chat(sender, str + "&0]");
 						}
-						Print.chat(sender, "&4#&7 - chunk data returned null.");
+						Print.chat(sender, "&4#&7 - chunk data returned null &8| &3#&7 transfer error");
 						Print.chat(sender, "&c#&7 - chunk already claimed &8| &b#&7 - no money &8| &2#&7 - chunk claimed.");
 					}
 				}
@@ -167,6 +177,34 @@ public class ChunkCmd extends CommandBase {
 					}
 				}
 				Print.chat(sender, "&2Claimed by &7" + Static.getPlayerNameByUUID(chunk.getClaimer()) + "&2 at &8" + Time.getAsString(chunk.getCreated()));
+				return;
+			}
+			case "update":{
+				//TODO reverse;
+				if(!PermManager.getPlayerPerms(player).hasPermission(States.ADMIN_PERM)){
+					int range = args.length > 1 ? Integer.parseInt(args[1]) : 0;
+					if(range <= 0){
+						ImageCache.update(player.world, player.world.getChunkFromChunkCoords(chunk.xCoord(), chunk.zCoord()), "update", "all");
+						Print.chat(sender, "&9Queued for map update.");
+					}
+					else{
+						int r = (range * 2) + 1;
+						int c = 0;
+						for(int i = 0; i < r; i++){
+							for(int j = 0; j < r; j++){
+								int x = (chunk.xCoord() - range) + i;
+								int z = (chunk.zCoord() - range) + j;
+								Chunk ck = StateUtil.getChunk(x, z);
+								if(ck == null){
+									continue;
+								}
+								c++;
+								ImageCache.update(player.world, player.world.getChunkFromChunkCoords(x, z), "update", "all");
+							}
+						}
+						Print.chat(sender, "&2" + c + " &9chunks queued for map update.");
+					}
+				}
 				return;
 			}
 			default:{

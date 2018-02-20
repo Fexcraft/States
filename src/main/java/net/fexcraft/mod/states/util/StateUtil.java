@@ -5,6 +5,7 @@ import net.fexcraft.mod.states.api.Chunk;
 import net.fexcraft.mod.states.api.District;
 import net.fexcraft.mod.states.api.Municipality;
 import net.fexcraft.mod.states.api.State;
+import net.fexcraft.mod.states.impl.GenericChunk;
 import net.fexcraft.mod.states.impl.GenericDistrict;
 import net.fexcraft.mod.states.impl.GenericMunicipality;
 import net.fexcraft.mod.states.impl.GenericState;
@@ -55,6 +56,11 @@ public class StateUtil {
 			return state;
 		}
 		else return States.STATES.get(-1);
+	}
+
+	public static Chunk getTempChunk(int x, int z){
+		Chunk chunk = getChunk(x, z);
+		return chunk == null ? new GenericChunk(x, z, false) : chunk;
 	}
 
 }

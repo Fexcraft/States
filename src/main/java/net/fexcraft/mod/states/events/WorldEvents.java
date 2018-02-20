@@ -12,6 +12,7 @@ import net.fexcraft.mod.states.api.State;
 import net.fexcraft.mod.states.impl.GenericDistrict;
 import net.fexcraft.mod.states.impl.GenericMunicipality;
 import net.fexcraft.mod.states.impl.GenericState;
+import net.fexcraft.mod.states.util.ImageCache;
 import net.minecraftforge.event.world.WorldEvent;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
@@ -21,7 +22,7 @@ public class WorldEvents {
 	
 	@SubscribeEvent
 	public static void onWorldLoad(WorldEvent.Load event){
-		if(event.getWorld().provider.getDimension() != 0){
+		if(event.getWorld().provider.getDimension() != 0 || event.getWorld().isRemote){
 			return;
 		}
 		if(!States.STATES.containsKey(-1)){
@@ -107,15 +108,18 @@ public class WorldEvents {
 			}
 			States.DISTRICTS.put(0, new GenericDistrict(0));
 		}
+		ImageCache.loadQueue();
 	}
 	
 	@SubscribeEvent
 	public static void onWorldUnload(WorldEvent.Unload event){
-		if(event.getWorld().provider.getDimension() != 0){
+		if(event.getWorld().provider.getDimension() != 0 || event.getWorld().isRemote){
 			return;
 		}
 		States.DISTRICTS.values().forEach(elm -> { elm.save(); });
 		States.MUNICIPALITIES.values().forEach(elm -> { elm.save(); });
+		States.STATES.values().forEach(elm -> { elm.save(); });
+		ImageCache.saveQueue();
 	}
 	
 }

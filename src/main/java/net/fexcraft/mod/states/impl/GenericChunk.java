@@ -38,12 +38,10 @@ public class GenericChunk implements Chunk {
 		creator = UUID.fromString(obj.has("creator") ? obj.get("creator").getAsString() : States.CONSOLE_UUID);
 		changed = JsonUtil.getIfExists(obj, "changed", Time.getDate()).longValue();
 		linked = JsonUtil.jsonArrayToResourceLocationArray(JsonUtil.getIfExists(obj, "linked", new JsonArray()).getAsJsonArray());
-		if(!getChunkFile().exists()){
+		if(!getChunkFile().exists() && create){
 			save();
-			if(create){
-				World world = Static.getServer().getWorld(0);
-				ImageCache.update(world, world.getChunkFromChunkCoords(x, z), "create", "all");
-			}
+			World world = Static.getServer().getWorld(0);
+			ImageCache.update(world, world.getChunkFromChunkCoords(x, z), "create", "all");
 		}
 	}
 

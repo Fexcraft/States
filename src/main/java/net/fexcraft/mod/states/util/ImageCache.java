@@ -30,7 +30,8 @@ import net.minecraftforge.fml.common.gameevent.TickEvent.Phase;
 public class ImageCache {
 	
 	private static final int IMGSIZE = 512;
-	public static final String[] TYPES = new String[]{"surface", "surface_states", "states", "surface_municipalities", "municipalities", "surface_districts", "districts", "commercial", "chunk_types", "biomemap"};
+	public static final String[] TYPES = new String[]{"surface", "surface_states"};//, "states", "surface_municipalities", "municipalities", "surface_districts", "districts", "commercial", "chunk_types", "biomemap"};
+	
 	private static final Queue<Object[]> QUEUE = new LinkedList<>();
 	
 	@Mod.EventBusSubscriber
@@ -79,6 +80,20 @@ public class ImageCache {
 		}
 		net.fexcraft.mod.states.api.Chunk st_chunk = StateUtil.getChunk(chunk.x, chunk.z);
 		if(type.contains("surface") && !type.equals("surface")){
+			String color = "#ffffff";
+			switch(type){
+				case "surface_states": color = st_chunk.getDistrict().getMunicipality().getState().getColor(); break;
+				case "surface_municipalities": st_chunk.getDistrict().getMunicipality().getColor(); break;
+				case "surface_districts": st_chunk.getDistrict().getColor(); break;
+			}
+			for(int k = 0; k < 16; k++){
+				for(int l = 0; l < 16; l++){
+					Color cor = Color.decode(color);
+					Color col = new Color(img.getRGB(x + k, z + l));
+					Color clr = new Color((cor.getRed() + col.getRed()) / 2, (cor.getGreen() + col.getGreen()) / 2, (cor.getBlue() + col.getBlue()) / 2);
+					img.setRGB(x + k, z + l, clr.getRGB());
+				}
+			}
 			for(int i = -1; i < 2; i++){
 				for(int j = -1; j < 2; j++){
 					if(i == 0 && j == 0){
@@ -103,11 +118,14 @@ public class ImageCache {
 					}
 					if(yes){
 						//paintBorder(img, i == 0 ? j == -1 ? "left" : "right" : i == 1 ? "down" : "up", Integer.toHexString(Color.BLUE.getRGB()).substring(2), x, z);
-						paintBorder(img, sideCorner(i, j), Integer.toHexString(Color.CYAN.getRGB()).substring(2), x, z);
+						paintBorder(img, sideCorner(i, j), color, x, z);
 					}
 					else continue;
 				}
 			}
+		}
+		else if(type.equals("states") || type.equals("municipalities") || type.equals("districts")){
+			//TODO
 		}
 		saveImage(img, chunk.x, chunk.z, type);
 		return;
@@ -148,6 +166,7 @@ public class ImageCache {
 			color_hex = "#" + color_hex;
 		}
 		Color color = Color.decode(color_hex);
+		//
 		int i, j, k, l;
 		switch(side){
 			case "left" :{ i = 0; j = 16; k = 0; l = 4; break; }
@@ -184,7 +203,7 @@ public class ImageCache {
 			try{
 				return ImageIO.read(file);
 			}
-			catch(IOException e){
+			catch(Exception e){
 				Print.debug(file.toPath().toString());
 				e.printStackTrace();
 				return new BufferedImage(IMGSIZE, IMGSIZE, BufferedImage.TYPE_INT_ARGB);
@@ -241,6 +260,10 @@ public class ImageCache {
 			});
 		}
 		
+	}
+
+	public static Queue<Object[]> getQueue(){
+		return QUEUE;
 	}
 	
 }

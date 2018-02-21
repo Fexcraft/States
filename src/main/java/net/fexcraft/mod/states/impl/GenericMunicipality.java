@@ -21,7 +21,7 @@ import net.fexcraft.mod.states.util.StateUtil;
 public class GenericMunicipality implements Municipality {
 	
 	private int id;
-	private String name;
+	private String name, color;
 	private long created, changed;
 	private UUID creator, mayor;
 	private Account account;
@@ -45,6 +45,7 @@ public class GenericMunicipality implements Municipality {
 		council = JsonUtil.jsonArrayToUUIDArray(JsonUtil.getIfExists(obj, "council", new JsonArray()).getAsJsonArray());
 		type = MunicipalityType.getType(this);
 		state = StateUtil.getState(JsonUtil.getIfExists(obj, "state", -1).intValue());
+		color = JsonUtil.getIfExists(obj, "color", "#ffffff");
 	}
 
 	@Override
@@ -62,6 +63,7 @@ public class GenericMunicipality implements Municipality {
 		obj.add("council", JsonUtil.getArrayFromUUIDList(council));
 		obj.addProperty("state", state.getId());
 		obj.addProperty("balance", account.getBalance());
+		obj.addProperty("color", color);
 		return obj;
 	}
 
@@ -170,6 +172,16 @@ public class GenericMunicipality implements Municipality {
 	@Override
 	public void setState(State new_state){
 		state = new_state;
+	}
+	
+	@Override
+	public String getColor(){
+		return color;
+	}
+
+	@Override
+	public void setColor(String newcolor){
+		color = newcolor;
 	}
 
 }

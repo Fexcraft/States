@@ -35,6 +35,7 @@ public class WorldEvents {
 				object.addProperty("name", "Neutral Territory");
 				object.addProperty("leader", States.CONSOLE_UUID);
 				object.addProperty("capital", -1);
+				object.addProperty("color", "#003500");
 				JsonUtil.write(State.getStateFile(-1), object);
 			}
 			States.STATES.put(-1, new GenericState(-1));
@@ -49,6 +50,7 @@ public class WorldEvents {
 				object.addProperty("name", "Testaria");
 				object.addProperty("leader", States.DEF_UUID);
 				object.addProperty("capital", 0);
+				object.addProperty("color", "#FF6600");
 				JsonUtil.write(State.getStateFile(0), object);
 			}
 			States.STATES.put(0, new GenericState(0));
@@ -62,6 +64,7 @@ public class WorldEvents {
 				object.addProperty("changed", Time.getDate());
 				object.addProperty("name", "Wilderness");
 				object.addProperty("state", -1);
+				object.addProperty("color", "#003500");
 				JsonUtil.write(Municipality.getMunicipalityFile(-1), object);
 			}
 			States.MUNICIPALITIES.put(-1, new GenericMunicipality(-1));
@@ -76,6 +79,7 @@ public class WorldEvents {
 				object.addProperty("mayor", States.DEF_UUID);
 				object.addProperty("name", "Spawn");
 				object.addProperty("state", 0);
+				object.addProperty("color", "#FF6600");
 				JsonUtil.write(Municipality.getMunicipalityFile(0), object);
 			}
 			States.MUNICIPALITIES.put(0, new GenericMunicipality(0));
@@ -90,6 +94,7 @@ public class WorldEvents {
 				object.addProperty("changed", Time.getDate());
 				object.addProperty("name", "Wilderness");
 				object.addProperty("municipality", -1);
+				object.addProperty("color", "#003500");
 				JsonUtil.write(District.getDistrictFile(-1), object);
 			}
 			States.DISTRICTS.put(-1, new GenericDistrict(-1));
@@ -104,6 +109,7 @@ public class WorldEvents {
 				object.addProperty("changed", Time.getDate());
 				object.addProperty("name", "Safezone");
 				object.addProperty("municipality", 0);
+				object.addProperty("color", "#FF6600");
 				JsonUtil.write(District.getDistrictFile(0), object);
 			}
 			States.DISTRICTS.put(0, new GenericDistrict(0));

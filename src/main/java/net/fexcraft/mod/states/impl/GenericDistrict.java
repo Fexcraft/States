@@ -23,7 +23,7 @@ public class GenericDistrict implements District {
 	private long created, changed;
 	private UUID creator, manager;
 	private ArrayList<Integer> neighbors;
-	private String name;
+	private String name, color;
 	private Municipality municipality;
 	
 	public GenericDistrict(int id){
@@ -37,6 +37,7 @@ public class GenericDistrict implements District {
 		name = JsonUtil.getIfExists(obj, "name", "Unnamed District");
 		municipality = StateUtil.getMunicipality(JsonUtil.getIfExists(obj, "municipality", -1).intValue());
 		manager = obj.has("manager") ? UUID.fromString(obj.get("manager").getAsString()) : null;
+		color = JsonUtil.getIfExists(obj, "color", "#ffffff");
 	}
 
 	@Override
@@ -51,6 +52,7 @@ public class GenericDistrict implements District {
 		obj.addProperty("municipality", municipality == null ? -1 : municipality.getId());
 		obj.add("neighbors", JsonUtil.getArrayFromIntegerList(neighbors));
 		if(!(manager == null)){ obj.addProperty("manager", manager.toString()); }
+		obj.addProperty("color", color);
 		return obj;
 	}
 
@@ -136,6 +138,16 @@ public class GenericDistrict implements District {
 	@Override
 	public void setType(DistrictType new_type){
 		type = new_type;
+	}
+
+	@Override
+	public String getColor(){
+		return color;
+	}
+
+	@Override
+	public void setColor(String newcolor){
+		color = newcolor;
 	}
 
 }

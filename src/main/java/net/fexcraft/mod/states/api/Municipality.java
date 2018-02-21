@@ -9,7 +9,7 @@ import com.google.gson.JsonObject;
 import net.fexcraft.mod.fsmm.api.Account;
 import net.fexcraft.mod.states.States;
 
-public interface Municipality {
+public interface Municipality extends ColorHolder {
 	
 	public int getId();
 	

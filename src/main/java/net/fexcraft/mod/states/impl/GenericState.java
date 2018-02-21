@@ -17,7 +17,7 @@ import net.fexcraft.mod.states.api.State;
 public class GenericState implements State {
 	
 	private int id, capital;
-	private String name;
+	private String name, color;
 	private long created, changed;
 	private UUID creator, leader;
 	private Account account;
@@ -32,11 +32,12 @@ public class GenericState implements State {
 		changed = JsonUtil.getIfExists(obj, "changed", Time.getDate()).longValue();
 		creator = obj.has("creator") ? UUID.fromString(obj.get("creator").getAsString()) : null;
 		leader = obj.has("leader") ? UUID.fromString(obj.get("leader").getAsString()) : null;
-		account = AccountManager.INSTANCE.getAccount("state", id + "");
+		account = AccountManager.INSTANCE.getAccount("state", id + "", true);
 		capital = JsonUtil.getIfExists(obj, "capital", -1).intValue();
 		neighbors = JsonUtil.jsonArrayToIntegerArray(JsonUtil.getIfExists(obj, "neighbors", new JsonArray()).getAsJsonArray());
 		municipalities = JsonUtil.jsonArrayToIntegerArray(JsonUtil.getIfExists(obj, "municipalities", new JsonArray()).getAsJsonArray());
 		council = JsonUtil.jsonArrayToUUIDArray(JsonUtil.getIfExists(obj, "council", new JsonArray()).getAsJsonArray());
+		color = JsonUtil.getIfExists(obj, "color", "#ffffff");
 	}
 
 	@Override
@@ -52,6 +53,8 @@ public class GenericState implements State {
 		obj.add("municipalities", JsonUtil.getArrayFromIntegerList(municipalities));
 		obj.addProperty("capital", capital);
 		obj.add("council", JsonUtil.getArrayFromUUIDList(council));
+		obj.addProperty("balance", account.getBalance());
+		obj.addProperty("color", color);
 		return obj;
 	}
 
@@ -144,6 +147,16 @@ public class GenericState implements State {
 	@Override
 	public void setCapitalId(int id){
 		capital = id;
+	}
+
+	@Override
+	public String getColor(){
+		return color;
+	}
+
+	@Override
+	public void setColor(String newcolor){
+		color = newcolor;
 	}
 	
 }

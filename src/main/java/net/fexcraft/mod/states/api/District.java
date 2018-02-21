@@ -8,7 +8,7 @@ import com.google.gson.JsonObject;
 
 import net.fexcraft.mod.states.States;
 
-public interface District {
+public interface District extends ColorHolder {
 	
 	public int getId();
 	
@@ -51,5 +51,5 @@ public interface District {
 	public UUID getManager();
 	
 	public void setManager(UUID uuid);
-
+	
 }

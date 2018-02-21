@@ -44,6 +44,7 @@ public class ChunkCmd extends CommandBase {
 			Print.chat(sender, "&7/ck link <args>");
 			Print.chat(sender, "&7/ck whitelist <args>");
 			Print.chat(sender, "&7/ck update <option:range> [admin-only]");
+			Print.chat(sender, "&7/ck queue");
 			return;
 		}
 		if(sender instanceof EntityPlayer == false){
@@ -203,8 +204,14 @@ public class ChunkCmd extends CommandBase {
 							}
 						}
 						Print.chat(sender, "&2" + c + " &9chunks queued for map update.");
+						Print.chat(sender, "&9There are &2" + ImageCache.TYPES.length + " &9map modes activated.");
 					}
 				}
+				return;
+			}
+			case "queue":{
+				Print.chat(sender, "&9There are &2" + ImageCache.getQueue().size() + "&9 chunk map updates queued.");
+				Print.chat(sender, "&9Current Config allows for &3" + net.fexcraft.mod.states.util.Config.MAP_UPDATES_PER_TICK + "&9 map updates per server tick.");
 				return;
 			}
 			default:{

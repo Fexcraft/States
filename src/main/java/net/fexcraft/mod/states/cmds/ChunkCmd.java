@@ -258,6 +258,29 @@ public class ChunkCmd extends CommandBase {
 				}
 				return;
 			}
+			case "buy":{
+				
+				return;
+			}
+			case "set_for_sale":
+			case "set-for-sale":
+			case "setforsale":
+			case "sfs":{
+				
+				return;
+			}
+			case "set":{
+				
+				return;
+			}
+			case "link":{
+				
+				return;
+			}
+			case "whitelist":{
+				
+				return;
+			}
 			default:{
 				Print.chat(sender, "//TODO");
 				return;

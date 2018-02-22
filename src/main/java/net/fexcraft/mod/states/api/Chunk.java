@@ -46,5 +46,9 @@ public interface Chunk {
 	public void setChanged(long new_change);
 	
 	public List<ResourceLocation> getLinkedChunks();
+	
+	public ChunkType getType();
+	
+	public void setType(ChunkType type);
 
 }

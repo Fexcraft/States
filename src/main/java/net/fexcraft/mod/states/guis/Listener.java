@@ -32,14 +32,7 @@ public class Listener implements IPacketListener<PacketNBTTagCompound> {
 				return;
 			}
 			case 1:{
-				/*BufferedImage image = new BufferedImage(16, 16, BufferedImage.TYPE_INT_ARGB);
-				for(int i = 0; i < 16; i++){
-					for(int j = 0; j < 16; j++){
-						boolean k = i % 2 == 0 && j % 2 == 0 ? true : false;
-						image.setRGB(i, j, k ? new Color(MapColor.BLACK.colorValue).getRGB() : new Color(MapColor.SNOW.colorValue).getRGB());
-					}
-				}*/
-				BufferedImage image = ImageCache.getImage(packet.nbt.getInteger("chunk_x"), packet.nbt.getInteger("chunk_z"), packet.nbt.getString("view"));
+				BufferedImage image = ImageCache.getImage(packet.nbt.getInteger("chunk_x"), packet.nbt.getInteger("chunk_z"), packet.nbt.getString("view"), true);
 				PacketHandler.getInstance().sendTo(new ImagePacket("area_view", image), player);
 			}
 			default: return;

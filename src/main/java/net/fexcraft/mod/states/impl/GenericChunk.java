@@ -13,6 +13,7 @@ import net.fexcraft.mod.lib.util.lang.ArrayList;
 import net.fexcraft.mod.lib.util.math.Time;
 import net.fexcraft.mod.states.States;
 import net.fexcraft.mod.states.api.Chunk;
+import net.fexcraft.mod.states.api.ChunkType;
 import net.fexcraft.mod.states.api.District;
 import net.fexcraft.mod.states.util.Config;
 import net.fexcraft.mod.states.util.ImageCache;
@@ -28,6 +29,7 @@ public class GenericChunk implements Chunk {
 	private long created, changed;
 	private UUID creator;
 	private ArrayList<ResourceLocation> linked;
+	private ChunkType type;
 	
 	public GenericChunk(int x, int z, boolean create){
 		this.x = x; this.z = z;
@@ -38,6 +40,8 @@ public class GenericChunk implements Chunk {
 		creator = UUID.fromString(obj.has("creator") ? obj.get("creator").getAsString() : States.CONSOLE_UUID);
 		changed = JsonUtil.getIfExists(obj, "changed", Time.getDate()).longValue();
 		linked = JsonUtil.jsonArrayToResourceLocationArray(JsonUtil.getIfExists(obj, "linked", new JsonArray()).getAsJsonArray());
+		type = ChunkType.valueOf(JsonUtil.getIfExists(obj, "type", ChunkType.NORMAL.name()).toUpperCase());
+		//
 		if(!getChunkFile().exists() && create){
 			save();
 			World world = Static.getServer().getWorld(0);
@@ -88,6 +92,7 @@ public class GenericChunk implements Chunk {
 		obj.addProperty("created", created);
 		obj.addProperty("creator", creator.toString());
 		obj.addProperty("changed", changed);
+		obj.addProperty("type", type.toString());
 		return obj;
 	}
 
@@ -129,6 +134,16 @@ public class GenericChunk implements Chunk {
 	@Override
 	public void setDistrict(District dis){
 		district = dis;
+	}
+
+	@Override
+	public ChunkType getType(){
+		return type;
+	}
+
+	@Override
+	public void setType(ChunkType type){
+		this.type = type;
 	}
 
 }

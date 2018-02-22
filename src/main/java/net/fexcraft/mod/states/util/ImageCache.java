@@ -17,11 +17,11 @@ import net.fexcraft.mod.lib.util.common.Static;
 import net.fexcraft.mod.lib.util.json.JsonUtil;
 import net.fexcraft.mod.lib.util.math.Time;
 import net.fexcraft.mod.states.States;
+import net.fexcraft.mod.states.api.Chunk;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.init.Blocks;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
-import net.minecraft.world.chunk.Chunk;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.gameevent.TickEvent;
@@ -30,8 +30,9 @@ import net.minecraftforge.fml.common.gameevent.TickEvent.Phase;
 public class ImageCache {
 	
 	private static final int IMGSIZE = 512;
-	public static final String[] TYPES = new String[]{"surface", "surface_states"};//, "states", "surface_municipalities", "municipalities", "surface_districts", "districts", "commercial", "chunk_types", "biomemap"};
+	public static final String[] TYPES = new String[]{"surface", "surface_states", "states", "surface_municipalities", "municipalities", "surface_districts", "districts", "surface_commercial", "chunk_types"};
 	
+	private static BufferedImage NOIMG;
 	private static final Queue<Object[]> QUEUE = new LinkedList<>();
 	
 	@Mod.EventBusSubscriber
@@ -43,7 +44,7 @@ public class ImageCache {
 				for(int i = 0; i < Config.MAP_UPDATES_PER_TICK; i++){
 					Object[] objs = QUEUE.poll();
 					if(objs != null){
-						updateImage((World)objs[0], (Chunk)objs[1], (String)objs[2], (String)objs[3]);
+						updateImage((World)objs[0], (net.minecraft.world.chunk.Chunk)objs[1], (String)objs[2], (String)objs[3]);
 					}
 				}
 			}
@@ -51,7 +52,7 @@ public class ImageCache {
 		
 	}
 	
-	public static void update(World world, Chunk chunk, String event, String type){
+	public static void update(World world, net.minecraft.world.chunk.Chunk chunk, String event, String type){
 		if(Config.MAP_UPDATES_PER_TICK == 0){
 			return;
 		}
@@ -65,8 +66,8 @@ public class ImageCache {
 		return;
 	}
 	
-	private static final void updateImage(World world, Chunk chunk, String event, String type){
-		BufferedImage img = getImage(chunk.x, chunk.z, type);
+	private static final void updateImage(World world, net.minecraft.world.chunk.Chunk chunk, String event, String type){
+		BufferedImage img = getImage(chunk.x, chunk.z, type, false);
 		int rx = (int)Math.floor(chunk.x / 32.0), rz = (int)Math.floor(chunk.z / 32.0);
 		int x = (chunk.x * 16) - (rx * 512), z = (chunk.z * 16) - (rz * 512);
 		if(type.contains("surface")){
@@ -78,14 +79,9 @@ public class ImageCache {
 				}
 			}
 		}
-		net.fexcraft.mod.states.api.Chunk st_chunk = StateUtil.getChunk(chunk.x, chunk.z);
+		Chunk st_chunk = StateUtil.getChunk(chunk.x, chunk.z);
+		String color = getColor(type, st_chunk);//"#afafaf";
 		if(type.contains("surface") && !type.equals("surface")){
-			String color = "#ffffff";
-			switch(type){
-				case "surface_states": color = st_chunk.getDistrict().getMunicipality().getState().getColor(); break;
-				case "surface_municipalities": st_chunk.getDistrict().getMunicipality().getColor(); break;
-				case "surface_districts": st_chunk.getDistrict().getColor(); break;
-			}
 			for(int k = 0; k < 16; k++){
 				for(int l = 0; l < 16; l++){
 					Color cor = Color.decode(color);
@@ -99,38 +95,108 @@ public class ImageCache {
 					if(i == 0 && j == 0){
 						continue;
 					}
-					net.fexcraft.mod.states.api.Chunk ck = StateUtil.getTempChunk(chunk.x + i, chunk.z + j);
-					boolean yes = false;
-					switch(type){
-						case "surface_states":{
-							yes = ck.getDistrict().getMunicipality().getState().getId() != st_chunk.getDistrict().getMunicipality().getState().getId();
-							break;
-						}
-						case "surface_municipalities":{
-							yes = ck.getDistrict().getMunicipality().getId() != st_chunk.getDistrict().getMunicipality().getId();
-							break;
-						}
-						case "surface_districts":{
-							yes = ck.getDistrict().getId() != st_chunk.getDistrict().getId();
-							break;
-						}
-						default: break;
-					}
-					if(yes){
+					if(borders(type, StateUtil.getTempChunk(chunk.x + i, chunk.z + j), st_chunk)){
 						//paintBorder(img, i == 0 ? j == -1 ? "left" : "right" : i == 1 ? "down" : "up", Integer.toHexString(Color.BLUE.getRGB()).substring(2), x, z);
-						paintBorder(img, sideCorner(i, j), color, x, z);
+						paintBorder(img, sideCorner(i, j), 4, color, x, z);
 					}
 					else continue;
 				}
 			}
 		}
 		else if(type.equals("states") || type.equals("municipalities") || type.equals("districts")){
+			Color clr = Color.decode(color);
+			for(int m = 0; m < 16; m++){
+				for(int n = 0; n < 16; n++){
+					img.setRGB(x + m, z + n, clr.getRGB());
+				}
+			}
+			for(int i = -1; i < 2; i++){
+				for(int j = -1; j < 2; j++){
+					if(i == 0 && j == 0){
+						continue;
+					}
+					if(borders(type, StateUtil.getTempChunk(chunk.x + i, chunk.z + j), st_chunk)){
+						paintBorder(img, sideCorner(i, j), 2, "#000000", x, z);
+					}
+					else continue;
+				}
+			}
+			//TODO markers
+		}
+		else if(type.equals("chunk_types")){
+			Color clr = Color.decode(color);
+			for(int m = 0; m < 16; m++){
+				for(int n = 0; n < 16; n++){
+					img.setRGB(x + m, z + n, clr.getRGB());
+				}
+			}
+			for(int i = -1; i < 2; i++){
+				for(int j = -1; j < 2; j++){
+					if(i == 0 && j == 0){
+						continue;
+					}
+					if(StateUtil.getTempChunk(chunk.x + i, chunk.z + j).getType() != st_chunk.getType()){
+						paintBorder(img, sideCorner(i, j), 2, "#000000", x, z);
+					}
+					else continue;
+				}
+			}
+		}
+		if(type.equals("surface_commercial")){
 			//TODO
 		}
 		saveImage(img, chunk.x, chunk.z, type);
 		return;
 	}
 	
+	private static boolean borders(String type, Chunk ck, Chunk st_chunk) {
+		switch(type){
+			case "surface_states":
+			case "states":{
+				return ck.getDistrict().getMunicipality().getState().getId() != st_chunk.getDistrict().getMunicipality().getState().getId();
+			}
+			case "surface_municipalities":
+			case "municipalities":{
+				return ck.getDistrict().getMunicipality().getId() != st_chunk.getDistrict().getMunicipality().getId();
+			}
+			case "surface_districts":
+			case "districts":{
+				return ck.getDistrict().getId() != st_chunk.getDistrict().getId();
+			}
+			case "chunk_types":{
+				return ck.getType() != st_chunk.getType();
+			}
+			case "surface_commercial":{
+				//TODO
+			}
+		}
+		return false;
+	}
+
+	private static String getColor(String type, net.fexcraft.mod.states.api.Chunk st_chunk) {
+		switch(type){
+			case "surface_states":
+			case "states":{
+				return st_chunk.getDistrict().getMunicipality().getState().getColor();
+			}
+			case "surface_municipalities":
+			case "municipalities":{
+				return st_chunk.getDistrict().getMunicipality().getColor();
+			}
+			case "surface_districts":
+			case "districts":{
+				return st_chunk.getDistrict().getColor();
+			}
+			case "chunk_types":{
+				return st_chunk.getType().getColor();
+			}
+			case "surface_commercial":{
+				//TODO
+			}
+		}
+		return "#afafaf";
+	}
+
 	private static final String sideCorner(int x, int z){
 		switch(x){
 			case -1:{
@@ -161,7 +227,7 @@ public class ImageCache {
 		return "null";
 	}
 	
-	private static void paintBorder(BufferedImage image, String side, String color_hex, int... coords){
+	private static void paintBorder(BufferedImage image, String side, int thickness, String color_hex, int... coords){
 		if(!color_hex.contains("#")){
 			color_hex = "#" + color_hex;
 		}
@@ -169,10 +235,10 @@ public class ImageCache {
 		//
 		int i, j, k, l;
 		switch(side){
-			case "left" :{ i = 0; j = 16; k = 0; l = 4; break; }
-			case "right":{ i = 0; j = 16; k = 12; l = 16; break; }
-			case "up"   :{ i = 0; j = 4; k = 0; l = 16; break; }
-			case "down" :{ i = 12; j = 16; k = 0; l = 16; break; }
+			case "left" :{ i = 0; j = 16; k = 0; l = thickness; break; }
+			case "right":{ i = 0; j = 16; k = 16 - thickness; l = 16; break; }
+			case "up"   :{ i = 0; j = thickness; k = 0; l = 16; break; }
+			case "down" :{ i = 16 - thickness; j = 16; k = 0; l = 16; break; }
 			//
 			/*case "up_left" :{ i = 0; j = 4; k = 0; l = 4; }
 			case "up_right":{ i = 0; j = 4; k = 12; l = 16; }
@@ -190,14 +256,41 @@ public class ImageCache {
 		return;
 	}
 
+	public static final int[] getRegion(int x, int z){
+		return new int[]{(int)Math.floor(x / 32.0), (int)Math.floor(z / 32.0)};
+	}
+
 	public static final String getChunkRegion(int x, int z){
 		return (int)Math.floor(x / 32.0) + "_" + (int)Math.floor(z / 32.0);
 	}
 	
-	public static final BufferedImage getImage(int x, int z, String type){
-		File file = new File(States.getSaveDirectory(), "image_cache/" + type + "/" + getChunkRegion(x, z) + ".png");
+	private static final BufferedImage emptyImage(String type){
+		File file = new File(States.getSaveDirectory(), "image_cache/defaults/" + type + ".png");
+		if(file.exists()){
+			try{
+				return ImageIO.read(file);
+			}
+			catch(Exception e){
+				e.printStackTrace();
+			}
+		}
+		if(NOIMG == null){
+			NOIMG = new BufferedImage(IMGSIZE, IMGSIZE, BufferedImage.TYPE_INT_ARGB);
+			boolean t = false;
+			int black = Color.BLACK.getRGB(), gray = Color.BLUE.getRGB();
+			for(int i = 0; i < IMGSIZE; i++){
+				for(int j = 0; j < IMGSIZE; j++){
+					NOIMG.setRGB(i, j, (t = !t) ? black : gray);
+				}
+			}
+		}
+		return NOIMG;
+	}
+	
+	public static final BufferedImage getImage(int x, int z, String type, boolean regcooords){
+		File file = new File(States.getSaveDirectory(), "image_cache/" + type + "/" + (regcooords ? x + "_" + z : getChunkRegion(x, z)) + ".png");
 		if(!file.exists()){
-			return new BufferedImage(IMGSIZE, IMGSIZE, BufferedImage.TYPE_INT_ARGB);
+			return emptyImage(type);
 		}
 		else{
 			try{
@@ -206,7 +299,7 @@ public class ImageCache {
 			catch(Exception e){
 				Print.debug(file.toPath().toString());
 				e.printStackTrace();
-				return new BufferedImage(IMGSIZE, IMGSIZE, BufferedImage.TYPE_INT_ARGB);
+				return emptyImage(type);
 			}
 		}
 	}
@@ -233,7 +326,7 @@ public class ImageCache {
 		while((entry = QUEUE.poll()) != null){
 			JsonObject obj = new JsonObject();
 			obj.addProperty("dimension", ((World)entry[0]).provider.getDimension());
-			Chunk chunk = (Chunk) entry[1];
+			net.minecraft.world.chunk.Chunk chunk = (net.minecraft.world.chunk.Chunk) entry[1];
 			obj.addProperty("chunk", chunk.x + ":" + chunk.z);
 			obj.addProperty("event", (String)entry[2]);
 			obj.addProperty("type", (String)entry[3]);
@@ -253,7 +346,7 @@ public class ImageCache {
 				JsonObject object = elm.getAsJsonObject();
 				World world = Static.getServer().getWorld(object.get("dimension").getAsInt());
 				String[] ckarr = object.get("chunk").getAsString().split(":");
-				Chunk chunk = world.getChunkFromChunkCoords(Integer.parseInt(ckarr[0]), Integer.parseInt(ckarr[1]));
+				net.minecraft.world.chunk.Chunk chunk = world.getChunkFromChunkCoords(Integer.parseInt(ckarr[0]), Integer.parseInt(ckarr[1]));
 				String event = object.get("event").getAsString();
 				String type = object.get("type").getAsString();
 				QUEUE.add(new Object[]{world, chunk, event, type});

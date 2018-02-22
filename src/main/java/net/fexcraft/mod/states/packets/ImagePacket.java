@@ -5,9 +5,7 @@ import java.nio.charset.StandardCharsets;
 
 import io.netty.buffer.ByteBuf;
 import net.fexcraft.mod.lib.api.network.IPacket;
-import net.fexcraft.mod.lib.util.common.Print;
 import net.minecraftforge.fml.common.network.simpleimpl.IMessage;
-import scala.actors.threadpool.Arrays;
 
 public class ImagePacket implements IPacket, IMessage{
 	
@@ -47,7 +45,7 @@ public class ImagePacket implements IPacket, IMessage{
 		//
 		int l = buf.readInt();
 		String str = buf.readCharSequence(l, StandardCharsets.UTF_8).toString();
-		Print.debug(Arrays.asList(str.split("_")));
+		//Print.debug(Arrays.asList(str.split("_")));
 		String[] arr0 = str.split("_");
 		for(int i = 0; i < x; i++){
 			String[] arr1 = arr0[i].split(",");

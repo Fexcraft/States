@@ -9,6 +9,7 @@ import net.fexcraft.mod.lib.util.common.Static;
 import net.fexcraft.mod.lib.util.math.Time;
 import net.fexcraft.mod.states.States;
 import net.fexcraft.mod.states.api.Chunk;
+import net.fexcraft.mod.states.api.ChunkType;
 import net.fexcraft.mod.states.api.District;
 import net.fexcraft.mod.states.util.ImageCache;
 import net.fexcraft.mod.states.util.StateUtil;
@@ -67,6 +68,7 @@ public class ChunkCmd extends CommandBase {
 					return;
 				}
 				boolean can = true;//(district.getManager() != null && district.getManager().equals(player.getGameProfile().getId())) || (district.getMunicipality().getMayor() != null && district.getMunicipality().getMayor().equals(player.getGameProfile().getId())) || PermManager.getPlayerPerms(player).hasPermission(States.ADMIN_PERM);
+				//TODO re-activate check after testing-end
 				if(can){
 					if(range > 3){
 						Print.chat(sender, "Invalid range, setting to \"3\"!");
@@ -102,23 +104,24 @@ public class ChunkCmd extends CommandBase {
 							for(int j = 0; j < r; j++){
 								int x = (chunk.xCoord() - range) + i;
 								int z = (chunk.zCoord() - range) + j;
+								String sign = x == chunk.xCoord() && z == chunk.zCoord() ? "+" : "#";
 								Chunk ck = StateUtil.getChunk(x, z);
 								if(ck == null){
 									//Print.chat(sender, "&7Chunk at " + x + "x, " + z + "z &creturned null&7!");
-									str += "&4#";
+									str += "&4" + sign;
 									continue;
 								}
 								if(ck.getDistrict().getId() >= 0){
 									//Print.chat(sender, "&7Chunk at " + x + "x, " + z + "z is &calready claimed&7.");
-									str += "&c#";
+									str += "&c" + sign;
 									continue;
 								}
 								if(district.getMunicipality().getAccount().getBalance() < chunk.getPrice()){
-									str += "&b#";
+									str += "&b" + sign;
 									continue;
 								}
 								if(chunk.getPrice() > 0 && !AccountManager.INSTANCE.getBank(district.getMunicipality().getAccount().getBankId()).processTransfer(sender, district.getMunicipality().getAccount(), chunk.getPrice(), States.SERVERACCOUNT)){
-									str += "&3#";
+									str += "&3" + sign;
 									continue;
 								}
 								ck.setDistrict(district);
@@ -128,11 +131,11 @@ public class ChunkCmd extends CommandBase {
 								ck.save();
 								ImageCache.update(player.world, player.world.getChunkFromChunkCoords(ck.xCoord(), ck.zCoord()), "claim", "all");
 								//Print.chat(sender, "&7Chunk at " + x + "x, " + z + "z &2claimed&7!");
-								str += "&2#";
+								str += "&2" + sign;
 							}
 							Print.chat(sender, str + "&0]");
 						}
-						Print.chat(sender, "&4#&7 - chunk data returned null &8| &3#&7 transfer error");
+						Print.chat(sender, "&4#&7 - chunk data returned null &8| &3#&7 transfer error &8| &7+ your position");
 						Print.chat(sender, "&c#&7 - chunk already claimed &8| &b#&7 - no money &8| &2#&7 - chunk claimed.");
 					}
 				}
@@ -148,22 +151,23 @@ public class ChunkCmd extends CommandBase {
 					for(int j = 0; j < r; j++){
 						int x = (chunk.xCoord() - rh) + i;
 						int z = (chunk.zCoord() - rh) + j;
+						String sign = x == chunk.xCoord() && z == chunk.zCoord() ? "+" : "#";
 						Chunk ck = StateUtil.getChunk(x, z);
 						if(ck == null){
-							str += "&4#";
+							str += "&4" + sign;
 							continue;
 						}
 						if(ck.getDistrict().getId() >= 0){
-							str += "&9#";
+							str += "&9" + sign;
 							continue;
 						}
 						else{
-							str += "&2#";
+							str += "&2" + sign;
 						}
 					}
 					Print.chat(sender, str + "&0]");
 				}
-				Print.chat(sender, "&4#&7 - null &8| &9#&7 - claimed &8| &2#&7 - not claimed.");
+				Print.chat(sender, "&4#&7 - null &8| &9#&7 - claimed &8| &2#&7 - not claimed &8| &7+ your position.");
 				return;
 			}
 			case "info":{
@@ -212,6 +216,46 @@ public class ChunkCmd extends CommandBase {
 			case "queue":{
 				Print.chat(sender, "&9There are &2" + ImageCache.getQueue().size() + "&9 chunk map updates queued.");
 				Print.chat(sender, "&9Current Config allows for &3" + net.fexcraft.mod.states.util.Config.MAP_UPDATES_PER_TICK + "&9 map updates per server tick.");
+				return;
+			}
+			case "unclaim":{
+				//TODO reverse;
+				if(!PermManager.getPlayerPerms(player).hasPermission(States.ADMIN_PERM)){
+					int range = args.length > 1 ? Integer.parseInt(args[1]) : 0;
+					if(range <= 0){
+						chunk.setClaimer(player.getGameProfile().getId());
+						chunk.setDistrict(StateUtil.getDistrict(-1));
+						chunk.setChanged(Time.getDate());
+						chunk.setType(ChunkType.NORMAL);
+						chunk.setPrice(net.fexcraft.mod.states.util.Config.DEFAULT_CHUNK_PRICE);
+						chunk.save();
+						ImageCache.update(player.world, player.world.getChunkFromChunkCoords(chunk.xCoord(), chunk.zCoord()), "unclaim", "all");
+						Print.chat(sender, "&9Chunk unclaimed and resseted.");
+					}
+					else{
+						int r = (range * 2) + 1;
+						int c = 0;
+						for(int i = 0; i < r; i++){
+							for(int j = 0; j < r; j++){
+								int x = (chunk.xCoord() - range) + i;
+								int z = (chunk.zCoord() - range) + j;
+								Chunk ck = StateUtil.getTempChunk(x, z);
+								if(ck == null){
+									continue;
+								}
+								ck.setClaimer(player.getGameProfile().getId());
+								ck.setDistrict(StateUtil.getDistrict(-1));
+								ck.setChanged(Time.getDate());
+								ck.setType(ChunkType.NORMAL);
+								ck.setPrice(net.fexcraft.mod.states.util.Config.DEFAULT_CHUNK_PRICE);
+								ck.save();
+								c++;
+								ImageCache.update(player.world, player.world.getChunkFromChunkCoords(x, z), "unclaim", "all");
+							}
+						}
+						Print.chat(sender, "&2" + c + " &9chunks have been resseted.");
+					}
+				}
 				return;
 			}
 			default:{

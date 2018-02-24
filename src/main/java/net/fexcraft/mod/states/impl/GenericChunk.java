@@ -26,10 +26,12 @@ public class GenericChunk implements Chunk {
 	private District district;
 	private long price;
 	private int x, z;
+	private Integer lx, lz;
 	private long created, changed;
 	private UUID creator;
 	private ArrayList<ResourceLocation> linked;
 	private ChunkType type;
+	private String owner;
 	
 	public GenericChunk(int x, int z, boolean create){
 		this.x = x; this.z = z;
@@ -41,6 +43,14 @@ public class GenericChunk implements Chunk {
 		changed = JsonUtil.getIfExists(obj, "changed", Time.getDate()).longValue();
 		linked = JsonUtil.jsonArrayToResourceLocationArray(JsonUtil.getIfExists(obj, "linked", new JsonArray()).getAsJsonArray());
 		type = ChunkType.valueOf(JsonUtil.getIfExists(obj, "type", ChunkType.NORMAL.name()).toUpperCase());
+		owner = JsonUtil.getIfExists(obj, "owner", "null");
+		//
+		String lk = JsonUtil.getIfExists(obj, "link", "");
+		if(lk.length() > 0){
+			String[] link = lk.split(":");
+			lx = Integer.parseInt(link[0]);
+			lz = Integer.parseInt(link[1]);
+		}
 		//
 		if(!getChunkFile().exists() && create){
 			save();
@@ -49,8 +59,8 @@ public class GenericChunk implements Chunk {
 		}
 	}
 
-	public GenericChunk(int x2, int z2){
-		this(x2, z2, true);
+	public GenericChunk(int x, int z){
+		this(x, z, true);
 	}
 
 	@Override
@@ -93,6 +103,10 @@ public class GenericChunk implements Chunk {
 		obj.addProperty("creator", creator.toString());
 		obj.addProperty("changed", changed);
 		obj.addProperty("type", type.toString());
+		obj.addProperty("owner", owner == null ? "null" : owner);
+		if((Integer)lx != null && (Integer)lz != null){
+			obj.addProperty("link", lx + ":" + lz);
+		}
 		return obj;
 	}
 
@@ -144,6 +158,31 @@ public class GenericChunk implements Chunk {
 	@Override
 	public void setType(ChunkType type){
 		this.type = type;
+	}
+
+	@Override
+	public String getOwner(){
+		return owner;
+	}
+
+	@Override
+	public void setOwner(String str){
+		owner = str;
+	}
+
+	@Override
+	public int[] getLink(){
+		return lx == null || lz == null ? null : new int[]{lx, lz};
+	}
+
+	@Override
+	public void setLink(Integer x, Integer z){
+		if(x == null || z == null){
+			lx = null; lz = null;
+		}
+		else{
+			lx = x; lz = z;
+		}
 	}
 
 }

@@ -1,13 +1,25 @@
 package net.fexcraft.mod.states.util;
 
+import java.io.File;
+import java.util.UUID;
+
+import javax.annotation.Nullable;
+
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
+
+import net.fexcraft.mod.lib.perms.PermManager;
+import net.fexcraft.mod.lib.util.json.JsonUtil;
 import net.fexcraft.mod.states.States;
 import net.fexcraft.mod.states.api.Chunk;
 import net.fexcraft.mod.states.api.District;
 import net.fexcraft.mod.states.api.Municipality;
+import net.fexcraft.mod.states.api.Player;
 import net.fexcraft.mod.states.api.State;
 import net.fexcraft.mod.states.impl.GenericChunk;
 import net.fexcraft.mod.states.impl.GenericDistrict;
 import net.fexcraft.mod.states.impl.GenericMunicipality;
+import net.fexcraft.mod.states.impl.GenericPlayer;
 import net.fexcraft.mod.states.impl.GenericState;
 import net.minecraft.entity.player.EntityPlayer;
 
@@ -61,6 +73,35 @@ public class StateUtil {
 	public static Chunk getTempChunk(int x, int z){
 		Chunk chunk = getChunk(x, z);
 		return chunk == null ? new GenericChunk(x, z, false) : chunk;
+	}
+
+	public static boolean isUUID(String owner){
+		try{
+			UUID uuid = UUID.fromString(owner);
+			return uuid != null;
+		}
+		catch(Exception e){
+			return false;
+		}
+	}
+	
+	@Nullable
+	public static Player getPlayer(UUID uuid, boolean loadtemp){
+		return States.PLAYERS.containsKey(uuid) ? States.PLAYERS.get(uuid) : loadtemp ? getOfflinePlayer(uuid) : null;
+	}
+
+	private static Player getOfflinePlayer(UUID uuid){
+		JsonElement elm = JsonUtil.read(new File(PermManager.userDir, "/" + uuid.toString() + ".perm"), false);
+		if(elm == null){
+			return null;
+		}
+		else{
+			JsonObject obj = elm.getAsJsonObject();
+			if(!obj.has("AttachedData") || !obj.get("AttachedData").getAsJsonObject().has(States.PLAYER_DATA)){
+				return null;
+			}
+			return GenericPlayer.getOfflineInstance(uuid, obj.get("AttachedData").getAsJsonObject().get(States.PLAYER_DATA).getAsJsonObject());
+		}
 	}
 
 }

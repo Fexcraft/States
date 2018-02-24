@@ -1,5 +1,7 @@
 package net.fexcraft.mod.states.cmds;
 
+import java.util.UUID;
+
 import net.fexcraft.mod.fsmm.util.AccountManager;
 import net.fexcraft.mod.fsmm.util.Config;
 import net.fexcraft.mod.lib.api.common.fCommand;
@@ -274,7 +276,12 @@ public class ChunkCmd extends CommandBase {
 				return;
 			}
 			case "link":{
-				
+				if(isOwner(chunk, player)){
+					
+				}
+				else{
+					Print.chat(sender, "No Permission.");
+				}
 				return;
 			}
 			case "whitelist":{
@@ -286,6 +293,19 @@ public class ChunkCmd extends CommandBase {
 				return;
 			}
 		}
+	}
+
+	private boolean isOwner(Chunk chunk, EntityPlayer player){
+		if(chunk.getOwner().startsWith("company")){
+			//TODO
+		}
+		else if(StateUtil.isUUID(chunk.getOwner())){
+			return UUID.fromString(chunk.getOwner()).equals(player.getGameProfile().getId());
+		}
+		else if(chunk.getOwner().equals("") || chunk.getOwner().equals("null")){
+			return false;//TODO playerdata
+		}
+		return PermManager.getPlayerPerms(player).hasPermission(States.ADMIN_PERM);
 	}
 
 }

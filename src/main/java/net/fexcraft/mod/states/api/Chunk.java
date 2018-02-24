@@ -51,4 +51,13 @@ public interface Chunk {
 	
 	public void setType(ChunkType type);
 
+	public String getOwner();
+	
+	public void setOwner(String str);
+	
+	public int[] getLink();
+	
+	/** Set either to null to reset. */
+	public void setLink(Integer x, Integer z);
+
 }

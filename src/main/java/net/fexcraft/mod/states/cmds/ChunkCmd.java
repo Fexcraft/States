@@ -268,11 +268,21 @@ public class ChunkCmd extends CommandBase {
 			case "set-for-sale":
 			case "setforsale":
 			case "sfs":{
-				
+				if(isPermitted(chunk, player)){
+					
+				}
+				else{
+					Print.chat(sender, "&7No Permission.");
+				}
 				return;
 			}
 			case "set":{
-				
+				if(isPermitted(chunk, player)){
+					
+				}
+				else{
+					Print.chat(sender, "&7No Permission.");
+				}
 				return;
 			}
 			case "link":{
@@ -280,12 +290,17 @@ public class ChunkCmd extends CommandBase {
 					
 				}
 				else{
-					Print.chat(sender, "No Permission.");
+					Print.chat(sender, "&7No Permission.");
 				}
 				return;
 			}
 			case "whitelist":{
-				
+				if(isOwner(chunk, player)){
+					
+				}
+				else{
+					Print.chat(sender, "&7No Permission.");
+				}
 				return;
 			}
 			default:{
@@ -295,16 +310,60 @@ public class ChunkCmd extends CommandBase {
 		}
 	}
 
+	private boolean isPermitted(Chunk chunk, EntityPlayer player){
+		if(isAdmin(player)){
+			return true;
+		}
+		UUID uuid = player.getGameProfile().getId();
+		boolean isco = chunk.getOwner().equals(uuid.toString());
+		boolean ismn = chunk.getDistrict().getManager() != null && chunk.getDistrict().getManager().equals(uuid);
+		boolean ismy = chunk.getDistrict().getMunicipality().getMayor() != null && chunk.getDistrict().getMunicipality().getMayor().equals(uuid);
+		boolean isst = chunk.getDistrict().getMunicipality().getState().getCouncil().contains(uuid) || (chunk.getDistrict().getMunicipality().getState().getLeader() != null || chunk.getDistrict().getMunicipality().getState().getLeader().equals(uuid));
+		boolean iscm = false;
+		switch(chunk.getType()){
+			case COMPANY: return iscm || isst;
+			case DISTRICT: return ismn || ismy || isst;
+			case MUNICIPIAL: return ismy || isst;
+			case NORMAL: return ismn || ismy || isst;
+			case PRIVATE: return isco || ismy || isst;
+			case PUBLIC: return ismn || ismy || isst;
+			case STATEOWNED: return isst;
+			default: return false;
+		}
+	}
+	
+	//TODO make as above
 	private boolean isOwner(Chunk chunk, EntityPlayer player){
-		if(chunk.getOwner().startsWith("company")){
-			//TODO
+		if(isAdmin(player)){
+			return true;
 		}
-		else if(StateUtil.isUUID(chunk.getOwner())){
-			return UUID.fromString(chunk.getOwner()).equals(player.getGameProfile().getId());
+		switch(chunk.getType()){
+			case COMPANY: return false;//TODO companies
+			case MUNICIPIAL:{
+				return chunk.getDistrict().getMunicipality().getMayor().equals(player.getGameProfile().getId()); 
+			}
+			case DISTRICT:
+			case NORMAL:{
+				return chunk.getDistrict().getMunicipality().getMayor() != null && chunk.getDistrict().getMunicipality().getMayor().equals(player.getGameProfile().getId())
+						|| chunk.getDistrict().getManager() != null && chunk.getDistrict().getManager().equals(player.getGameProfile().getId());
+			}
+			case PRIVATE:{
+				return StateUtil.isUUID(chunk.getOwner()) && UUID.fromString(chunk.getOwner()).equals(player.getGameProfile().getId());
+			}
+			case PUBLIC:{
+				return false;
+			}
+			case STATEOWNED:{
+				if(chunk.getDistrict().getMunicipality().getState().getCouncil().contains(player.getGameProfile().getId())){
+					return true;
+				}
+				return chunk.getDistrict().getMunicipality().getState().getLeader() != null && chunk.getDistrict().getMunicipality().getState().getLeader().equals(player.getGameProfile().getId());
+			}
+			default: return false;
 		}
-		else if(chunk.getOwner().equals("") || chunk.getOwner().equals("null")){
-			return false;//TODO playerdata
-		}
+	}
+
+	private boolean isAdmin(EntityPlayer player){
 		return PermManager.getPlayerPerms(player).hasPermission(States.ADMIN_PERM);
 	}
 

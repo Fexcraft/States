@@ -6,6 +6,7 @@ public enum ChunkType implements ColorHolder {
 	PUBLIC("#703DFF"),
 	PRIVATE("#0020D8"),
 	COMPANY("#008E96"),
+	DISTRICT("#007F7F"),
 	MUNICIPIAL("#C1A100"),
 	STATEOWNED("#A01818");
 	

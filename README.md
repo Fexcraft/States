@@ -8,7 +8,9 @@ Players can create a "Municipality", which depending on (configurable!) size wil
 The Size also decides how many districts a Municipality can have. There is also the "Village" district type for sub-villages.<br>
 **To state clearly, I am not gonna implement any type of "war"/"pvp" into this!**<br>
 As some years of server management experience confirm, it's for one hard to have a realistic war in MC, and for other part, if allowing it to be "minecrafty", it will be a mere clicking around with swords, which I do not like.
-Another point is.. the current situation on the real world in the past years, I do not really want the same in Minecraft, I could just aswel go and create my own State in the real world? (no joke, I was capable back in the days)
+
+On other side, I'm pretty tired by all that's happening on the "real" world in the recent years, expecially since it's the age of "information", one is overloaded with the amount of data, which additionally is biased or faked. The more if one understands multiple languages it's far beyond a headache seeing how news stations in any country state things completely differently.
+I do not want that in Minecraft, I had such a server already in the past. _Kill it before it lays eggs!_
 
 ### Why "States" as name? Wasn't the old one good enough?
 It maybe was good, but a quick googling shows you this:
@@ -17,7 +19,7 @@ nation - english
 a large aggregate of people united by common descent, history, culture, or language,
 inhabiting a particular country or territory.
 ```
-Could too fast lead into having nationalists, or people spending their whole online time arguing about each other's real country's stuff, recreating them, and ... hating each other. Seriously, saw such.
+That could fastly lead into having nationalists, people spending their whole online time arguing about each other's real country's stuff, recreating them, and eventually... hating each other. Seriously, I did see such.
 ```
 state - english
 a nation or territory considered as an organized political community under one government.
@@ -39,3 +41,5 @@ _States_ is also using the FSMM currency!
 http://fexcraft.net/license?id=mods
 ### Discord
 https://discord.gg/rMXcrsv
+### Wiki
+https://github.com/Fexcraft/States/wiki

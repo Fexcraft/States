@@ -22,6 +22,9 @@ import net.fexcraft.mod.states.impl.GenericMunicipality;
 import net.fexcraft.mod.states.impl.GenericPlayer;
 import net.fexcraft.mod.states.impl.GenericState;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.util.ResourceLocation;
+import net.minecraft.util.math.BlockPos;
+import net.minecraft.world.World;
 
 public class StateUtil {
 
@@ -32,6 +35,11 @@ public class StateUtil {
 
 	public static Chunk getChunk(int x, int z){
 		return  States.CHUNKS.get(x, z);
+	}
+
+	public static Chunk getChunk(World world, BlockPos pos){
+		net.minecraft.world.chunk.Chunk chunk = world.getChunkFromBlockCoords(pos);
+		return States.CHUNKS.get(chunk.x, chunk.z);
 	}
 
 	public static District getDistrict(int value){
@@ -75,6 +83,12 @@ public class StateUtil {
 		return chunk == null ? new GenericChunk(x, z, false) : chunk;
 	}
 
+	public static Chunk getTempChunk(ResourceLocation ckpos){
+		int x = Integer.parseInt(ckpos.getResourceDomain());
+		int z = Integer.parseInt(ckpos.getResourcePath());
+		return getTempChunk(x, z);
+	}
+
 	public static boolean isUUID(String owner){
 		try{
 			UUID uuid = UUID.fromString(owner);
@@ -102,6 +116,10 @@ public class StateUtil {
 			}
 			return GenericPlayer.getOfflineInstance(uuid, obj.get("AttachedData").getAsJsonObject().get(States.PLAYER_DATA).getAsJsonObject());
 		}
+	}
+
+	public static Player getPlayer(EntityPlayer player){
+		return PermManager.getPlayerPerms(player).getAdditionalData(GenericPlayer.class);
 	}
 
 }

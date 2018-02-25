@@ -4,6 +4,7 @@ import java.util.UUID;
 
 import javax.annotation.Nullable;
 
+import net.fexcraft.mod.fsmm.api.Account;
 import net.fexcraft.mod.lib.perms.player.PlayerPerms;
 import net.minecraft.command.ICommandSender;
 
@@ -27,5 +28,7 @@ public interface Player {
 	public PlayerPerms getPermissions();
 	
 	public UUID getUUID();
+
+	public Account getAccount();
 
 }

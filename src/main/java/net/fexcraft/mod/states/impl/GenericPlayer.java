@@ -4,6 +4,8 @@ import java.util.UUID;
 
 import com.google.gson.JsonObject;
 
+import net.fexcraft.mod.fsmm.api.Account;
+import net.fexcraft.mod.fsmm.util.AccountManager;
 import net.fexcraft.mod.lib.perms.player.AttachedData;
 import net.fexcraft.mod.lib.perms.player.PlayerPerms;
 import net.fexcraft.mod.lib.util.common.Formatter;
@@ -22,6 +24,7 @@ public class GenericPlayer implements AttachedData, Player {
 	private UUID uuid;
 	private int color;
 	private long lastsave;
+	private Account account;
 	//
 	private Municipality municipality;
 	
@@ -52,11 +55,15 @@ public class GenericPlayer implements AttachedData, Player {
 
 	@Override
 	public AttachedData load(UUID uuid, JsonObject obj){
+		if(obj == null){
+			obj = new JsonObject();
+		}
 		online_instance = true;
 		this.uuid = uuid;
 		this.nick = obj.has("Nickname") ? obj.get("Nickname").getAsString() : null;
 		this.color = JsonUtil.getIfExists(obj, "Color", 2).intValue();
 		this.municipality = StateUtil.getMunicipality(JsonUtil.getIfExists(obj, "Municipality", -1).intValue());
+		this.account = AccountManager.INSTANCE.getAccount("player", uuid.toString(), true);
 		return this;
 	}
 
@@ -77,7 +84,8 @@ public class GenericPlayer implements AttachedData, Player {
 	
 	public static Player getOfflineInstance(UUID uuid, JsonObject obj){
 		GenericPlayer player = new GenericPlayer();
-		//TODO
+		player.load(uuid, obj);
+		player.online_instance = false;
 		return player;
 	}
 
@@ -98,7 +106,7 @@ public class GenericPlayer implements AttachedData, Player {
 
 	@Override
 	public String getFormattedNickname(ICommandSender player){
-		return Formatter.format(Formatter.fromInt(color) + nick == null ? player.getName() : nick);
+		return Formatter.format(Formatter.fromInt(color) + (nick == null ? player.getName() : nick));
 	}
 
 	@Override
@@ -109,6 +117,11 @@ public class GenericPlayer implements AttachedData, Player {
 	@Override
 	public UUID getUUID(){
 		return uuid;
+	}
+
+	@Override
+	public Account getAccount(){
+		return account;
 	}
 
 }

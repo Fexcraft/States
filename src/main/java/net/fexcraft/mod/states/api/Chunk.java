@@ -59,5 +59,9 @@ public interface Chunk {
 	
 	/** Set either to null to reset. */
 	public void setLink(Integer x, Integer z);
+	
+	public List<UUID> getPlayerWhitelist();
+	
+	public List<Integer> getCompanyWhitelist();
 
 }

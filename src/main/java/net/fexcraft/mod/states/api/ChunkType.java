@@ -7,7 +7,7 @@ public enum ChunkType implements ColorHolder {
 	PRIVATE("#0020D8"),
 	COMPANY("#008E96"),
 	DISTRICT("#007F7F"),
-	MUNICIPIAL("#C1A100"),
+	MUNICIPAL("#C1A100"),
 	STATEOWNED("#A01818");
 	
 	private String name, color;

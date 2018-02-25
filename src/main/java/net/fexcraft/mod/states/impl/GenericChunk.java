@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.UUID;
 
 import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 
 import net.fexcraft.mod.lib.util.common.Static;
@@ -32,6 +33,8 @@ public class GenericChunk implements Chunk {
 	private ArrayList<ResourceLocation> linked;
 	private ChunkType type;
 	private String owner;
+	private List<UUID> wl_players = new ArrayList<>();
+	private List<Integer> wl_companies = new ArrayList<>();
 	
 	public GenericChunk(int x, int z, boolean create){
 		this.x = x; this.z = z;
@@ -50,6 +53,26 @@ public class GenericChunk implements Chunk {
 			String[] link = lk.split(":");
 			lx = Integer.parseInt(link[0]);
 			lz = Integer.parseInt(link[1]);
+		}
+		//
+		if(obj.has("whitelist")){
+			JsonArray array = obj.get("whitelist").getAsJsonArray();
+			for(JsonElement elm : array){
+				try{
+					UUID uuid = UUID.fromString(elm.getAsString());
+					wl_players.add(uuid);
+				}
+				catch(Exception e){
+					try{
+						int i = Integer.parseInt(elm.getAsString());
+						wl_companies.add(i);
+					}
+					catch(Exception ex){
+						e.printStackTrace();
+						ex.printStackTrace();
+					}
+				}
+			}
 		}
 		//
 		if(!getChunkFile().exists() && create){
@@ -107,6 +130,17 @@ public class GenericChunk implements Chunk {
 		if((Integer)lx != null && (Integer)lz != null){
 			obj.addProperty("link", lx + ":" + lz);
 		}
+		if(!linked.isEmpty()){
+			JsonArray array = new JsonArray();
+			linked.forEach(rs -> array.add(rs.toString()));
+			obj.add("linked", array);
+		}
+		if(wl_players.size() > 0 || wl_companies.size() > 0){
+			JsonArray array = new JsonArray();
+			wl_players.forEach(entry -> array.add(entry.toString()));
+			wl_companies.forEach(entry -> array.add(entry));
+			obj.add("whitelist", array);
+		}
 		return obj;
 	}
 
@@ -162,7 +196,16 @@ public class GenericChunk implements Chunk {
 
 	@Override
 	public String getOwner(){
-		return owner;
+		switch(type){
+			case COMPANY: return owner;//TODO company
+			case DISTRICT: return "District";
+			case MUNICIPAL: return "Municipal";
+			case NORMAL: return "(" + district.getMunicipality().getType().getTitle() + ") " + district.getMunicipality().getName();
+			case PRIVATE: return owner;
+			case PUBLIC: return "Public";
+			case STATEOWNED: return "State Owned";
+			default: return owner;
+		}
 	}
 
 	@Override
@@ -183,6 +226,16 @@ public class GenericChunk implements Chunk {
 		else{
 			lx = x; lz = z;
 		}
+	}
+
+	@Override
+	public List<UUID> getPlayerWhitelist(){
+		return wl_players;
+	}
+
+	@Override
+	public List<Integer> getCompanyWhitelist(){
+		return wl_companies;
 	}
 
 }

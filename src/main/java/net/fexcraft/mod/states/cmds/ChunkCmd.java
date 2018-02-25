@@ -2,6 +2,9 @@ package net.fexcraft.mod.states.cmds;
 
 import java.util.UUID;
 
+import com.mojang.authlib.GameProfile;
+
+import net.fexcraft.mod.fsmm.api.Account;
 import net.fexcraft.mod.fsmm.util.AccountManager;
 import net.fexcraft.mod.fsmm.util.Config;
 import net.fexcraft.mod.lib.api.common.fCommand;
@@ -20,6 +23,7 @@ import net.minecraft.command.CommandException;
 import net.minecraft.command.ICommandSender;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.server.MinecraftServer;
+import net.minecraft.util.math.BlockPos;
 
 @fCommand
 public class ChunkCmd extends CommandBase {
@@ -33,6 +37,16 @@ public class ChunkCmd extends CommandBase {
 	public String getUsage(ICommandSender sender){
 		return "/ck";
 	}
+	
+	@Override
+    public boolean checkPermission(MinecraftServer server, ICommandSender sender){
+        return sender != null;
+    }
+	
+	@Override
+    public int getRequiredPermissionLevel(){
+        return 0;
+    }
 
 	@Override
 	public void execute(MinecraftServer server, ICommandSender sender, String[] args) throws CommandException {
@@ -50,7 +64,7 @@ public class ChunkCmd extends CommandBase {
 			Print.chat(sender, "&7/ck queue");
 			return;
 		}
-		if(sender instanceof EntityPlayer == false){
+		if(sender.getCommandSenderEntity() instanceof EntityPlayer == false){
 			Print.chat(sender, "&7Only available Ingame.");
 			return;
 		}
@@ -173,8 +187,10 @@ public class ChunkCmd extends CommandBase {
 				return;
 			}
 			case "info":{
-				Print.chat(sender, "&2Info of chunk &7" + chunk.xCoord() + "x&2, &7" + chunk.zCoord() + "z&2:");
+				Print.chat(sender, "&e====-====-====-====-====-====&0[&2States&0]");
+				Print.chat(sender, "&6Info of chunk &7" + chunk.xCoord() + "x&2, &7" + chunk.zCoord() + "z&2:");
 				Print.chat(sender, "&9District: &7" + chunk.getDistrict().getName() + " (" + chunk.getDistrict().getId() + ")");
+				Print.chat(sender, "&9Owner: &7" + (chunk.getType() == ChunkType.PRIVATE ? Static.getPlayerNameByUUID(UUID.fromString(chunk.getOwner())) : chunk.getOwner()));
 				Print.chat(sender, "&9Price: &7" + Config.getWorthAsString(chunk.getPrice()));
 				Print.chat(sender, "&9Last change: &7" + Time.getAsString(chunk.getChanged()));
 				Print.chat(sender, "&9Linked chunks: &7" + chunk.getLinkedChunks().size());
@@ -183,6 +199,7 @@ public class ChunkCmd extends CommandBase {
 						Print.chat(sender, "&c-> &9" + chunk.getLinkedChunks().get(i));
 					}
 				}
+				Print.chat(sender, "&9Linked: &7" + (chunk.getLink() == null ? "false" : chunk.getLink()[0] + "x, " + chunk.getLink()[1] + "z"));
 				Print.chat(sender, "&2Claimed by &7" + Static.getPlayerNameByUUID(chunk.getClaimer()) + "&2 at &8" + Time.getAsString(chunk.getCreated()));
 				return;
 			}
@@ -261,45 +278,219 @@ public class ChunkCmd extends CommandBase {
 				return;
 			}
 			case "buy":{
-				
+				//TODO add check if of same state/municipality
+				//TODO add check for companies, based on their type
+				if(chunk.getType() == ChunkType.PRIVATE && UUID.fromString(chunk.getOwner()).equals(player.getGameProfile().getId())){
+					Print.chat(sender, "&7&oYou already do own this chunk.");
+					return;
+				}
+				if(args.length >= 3 && args[1].equals("via-sign")){
+					try{
+						chunk = StateUtil.getChunk(player.world, BlockPos.fromLong(Long.parseLong(args[2])));
+					}
+					catch(Exception e){
+						Print.chat(sender, "&9Error: &7" + e.getMessage());
+					}
+				}
+				if(chunk.getPrice() <= 0){
+					Print.chat(sender, "&cChunk isn't for sale.");
+				}
+				else{
+					Account receiver = null;
+					boolean wasloadedin = true;
+					switch(chunk.getType()){
+						case COMPANY:{
+							Print.chat(sender, "&cNot available yet.");//TODO companies.
+							return;
+						}
+						case DISTRICT:
+						case MUNICIPAL:
+						case NORMAL:{
+							receiver = chunk.getDistrict().getMunicipality().getAccount();
+							break;
+						}
+						case PRIVATE:{
+							receiver = AccountManager.INSTANCE.getAccount("player", chunk.getOwner());
+							if(receiver == null){
+								wasloadedin = false;
+								receiver = AccountManager.INSTANCE.getAccount("player", chunk.getOwner(), true);
+							}
+							break;
+						}
+						case PUBLIC:
+						case STATEOWNED:{
+							receiver = chunk.getDistrict().getMunicipality().getState().getAccount();
+							break;
+						}
+						default:{
+							Print.chat(sender, "&cInvalid Chunk Type! Payment destination unknown.");
+							return;
+						}
+					}
+					Account ac_sender = StateUtil.getPlayer(player).getAccount();
+					if(!AccountManager.INSTANCE.getBank(ac_sender.getBankId()).processTransfer(sender, ac_sender, chunk.getPrice(), receiver)){
+						return;
+					}
+					long time = Time.getDate();
+					chunk.setOwner(player.getGameProfile().getId().toString());
+					chunk.setPrice(0);
+					chunk.setType(ChunkType.PRIVATE);
+					chunk.setChanged(time);
+					chunk.save();
+					ImageCache.update(player.world, player.world.getChunkFromChunkCoords(chunk.xCoord(), chunk.zCoord()), "bought", "chunk_types");
+					Print.chat(sender, "&aChunk bought!");
+					if(chunk.getLinkedChunks().size() > 0){
+						chunk.getLinkedChunks().forEach(ckpos -> {
+							Chunk ck = StateUtil.getTempChunk(ckpos);
+							ck.setOwner(player.getGameProfile().getId().toString());
+							ck.setPrice(0);
+							ck.setType(ChunkType.PRIVATE);
+							ck.setChanged(time);
+							ck.save();
+							ImageCache.update(player.world, player.world.getChunkFromChunkCoords(ck.xCoord(), ck.zCoord()), "bought", "chunk_types");
+						});
+						Print.chat(sender, "&7" + chunk.getLinkedChunks().size() + "&a linked chunks bought!");
+					}
+					if(!wasloadedin){
+						AccountManager.INSTANCE.unloadAccount(receiver);
+					}
+				}
 				return;
 			}
 			case "set_for_sale":
 			case "set-for-sale":
 			case "setforsale":
+			case "sell":
 			case "sfs":{
 				if(isPermitted(chunk, player)){
-					
-				}
-				else{
-					Print.chat(sender, "&7No Permission.");
+					if(args.length < 2){
+						Print.chat(sender, "&9Missing argument.");
+						Print.chat(sender, "&7/ck set-for-sale <price>");
+						Print.chat(sender, "&6Remember!&2 1000 equals &71" + Config.CURRENCY_SIGN + "&2!");
+						return;
+					}
+					try{
+						Long price = Long.parseLong(args[1]);
+						chunk.setPrice(price);
+						Print.chat(sender, "&9Price set to &7" + Config.getWorthAsString(price));
+					}
+					catch(Exception e){
+						Print.chat(sender, "&9Error: &7" + e.getMessage());
+					}
 				}
 				return;
 			}
 			case "set":{
 				if(isPermitted(chunk, player)){
-					
-				}
-				else{
-					Print.chat(sender, "&7No Permission.");
+					//
 				}
 				return;
 			}
 			case "link":{
 				if(isOwner(chunk, player)){
-					
-				}
-				else{
-					Print.chat(sender, "&7No Permission.");
+					if(args.length < 2){
+						Print.chat(sender, "&9Missing argument.");
+						Print.chat(sender, "&7/ck link <x> <z>");
+						Print.chat(sender, "&7/ck link reset");
+						return;
+					}
+					if(args[1].equals("reset")){
+						chunk.setLink(null, null);
+						Print.chat(sender, "&6Chunk unlinked.");
+					}
+					else{
+						try{
+							int x = Integer.parseInt(args[1]);
+							int z = Integer.parseInt(args[2]);
+							chunk.setLink(x, z);
+							Print.chat(sender, "&6Chunk linked. ( " + x + " | " + z + " );");
+							
+						}
+						catch(Exception e){
+							Print.chat(sender, "&9Error: &c" + e.getMessage());
+						}
+					}
 				}
 				return;
 			}
 			case "whitelist":{
-				if(isOwner(chunk, player)){
-					
-				}
-				else{
-					Print.chat(sender, "&7No Permission.");
+				if(isOwner(chunk, player) || (args.length >= 2 && args[1].equals("view"))){
+					if(args.length < 2){
+						Print.chat(sender, "&9Missing argument.");
+						Print.chat(sender, "&7/ck whitelist add <playername>");
+						Print.chat(sender, "&7/ck whitelist add company <id>");
+						Print.chat(sender, "&7/ck whitelist rem <playername>");
+						Print.chat(sender, "&7/ck whitelist rem company <id>");
+						Print.chat(sender, "&7/ck whitelist clear");
+						Print.chat(sender, "&7/ck whitelist view");
+						return;
+					}
+					switch(args[1]){
+						case "add":
+						case "rem":{
+							if(args.length < 3){
+								Print.chat(sender, "&9Missing Arguemnt.");
+								return;
+							}
+							if(args[2].equals("company")){
+								if(args.length < 4){
+									Print.chat(sender, "&9Missing Arguemnt.");
+									return;
+								}
+								Print.chat(sender, "&cNot available yet.");
+								//TODO companies
+								return;
+							}
+							GameProfile gp = Static.getServer().getPlayerProfileCache().getGameProfileForUsername(args[2]);
+							if(gp == null){
+								Print.chat(sender, "&7Player not found.");
+							}
+							else{
+								if(args[1].equals("add")){
+									chunk.getPlayerWhitelist().add(gp.getId());
+									chunk.save();
+									Print.chat(sender, "&aPlayer added to whitelist.");
+								}
+								else if(args[1].equals("rem")){
+									chunk.getPlayerWhitelist().remove(gp.getId());
+									chunk.save();
+									Print.chat(sender, "&aPlayer removed from whitelist.");
+								}
+								else{
+									Print.chat(sender, "&c&oHow could this happen?! Report this issue immediatelly.");
+								}
+							}
+							return;
+						}
+						case "clear":{
+							chunk.getPlayerWhitelist().clear();
+							chunk.getCompanyWhitelist().clear();
+							chunk.save();
+							Print.chat(sender, "Whitelist cleared.");
+							return;
+						}
+						case "view":{
+							Print.chat(sender, "&2Whitelist of " + chunk.xCoord() + "x, " + chunk.zCoord() + "z &0:");
+							if(chunk.getPlayerWhitelist().size() <= 0){
+								Print.chat(sender, "&eNo players are whitelisted.");
+							}
+							else{
+								chunk.getPlayerWhitelist().forEach(uuid -> Print.chat(sender, "&5-> &7" + Static.getPlayerNameByUUID(uuid)));
+							}
+							if(chunk.getCompanyWhitelist().size() <= 0){
+								Print.chat(sender, "&eNo companies are whitelisted.");
+							}
+							else{
+								//TODO companies
+								chunk.getCompanyWhitelist().forEach(id -> Print.chat(sender, "&9-> &7Company (" + id + ");"));
+							}
+							return;
+						}
+						default:{
+							Print.chat(sender, "&cInvalid Argument.");
+							return;
+						}
+					}
 				}
 				return;
 			}
@@ -311,56 +502,75 @@ public class ChunkCmd extends CommandBase {
 	}
 
 	private boolean isPermitted(Chunk chunk, EntityPlayer player){
+		if(chunk.getLink() != null){
+			int[] link = chunk.getLink();
+			Print.chat(player, "&7Chunk is linked to a chunk at &2" + link[0] + "x&7, &2" + link[1] + "z&7.");
+			Print.chat(player, "&7Please make changes to that chunk, they will be copied to this one.");
+			Print.chat(player, "&7Alternatively unlink this chunk.");
+			return false;
+		}
 		if(isAdmin(player)){
+			Print.chat(player, "&7&oAdmin bypass.");
 			return true;
 		}
+		boolean result = false;
 		UUID uuid = player.getGameProfile().getId();
 		boolean isco = chunk.getOwner().equals(uuid.toString());
 		boolean ismn = chunk.getDistrict().getManager() != null && chunk.getDistrict().getManager().equals(uuid);
 		boolean ismy = chunk.getDistrict().getMunicipality().getMayor() != null && chunk.getDistrict().getMunicipality().getMayor().equals(uuid);
-		boolean isst = chunk.getDistrict().getMunicipality().getState().getCouncil().contains(uuid) || (chunk.getDistrict().getMunicipality().getState().getLeader() != null || chunk.getDistrict().getMunicipality().getState().getLeader().equals(uuid));
-		boolean iscm = false;
+		boolean isst = chunk.getDistrict().getMunicipality().getState().getCouncil().contains(uuid) || (chunk.getDistrict().getMunicipality().getState().getLeader() != null && chunk.getDistrict().getMunicipality().getState().getLeader().equals(uuid));
+		boolean iscm = false;//TODO companies
+		Print.debug(isco, ismn, ismy, isst, iscm);
 		switch(chunk.getType()){
-			case COMPANY: return iscm || isst;
-			case DISTRICT: return ismn || ismy || isst;
-			case MUNICIPIAL: return ismy || isst;
-			case NORMAL: return ismn || ismy || isst;
-			case PRIVATE: return isco || ismy || isst;
-			case PUBLIC: return ismn || ismy || isst;
-			case STATEOWNED: return isst;
-			default: return false;
+			case COMPANY: result = iscm || isst; break;
+			case DISTRICT: result = ismn || ismy || isst; break;
+			case MUNICIPAL: result = ismy || isst; break;
+			case NORMAL: result = ismn || ismy || isst; break;
+			case PRIVATE: result = isco || ismy || isst; break;
+			case PUBLIC: result = ismn || ismy || isst; break;
+			case STATEOWNED: result = isst; break;
+			default: result = false; break;
 		}
+		if(!result){
+			Print.chat(player, "&7No Permission.");
+		}
+		return result;
 	}
 	
-	//TODO make as above
 	private boolean isOwner(Chunk chunk, EntityPlayer player){
+		if(chunk.getLink() != null){
+			int[] link = chunk.getLink();
+			Print.chat(player, "&7Chunk is linked to a chunk at &2" + link[0] + "x&7, &2" + link[1] + "z&7.");
+			Print.chat(player, "&7Please make changes to that chunk, they will be copied to this one.");
+			Print.chat(player, "&7Alternatively unlink this chunk.");
+			return false;
+		}
 		if(isAdmin(player)){
+			Print.chat(player, "&7&oAdmin bypass.");
 			return true;
 		}
+		boolean result = false;
+		UUID uuid = player.getGameProfile().getId();
+		boolean isco = chunk.getOwner().equals(uuid.toString());
+		boolean ismn = chunk.getDistrict().getManager() != null && chunk.getDistrict().getManager().equals(uuid);
+		boolean ismy = chunk.getDistrict().getMunicipality().getMayor() != null && chunk.getDistrict().getMunicipality().getMayor().equals(uuid);
+		boolean isst = chunk.getDistrict().getMunicipality().getState().getCouncil().contains(uuid) || (chunk.getDistrict().getMunicipality().getState().getLeader() != null && chunk.getDistrict().getMunicipality().getState().getLeader().equals(uuid));
+		boolean iscm = false;//TODO companies
+		Print.debug(isco, ismn, ismy, isst, iscm);
 		switch(chunk.getType()){
-			case COMPANY: return false;//TODO companies
-			case MUNICIPIAL:{
-				return chunk.getDistrict().getMunicipality().getMayor().equals(player.getGameProfile().getId()); 
-			}
-			case DISTRICT:
-			case NORMAL:{
-				return chunk.getDistrict().getMunicipality().getMayor() != null && chunk.getDistrict().getMunicipality().getMayor().equals(player.getGameProfile().getId())
-						|| chunk.getDistrict().getManager() != null && chunk.getDistrict().getManager().equals(player.getGameProfile().getId());
-			}
-			case PRIVATE:{
-				return StateUtil.isUUID(chunk.getOwner()) && UUID.fromString(chunk.getOwner()).equals(player.getGameProfile().getId());
-			}
-			case PUBLIC:{
-				return false;
-			}
-			case STATEOWNED:{
-				if(chunk.getDistrict().getMunicipality().getState().getCouncil().contains(player.getGameProfile().getId())){
-					return true;
-				}
-				return chunk.getDistrict().getMunicipality().getState().getLeader() != null && chunk.getDistrict().getMunicipality().getState().getLeader().equals(player.getGameProfile().getId());
-			}
-			default: return false;
+			case COMPANY: result = iscm; break;
+			case DISTRICT: result = ismn || ismy || isst; break;
+			case MUNICIPAL: result = ismy || isst; break;
+			case NORMAL: result = ismn || ismy || isst; break;
+			case PRIVATE: result = isco || ismy; break;
+			case PUBLIC: result = false; break;
+			case STATEOWNED: result = isst; break;
+			default: result = false;
 		}
+		if(!result){
+			Print.chat(player, "&7No Permission.");
+		}
+		return result;
 	}
 
 	private boolean isAdmin(EntityPlayer player){

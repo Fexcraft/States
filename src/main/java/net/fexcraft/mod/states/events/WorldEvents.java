@@ -115,6 +115,7 @@ public class WorldEvents {
 			States.DISTRICTS.put(0, new GenericDistrict(0));
 		}
 		ImageCache.loadQueue();
+		//event.getWorld().addEventListener(new TestListener());
 	}
 	
 	@SubscribeEvent

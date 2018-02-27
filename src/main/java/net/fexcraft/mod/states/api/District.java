@@ -52,4 +52,8 @@ public interface District extends ColorHolder {
 	
 	public void setManager(UUID uuid);
 	
+	public boolean canForeignersSettle();
+	
+	public void setForeignersSettle(boolean bool);
+	
 }

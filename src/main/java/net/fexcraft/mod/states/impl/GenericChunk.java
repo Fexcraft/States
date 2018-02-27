@@ -210,7 +210,7 @@ public class GenericChunk implements Chunk {
 
 	@Override
 	public void setOwner(String str){
-		owner = str;
+		owner = str == null ? "null" : owner;
 	}
 
 	@Override

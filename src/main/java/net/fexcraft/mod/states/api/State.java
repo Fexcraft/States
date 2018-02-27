@@ -56,4 +56,6 @@ public interface State extends ColorHolder {
 	
 	public void setCapitalId(int id);
 
+	public List<Integer> getBlacklist();
+
 }

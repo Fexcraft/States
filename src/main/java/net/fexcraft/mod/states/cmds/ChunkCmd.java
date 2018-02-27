@@ -16,6 +16,7 @@ import net.fexcraft.mod.states.States;
 import net.fexcraft.mod.states.api.Chunk;
 import net.fexcraft.mod.states.api.ChunkType;
 import net.fexcraft.mod.states.api.District;
+import net.fexcraft.mod.states.api.Player;
 import net.fexcraft.mod.states.util.ImageCache;
 import net.fexcraft.mod.states.util.StateUtil;
 import net.minecraft.command.CommandBase;
@@ -62,6 +63,7 @@ public class ChunkCmd extends CommandBase {
 			Print.chat(sender, "&7/ck whitelist <args>");
 			Print.chat(sender, "&7/ck update <option:range> [admin-only]");
 			Print.chat(sender, "&7/ck queue");
+			Print.chat(sender, "&7/ck types");
 			return;
 		}
 		if(sender.getCommandSenderEntity() instanceof EntityPlayer == false){
@@ -69,6 +71,7 @@ public class ChunkCmd extends CommandBase {
 			return;
 		}
 		EntityPlayer player = (EntityPlayer)sender.getCommandSenderEntity();
+		Player playerdata = StateUtil.getPlayer(player);
 		Chunk chunk = StateUtil.getChunk(player);
 		switch(args[0]){
 			case "claim":{
@@ -278,10 +281,34 @@ public class ChunkCmd extends CommandBase {
 				return;
 			}
 			case "buy":{
-				//TODO add check if of same state/municipality
 				//TODO add check for companies, based on their type
 				if(chunk.getType() == ChunkType.PRIVATE && UUID.fromString(chunk.getOwner()).equals(player.getGameProfile().getId())){
 					Print.chat(sender, "&7&oYou already do own this chunk.");
+					return;
+				}
+				if(args.length >= 2 && args[1].equals("company")){
+					//TODO
+					return;
+				}
+				if(playerdata.getMunicipality().getId() < 0){
+					Print.chat(sender, "&7You must be citizen of a Municipality to be able to buy chunks.");
+					return;
+				}
+				if(playerdata.getMunicipality().getState().getId() < 0){
+					Print.chat(sender, "&7You must be citizen of a State to be able to buy chunks.");
+					return;
+				}
+				if(chunk.getDistrict().getMunicipality().getId() != playerdata.getMunicipality().getId() && !chunk.getDistrict().canForeignersSettle()){
+					Print.chat(sender, "&cYou are not part of this Municipality.");
+					Print.chat(sender, "&cChunks in this District can not be bought by Foreigners.");
+					return;
+				}
+				if(chunk.getDistrict().getMunicipality().getPlayerBlacklist().contains(player.getGameProfile().getId())){
+					Print.chat(sender, "&cYou are blacklisted in this Municipality.");
+					return;
+				}
+				if(chunk.getDistrict().getMunicipality().getState().getBlacklist().contains(playerdata.getMunicipality().getState().getId())){
+					Print.chat(sender, "&cPlayers from your State can not buy chunks here.");
 					return;
 				}
 				if(args.length >= 3 && args[1].equals("via-sign")){
@@ -381,8 +408,121 @@ public class ChunkCmd extends CommandBase {
 				return;
 			}
 			case "set":{
-				if(isPermitted(chunk, player)){
-					//
+				if(!isPermitted(chunk, player)){//TODO testing/reverse
+					if(args.length < 2){
+						Print.chat(sender, "&9Missing argument.");
+						Print.chat(sender, "&7/ck set <option> <value>");
+						return;
+					}
+					switch(args[1]){
+						case "district":{
+							if(isAdmin(player)){
+								try{
+									chunk.setDistrict(StateUtil.getDistrict(Integer.parseInt(args[2])));
+									Print.chat(sender, "&2District set to: " + chunk.getDistrict().getName() + " (" + chunk.getDistrict().getId() + ");");
+								}
+								catch(Exception e){
+									Print.chat(sender, "&9Error: &7" + e.getMessage());
+								}
+							}
+							else{
+								Print.chat(sender, "&2Once a chunk is claimed, the district cannot be changed.");
+							}
+							break;
+						}
+						case "price":{
+							Print.chat(sender, "&2Please use the &7/ck set-for-sale &2command instead!");
+							break;
+						}
+						case "link":{
+							Print.chat(sender, "&2Please use the &7/ck link &2command instead!");
+							break;
+						}
+						case "type":{
+							if(args.length < 3){
+								Print.chat(sender, "&7&o/ck set type <type>");
+								break;
+							}
+							ChunkType type = ChunkType.valueOf(args[2].toUpperCase());
+							if(type == null){
+								Print.chat(sender, "&9Chunk Type not found. Use &7/ck types &9to see available types.");
+							}
+							else{
+								long time = Time.getDate();
+								switch(type){
+									case COMPANY:{
+										Print.chat(sender, "&2Please use the &7/ck set-for-sale &2command instead.");
+										Print.chat(sender, "&2To buy as company use &7/ck buy company");
+										break;
+									}
+									case STATEOWNED:
+									case MUNICIPAL:
+									case DISTRICT:
+									case NORMAL:{
+										chunk.setType(type);
+										chunk.setOwner(null);
+										chunk.setPrice(0);
+										chunk.setChanged(time);
+										chunk.getLinkedChunks().forEach(link -> {
+											Chunk ck = StateUtil.getTempChunk(link);
+											ck.setType(type);
+											ck.setOwner(null);
+											ck.setPrice(0);
+											ck.setChanged(time);
+											ck.save();
+										});
+										chunk.save();
+										String to = type == ChunkType.NORMAL || type == ChunkType.DISTRICT ? "District" : type == ChunkType.MUNICIPAL ? "Municipality" : type == ChunkType.STATEOWNED ? "State" : "ERROR";
+										Print.chat(sender, "&9Chunk given to the &2" + to + "&9!");
+										break;
+									}
+									case PRIVATE:{
+										Print.chat(sender, "&2Please use the &7/ck set-for-sale &2command instead.");
+										break;
+									}
+									case PUBLIC:{
+										chunk.setType(type);
+										chunk.setChanged(time);
+										chunk.getLinkedChunks().forEach(link -> {
+											Chunk ck = StateUtil.getTempChunk(link);
+											ck.setType(type);
+											ck.setChanged(time);
+											ck.save();
+										});
+										chunk.save();
+										Print.chat(sender, "&2Chunk set to &cPUBLIC&2!");
+										Print.chat(sender, "&2It is still yours, but anyone can edit blocks.");
+										break;
+									}
+									default:{
+										Print.chat(sender, "&4Invalid chunk type, this actually shouldn't happen.");
+										break;
+									}
+								}
+								ImageCache.update(player.world, player.world.getChunkFromChunkCoords(chunk.hashCode(), chunk.zCoord()), "type_changed", "chunk_types");
+								chunk.getLinkedChunks().forEach(link -> {
+									ImageCache.update(player.world, player.world.getChunkFromChunkCoords(Integer.parseInt(link.getResourceDomain()), Integer.parseInt(link.getResourcePath())), "type_changed", "chunk_types");
+								});
+							}
+							break;
+						}
+						case "owner":{
+							Print.chat(sender, "&2If you want to give the chunk to a player or company, use the &7/ck set-for-sale &2command instead.");
+							Print.chat(sender, "&2If you want to give the chunk to the district, municipality or state, use the &7/ck set type &2command.");
+							Print.chat(sender, "&c&oGiving the chunk to the district, municipality or state does not give you money, and removes you from ownership!");
+							break;
+						}
+						case "whitelist":{
+							Print.chat(sender, "&2Please use the &7/ck whitelist &2command instead!");
+							break;
+						}
+						case "help":
+						default:{
+							Print.chat(sender, "&9Available options:");
+							Print.chat(sender, "&7district, price, link, type, owner, whitelist");
+							break;
+						}
+					}
 				}
 				return;
 			}
@@ -491,6 +631,13 @@ public class ChunkCmd extends CommandBase {
 							return;
 						}
 					}
+				}
+				return;
+			}
+			case "types":{
+				Print.chat(sender, "&9Existing chunk types:");
+				for(ChunkType type : ChunkType.values()){
+					Print.chat(sender, "&2-> &3" + type.name().toLowerCase());
 				}
 				return;
 			}

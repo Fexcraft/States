@@ -108,7 +108,7 @@ public class AreaView extends GuiContainer {
 			case 7:{ z++; break; }
 			default: break;
 		}
-		if(sel < 0){ sel = 0; }
+		if(sel < 0){ sel = ImageCache.TYPES.length - 1; }
 		if(sel >= ImageCache.TYPES.length){ sel = 0; }
 		view_mode = ImageCache.TYPES[sel];
 		//

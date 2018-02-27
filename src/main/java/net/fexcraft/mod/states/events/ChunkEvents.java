@@ -16,7 +16,7 @@ public class ChunkEvents {
 	
 	@SubscribeEvent
 	public static void onLoad(ChunkEvent.Load event){
-		if(event.getWorld().provider.getDimension() != 0){
+		if(event.getWorld().isRemote || event.getWorld().provider.getDimension() != 0){
 			return;
 		}
 		int x = event.getChunk().x, z = event.getChunk().z;
@@ -27,7 +27,7 @@ public class ChunkEvents {
 	
 	@SubscribeEvent
 	public static void onUnload(ChunkEvent.Unload event){
-		if(event.getWorld().provider.getDimension() != 0){
+		if(event.getWorld().isRemote || event.getWorld().provider.getDimension() != 0){
 			return;
 		}
 		int x = event.getChunk().x, z = event.getChunk().z;

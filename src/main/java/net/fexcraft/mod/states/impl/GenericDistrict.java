@@ -25,6 +25,7 @@ public class GenericDistrict implements District {
 	private ArrayList<Integer> neighbors;
 	private String name, color;
 	private Municipality municipality;
+	private boolean cfs;
 	
 	public GenericDistrict(int id){
 		this.id = id;
@@ -38,6 +39,7 @@ public class GenericDistrict implements District {
 		municipality = StateUtil.getMunicipality(JsonUtil.getIfExists(obj, "municipality", -1).intValue());
 		manager = obj.has("manager") ? UUID.fromString(obj.get("manager").getAsString()) : null;
 		color = JsonUtil.getIfExists(obj, "color", "#ffffff");
+		cfs = JsonUtil.getIfExists(obj, "can_foreigners_settle", false);
 	}
 
 	@Override
@@ -53,6 +55,7 @@ public class GenericDistrict implements District {
 		obj.add("neighbors", JsonUtil.getArrayFromIntegerList(neighbors));
 		if(!(manager == null)){ obj.addProperty("manager", manager.toString()); }
 		obj.addProperty("color", color);
+		obj.addProperty("can_foreigners_settle", cfs);
 		return obj;
 	}
 
@@ -122,7 +125,9 @@ public class GenericDistrict implements District {
 
 	@Override
 	public void setMunicipality(Municipality mun){
+		municipality.getDistricts().remove(this.getId());
 		municipality = mun;
+		municipality.getDistricts().add(this.getId());
 	}
 
 	@Override
@@ -148,6 +153,16 @@ public class GenericDistrict implements District {
 	@Override
 	public void setColor(String newcolor){
 		color = newcolor;
+	}
+
+	@Override
+	public boolean canForeignersSettle(){
+		return cfs;
+	}
+
+	@Override
+	public void setForeignersSettle(boolean bool){
+		cfs = bool;
 	}
 
 }

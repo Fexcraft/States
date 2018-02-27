@@ -60,5 +60,13 @@ public interface Municipality extends ColorHolder {
 	public State getState();
 	
 	public void setState(State new_state);
+	
+	public boolean isOpen();
+	
+	public void setOpen(boolean bool);
+
+	public List<UUID> getPlayerBlacklist();
+
+	public List<Integer> getCompanyBlacklist();
 
 }

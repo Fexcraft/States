@@ -21,7 +21,7 @@ public class GenericState implements State {
 	private long created, changed;
 	private UUID creator, leader;
 	private Account account;
-	private ArrayList<Integer> neighbors, municipalities;
+	private ArrayList<Integer> neighbors, municipalities, blacklist;
 	private ArrayList<UUID> council;
 
 	public GenericState(int value){
@@ -38,6 +38,7 @@ public class GenericState implements State {
 		municipalities = JsonUtil.jsonArrayToIntegerArray(JsonUtil.getIfExists(obj, "municipalities", new JsonArray()).getAsJsonArray());
 		council = JsonUtil.jsonArrayToUUIDArray(JsonUtil.getIfExists(obj, "council", new JsonArray()).getAsJsonArray());
 		color = JsonUtil.getIfExists(obj, "color", "#ffffff");
+		blacklist = JsonUtil.jsonArrayToIntegerArray(JsonUtil.getIfExists(obj, "blacklist", new JsonArray()).getAsJsonArray());
 	}
 
 	@Override
@@ -55,6 +56,7 @@ public class GenericState implements State {
 		obj.add("council", JsonUtil.getArrayFromUUIDList(council));
 		obj.addProperty("balance", account.getBalance());
 		obj.addProperty("color", color);
+		obj.add("blacklist", JsonUtil.getArrayFromIntegerList(blacklist));
 		return obj;
 	}
 
@@ -157,6 +159,11 @@ public class GenericState implements State {
 	@Override
 	public void setColor(String newcolor){
 		color = newcolor;
+	}
+
+	@Override
+	public List<Integer> getBlacklist(){
+		return blacklist;
 	}
 	
 }

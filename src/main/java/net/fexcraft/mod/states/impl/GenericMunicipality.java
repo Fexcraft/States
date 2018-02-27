@@ -25,10 +25,11 @@ public class GenericMunicipality implements Municipality {
 	private long created, changed;
 	private UUID creator, mayor;
 	private Account account;
-	private ArrayList<Integer> neighbors, districts;
-	private ArrayList<UUID> citizen, council;
+	private ArrayList<Integer> neighbors, districts, com_blacklist;
+	private ArrayList<UUID> citizen, council, pl_blacklist;
 	private MunicipalityType type;
 	private State state;
+	private boolean open;
 	
 	public GenericMunicipality(int id){
 		this.id = id;
@@ -46,6 +47,9 @@ public class GenericMunicipality implements Municipality {
 		type = MunicipalityType.getType(this);
 		state = StateUtil.getState(JsonUtil.getIfExists(obj, "state", -1).intValue());
 		color = JsonUtil.getIfExists(obj, "color", "#ffffff");
+		open = JsonUtil.getIfExists(obj, "open", false);
+		com_blacklist = JsonUtil.jsonArrayToIntegerArray(JsonUtil.getIfExists(obj, "company_blacklist", new JsonArray()).getAsJsonArray());
+		pl_blacklist = JsonUtil.jsonArrayToUUIDArray(JsonUtil.getIfExists(obj, "player_blacklist", new JsonArray()).getAsJsonArray());
 	}
 
 	@Override
@@ -64,6 +68,7 @@ public class GenericMunicipality implements Municipality {
 		obj.addProperty("state", state.getId());
 		obj.addProperty("balance", account.getBalance());
 		obj.addProperty("color", color);
+		obj.addProperty("open", false);
 		return obj;
 	}
 
@@ -171,7 +176,9 @@ public class GenericMunicipality implements Municipality {
 
 	@Override
 	public void setState(State new_state){
+		state.getMunicipalities().remove(this.getId());
 		state = new_state;
+		state.getMunicipalities().add(this.getId());
 	}
 	
 	@Override
@@ -182,6 +189,26 @@ public class GenericMunicipality implements Municipality {
 	@Override
 	public void setColor(String newcolor){
 		color = newcolor;
+	}
+
+	@Override
+	public boolean isOpen(){
+		return open;
+	}
+
+	@Override
+	public void setOpen(boolean bool){
+		open = bool;
+	}
+
+	@Override
+	public List<UUID> getPlayerBlacklist(){
+		return pl_blacklist;
+	}
+
+	@Override
+	public List<Integer> getCompanyBlacklist(){
+		return com_blacklist;
 	}
 
 }

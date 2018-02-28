@@ -29,7 +29,7 @@ public class TESImplementation implements TESCapability {
 	public void setup(Chunk chunk){
 		isStatesSign = true;
 		mode = tileentity.signText[1].getUnformattedText().toLowerCase();
-		update(chunk, true);
+		update(chunk, null, true);
 	}
 
 	@Override
@@ -43,8 +43,8 @@ public class TESImplementation implements TESCapability {
 	}
 
 	@Override
-	public void update(Chunk chunk, boolean send){
-		if(!isStatesSign || chunk == null){
+	public void update(Chunk chunk, String task, boolean send){
+		if(!isStatesSign || chunk == null || (task != null && !task.equals(mode))){
 			return;
 		}
 		//
@@ -156,7 +156,7 @@ public class TESImplementation implements TESCapability {
 	public void onPlayerInteract(Chunk chunk, EntityPlayer player){
 		if(chunk.getChanged() != this.lastupdate){
 			Print.chat(player, "&7Sign Updating...");
-			update(chunk, true);
+			update(chunk, null, true);
 			return;
 		}
 		Print.debug(player, chunk.toJsonObject());

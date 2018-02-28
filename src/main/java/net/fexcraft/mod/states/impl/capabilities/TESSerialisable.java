@@ -45,12 +45,12 @@ public class TESSerialisable implements ICapabilitySerializable<NBTBase> {
 		TESCapability.CAPINJ.getStorage().readNBT(TESCapability.CAPINJ, instance, null, nbt);
 	}
 
-	public static void processChunkChange(Chunk chunk){
+	public static void processChunkChange(Chunk chunk, String string){
 		net.minecraft.world.chunk.Chunk ck = Static.getServer().worlds[0].getChunkFromChunkCoords(chunk.xCoord(), chunk.zCoord());
 		ck.getTileEntityMap().values().forEach(te -> {
 			if(te instanceof TileEntitySign){
 				TESCapability cap = te.getCapability(TESCapability.CAPINJ, null);
-				cap.update(chunk, true);
+				cap.update(chunk, string, true);
 			}
 		});
 	}

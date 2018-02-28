@@ -1,5 +1,9 @@
 package net.fexcraft.mod.states.cmds;
 
+import java.awt.Color;
+
+import com.mojang.authlib.GameProfile;
+
 import net.fexcraft.mod.fsmm.util.Config;
 import net.fexcraft.mod.lib.api.common.fCommand;
 import net.fexcraft.mod.lib.util.common.Print;
@@ -66,6 +70,7 @@ public class DistrictCmd extends CommandBase {
 					District district = StateUtil.getDistrict(var);
 					Print.chat(sender, "&c-> &9" + district.getName() + " &7(" + district.getId() + ");");
 				});
+				Print.chat(sender, "&7Can Foreigners Settle: " + dis.canForeignersSettle());
 				Print.chat(sender, "&2Created by &7" + Static.getPlayerNameByUUID(dis.getCreator()) + "&2 at &8" + Time.getAsString(dis.getCreated()));
 				return;
 			}
@@ -87,7 +92,164 @@ public class DistrictCmd extends CommandBase {
 				return;
 			}
 			case "set":{
-				
+				if(args.length < 2){
+					Print.chat(sender, "&7/dis set type <type>");
+					Print.chat(sender, "&7/dis set name <new name>");
+					Print.chat(sender, "&7/dis set price <price/0>");
+					Print.chat(sender, "&7/dis set manager <playername>");
+					Print.chat(sender, "&7/dis set color <hex>");
+					Print.chat(sender, "&7/dis set can-foreigners-settle <true/false>");
+					return;
+				}
+				boolean can0 = (dis.getManager() != null && dis.getManager().equals(player.getGameProfile().getId())) || (dis.getMunicipality().getMayor() != null && dis.getMunicipality().getMayor().equals(player.getGameProfile().getId())) || isAdmin(player);
+				boolean can1 = (dis.getMunicipality().getMayor() != null && dis.getMunicipality().getMayor().equals(player.getGameProfile().getId())) || dis.getMunicipality().getState().getCouncil().contains(player.getGameProfile().getId()) || (dis.getMunicipality().getState().getLeader() != null && dis.getMunicipality().getState().getLeader().equals(player.getGameProfile().getId())) || isAdmin(player);
+				boolean can2 = dis.getMunicipality().getCouncil().contains(player.getGameProfile().getId());
+				switch(args[1]){
+					case "type":{
+						if(can1){
+							if(args.length < 3){
+								Print.chat(sender, "&9Missing Argument!");
+								Print.chat(sender, "&2You can see available types using &7/dis types&2!");
+								break;
+							}
+							try{
+								DistrictType type = DistrictType.valueOf(args[2].toUpperCase());
+								if(type != null){
+									dis.setType(type);
+									dis.setChanged(Time.getDate());
+									dis.save();
+								}
+								Print.chat(sender, "&9District type set to &7" + type.name().toLowerCase() + "&9!");
+							}
+							catch(Exception e){
+								Print.chat(sender, "&9Error: &7" + e.getMessage());
+							}
+						}
+						else{
+							Print.chat(sender, "&cNo permission.");
+						}
+						break;
+					}
+					case "name":{
+						if(can0 || can2){
+							if(args.length < 3){
+								Print.chat(sender, "&9Missing Arguments!");
+								break;
+							}
+							String str = args[2];
+							if(args.length > 3){
+								for(int i = 3; i < args.length; i++){
+									str += " " + args[i];
+								}
+							}
+							if(str.replace(" ", "").length() < 3){
+								Print.chat(sender, "&cName is too short!");
+								break;
+							}
+							dis.setName(str);
+							dis.setChanged(Time.getDate());
+							dis.save();
+							Print.chat(sender, "&6Name set to: &7" + dis.getName());
+						}
+						else{
+							Print.chat(sender, "&cNo permission.");
+						}
+						break;
+					}
+					case "price":{
+						if(can1){
+							if(args.length < 3){
+								Print.chat(sender, "&9Missing Argument!");
+								Print.chat(sender, "&7Setting the price to \"0\" makes the district not buyable.");
+								break;
+							}
+							try{
+								Long price = Long.parseLong(args[2]);
+								if(price < 0){ price = 0l; }
+								dis.setPrice(price);
+								dis.setChanged(Time.getDate());
+								dis.save();
+								Print.chat(sender, "&2Price set to: &7" + Config.getWorthAsString(dis.getPrice()));
+							}
+							catch(Exception e){
+								Print.chat(sender, "&cError: &7" + e.getMessage());
+							}
+						}
+						else{
+							Print.chat(sender, "&cNo permission.");
+						}
+						break;
+					}
+					case "manager":{
+						if(can1 || can2){
+							if(args.length < 3){
+								Print.chat(sender, "&9Missing Argument!");
+								break;
+							}
+							GameProfile gp = Static.getServer().getPlayerProfileCache().getGameProfileForUsername(args[2]);
+							if(gp == null || gp.getId() == null){
+								Print.chat(sender, "&cPlayer not found in Cache.");
+								break;
+							}
+							dis.setManager(gp.getId());
+							dis.setChanged(Time.getDate());
+							dis.save();
+							Print.chat(sender, "&2Set &7" + gp.getName() + "&2 to new District Manager!");
+						}
+						else{
+							Print.chat(sender, "&cNo permission.");
+						}
+						break;
+					}
+					case "color":{
+						if(can0 || can2){
+							if(args.length < 3){
+								Print.chat(sender, "&9Missing Argument!");
+								break;
+							}
+							try{
+								String str = args[2];
+								if(str.replace("#", "").length() != 6){
+									Print.chat(sender, "&cInvalid HEX String.");
+									break;
+								}
+								str = str.startsWith("#") ? str : "#" + str;
+								Color color = Color.decode(str);
+								dis.setColor(str);
+								dis.setChanged(Time.getDate());
+								dis.save();
+								Print.chat(sender, "&6Color set to &7" + str + "&6! (" + color.getRed() + ", " + color.getGreen() + ", " + color.getBlue() + ");");
+							}
+							catch(Exception e){
+								Print.chat(sender, "&2Error: &7" + e.getMessage());
+							}
+						}
+						else{
+							Print.chat(sender, "&cNo permission.");
+						}
+						break;
+					}
+					case "can-foreigners-settle":{
+						if(can0 || can2){
+							if(args.length < 3){
+								Print.chat(sender, "&9Missing Argument!");
+								break;
+							}
+							dis.setForeignersSettle(Boolean.parseBoolean(args[2]));
+							dis.setChanged(Time.getDate());
+							dis.save();
+							Print.chat(sender, "&2FCS: &7" + dis.canForeignersSettle());
+						}
+						else{
+							Print.chat(sender, "&cNo permission.");
+						}
+						break;
+					}
+					default:{
+						Print.chat(sender, "&9Invalid Argument.");
+						break;
+					}
+				}
 				return;
 			}
 			default:{

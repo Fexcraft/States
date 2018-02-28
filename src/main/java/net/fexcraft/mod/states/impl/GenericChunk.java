@@ -173,7 +173,7 @@ public class GenericChunk implements Chunk {
 	@Override
 	public void setChanged(long new_change){
 		changed = new_change;
-		TESSerialisable.processChunkChange(this);
+		TESSerialisable.processChunkChange(this, "chunk");
 	}
 
 	@Override

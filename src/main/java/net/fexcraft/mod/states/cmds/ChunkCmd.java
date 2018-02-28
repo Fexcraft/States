@@ -402,6 +402,7 @@ public class ChunkCmd extends CommandBase {
 						Long price = Long.parseLong(args[1]);
 						chunk.setPrice(price);
 						chunk.setChanged(Time.getDate());
+						chunk.save();
 						Print.chat(sender, "&9Price set to &7" + Config.getWorthAsString(price));
 					}
 					catch(Exception e){

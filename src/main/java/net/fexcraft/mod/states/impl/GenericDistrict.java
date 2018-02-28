@@ -14,6 +14,7 @@ import net.fexcraft.mod.states.States;
 import net.fexcraft.mod.states.api.District;
 import net.fexcraft.mod.states.api.DistrictType;
 import net.fexcraft.mod.states.api.Municipality;
+import net.fexcraft.mod.states.impl.capabilities.TESSerialisable;
 import net.fexcraft.mod.states.util.StateUtil;
 
 public class GenericDistrict implements District {
@@ -108,6 +109,9 @@ public class GenericDistrict implements District {
 	@Override
 	public void setChanged(long new_change){
 		changed = new_change;
+		States.CHUNKS.cellSet().forEach(cell -> {
+			TESSerialisable.processChunkChange(cell.getValue(), "district");
+		});
 	}
 
 	@Override

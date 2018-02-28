@@ -1,5 +1,7 @@
 package net.fexcraft.mod.states.impl.capabilities;
 
+import javax.annotation.Nullable;
+
 import net.fexcraft.mod.states.api.Chunk;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.nbt.NBTBase;
@@ -19,7 +21,7 @@ public interface TESCapability {
 	
 	public TileEntitySign getTileEntity();
 	
-	public void update(Chunk chunk, boolean sendupdatepacket);
+	public void update(Chunk chunk, @Nullable String task, boolean sendupdatepacket);
 
 	public NBTBase writeToNBT(Capability<TESCapability> capability, EnumFacing side);
 

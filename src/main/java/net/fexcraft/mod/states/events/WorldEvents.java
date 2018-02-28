@@ -12,7 +12,12 @@ import net.fexcraft.mod.states.api.State;
 import net.fexcraft.mod.states.impl.GenericDistrict;
 import net.fexcraft.mod.states.impl.GenericMunicipality;
 import net.fexcraft.mod.states.impl.GenericState;
+import net.fexcraft.mod.states.impl.capabilities.TESSerialisable;
 import net.fexcraft.mod.states.util.ImageCache;
+import net.minecraft.tileentity.TileEntity;
+import net.minecraft.tileentity.TileEntitySign;
+import net.minecraft.util.ResourceLocation;
+import net.minecraftforge.event.AttachCapabilitiesEvent;
 import net.minecraftforge.event.world.WorldEvent;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
@@ -127,6 +132,13 @@ public class WorldEvents {
 		States.MUNICIPALITIES.values().forEach(elm -> { elm.save(); });
 		States.STATES.values().forEach(elm -> { elm.save(); });
 		ImageCache.saveQueue();
+	}
+	
+	@SubscribeEvent
+	public static void onTEL(AttachCapabilitiesEvent<TileEntity> event){
+		if(event.getObject() instanceof TileEntitySign){
+			event.addCapability(new ResourceLocation("states", "sign"), new TESSerialisable(event.getObject()));
+		}
 	}
 	
 }

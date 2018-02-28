@@ -15,7 +15,6 @@ import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import net.minecraft.world.chunk.Chunk;
 
@@ -29,9 +28,9 @@ public class AreaView extends GuiContainer {
 	public AreaView(EntityPlayer player, World world, int x, int y, int z){
 		super(new PlaceholderContainer());
 		xSize = 150; ySize = 200;
-		view_mode = ImageCache.TYPES[0];
+		view_mode = ImageCache.TYPES[x];
 		//
-		Chunk chunk = world.getChunkFromBlockCoords(new BlockPos(x, y, z));
+		Chunk chunk = world.getChunkFromBlockCoords(player.getPosition());
 		int[] i = ImageCache.getRegion(chunk.x, chunk.z);
 		this.x = px = i[0]; this.z = pz = i[1];
 		requestRegion();

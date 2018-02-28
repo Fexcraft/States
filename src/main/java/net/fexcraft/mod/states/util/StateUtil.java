@@ -38,8 +38,7 @@ public class StateUtil {
 	}
 
 	public static Chunk getChunk(World world, BlockPos pos){
-		net.minecraft.world.chunk.Chunk chunk = world.getChunkFromBlockCoords(pos);
-		return States.CHUNKS.get(chunk.x, chunk.z);
+		return States.CHUNKS.get(pos.getX() >> 4, pos.getZ() >> 4);
 	}
 
 	public static District getDistrict(int value){

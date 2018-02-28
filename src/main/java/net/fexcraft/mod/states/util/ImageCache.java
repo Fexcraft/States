@@ -164,7 +164,19 @@ public class ImageCache {
 				return ck.getDistrict().getId() != st_chunk.getDistrict().getId();
 			}
 			case "chunk_types":{
-				return ck.getType() != st_chunk.getType();
+				if(ck.getType() != st_chunk.getType()){
+					return true;
+				}
+				switch(st_chunk.getType()){
+					case DISTRICT: return st_chunk.getDistrict().getId() != ck.getDistrict().getId();
+					case MUNICIPAL: return st_chunk.getDistrict().getMunicipality().getId() != ck.getDistrict().getMunicipality().getId();
+					case STATEOWNED: return st_chunk.getDistrict().getMunicipality().getState().getId() != ck.getDistrict().getMunicipality().getState().getId();
+					case PUBLIC:
+					case NORMAL:
+					case PRIVATE:
+					case COMPANY: return st_chunk.getOwner() != null && ck.getOwner() != null && !ck.getOwner().equals(st_chunk.getOwner());
+					default: break;
+				}
 			}
 			case "surface_commercial":{
 				//TODO

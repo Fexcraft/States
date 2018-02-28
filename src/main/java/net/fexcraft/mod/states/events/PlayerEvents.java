@@ -1,19 +1,16 @@
 package net.fexcraft.mod.states.events;
 
 import net.fexcraft.mod.lib.perms.PermManager;
-import net.fexcraft.mod.lib.util.common.Formatter;
 import net.fexcraft.mod.lib.util.common.Print;
-import net.fexcraft.mod.lib.util.common.Static;
 import net.fexcraft.mod.states.States;
 import net.fexcraft.mod.states.api.Chunk;
 import net.fexcraft.mod.states.api.Player;
 import net.fexcraft.mod.states.impl.GenericPlayer;
-import net.fexcraft.mod.states.util.SignUtil;
+import net.fexcraft.mod.states.impl.capabilities.TESCapability;
 import net.fexcraft.mod.states.util.StateUtil;
 import net.minecraft.block.BlockSign;
 import net.minecraft.tileentity.TileEntitySign;
 import net.minecraft.util.EnumHand;
-import net.minecraft.util.text.TextComponentString;
 import net.minecraftforge.event.entity.player.PlayerInteractEvent;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
@@ -62,34 +59,16 @@ public class PlayerEvents {
 				return;
 			}
 			Chunk chunk = StateUtil.getChunk(event.getWorld(), event.getPos());
+			TESCapability cap = te_sign.getCapability(TESCapability.CAPINJ, null);
 			if(te_sign.signText[0].getUnformattedText().equalsIgnoreCase("[States]")){
-				switch(te_sign.signText[1].getUnformattedText().toLowerCase()){
-					case "chunk":{
-						SignUtil.updateChunkState(event.getEntityPlayer(), chunk, te_sign);
-						break;
-					}
-					default: break;
-				}
+				if(cap != null){ cap.setup(chunk); }
 			}
-			else if(te_sign.signText[0].getUnformattedText().startsWith("[States]> ")){
-				switch(te_sign.signText[0].getUnformattedText().replace("[States]> ", "").toLowerCase()){
-					case "chunk":{
-						SignUtil.updateChunkState(event.getEntityPlayer(), chunk, te_sign);
-						if(te_sign.signText[1].getUnformattedText().equals(Formatter.format("&2For Sale!"))){
-							te_sign.signText[1] = new TextComponentString(Formatter.format("&cProcessing..."));
-							Static.getServer().commandManager.executeCommand(event.getEntityPlayer(), "ck buy via-sign " + te_sign.getPos().toLong());
-							SignUtil.updateChunkState(event.getEntityPlayer(), chunk, te_sign);
-							return;
-						}
-						break;
-					}
-					default: break;
-				}
+			else if(cap != null && cap.isStatesSign()){
+				cap.onPlayerInteract(chunk, event.getEntityPlayer());
 			}
 			else return;
 		}
 		else return;
-	}
-	
+	}	
 
 }

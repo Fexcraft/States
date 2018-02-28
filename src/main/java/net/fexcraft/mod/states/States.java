@@ -23,9 +23,13 @@ import net.fexcraft.mod.states.guis.GuiHandler;
 import net.fexcraft.mod.states.guis.Listener;
 import net.fexcraft.mod.states.guis.Receiver;
 import net.fexcraft.mod.states.impl.GenericPlayer;
+import net.fexcraft.mod.states.impl.capabilities.TESCapability;
+import net.fexcraft.mod.states.impl.capabilities.TESImplementation;
+import net.fexcraft.mod.states.impl.capabilities.TESStorage;
 import net.fexcraft.mod.states.packets.ImagePacket;
 import net.fexcraft.mod.states.packets.ImagePacketHandler;
 import net.fexcraft.mod.states.util.Config;
+import net.minecraftforge.common.capabilities.CapabilityManager;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.event.FMLInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLPostInitializationEvent;
@@ -77,6 +81,7 @@ public class States {
 		PlayerPerms.addAdditionalData(GenericPlayer.class);
 		//
 		SERVERACCOUNT = AccountManager.INSTANCE.getAccount("server", "states", true);
+		CapabilityManager.INSTANCE.register(TESCapability.class, new TESStorage(), TESImplementation.class);
 	}
 	
 	public static final File getWorldDirectory(){

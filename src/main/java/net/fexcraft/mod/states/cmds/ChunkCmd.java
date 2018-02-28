@@ -86,8 +86,7 @@ public class ChunkCmd extends CommandBase {
 					Print.chat(sender, "&7District not found. (" + disid + ");");
 					return;
 				}
-				boolean can = true;//(district.getManager() != null && district.getManager().equals(player.getGameProfile().getId())) || (district.getMunicipality().getMayor() != null && district.getMunicipality().getMayor().equals(player.getGameProfile().getId())) || PermManager.getPlayerPerms(player).hasPermission(States.ADMIN_PERM);
-				//TODO re-activate check after testing-end
+				boolean can = (district.getManager() != null && district.getManager().equals(player.getGameProfile().getId())) || (district.getMunicipality().getMayor() != null && district.getMunicipality().getMayor().equals(player.getGameProfile().getId())) || isAdmin(player);
 				if(can){
 					if(range > 3){
 						Print.chat(sender, "Invalid range, setting to \"3\"!");
@@ -195,6 +194,7 @@ public class ChunkCmd extends CommandBase {
 				Print.chat(sender, "&9District: &7" + chunk.getDistrict().getName() + " (" + chunk.getDistrict().getId() + ")");
 				Print.chat(sender, "&9Owner: &7" + (chunk.getType() == ChunkType.PRIVATE ? Static.getPlayerNameByUUID(UUID.fromString(chunk.getOwner())) : chunk.getOwner()));
 				Print.chat(sender, "&9Price: &7" + Config.getWorthAsString(chunk.getPrice()));
+				Print.chat(sender, "&9Type: &7" + chunk.getType().name().toLowerCase());
 				Print.chat(sender, "&9Last change: &7" + Time.getAsString(chunk.getChanged()));
 				Print.chat(sender, "&9Linked chunks: &7" + chunk.getLinkedChunks().size());
 				if(chunk.getLinkedChunks().size() > 0){
@@ -207,8 +207,7 @@ public class ChunkCmd extends CommandBase {
 				return;
 			}
 			case "update":{
-				//TODO reverse;
-				if(!PermManager.getPlayerPerms(player).hasPermission(States.ADMIN_PERM)){
+				if(isAdmin(player)){
 					int range = args.length > 1 ? Integer.parseInt(args[1]) : 0;
 					if(range <= 0){
 						ImageCache.update(player.world, player.world.getChunkFromChunkCoords(chunk.xCoord(), chunk.zCoord()), "update", "all");
@@ -241,8 +240,7 @@ public class ChunkCmd extends CommandBase {
 				return;
 			}
 			case "unclaim":{
-				//TODO reverse;
-				if(!PermManager.getPlayerPerms(player).hasPermission(States.ADMIN_PERM)){
+				if(isAdmin(player)){
 					int range = args.length > 1 ? Integer.parseInt(args[1]) : 0;
 					if(range <= 0){
 						chunk.setClaimer(player.getGameProfile().getId());
@@ -282,6 +280,10 @@ public class ChunkCmd extends CommandBase {
 			}
 			case "buy":{
 				//TODO add check for companies, based on their type
+				if(chunk.getDistrict().getId() < 0){
+					Print.chat(sender, "Not claimed chunks can not be bought.");
+					return;
+				}
 				if(chunk.getType() == ChunkType.PRIVATE && UUID.fromString(chunk.getOwner()).equals(player.getGameProfile().getId())){
 					Print.chat(sender, "&7&oYou already do own this chunk.");
 					return;
@@ -389,7 +391,7 @@ public class ChunkCmd extends CommandBase {
 			case "setforsale":
 			case "sell":
 			case "sfs":{
-				if(isPermitted(chunk, player)){
+				if(!isPermitted(chunk, player)){
 					if(args.length < 2){
 						Print.chat(sender, "&9Missing argument.");
 						Print.chat(sender, "&7/ck set-for-sale <price>");
@@ -399,6 +401,7 @@ public class ChunkCmd extends CommandBase {
 					try{
 						Long price = Long.parseLong(args[1]);
 						chunk.setPrice(price);
+						chunk.setChanged(Time.getDate());
 						Print.chat(sender, "&9Price set to &7" + Config.getWorthAsString(price));
 					}
 					catch(Exception e){
@@ -408,7 +411,7 @@ public class ChunkCmd extends CommandBase {
 				return;
 			}
 			case "set":{
-				if(!isPermitted(chunk, player)){//TODO testing/reverse
+				if(isPermitted(chunk, player)){
 					if(args.length < 2){
 						Print.chat(sender, "&9Missing argument.");
 						Print.chat(sender, "&7/ck set <option> <value>");
@@ -720,7 +723,7 @@ public class ChunkCmd extends CommandBase {
 		return result;
 	}
 
-	private boolean isAdmin(EntityPlayer player){
+	public static final boolean isAdmin(EntityPlayer player){
 		return PermManager.getPlayerPerms(player).hasPermission(States.ADMIN_PERM);
 	}
 

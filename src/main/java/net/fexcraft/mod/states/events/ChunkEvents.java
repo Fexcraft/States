@@ -6,6 +6,7 @@ import net.fexcraft.mod.lib.util.json.JsonUtil;
 import net.fexcraft.mod.states.States;
 import net.fexcraft.mod.states.api.Chunk;
 import net.fexcraft.mod.states.impl.GenericChunk;
+import net.fexcraft.mod.states.impl.capabilities.TESSerialisable;
 import net.fexcraft.mod.states.util.ImageCache;
 import net.minecraftforge.event.world.ChunkEvent;
 import net.minecraftforge.fml.common.Mod;
@@ -42,6 +43,9 @@ public class ChunkEvents {
 				}
 			}
 		}
+		event.getChunk().getTileEntityMap().keySet().forEach(key -> {
+			TESSerialisable.TILEENTITIES.remove(key);
+		});
 	}
 
 }

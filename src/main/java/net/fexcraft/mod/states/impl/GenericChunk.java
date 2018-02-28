@@ -16,6 +16,7 @@ import net.fexcraft.mod.states.States;
 import net.fexcraft.mod.states.api.Chunk;
 import net.fexcraft.mod.states.api.ChunkType;
 import net.fexcraft.mod.states.api.District;
+import net.fexcraft.mod.states.impl.capabilities.TESSerialisable;
 import net.fexcraft.mod.states.util.Config;
 import net.fexcraft.mod.states.util.ImageCache;
 import net.fexcraft.mod.states.util.StateUtil;
@@ -172,6 +173,7 @@ public class GenericChunk implements Chunk {
 	@Override
 	public void setChanged(long new_change){
 		changed = new_change;
+		TESSerialisable.processChunkChange(this);
 	}
 
 	@Override

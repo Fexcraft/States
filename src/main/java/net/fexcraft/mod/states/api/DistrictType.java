@@ -34,4 +34,14 @@ public enum DistrictType {
 		}
 	}
 	
+	public String toDetailedString(){
+		String str = "&0[";
+		str += "&" + (housing ? 2 : 4) + "#";
+		str += "&" + (commerce ? 2 : 4) + "#";
+		str += "&" + (industry ? 2 : 4) + "#";
+		str += "&" + (cultivation ? 2 : 4) + "#";
+		str += "&" + (exploit ? 2 : 4) + "#";
+		return str + "&0]&2" + name().toLowerCase();
+	}
+	
 }

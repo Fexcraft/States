@@ -22,7 +22,7 @@ public class GenericMunicipality implements Municipality {
 	
 	private int id;
 	private String name, color;
-	private long created, changed;
+	private long created, changed, price;
 	private UUID creator, mayor;
 	private Account account;
 	private ArrayList<Integer> neighbors, districts, com_blacklist;
@@ -50,6 +50,7 @@ public class GenericMunicipality implements Municipality {
 		open = JsonUtil.getIfExists(obj, "open", false);
 		com_blacklist = JsonUtil.jsonArrayToIntegerArray(JsonUtil.getIfExists(obj, "company_blacklist", new JsonArray()).getAsJsonArray());
 		pl_blacklist = JsonUtil.jsonArrayToUUIDArray(JsonUtil.getIfExists(obj, "player_blacklist", new JsonArray()).getAsJsonArray());
+		price = JsonUtil.getIfExists(obj, "price", 0).longValue();
 	}
 
 	@Override
@@ -69,6 +70,7 @@ public class GenericMunicipality implements Municipality {
 		obj.addProperty("balance", account.getBalance());
 		obj.addProperty("color", color);
 		obj.addProperty("open", false);
+		obj.addProperty("price", price);
 		return obj;
 	}
 
@@ -209,6 +211,16 @@ public class GenericMunicipality implements Municipality {
 	@Override
 	public List<Integer> getCompanyBlacklist(){
 		return com_blacklist;
+	}
+
+	@Override
+	public long getPrice(){
+		return price;
+	}
+
+	@Override
+	public void setPrice(long new_price){
+		price = new_price;
 	}
 
 }

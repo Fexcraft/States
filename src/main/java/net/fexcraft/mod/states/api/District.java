@@ -8,7 +8,7 @@ import com.google.gson.JsonObject;
 
 import net.fexcraft.mod.states.States;
 
-public interface District extends ColorHolder {
+public interface District extends ColorHolder, BuyableType {
 	
 	public int getId();
 	

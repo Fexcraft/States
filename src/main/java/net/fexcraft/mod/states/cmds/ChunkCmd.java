@@ -193,7 +193,7 @@ public class ChunkCmd extends CommandBase {
 				Print.chat(sender, "&6Info of chunk &7" + chunk.xCoord() + "x&2, &7" + chunk.zCoord() + "z&2:");
 				Print.chat(sender, "&9District: &7" + chunk.getDistrict().getName() + " (" + chunk.getDistrict().getId() + ")");
 				Print.chat(sender, "&9Owner: &7" + (chunk.getType() == ChunkType.PRIVATE ? Static.getPlayerNameByUUID(UUID.fromString(chunk.getOwner())) : chunk.getOwner()));
-				Print.chat(sender, "&9Price: &7" + Config.getWorthAsString(chunk.getPrice()));
+				Print.chat(sender, "&9Price: &7" + (chunk.getPrice() > 0 ? Config.getWorthAsString(chunk.getPrice()) : "not for sale"));
 				Print.chat(sender, "&9Type: &7" + chunk.getType().name().toLowerCase());
 				Print.chat(sender, "&9Last change: &7" + Time.getAsString(chunk.getChanged()));
 				Print.chat(sender, "&9Linked chunks: &7" + chunk.getLinkedChunks().size());

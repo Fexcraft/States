@@ -20,7 +20,7 @@ public class GenericDistrict implements District {
 	
 	private int id;
 	private DistrictType type;
-	private long created, changed;
+	private long created, changed, price;
 	private UUID creator, manager;
 	private ArrayList<Integer> neighbors;
 	private String name, color;
@@ -40,6 +40,7 @@ public class GenericDistrict implements District {
 		manager = obj.has("manager") ? UUID.fromString(obj.get("manager").getAsString()) : null;
 		color = JsonUtil.getIfExists(obj, "color", "#ffffff");
 		cfs = JsonUtil.getIfExists(obj, "can_foreigners_settle", false);
+		price = JsonUtil.getIfExists(obj, "price", 0).longValue();
 	}
 
 	@Override
@@ -56,6 +57,7 @@ public class GenericDistrict implements District {
 		if(!(manager == null)){ obj.addProperty("manager", manager.toString()); }
 		obj.addProperty("color", color);
 		obj.addProperty("can_foreigners_settle", cfs);
+		obj.addProperty("price", price);
 		return obj;
 	}
 
@@ -163,6 +165,16 @@ public class GenericDistrict implements District {
 	@Override
 	public void setForeignersSettle(boolean bool){
 		cfs = bool;
+	}
+
+	@Override
+	public long getPrice(){
+		return price;
+	}
+
+	@Override
+	public void setPrice(long new_price){
+		price = new_price;
 	}
 
 }

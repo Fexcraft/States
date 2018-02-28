@@ -9,15 +9,11 @@ import com.google.gson.JsonObject;
 import net.fexcraft.mod.states.States;
 import net.minecraft.util.ResourceLocation;
 
-public interface Chunk {
+public interface Chunk extends BuyableType {
 	
 	public int xCoord();
 	
 	public int zCoord();
-	
-	public long getPrice();
-	
-	public void setPrice(long new_price);
 	
 	public default File getChunkFile(){
 		return new File(States.getSaveDirectory(), "chunks/" + getChunkRegion() + "/" + this.xCoord() + "_" + this.zCoord() + ".json");

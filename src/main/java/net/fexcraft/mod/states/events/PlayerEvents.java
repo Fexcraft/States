@@ -21,9 +21,9 @@ import net.minecraft.block.BlockPressurePlate;
 import net.minecraft.block.BlockRedstoneComparator;
 import net.minecraft.block.BlockRedstoneRepeater;
 import net.minecraft.block.BlockSign;
+import net.minecraft.block.ITileEntityProvider;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.tileentity.TileEntity;
 import net.minecraft.tileentity.TileEntitySign;
 import net.minecraft.util.EnumHand;
 import net.minecraft.util.math.BlockPos;
@@ -71,10 +71,9 @@ public class PlayerEvents {
 			return;
 		}
 		IBlockState state = event.getWorld().getBlockState(event.getPos());
-		TileEntity te = event.getWorld().getTileEntity(event.getPos());
 		if(state.getBlock() instanceof BlockSign){
 			//IBlockState state = event.getWorld().getBlockState(event.getPos());
-			TileEntitySign te_sign = (TileEntitySign) te;
+			TileEntitySign te_sign = (TileEntitySign)event.getWorld().getTileEntity(event.getPos());
 			if(te_sign == null || te_sign.signText == null || te_sign.signText[0] == null){
 				return;
 			}
@@ -88,7 +87,7 @@ public class PlayerEvents {
 			}
 			else return;
 		}
-		else if(state.getBlock() instanceof LockableObject || te instanceof LockableObject){
+		else if(state.getBlock() instanceof LockableObject || (state.getBlock() instanceof ITileEntityProvider && event.getWorld().getTileEntity(event.getPos()) instanceof LockableObject)){
 			/*LockableObject obj = state.getBlock() instanceof LockableObject ? (LockableObject)state.getBlock() : (LockableObject)te;
 			if(event.getItemStack().getItem() instanceof KeyItem){
 				if(obj.isLocked()){
@@ -120,7 +119,7 @@ public class PlayerEvents {
 		else return;
 	}
 	
-	@SubscribeEvent
+	//@SubscribeEvent
 	public static void onBlockBreak(BlockEvent.BreakEvent event){
 		if(!checkAccess(event.getWorld(), event.getPos(), event.getState(), event.getPlayer())){
 			Print.chat(event.getPlayer(), "No permission to break blocks here.");
@@ -163,7 +162,7 @@ public class PlayerEvents {
 		}
 	}
 
-	@SubscribeEvent
+	//@SubscribeEvent
 	public static void onBlockPlace(BlockEvent.PlaceEvent event){
 		if(!checkAccess(event.getWorld(), event.getPos(), event.getState(), event.getPlayer())){
 			Print.chat(event.getPlayer(), "No permission to place blocks here.");

@@ -11,8 +11,10 @@ import net.fexcraft.mod.lib.perms.player.PlayerPerms;
 import net.fexcraft.mod.lib.util.common.Formatter;
 import net.fexcraft.mod.lib.util.json.JsonUtil;
 import net.fexcraft.mod.lib.util.math.Time;
+import net.fexcraft.mod.states.api.District;
 import net.fexcraft.mod.states.api.Municipality;
 import net.fexcraft.mod.states.api.Player;
+import net.fexcraft.mod.states.api.State;
 import net.fexcraft.mod.states.util.StateUtil;
 import net.minecraft.command.ICommandSender;
 
@@ -122,6 +124,26 @@ public class GenericPlayer implements AttachedData, Player {
 	@Override
 	public Account getAccount(){
 		return account;
+	}
+
+	@Override
+	public String getUUIDAsString(){
+		return uuid.toString();//TODO
+	}
+
+	@Override
+	public boolean isDistrictManagerOf(District district){
+		return district.getManager() != null && district.getManager().equals(uuid);
+	}
+
+	@Override
+	public boolean isMayorOf(Municipality municipality){
+		return municipality.getMayor() != null && municipality.getMayor().equals(uuid);
+	}
+
+	@Override
+	public boolean isStateLeaderOf(State state){
+		return state.getLeader() != null && state.getLeader().equals(uuid);
 	}
 
 }

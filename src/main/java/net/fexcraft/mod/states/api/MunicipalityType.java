@@ -38,6 +38,10 @@ public class MunicipalityType implements Comparable<MunicipalityType>{
 					JsonUtil.getIfExists(obj, "districts", 0).intValue(),
 						JsonUtil.getIfExists(obj, "available", true));
 	}
+	
+	public String toDetailedString(){
+		return "&0[&7" + requred_citizen + " | " + district_limit + "&0]&2 " + title;
+	}
 
 	@Override
 	public int compareTo(MunicipalityType o){
@@ -48,6 +52,10 @@ public class MunicipalityType implements Comparable<MunicipalityType>{
 		TYPES.clear();
 		new MunicipalityType("Invalid", 0, 0, false);
 		new MunicipalityType("(Abandoned)", 0, 0, false);
+	}
+	
+	public static final TreeSet<MunicipalityType> values(){
+		return TYPES;
 	}
 	
 	public static final MunicipalityType getType(Municipality mun){

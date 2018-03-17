@@ -29,6 +29,14 @@ public interface Player {
 	
 	public UUID getUUID();
 
+	public String getUUIDAsString();
+
 	public Account getAccount();
+
+	public boolean isMayorOf(Municipality municipality);
+
+	public boolean isStateLeaderOf(State state);
+
+	public boolean isDistrictManagerOf(District district);
 
 }

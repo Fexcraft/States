@@ -16,6 +16,7 @@ public class Config {
 	public static File CONFIG_PATH;
 	public static long DEFAULT_CHUNK_PRICE;
 	public static int MAP_UPDATES_PER_TICK;
+	public static boolean ALLOW_WILDERNESS_ACCESS;
 	//
 	public static final String DEFAULT_CAT = "Default Settings";
 	//
@@ -50,6 +51,7 @@ public class Config {
 			for(String str : arr){ new MunicipalityType(JsonUtil.getFromString(str).getAsJsonObject()); }
 		}
 		MAP_UPDATES_PER_TICK = config.getInt("map_updates_per_tick", DEFAULT_CAT, 1, 0, 128, "Max amount of Map updates per Server Tick.");
+		ALLOW_WILDERNESS_ACCESS = config.getBoolean("allow_wilderness_access", DEFAULT_CAT, false, "Should players be able to break, place or interact with blocks in Wilderness? (District:-1)");
 	}
 	
 }

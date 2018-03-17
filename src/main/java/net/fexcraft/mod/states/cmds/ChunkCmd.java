@@ -75,6 +75,7 @@ public class ChunkCmd extends CommandBase {
 		Chunk chunk = StateUtil.getChunk(player);
 		switch(args[0]){
 			case "claim":{
+				//TODO add check if claims are connected.
 				if(args.length == 1){
 					Print.chat(sender, "&7/ck claim <district> <optinal:range>");
 					return;

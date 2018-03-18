@@ -91,10 +91,10 @@ public class MunicipalityCmd extends CommandBase {
 			}
 			case "set":{
 				if(args.length < 2){
-					Print.chat(sender, "&7/dis set open <true/false>");
-					Print.chat(sender, "&7/dis set name <new name>");
-					Print.chat(sender, "&7/dis set price <price/0>");
-					Print.chat(sender, "&7/dis set color <hex>");
+					Print.chat(sender, "&7/mun set open <true/false>");
+					Print.chat(sender, "&7/mun set name <new name>");
+					Print.chat(sender, "&7/mun set price <price/0>");
+					Print.chat(sender, "&7/mun set color <hex>");
 					return;
 				}
 				boolean can0 = (mun.getMayor() != null && mun.getMayor().equals(player.getGameProfile().getId())) || isAdmin(player);
@@ -203,11 +203,23 @@ public class MunicipalityCmd extends CommandBase {
 				return;
 			}
 			case "council":{
-				
+				if(args.length < 2){
+					Print.chat(sender, "&7/mun council vote <playername> (for mayor)");
+					Print.chat(sender, "&7/mun council kick <playername>");
+					Print.chat(sender, "&7/mun council invite <playername>");
+					Print.chat(sender, "&7/mun council leave");
+					Print.chat(sender, "&7/mun council join");
+					return;
+				}
 				return;
 			}
 			case "blacklist":{
-				
+				if(args.length < 2){
+					Print.chat(sender, "&7/mun blacklist add <playername/company:id>");
+					Print.chat(sender, "&7/mun blacklist remove <playername/company:id>");
+					Print.chat(sender, "&7/mun blacklist view");
+					return;
+				}
 				return;
 			}
 			case "kick":{

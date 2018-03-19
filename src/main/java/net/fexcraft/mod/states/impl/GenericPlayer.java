@@ -64,7 +64,14 @@ public class GenericPlayer implements AttachedData, Player {
 		this.uuid = uuid;
 		this.nick = obj.has("Nickname") ? obj.get("Nickname").getAsString() : null;
 		this.color = JsonUtil.getIfExists(obj, "Color", 2).intValue();
-		this.municipality = StateUtil.getMunicipality(JsonUtil.getIfExists(obj, "Municipality", -1).intValue());
+		//this.municipality = StateUtil.getMunicipality(JsonUtil.getIfExists(obj, "Municipality", -1).intValue());
+		Municipality mun = StateUtil.getMunicipality(JsonUtil.getIfExists(obj, "Municipality", -1).intValue());
+		if(mun.getId() >= 0 && mun.getCitizen().contains(uuid)){
+			this.municipality = mun;
+		}
+		else{
+			this.municipality = StateUtil.getMunicipality(-1);
+		}
 		this.account = AccountManager.INSTANCE.getAccount("player", uuid.toString(), true);
 		return this;
 	}

@@ -2,14 +2,21 @@ package net.fexcraft.mod.states.cmds;
 
 import java.awt.Color;
 
+import com.google.gson.JsonObject;
+import com.mojang.authlib.GameProfile;
+
 import net.fexcraft.mod.fsmm.util.Config;
 import net.fexcraft.mod.lib.api.common.fCommand;
 import net.fexcraft.mod.lib.util.common.Print;
 import net.fexcraft.mod.lib.util.common.Static;
 import net.fexcraft.mod.lib.util.math.Time;
 import net.fexcraft.mod.states.api.Chunk;
+import net.fexcraft.mod.states.api.Mail;
+import net.fexcraft.mod.states.api.MailType;
 import net.fexcraft.mod.states.api.Municipality;
 import net.fexcraft.mod.states.api.MunicipalityType;
+import net.fexcraft.mod.states.api.Player;
+import net.fexcraft.mod.states.impl.GenericMail;
 import net.fexcraft.mod.states.util.StateUtil;
 import net.minecraft.command.CommandBase;
 import net.minecraft.command.CommandException;
@@ -48,6 +55,7 @@ public class MunicipalityCmd extends CommandBase {
 			Print.chat(sender, "&7/mun set <option> <value>");
 			Print.chat(sender, "&7/mun council <args...>");
 			Print.chat(sender, "&7/mun blacklist <args...>");
+			Print.chat(sender, "&7/mun citizen");
 			Print.chat(sender, "&7/mun kick <player>");
 			Print.chat(sender, "&7/mun invite <player>");
 			Print.chat(sender, "&7/mun create <name...>");
@@ -65,6 +73,7 @@ public class MunicipalityCmd extends CommandBase {
 				Print.chat(sender, "&9Price: &7" + (mun.getPrice() > 0 ? Config.getWorthAsString(mun.getPrice()) : "not for sale"));
 				Print.chat(sender, "&9Type: &7" + mun.getType().getTitle());
 				Print.chat(sender, "&6Color: &7" + mun.getColor());
+				Print.chat(sender, "&8Citizen: &7" + mun.getCitizen().size());
 				Print.chat(sender, "&9Balance: &7" + Config.getWorthAsString(mun.getAccount().getBalance()));
 				Print.chat(sender, "&9Last change: &7" + Time.getAsString(mun.getChanged()));
 				Print.chat(sender, "&9Council Members: &7" + mun.getCouncil().size());
@@ -220,14 +229,121 @@ public class MunicipalityCmd extends CommandBase {
 					Print.chat(sender, "&7/mun blacklist view");
 					return;
 				}
+				if(args[1].equals("view")){
+					Print.chat(sender, "&9Blacklisted Players: &7" + mun.getPlayerBlacklist().size());
+					mun.getPlayerBlacklist().forEach(uuid -> {
+						Print.chat(sender, "&c-> &9" + Static.getPlayerNameByUUID(uuid));
+					});
+					Print.chat(sender, "&9Blacklisted Companies: &7" + mun.getCompanyBlacklist().size());
+					mun.getCompanyBlacklist().forEach(id -> {
+						Print.chat(sender, "&c-> &9" + id);
+					});//TODO
+					return;
+				}
+				if(!mun.getCouncil().contains(player.getGameProfile().getId())){
+					Print.chat(sender, "&cNo permission!");
+					return;
+				}
+				if(args[1].equals("add")){
+					//TODO
+				}
+				else if(args[1].equals("remove") || args[1].equals("rem")){
+					//TODO
+				}
+				else{
+					Print.chat(sender, "&9Invalid Argument.");
+				}
+				return;
+			}
+			case "citizen":{
+				Print.chat(sender, "&9Citizen: &7" + mun.getCouncil().size());
+				mun.getCitizen().forEach(uuid -> {
+					Print.chat(sender, "&c-> &9" + Static.getPlayerNameByUUID(uuid) + (mun.getCouncil().contains(uuid) ? " &6" + "[CM]" : ""));
+				});
 				return;
 			}
 			case "kick":{
-				
+				if(!mun.getCouncil().contains(player.getGameProfile().getId())){
+					Print.chat(sender, "&cNo permission!");
+					return;
+				}
+				if(args.length < 2){
+					Print.chat(sender, "&7/mun kick <playername> <optional:reason>");
+					return;
+				}
+				GameProfile gp = server.getPlayerProfileCache().getGameProfileForUsername(args[1]);
+				if(gp == null || gp.getId() == null){
+					Print.chat(sender, "&cPlayer not found.");
+					return;
+				}
+				if(mun.getCouncil().contains(gp.getId())){
+					Print.chat(sender, "&9You can not kick council members!");
+					Print.chat(sender, "&cUse &7/mun council kick &c instead!");
+					return;
+				}
+				if(!mun.getCitizen().contains(gp.getId())){
+					Print.chat(sender, "That player isn't a citizen of this Municipality.");
+					return;
+				}
+				String reason = null;
+				if(args.length > 2){
+					reason = args[2];
+					if(args.length >= 3){
+						for(int i = 3; i < args.length; i++){
+							reason += " " + args[i];
+						}
+					}
+				}
+				mun.getCitizen().remove(gp.getId());
+				String kickmsg = "You have been kicked from the Municipality (" + mun.getId() + ") for: " + (reason == null ? "No Kick reason given." : reason);
+				Mail mail = new GenericMail("player", gp.getId().toString(), player.getGameProfile().getId().toString(), kickmsg, MailType.SYSTEM, null);
+				Player playr = StateUtil.getPlayer(gp.getId(), false);
+				if(playr != null){ playr.setMunicipality(StateUtil.getMunicipality(-1)); }
+				StateUtil.sendMail(mail);
+				Print.chat(sender, "&7Player &9" + gp.getName() + "&7 kicked from the Municipality!");
+				return;
+			}
+			case "mail":{//TODO temporary, send dummy mail.
+				Mail mail = new GenericMail("player", player.getGameProfile().getId().toString(), player.getGameProfile().getId().toString(), "EMPTYMAIL", MailType.SYSTEM, null);
+				StateUtil.sendMail(mail);
 				return;
 			}
 			case "invite":{
-				
+				if(!mun.getCouncil().contains(player.getGameProfile().getId())){
+					Print.chat(sender, "&cNo permission!");
+					return;
+				}
+				if(args.length < 2){
+					Print.chat(sender, "&7/mun invite <playername> <optional:message>");
+					return;
+				}
+				GameProfile gp = server.getPlayerProfileCache().getGameProfileForUsername(args[1]);
+				if(gp == null || gp.getId() == null){
+					Print.chat(sender, "&cPlayer not found.");
+					return;
+				}
+				if(mun.getCitizen().contains(gp.getId())){
+					Print.chat(sender, "That player is already a citizen of this Municipality.");
+					return;
+				}
+				String msg = null;
+				if(args.length > 2){
+					msg = args[2];
+					if(args.length >= 3){
+						for(int i = 3; i < args.length; i++){
+							msg += " " + args[i];
+						}
+					}
+				}
+				String invmsg = "You have been invited to join the Municipality " + mun.getName() + " (" + mun.getId() + ")!" + (msg == null ? "" : " MSG: " + msg);
+				JsonObject obj = new JsonObject();
+				obj.addProperty("type", "municipality");
+				obj.addProperty("from", player.getGameProfile().getId().toString());
+				obj.addProperty("at", Time.getDate());
+				obj.addProperty("valid", Time.DAY_MS * 2);
+				Mail mail = new GenericMail("player", gp.getId().toString(), player.getGameProfile().getId().toString(), invmsg, MailType.INVITE, obj);
+				StateUtil.sendMail(mail);
+				Print.chat(sender, "&7&oInvite sent! (Will be valid for 2 days.)");
 				return;
 			}
 			case "create":{

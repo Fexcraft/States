@@ -57,6 +57,8 @@ public class PlayerEvents {
 			Print.chat(event.player, "&2Which is part of the &6$1 &7$0&2.".replace("$0", chunk.getDistrict().getMunicipality().getName()).replace("$1", chunk.getDistrict().getMunicipality().getType().getTitle()));
 			Print.chat(event.player, "&2In the State of &7$0&2.".replace("$0", chunk.getDistrict().getMunicipality().getState().getName()));
 		}
+		int i = StateUtil.getUnreadMailsOf("player", event.player.getGameProfile().getId().toString());
+		Print.chat(event.player, "&6You have &7" + (i <= 0 ? "no" : i) + "&6 new mail" + (i == 1 ? "" : "s") + ".");
 		Print.chat(event.player, "&e====-====-====-====-====-====&0[&2States&0]");
 	}
 	

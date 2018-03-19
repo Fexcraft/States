@@ -1,6 +1,7 @@
 package net.fexcraft.mod.states.util;
 
 import java.io.File;
+import java.util.List;
 import java.util.UUID;
 
 import javax.annotation.Nullable;
@@ -9,10 +10,13 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 
 import net.fexcraft.mod.lib.perms.PermManager;
+import net.fexcraft.mod.lib.util.common.Print;
+import net.fexcraft.mod.lib.util.common.Static;
 import net.fexcraft.mod.lib.util.json.JsonUtil;
 import net.fexcraft.mod.states.States;
 import net.fexcraft.mod.states.api.Chunk;
 import net.fexcraft.mod.states.api.District;
+import net.fexcraft.mod.states.api.Mail;
 import net.fexcraft.mod.states.api.Municipality;
 import net.fexcraft.mod.states.api.Player;
 import net.fexcraft.mod.states.api.State;
@@ -22,6 +26,7 @@ import net.fexcraft.mod.states.impl.GenericMunicipality;
 import net.fexcraft.mod.states.impl.GenericPlayer;
 import net.fexcraft.mod.states.impl.GenericState;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
@@ -119,6 +124,35 @@ public class StateUtil {
 
 	public static Player getPlayer(EntityPlayer player){
 		return PermManager.getPlayerPerms(player).getAdditionalData(GenericPlayer.class);
+	}
+
+	public static void sendMail(Mail mail){
+		if(mail.getRecipientType().equals("player")){
+			UUID uuid = UUID.fromString(mail.getRecipient());
+			EntityPlayerMP player = Static.getServer().getPlayerList().getPlayerByUUID(uuid);
+			if(player != null){
+				Print.chat(player, "&0[&eSt&0]&6 You have got new mail!");
+			}
+		}
+		mail.save();
+	}
+
+	public static List<Mail> gatherMailOf(String type, String string){
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	public static int getUnreadMailsOf(String rectype, String string){
+		File folder = new File(States.getSaveDirectory(), "mails/" + rectype + "/" + string + "/");
+		int i = 0;
+		if(folder.exists()){
+			for(String file : folder.list()){
+				if(file.endsWith(".unread")){
+					i++;
+				}
+			}
+		}
+		return i;
 	}
 
 }

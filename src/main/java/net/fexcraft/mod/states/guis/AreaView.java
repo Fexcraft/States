@@ -28,7 +28,7 @@ public class AreaView extends GuiContainer {
 	public AreaView(EntityPlayer player, World world, int x, int y, int z){
 		super(new PlaceholderContainer());
 		xSize = 150; ySize = 200;
-		view_mode = ImageCache.TYPES[x];
+		view_mode = ImageCache.TYPES[x >= ImageCache.TYPES.length ? 0 : x];
 		//
 		Chunk chunk = world.getChunkFromBlockCoords(player.getPosition());
 		int[] i = ImageCache.getRegion(chunk.x, chunk.z);
@@ -81,7 +81,7 @@ public class AreaView extends GuiContainer {
 		this.buttonList.add(new Button(2, guiLeft + 130, guiTop + 178,  0, 242));
 		//
 		this.buttonList.add(new Button(3, guiLeft +  22, guiTop + 146,  0, 214));//up
-		this.buttonList.add(new Button(4, guiLeft +   6, guiTop + 162, 14, 228));//left
+		this.buttonList.add(new Button(4, guiLeft +   6, guiTop + 162, 14, 214));//left
 		this.buttonList.add(new Button(5, guiLeft +  22, guiTop + 162,  0, 228));//center
 		this.buttonList.add(new Button(6, guiLeft +  38, guiTop + 162, 14, 228));//right
 		this.buttonList.add(new Button(7, guiLeft +  22, guiTop + 178,  0, 242));//down

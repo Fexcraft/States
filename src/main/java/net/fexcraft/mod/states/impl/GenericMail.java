@@ -38,12 +38,13 @@ public class GenericMail implements Mail {
 	}
 	
 	/** Create new. */
-	public GenericMail(String rectype, String receiver, String sender, String message, JsonObject data){
+	public GenericMail(String rectype, String receiver, String sender, String message, MailType type, JsonObject data){
 		this.id = Time.getDate() + "";
 		this.rectype = rectype;
 		this.recipient = receiver;
 		this.sender = sender;
 		this.message = message;
+		this.type = type;
 		this.data = data;
 		this.read = false;
 	}
@@ -111,18 +112,18 @@ public class GenericMail implements Mail {
 
 	@Override
 	public void archive(){
-		File file = new File(States.getSaveDirectory(), "mails/" + type + "/" + recipient + "/" + id + ".unread");
+		File file = new File(States.getSaveDirectory(), "mails/" + rectype + "/" + recipient + "/" + id + ".unread");
 		if(file.exists()){
 			file.delete();
 		}
-		file = new File(States.getSaveDirectory(), "mails/" + type + "/" + recipient + "/" + id + ".read");
-		JsonUtil.write(file, toJsonObject());
+		file = new File(States.getSaveDirectory(), "mails/" + rectype + "/" + recipient + "/" + id + ".read");
+		JsonUtil.write(file, toJsonObject(), true);
 	}
 	
 	@Override
 	public void save(){
-		File file = new File(States.getSaveDirectory(), "mails/" + type + "/" + recipient + "/" + id + ".unread");
-		JsonUtil.write(file, toJsonObject());
+		File file = new File(States.getSaveDirectory(), "mails/" + rectype + "/" + recipient + "/" + id + ".unread");
+		JsonUtil.write(file, toJsonObject(), true);
 	}
 
 }

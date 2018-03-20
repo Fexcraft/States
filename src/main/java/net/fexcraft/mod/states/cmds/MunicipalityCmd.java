@@ -244,11 +244,31 @@ public class MunicipalityCmd extends CommandBase {
 					Print.chat(sender, "&cNo permission!");
 					return;
 				}
-				if(args[1].equals("add")){
-					//TODO
-				}
-				else if(args[1].equals("remove") || args[1].equals("rem")){
-					//TODO
+				if(args[1].equals("add") || args[1].equals("remove") || args[1].equals("rem")){
+					if(args.length < 3){
+						Print.chat(sender, "&cMissing Argument.");
+						return;
+					}
+					GameProfile gp = Static.getServer().getPlayerProfileCache().getGameProfileForUsername(args[2]);
+					if(gp == null || gp.getId() == null){
+						Print.chat(sender, "&aPlayer not found.");
+						return;
+					}
+					if(mun.getCouncil().contains(gp.getId())){
+						Print.chat(sender, "&9You can not blacklist council members!");
+						Print.chat(sender, "&cKick them from the council first!");
+						return;
+					}
+					if(args[1].equals("add")){
+						mun.getPlayerBlacklist().add(gp.getId());
+						Print.chat(sender, "&9Player &7" + gp.getName() + "&9 added to blacklist!");
+						return;
+					}
+					else{
+						mun.getPlayerBlacklist().remove(gp.getId());
+						Print.chat(sender, "&9Player &7" + gp.getName() + "&9 removed from blacklist!");
+						return;
+					}
 				}
 				else{
 					Print.chat(sender, "&9Invalid Argument.");
@@ -303,11 +323,6 @@ public class MunicipalityCmd extends CommandBase {
 				Print.chat(sender, "&7Player &9" + gp.getName() + "&7 kicked from the Municipality!");
 				return;
 			}
-			case "mail":{//TODO temporary, send dummy mail.
-				Mail mail = new GenericMail("player", player.getGameProfile().getId().toString(), player.getGameProfile().getId().toString(), "EMPTYMAIL", MailType.SYSTEM, null);
-				StateUtil.sendMail(mail);
-				return;
-			}
 			case "invite":{
 				if(!mun.getCouncil().contains(player.getGameProfile().getId())){
 					Print.chat(sender, "&cNo permission!");
@@ -347,7 +362,11 @@ public class MunicipalityCmd extends CommandBase {
 				return;
 			}
 			case "create":{
-				
+				Player ply = StateUtil.getPlayer(player);
+				if(ply == null){
+					Print.chat(sender, "&o&4There was an error loading your Playerdata.");
+					return;
+				}
 				return;
 			}
 			default:{

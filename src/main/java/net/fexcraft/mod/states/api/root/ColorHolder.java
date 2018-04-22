@@ -1,4 +1,4 @@
-package net.fexcraft.mod.states.api;
+package net.fexcraft.mod.states.api.root;
 
 import java.awt.Color;
 

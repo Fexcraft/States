@@ -7,6 +7,8 @@ import java.util.UUID;
 import com.google.gson.JsonObject;
 
 import net.fexcraft.mod.states.States;
+import net.fexcraft.mod.states.api.root.BuyableType;
+import net.fexcraft.mod.states.api.root.ColorHolder;
 
 public interface District extends ColorHolder, BuyableType {
 	

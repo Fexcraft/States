@@ -1,5 +1,7 @@
 package net.fexcraft.mod.states.api;
 
+import net.fexcraft.mod.states.api.root.ColorHolder;
+
 public enum ChunkType implements ColorHolder {
 	
 	NORMAL("#003600"),

@@ -347,7 +347,7 @@ public class ImageCache {
 		JsonObject obj = new JsonObject();
 		obj.addProperty("last_save", Time.getDate());
 		obj.add("queue", array);
-		JsonUtil.write(new File(States.getSaveDirectory(), "image_cache/queue.json"), obj);
+		JsonUtil.write(new File(States.getSaveDirectory(), "image_cache/queue.json"), obj, true);
 	}
 
 	public static void loadQueue(){

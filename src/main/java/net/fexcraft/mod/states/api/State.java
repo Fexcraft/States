@@ -8,6 +8,8 @@ import com.google.gson.JsonObject;
 
 import net.fexcraft.mod.fsmm.api.Account;
 import net.fexcraft.mod.states.States;
+import net.fexcraft.mod.states.api.root.BuyableType;
+import net.fexcraft.mod.states.api.root.ColorHolder;
 
 public interface State extends ColorHolder, BuyableType {
 	

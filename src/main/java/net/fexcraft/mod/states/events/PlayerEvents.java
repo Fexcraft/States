@@ -10,6 +10,7 @@ import net.fexcraft.mod.states.impl.GenericPlayer;
 import net.fexcraft.mod.states.impl.capabilities.TESCapability;
 import net.fexcraft.mod.states.util.Config;
 import net.fexcraft.mod.states.util.StateUtil;
+import net.fexcraft.mod.states.util.chunk.ChunkCapabilityUtil;
 import net.minecraft.block.BlockButton;
 import net.minecraft.block.BlockChest;
 import net.minecraft.block.BlockDispenser;
@@ -135,7 +136,7 @@ public class PlayerEvents {
 		if(pl.getPermissions().hasPermission(States.ADMIN_PERM)){
 			return false;
 		}
-		Chunk chunk = StateUtil.getChunk(world, pos);
+		Chunk chunk = world.getChunkFromBlockCoords(pos).getCapability(ChunkCapabilityUtil.CHUNK_CAPABILITY, null).getStatesChunk();
 		if(chunk.getDistrict().getId() == -1){
 			return Config.ALLOW_WILDERNESS_ACCESS;
 		}

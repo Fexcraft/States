@@ -140,7 +140,7 @@ public class MunicipalityCmd extends CommandBase {
 						if(can1){
 							if(args.length < 3){
 								Print.chat(sender, "&9Missing Argument!");
-								Print.chat(sender, "&7Setting the price to \"0\" makes the district not buyable.");
+								Print.chat(sender, "&7Setting the price to \"0\" makes the municipality not buyable.");
 								break;
 							}
 							try{

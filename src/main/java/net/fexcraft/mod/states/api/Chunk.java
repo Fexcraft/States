@@ -7,6 +7,7 @@ import java.util.UUID;
 import com.google.gson.JsonObject;
 
 import net.fexcraft.mod.states.States;
+import net.fexcraft.mod.states.api.root.BuyableType;
 import net.minecraft.util.ResourceLocation;
 
 public interface Chunk extends BuyableType {

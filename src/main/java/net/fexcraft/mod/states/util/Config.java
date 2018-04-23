@@ -14,7 +14,7 @@ import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
 public class Config {
 	
 	public static File CONFIG_PATH;
-	public static long DEFAULT_CHUNK_PRICE, MUNICIPALITY_CREATION_PRICE;
+	public static long DEFAULT_CHUNK_PRICE, MUNICIPALITY_CREATION_PRICE, STATE_CREATION_PRICE;
 	public static int MAP_UPDATES_PER_TICK;
 	public static boolean ALLOW_WILDERNESS_ACCESS;
 	//
@@ -53,6 +53,7 @@ public class Config {
 		MAP_UPDATES_PER_TICK = config.getInt("map_updates_per_tick", DEFAULT_CAT, 1, 0, 128, "Max amount of Map updates per Server Tick.");
 		ALLOW_WILDERNESS_ACCESS = config.getBoolean("allow_wilderness_access", DEFAULT_CAT, false, "Should players be able to break, place or interact with blocks in Wilderness? (District:-1)");
 		MUNICIPALITY_CREATION_PRICE = config.getInt("municipality_creation_price", DEFAULT_CAT, 2500000, 0, Integer.MAX_VALUE, "Amount of Money needed to create a municipality. (1000 == 1F$)");
+		STATE_CREATION_PRICE = config.getInt("state_creation_price", DEFAULT_CAT, 52000000, 0, Integer.MAX_VALUE, "Amount of Money needed to create a state. (1000 == 1F$)");
 	}
 	
 }

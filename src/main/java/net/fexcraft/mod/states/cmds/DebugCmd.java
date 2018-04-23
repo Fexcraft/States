@@ -67,6 +67,7 @@ public class DebugCmd extends CommandBase {
 					Print.log(JsonUtil.setPrettyPrinting(elm.toJsonObject()));
 				});
 				Print.chat(sender, "&9Districts loaded: &a" + States.DISTRICTS.size());
+				Print.chat(sender, "&9Districts indata: &a" + States.DISTRICTS.firstEntry().getValue().getDistrictFile().getParentFile().listFiles().length);
 				Print.chat(sender, "Districts JSON's printed into console.");
 				return;
 			}
@@ -79,6 +80,7 @@ public class DebugCmd extends CommandBase {
 					Print.log(JsonUtil.setPrettyPrinting(elm.toJsonObject()));
 				});
 				Print.chat(sender, "&9Municipalities loaded: &a" + States.MUNICIPALITIES.size());
+				Print.chat(sender, "&9Municipalities indata: &a" + States.MUNICIPALITIES.firstEntry().getValue().getMunicipalityFile().getParentFile().listFiles().length);
 				Print.chat(sender, "Municipality JSON's printed into console.");
 				return;
 			}
@@ -91,6 +93,7 @@ public class DebugCmd extends CommandBase {
 					Print.log(JsonUtil.setPrettyPrinting(elm.toJsonObject()));
 				});
 				Print.chat(sender, "&9States loaded: &a" + States.STATES.size());
+				Print.chat(sender, "&9States indata: &a" + States.STATES.firstEntry().getValue().getStateFile().getParentFile().listFiles().length);
 				Print.chat(sender, "State JSON's printed into console.");
 				return;
 			}

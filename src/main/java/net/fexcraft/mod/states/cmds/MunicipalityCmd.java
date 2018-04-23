@@ -14,6 +14,7 @@ import net.fexcraft.mod.lib.util.common.Static;
 import net.fexcraft.mod.lib.util.math.Time;
 import net.fexcraft.mod.states.States;
 import net.fexcraft.mod.states.api.Chunk;
+import net.fexcraft.mod.states.api.ChunkType;
 import net.fexcraft.mod.states.api.DistrictType;
 import net.fexcraft.mod.states.api.Mail;
 import net.fexcraft.mod.states.api.MailType;
@@ -23,6 +24,7 @@ import net.fexcraft.mod.states.api.Player;
 import net.fexcraft.mod.states.impl.GenericDistrict;
 import net.fexcraft.mod.states.impl.GenericMail;
 import net.fexcraft.mod.states.impl.GenericMunicipality;
+import net.fexcraft.mod.states.util.ImageCache;
 import net.fexcraft.mod.states.util.StateUtil;
 import net.fexcraft.mod.states.util.world.WorldCapabilityUtil;
 import net.minecraft.command.CommandBase;
@@ -416,6 +418,7 @@ public class MunicipalityCmd extends CommandBase {
 						newmun.setOpen(false);
 						newmun.setPrice(0);
 						newmun.getCitizen().add(ply.getUUID());
+						newmun.setChanged(Time.getDate());
 						//
 						GenericDistrict newdis = new GenericDistrict(sender.getEntityWorld().getCapability(WorldCapabilityUtil.WORLD_CAPABILITY, null).getNewDistrictId());
 						if(newdis.getDistrictFile().exists() || StateUtil.getDistrict(newdis.getId()).getId() >= 0){
@@ -429,6 +432,7 @@ public class MunicipalityCmd extends CommandBase {
 							newdis.setMunicipality(newmun);
 							newdis.setPrice(0);
 							newdis.setType(DistrictType.VILLAGE);
+							newdis.setChanged(Time.getDate());
 							//
 							//Now let's save stuff.
 							long halfprice = price / 2;
@@ -437,7 +441,10 @@ public class MunicipalityCmd extends CommandBase {
 								newmun.save(); States.MUNICIPALITIES.put(newmun.getId(), newmun);
 								newdis.save(); States.DISTRICTS.put(newdis.getId(), newdis);
 								chunk.setDistrict(newdis); chunk.save();
+								chunk.setType(ChunkType.MUNICIPAL);
+								chunk.setChanged(Time.getDate());
 								ply.setMunicipality(newmun);
+								ImageCache.update(sender.getEntityWorld(), sender.getEntityWorld().getChunkFromBlockCoords(sender.getPosition()), "municipality_creation", "all");
 								StateUtil.announce(server, "&9New Municipality and District was created!");
 								StateUtil.announce(server, "&9Created by " + ply.getFormattedNickname(sender));
 								StateUtil.announce(server, "&9Name&0: &7" + newmun.getName());

@@ -233,6 +233,9 @@ public class ChunkCmd extends CommandBase {
 						Print.chat(sender, "&9There are &2" + ImageCache.TYPES.length + " &9map modes activated.");
 					}
 				}
+				else{
+					Print.chat(sender, "&cNo Permission.");
+				}
 				return;
 			}
 			case "queue":{

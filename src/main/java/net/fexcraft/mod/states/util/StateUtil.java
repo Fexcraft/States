@@ -10,6 +10,7 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 
 import net.fexcraft.mod.lib.perms.PermManager;
+import net.fexcraft.mod.lib.util.common.Formatter;
 import net.fexcraft.mod.lib.util.common.Print;
 import net.fexcraft.mod.lib.util.common.Static;
 import net.fexcraft.mod.lib.util.json.JsonUtil;
@@ -27,8 +28,10 @@ import net.fexcraft.mod.states.impl.GenericPlayer;
 import net.fexcraft.mod.states.impl.GenericState;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
+import net.minecraft.server.MinecraftServer;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.text.TextComponentString;
 import net.minecraft.world.World;
 
 public class StateUtil {
@@ -153,6 +156,10 @@ public class StateUtil {
 			}
 		}
 		return i;
+	}
+
+	public static void announce(MinecraftServer server, String string){
+		server.getPlayerList().sendMessage(new TextComponentString(Formatter.format(string)), true);
 	}
 
 }

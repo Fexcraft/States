@@ -129,6 +129,10 @@ public class GenericMunicipality implements Municipality {
 	public UUID getCreator(){
 		return creator;
 	}
+	
+	public void setCreator(UUID uuid){
+		creator = uuid;
+	}
 
 	@Override
 	public long getChanged(){

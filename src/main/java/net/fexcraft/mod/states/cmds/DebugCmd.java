@@ -95,7 +95,7 @@ public class DebugCmd extends CommandBase {
 				return;
 			}
 			case "serveraccount":{
-				Print.chat(sender, "&9Server Account Balance: " + Config.getWorthAsString(States.SERVERACCOUNT.getBalance()));
+				Print.chat(sender, "&9Server Account Balance: &7" + Config.getWorthAsString(States.SERVERACCOUNT.getBalance()));
 				return;
 			}
 		}

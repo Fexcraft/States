@@ -31,6 +31,8 @@ import net.fexcraft.mod.states.packets.ImagePacketHandler;
 import net.fexcraft.mod.states.util.Config;
 import net.fexcraft.mod.states.util.chunk.ChunkCapability;
 import net.fexcraft.mod.states.util.chunk.ChunkCapabilityUtil;
+import net.fexcraft.mod.states.util.world.WorldCapability;
+import net.fexcraft.mod.states.util.world.WorldCapabilityUtil;
 import net.minecraftforge.common.capabilities.CapabilityManager;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.event.FMLInitializationEvent;
@@ -85,6 +87,7 @@ public class States {
 		SERVERACCOUNT = AccountManager.INSTANCE.getAccount("server", "states", true);
 		CapabilityManager.INSTANCE.register(TESCapability.class, new TESStorage(), TESImplementation.class);
 		CapabilityManager.INSTANCE.register(ChunkCapability.class, new ChunkCapabilityUtil.Storage(), new ChunkCapabilityUtil.Callable());
+		CapabilityManager.INSTANCE.register(WorldCapability.class, new WorldCapabilityUtil.Storage(), new WorldCapabilityUtil.Callable());
 	}
 	
 	public static final File getWorldDirectory(){

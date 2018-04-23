@@ -96,6 +96,10 @@ public class GenericDistrict implements District {
 		return creator;
 	}
 
+	public void setCreator(UUID uuid){
+		creator = uuid;
+	}
+
 	@Override
 	public long getChanged(){
 		return changed;
@@ -131,7 +135,7 @@ public class GenericDistrict implements District {
 
 	@Override
 	public void setMunicipality(Municipality mun){
-		municipality.getDistricts().remove(this.getId());
+		municipality.getDistricts().removeIf(pre -> pre == this.getId());
 		municipality = mun;
 		municipality.getDistricts().add(this.getId());
 	}

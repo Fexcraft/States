@@ -19,5 +19,10 @@ public class ChunkCap implements ChunkCapability {
 	public net.fexcraft.mod.states.api.Chunk getStatesChunk(){
 		return statechunk == null ? statechunk = StateUtil.getChunk(chunk.x, chunk.z) : statechunk;
 	}
+
+	@Override
+	public Chunk getChunk(){
+		return chunk;
+	}
 	
 }

@@ -1,6 +1,7 @@
 package net.fexcraft.mod.states.util.chunk;
 
 import net.minecraft.nbt.NBTBase;
+import net.minecraft.nbt.NBTTagString;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.world.chunk.Chunk;
@@ -8,8 +9,6 @@ import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.capabilities.Capability.IStorage;
 import net.minecraftforge.common.capabilities.CapabilityInject;
 import net.minecraftforge.common.capabilities.ICapabilitySerializable;
-import net.minecraftforge.event.AttachCapabilitiesEvent;
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 
 public class ChunkCapabilityUtil implements ICapabilitySerializable<NBTBase>{
 	
@@ -49,7 +48,8 @@ public class ChunkCapabilityUtil implements ICapabilitySerializable<NBTBase>{
 
 		@Override
 		public NBTBase writeNBT(Capability<ChunkCapability> capability, ChunkCapability instance, EnumFacing side){
-			return null;
+			return new NBTTagString(instance == null ? "" : instance.getStatesChunk() == null ? instance.getChunk().x + "_" + instance.getChunk().z : instance.getStatesChunk().toString());
+			//I know this is nonsense, but else chunks kept getting errors and didn't save.
 		}
 
 		@Override
@@ -68,16 +68,6 @@ public class ChunkCapabilityUtil implements ICapabilitySerializable<NBTBase>{
 			return new ChunkCap();
 		}
 		
-	}
-	
-	//
-	
-	public static class EventHandler {
-		
-		@SubscribeEvent
-		public void onAttachEvent(AttachCapabilitiesEvent<net.minecraft.world.chunk.Chunk> event){
-			event.addCapability(REGISTRY_NAME, new ChunkCapabilityUtil(event.getObject()));
-		}
 	}
 
 }

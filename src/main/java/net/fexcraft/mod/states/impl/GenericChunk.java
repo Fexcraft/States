@@ -239,5 +239,10 @@ public class GenericChunk implements Chunk {
 	public List<Integer> getCompanyWhitelist(){
 		return wl_companies;
 	}
+	
+	@Override
+	public String toString(){
+		return x + "_" + z;
+	}
 
 }

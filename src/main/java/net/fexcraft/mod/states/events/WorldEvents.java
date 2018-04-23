@@ -14,6 +14,8 @@ import net.fexcraft.mod.states.impl.GenericMunicipality;
 import net.fexcraft.mod.states.impl.GenericState;
 import net.fexcraft.mod.states.impl.capabilities.TESSerialisable;
 import net.fexcraft.mod.states.util.ImageCache;
+import net.fexcraft.mod.states.util.chunk.ChunkCapabilityUtil;
+import net.fexcraft.mod.states.util.world.WorldCapabilityUtil;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.tileentity.TileEntitySign;
 import net.minecraft.util.ResourceLocation;
@@ -134,11 +136,23 @@ public class WorldEvents {
 		ImageCache.saveQueue();
 	}
 	
+	//
+	
 	@SubscribeEvent
-	public static void onTEL(AttachCapabilitiesEvent<TileEntity> event){
+	public static void onAttachEventTileEntity(AttachCapabilitiesEvent<TileEntity> event){
 		if(event.getObject() instanceof TileEntitySign){
 			event.addCapability(new ResourceLocation("states", "sign"), new TESSerialisable(event.getObject()));
 		}
+	}
+	
+	@SubscribeEvent
+	public static void onAttachEventWorld(AttachCapabilitiesEvent<net.minecraft.world.World> event){
+		event.addCapability(WorldCapabilityUtil.REGISTRY_NAME, new WorldCapabilityUtil(event.getObject()));
+	}
+	
+	@SubscribeEvent
+	public static void onAttachEventChunk(AttachCapabilitiesEvent<net.minecraft.world.chunk.Chunk> event){
+		event.addCapability(ChunkCapabilityUtil.REGISTRY_NAME, new ChunkCapabilityUtil(event.getObject()));
 	}
 	
 }

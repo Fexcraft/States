@@ -5,19 +5,26 @@ import java.awt.Color;
 import com.google.gson.JsonObject;
 import com.mojang.authlib.GameProfile;
 
+import net.fexcraft.mod.fsmm.api.Bank;
+import net.fexcraft.mod.fsmm.util.AccountManager;
 import net.fexcraft.mod.fsmm.util.Config;
 import net.fexcraft.mod.lib.api.common.fCommand;
 import net.fexcraft.mod.lib.util.common.Print;
 import net.fexcraft.mod.lib.util.common.Static;
 import net.fexcraft.mod.lib.util.math.Time;
+import net.fexcraft.mod.states.States;
 import net.fexcraft.mod.states.api.Chunk;
+import net.fexcraft.mod.states.api.DistrictType;
 import net.fexcraft.mod.states.api.Mail;
 import net.fexcraft.mod.states.api.MailType;
 import net.fexcraft.mod.states.api.Municipality;
 import net.fexcraft.mod.states.api.MunicipalityType;
 import net.fexcraft.mod.states.api.Player;
+import net.fexcraft.mod.states.impl.GenericDistrict;
 import net.fexcraft.mod.states.impl.GenericMail;
+import net.fexcraft.mod.states.impl.GenericMunicipality;
 import net.fexcraft.mod.states.util.StateUtil;
+import net.fexcraft.mod.states.util.world.WorldCapabilityUtil;
 import net.minecraft.command.CommandBase;
 import net.minecraft.command.CommandException;
 import net.minecraft.command.ICommandSender;
@@ -363,9 +370,85 @@ public class MunicipalityCmd extends CommandBase {
 			}
 			case "create":{
 				Player ply = StateUtil.getPlayer(player);
+				long price = net.fexcraft.mod.states.util.Config.MUNICIPALITY_CREATION_PRICE;
 				if(ply == null){
 					Print.chat(sender, "&o&4There was an error loading your Playerdata.");
 					return;
+				}
+				if(ply.getMunicipality().getId() >= 0){
+					Print.chat(sender, "&cYou must leave your current municipality to create a new one.");
+					return;
+				}
+				if(chunk.getDistrict().getId() >= 0){
+					Print.chat(sender, "&cThis chunk is already part of a municipality.");
+					return;
+				}
+				if(ply.getAccount().getBalance() < price){
+					Print.chat(sender, "&cNot enough money to create a municipality.");
+					Print.chat(sender, "(needed: " + Config.getWorthAsString(price, false) + "; available: " + Config.getWorthAsString(ply.getAccount().getBalance(), false) + ")");
+					return;
+				}
+				if(args.length < 2){
+					Print.chat(sender, "&9No name for new Municipality Specified.");
+					return;
+				}
+				Bank bank = AccountManager.INSTANCE.getBank(ply.getAccount().getBankId());
+				if(bank == null){
+					Print.chat(sender, "&9Your bank couldn't be found.");
+					return;
+				}
+				//TODO permissions check
+				try{
+					String name = args[1];
+					if(args.length > 2){
+						for(int i = 2; i < args.length; i++){
+							name += " " + args[i];
+						}
+					}
+					GenericMunicipality newmun = new GenericMunicipality(sender.getEntityWorld().getCapability(WorldCapabilityUtil.WORLD_CAPABILITY, null).getNewMunicipalityId());
+					if(newmun.getMunicipalityFile().exists() || StateUtil.getMunicipality(newmun.getId()).getId() >= 0){
+						throw new Exception("Tried to create new Municipality with ID '" + newmun.getId() + "', but savefile already exists.");
+					}
+					else{
+						newmun.setCreator(ply.getUUID());
+						newmun.setName(name);
+						newmun.setMayor(ply.getUUID());
+						newmun.setOpen(false);
+						newmun.setPrice(0);
+						newmun.getCitizen().add(ply.getUUID());
+						//
+						GenericDistrict newdis = new GenericDistrict(sender.getEntityWorld().getCapability(WorldCapabilityUtil.WORLD_CAPABILITY, null).getNewDistrictId());
+						if(newdis.getDistrictFile().exists() || StateUtil.getDistrict(newdis.getId()).getId() >= 0){
+							throw new Exception("Tried to create new Municipality with ID '" + newmun.getId() + "', but savefile already exists.");
+						}
+						else{
+							newdis.setCreator(ply.getUUID());
+							newdis.setName("Center");
+							newdis.setManager(ply.getUUID());
+							newdis.setForeignersSettle(false);
+							newdis.setMunicipality(newmun);
+							newdis.setPrice(0);
+							newdis.setType(DistrictType.VILLAGE);
+							//
+							//Now let's save stuff.
+							long halfprice = price / 2;
+							if(halfprice == 0 || bank.processTransfer(sender, ply.getAccount(), halfprice, States.SERVERACCOUNT)){
+								bank.processTransfer(null, ply.getAccount(), halfprice, newmun.getAccount());
+								newmun.save(); States.MUNICIPALITIES.put(newmun.getId(), newmun);
+								newdis.save(); States.DISTRICTS.put(newdis.getId(), newdis);
+								chunk.setDistrict(newdis); chunk.save();
+								ply.setMunicipality(newmun);
+								StateUtil.announce(server, "&9New Municipality and District was created!");
+								StateUtil.announce(server, "&9Created by " + ply.getFormattedNickname(sender));
+								StateUtil.announce(server, "&9Name&0: &7" + newmun.getName());
+							}
+						}
+					}
+				}
+				catch(Exception e){
+					Print.chat(sender, "Error: " + e.getMessage());
+					Print.chat(sender, e);
+					Print.debug(e);
 				}
 				return;
 			}

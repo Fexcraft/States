@@ -106,7 +106,9 @@ public class GenericMail implements Mail {
 		object.addProperty("sender", sender);
 		object.addProperty("message", message);
 		object.addProperty("read", read);
-		object.add("data", data);
+		if(data != null){
+			object.add("data", data);
+		}
 		return object;
 	}
 

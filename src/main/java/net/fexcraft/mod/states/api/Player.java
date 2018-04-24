@@ -39,4 +39,6 @@ public interface Player {
 
 	public boolean isDistrictManagerOf(District district);
 
+	public boolean canLeave(ICommandSender sender);
+
 }

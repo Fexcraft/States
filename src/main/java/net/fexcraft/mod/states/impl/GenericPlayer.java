@@ -9,6 +9,7 @@ import net.fexcraft.mod.fsmm.util.AccountManager;
 import net.fexcraft.mod.lib.perms.player.AttachedData;
 import net.fexcraft.mod.lib.perms.player.PlayerPerms;
 import net.fexcraft.mod.lib.util.common.Formatter;
+import net.fexcraft.mod.lib.util.common.Print;
 import net.fexcraft.mod.lib.util.json.JsonUtil;
 import net.fexcraft.mod.lib.util.math.Time;
 import net.fexcraft.mod.states.api.District;
@@ -67,10 +68,10 @@ public class GenericPlayer implements AttachedData, Player {
 		//this.municipality = StateUtil.getMunicipality(JsonUtil.getIfExists(obj, "Municipality", -1).intValue());
 		Municipality mun = StateUtil.getMunicipality(JsonUtil.getIfExists(obj, "Municipality", -1).intValue());
 		if(mun.getId() >= 0 && mun.getCitizen().contains(uuid)){
-			this.municipality = mun;
+			this.setMunicipality(mun);
 		}
 		else{
-			this.municipality = StateUtil.getMunicipality(-1);
+			this.setMunicipality(mun == null ? StateUtil.getMunicipality(-1) : mun);
 		}
 		this.account = AccountManager.INSTANCE.getAccount("player", uuid.toString(), true);
 		return this;
@@ -83,7 +84,22 @@ public class GenericPlayer implements AttachedData, Player {
 
 	@Override
 	public void setMunicipality(Municipality mun){
+		if(this.municipality != null){
+			this.municipality.getCitizen().remove(uuid);
+			//
+			for(int id : this.municipality.getDistricts()){
+				District dis = StateUtil.getDistrict(id);
+				if(dis == null){ continue; }
+				if(dis.getManager().equals(uuid)){
+					dis.setManager(null);
+					dis.save();
+				}
+			}
+		}
 		this.municipality = mun;
+		if(!this.municipality.getCitizen().contains(uuid)){
+			this.municipality.getCitizen().add(uuid);
+		}
 	}
 
 	@Override
@@ -151,6 +167,20 @@ public class GenericPlayer implements AttachedData, Player {
 	@Override
 	public boolean isStateLeaderOf(State state){
 		return state.getLeader() != null && state.getLeader().equals(uuid);
+	}
+
+	@Override
+	public boolean canLeave(ICommandSender sender){
+		if(this.municipality == null){ return true; }
+		if(this.municipality.getMayor().equals(uuid)){
+			Print.chat(sender, "&eYou must assign a new Mayor first, or remove youself as one, before you can leave the Municipality.");
+			return false;
+		}
+		if(this.municipality.getCouncil().size() < 2){
+			Print.chat(sender, "&eYou cannot leave the Municipality as last Council member.");
+			return false;
+		}
+		return true;
 	}
 
 }

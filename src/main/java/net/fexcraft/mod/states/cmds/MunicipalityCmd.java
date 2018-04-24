@@ -21,6 +21,7 @@ import net.fexcraft.mod.states.api.MailType;
 import net.fexcraft.mod.states.api.Municipality;
 import net.fexcraft.mod.states.api.MunicipalityType;
 import net.fexcraft.mod.states.api.Player;
+import net.fexcraft.mod.states.api.root.AnnounceLevel;
 import net.fexcraft.mod.states.impl.GenericDistrict;
 import net.fexcraft.mod.states.impl.GenericMail;
 import net.fexcraft.mod.states.impl.GenericMunicipality;
@@ -65,6 +66,8 @@ public class MunicipalityCmd extends CommandBase {
 			Print.chat(sender, "&7/mun council <args...>");
 			Print.chat(sender, "&7/mun blacklist <args...>");
 			Print.chat(sender, "&7/mun citizen");
+			Print.chat(sender, "&7/mun join");
+			Print.chat(sender, "&7/mun leave");
 			Print.chat(sender, "&7/mun kick <player>");
 			Print.chat(sender, "&7/mun invite <player>");
 			Print.chat(sender, "&7/mun create <name...>");
@@ -330,6 +333,56 @@ public class MunicipalityCmd extends CommandBase {
 				if(playr != null){ playr.setMunicipality(StateUtil.getMunicipality(-1)); }
 				StateUtil.sendMail(mail);
 				Print.chat(sender, "&7Player &9" + gp.getName() + "&7 kicked from the Municipality!");
+				return;
+			}
+			case "join":{
+				if(!mun.isOpen()){
+					Print.chat(sender, "&aYou need an invite to be able to join this Municipality.");
+					return;
+				}
+				if(mun.getPlayerBlacklist().contains(player.getGameProfile().getId())){
+					Print.chat(sender, "&eYou are banned from this Municipality.");
+					return;
+				}
+				Player ply = StateUtil.getPlayer(player);
+				if(ply == null){
+					Print.chat(sender, "&cError loading playerdata.");
+					return;
+				}
+				//TODO company check
+				if(mun.getId() == ply.getMunicipality().getId()){
+					Print.chat(sender, "You are already part of this municipality.");
+					return;
+				}
+				if(!ply.canLeave(sender)){
+					return;
+				}
+				StateUtil.announce(server, AnnounceLevel.MUNICIPALITY, "&o" + ply.getFormattedNickname(sender) + " &e&oleft the Municipality!", ply.getMunicipality().getId());
+				ply.setMunicipality(mun);
+				if(mun.getMayor() != null){
+					StateUtil.sendMail(new GenericMail("player", States.CONSOLE_UUID, mun.getMayor().toString(), player.getGameProfile().getName() + " joined the Municipality. At " + Time.getAsString(-1), MailType.SYSTEM, null));
+				}
+				StateUtil.announce(server, AnnounceLevel.MUNICIPALITY, "&o" + ply.getFormattedNickname(sender) + " &2&ojoined the Municipality!", ply.getMunicipality().getId());
+				return;
+			}
+			case "leave":{
+				Player ply = StateUtil.getPlayer(player);
+				if(ply == null){
+					Print.chat(sender, "&cError loading playerdata.");
+					return;
+				}
+				if(ply.getMunicipality().getId() == -1){
+					Print.chat(sender, "You aren't part of any Municipality.");
+					return;
+				}
+				if(!ply.canLeave(sender)){
+					return;
+				}
+				if(ply.getMunicipality().getMayor() != null){
+					StateUtil.sendMail(new GenericMail("player", States.CONSOLE_UUID, ply.getMunicipality().getMayor().toString(), player.getGameProfile().getName() + " left the Municipality. At " + Time.getAsString(-1), MailType.SYSTEM, null));
+				}
+				StateUtil.announce(server, AnnounceLevel.MUNICIPALITY, "&o" + ply.getFormattedNickname(sender) + " &e&oleft the Municipality!", ply.getMunicipality().getId());
+				ply.setMunicipality(StateUtil.getMunicipality(-1));
 				return;
 			}
 			case "invite":{

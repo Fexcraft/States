@@ -1,6 +1,7 @@
 package net.fexcraft.mod.states.util;
 
 import java.io.File;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
@@ -21,18 +22,22 @@ import net.fexcraft.mod.states.api.Mail;
 import net.fexcraft.mod.states.api.Municipality;
 import net.fexcraft.mod.states.api.Player;
 import net.fexcraft.mod.states.api.State;
+import net.fexcraft.mod.states.api.root.AnnounceLevel;
 import net.fexcraft.mod.states.impl.GenericChunk;
 import net.fexcraft.mod.states.impl.GenericDistrict;
 import net.fexcraft.mod.states.impl.GenericMunicipality;
 import net.fexcraft.mod.states.impl.GenericPlayer;
 import net.fexcraft.mod.states.impl.GenericState;
+import net.minecraft.command.ICommandSender;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.Vec3d;
 import net.minecraft.util.text.TextComponentString;
 import net.minecraft.world.World;
+import net.minecraftforge.fml.common.FMLCommonHandler;
 
 public class StateUtil {
 
@@ -159,7 +164,84 @@ public class StateUtil {
 	}
 
 	public static void announce(MinecraftServer server, String string){
-		server.getPlayerList().sendMessage(new TextComponentString(Formatter.format(string)), true);
+		announce(server, AnnounceLevel.ALL, string, 0);
+		return;
+	}
+	
+	public static void announce(MinecraftServer server, AnnounceLevel level, String string, int range){
+		announce(server, level, string, range, null);
+	}
+
+	public static void announce(MinecraftServer server, AnnounceLevel level, String string, int range, ICommandSender sender){
+		server = server == null ? Static.getServer() : server;
+		switch(level){
+			case ALL:
+				server.getPlayerList().sendMessage(new TextComponentString(Formatter.format(string)), true);
+				break;
+			case UNION:
+				//TODO doesn't exists yet.
+				break;
+			case STATE:
+				server.getPlayerList().getPlayers().forEach(player -> {
+					Player playerdata;
+					if((playerdata = StateUtil.getPlayer(player)) != null && playerdata.getMunicipality().getState().getId() == range){
+						Print.chat(player, string);
+					}
+				});
+				break;
+			case STATE_ALL:
+				server.getPlayerList().getPlayers().forEach(player -> {
+					if(StateUtil.getChunk(player).getDistrict().getMunicipality().getState().getId() == range){
+						Print.chat(player, string);
+					}
+				});
+				break;
+			case MUNICIPALITY:
+				server.getPlayerList().getPlayers().forEach(player -> {
+					Player playerdata;
+					if((playerdata = StateUtil.getPlayer(player)) != null && playerdata.getMunicipality().getId() == range){
+						Print.chat(player, string);
+					}
+				});
+				break;
+			case MUNICIPALITY_ALL:
+				server.getPlayerList().getPlayers().forEach(player -> {
+					if(StateUtil.getChunk(player).getDistrict().getMunicipality().getId() == range){
+						Print.chat(player, string);
+					}
+				});
+				break;
+			case DISTRICT:
+				server.getPlayerList().getPlayers().forEach(player -> {
+					if(StateUtil.getChunk(player).getDistrict().getId() == range){
+						Print.chat(player, string);
+					}
+				});
+				break;
+			case AREAL:
+				List<EntityPlayerMP> players = getPlayersInRange(server, sender, range);
+				players.forEach(player -> { Print.chat(player, string); });
+				break;
+			default:
+				break;
+		}
+	}
+
+	private static List<EntityPlayerMP> getPlayersInRange(MinecraftServer server, ICommandSender sender, int range){
+		if(sender == null || server == null){ return new ArrayList<EntityPlayerMP>(); }
+		List<EntityPlayerMP> list = new ArrayList<EntityPlayerMP>();
+		Vec3d position = sender.getCommandSenderEntity().getPositionVector();
+        for(EntityPlayerMP player : FMLCommonHandler.instance().getMinecraftServerInstance().getPlayerList().getPlayers()){
+            if(player.dimension == sender.getCommandSenderEntity().dimension){
+                double d4 = position.x - player.posX;
+                double d5 = position.y - player.posY;
+                double d6 = position.z - player.posZ;
+                if(d4 * d4 + d5 * d5 + d6 * d6 < range * range){
+                    list.add(player);
+                }
+            }
+        }
+		return list;
 	}
 
 }

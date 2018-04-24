@@ -99,6 +99,7 @@ public class DistrictCmd extends CommandBase {
 					Print.chat(sender, "&7/dis set manager <playername>");
 					Print.chat(sender, "&7/dis set color <hex>");
 					Print.chat(sender, "&7/dis set can-foreigners-settle <true/false>");
+					Print.chat(sender, "&7/dis set icon <url>");
 					return;
 				}
 				switch(args[1]){
@@ -244,6 +245,27 @@ public class DistrictCmd extends CommandBase {
 					}
 					default:{
 						Print.chat(sender, "&9Invalid Argument.");
+						break;
+					}
+					case "icon":{
+						if(hasPerm("district.set.icon", player, dis)){
+							if(args.length < 3){
+								Print.chat(sender, "&9Missing Argument!");
+								break;
+							}
+							try{
+								dis.setIcon(args[2]);
+								dis.setChanged(Time.getDate());
+								dis.save();
+								Print.chat(sender, "&6Icon set to &7" + args[2] + "&6!");
+							}
+							catch(Exception e){
+								Print.chat(sender, "&2Error: &7" + e.getMessage());
+							}
+						}
+						else{
+							Print.chat(sender, "&cNo permission.");
+						}
 						break;
 					}
 				}

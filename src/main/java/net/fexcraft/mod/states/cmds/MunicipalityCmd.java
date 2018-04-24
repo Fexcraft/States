@@ -171,6 +171,7 @@ public class MunicipalityCmd extends CommandBase {
 					Print.chat(sender, "&7/mun set name <new name>");
 					Print.chat(sender, "&7/mun set price <price/0>");
 					Print.chat(sender, "&7/mun set color <hex>");
+					Print.chat(sender, "&7/mun set icon <url>");
 					return;
 				}
 				switch(args[1]){
@@ -268,6 +269,27 @@ public class MunicipalityCmd extends CommandBase {
 						}
 						break;
 					}
+					case "icon":{
+						if(hasPerm("municipality.set.icon", player, mun)){
+							if(args.length < 3){
+								Print.chat(sender, "&9Missing Argument!");
+								break;
+							}
+							try{
+								mun.setIcon(args[2]);
+								mun.setChanged(Time.getDate());
+								mun.save();
+								Print.chat(sender, "&6Icon set to &7" + args[2] + "&6!");
+							}
+							catch(Exception e){
+								Print.chat(sender, "&2Error: &7" + e.getMessage());
+							}
+						}
+						else{
+							Print.chat(sender, "&cNo permission.");
+						}
+						break;
+					}
 					default:{
 						Print.chat(sender, "&9Invalid Argument.");
 						break;
@@ -281,8 +303,87 @@ public class MunicipalityCmd extends CommandBase {
 					Print.chat(sender, "&7/mun council kick <playername>");
 					Print.chat(sender, "&7/mun council invite <playername>");
 					Print.chat(sender, "&7/mun council leave");
-					Print.chat(sender, "&7/mun council join");
 					return;
+				}
+				switch(args[1]){
+					case "vote":{
+						Print.chat(sender, "Not available yet.");
+						if(!hasPerm("municipality.council.vote", player, mun)){
+							Print.chat(sender, "&4No permission.");
+							return;
+						}
+						break;
+					}
+					case "kick":{
+						if(!hasPerm("municipality.council.kick", player, mun)){
+							Print.chat(sender, "&4No permission.");
+							return;
+						}
+						if(args.length < 3){
+							Print.chat(sender, "&9Missing Argument.");
+							return;
+						}
+						GameProfile gp = Static.getServer().getPlayerProfileCache().getGameProfileForUsername(args[2]);
+						if(gp == null){
+							Print.chat(sender, "&eGameProfile not found.");
+							return;
+						}
+						if(!mun.getCouncil().contains(gp.getId())){
+							Print.chat(sender, "Player isn't part of the council.");
+							return;
+						}
+						mun.getCouncil().remove(gp.getId());
+						mun.save();
+						StateUtil.announce(server, AnnounceLevel.MUNICIPALITY, gp.getName() + " &9was removed from the Municipality Council!", mun.getId());
+						break;
+					}
+					case "leave":{
+						if(mun.getCouncil().size() < 2){
+							Print.chat(sender, "&9You cannot leave while being the last council member.");
+							return;
+						}
+						mun.getCouncil().remove(ply.getUUID());
+						mun.save();
+						StateUtil.announce(server, AnnounceLevel.MUNICIPALITY, ply.getFormattedNickname(sender) + " &9left the Municipality Council!", mun.getId());
+					}
+					case "invite":{
+						if(!hasPerm("municipality.council.invite", player, mun)){
+							Print.chat(sender, "&4No permission.");
+							return;
+						}
+						if(args.length < 3){
+							Print.chat(sender, "&7/mun council invite <playername> <optional:message>");
+							return;
+						}
+						GameProfile gp = server.getPlayerProfileCache().getGameProfileForUsername(args[2]);
+						if(gp == null || gp.getId() == null){
+							Print.chat(sender, "&cPlayer not found.");
+							return;
+						}
+						if(mun.getCouncil().contains(gp.getId())){
+							Print.chat(sender, "That player is already a Council member.");
+							return;
+						}
+						String msg = null;
+						if(args.length > 3){
+							msg = args[3];
+							if(args.length >= 4){
+								for(int i = 4; i < args.length; i++){
+									msg += " " + args[i];
+								}
+							}
+						}
+						String invmsg = "You have been invited become a Municipality Countil Member " + mun.getName() + " (" + mun.getId() + ")!" + (msg == null ? "" : " MSG: " + msg);
+						JsonObject obj = new JsonObject();
+						obj.addProperty("type", "municipality_council");
+						obj.addProperty("from", player.getGameProfile().getId().toString());
+						obj.addProperty("at", Time.getDate());
+						obj.addProperty("valid", Time.DAY_MS * 5);
+						Mail mail = new GenericMail("player", gp.getId().toString(), player.getGameProfile().getId().toString(), invmsg, MailType.INVITE, obj);
+						StateUtil.sendMail(mail);
+						Print.chat(sender, "&7&oInvite sent! (Will be valid for 5 days.)");
+						return;
+					}
 				}
 				return;
 			}

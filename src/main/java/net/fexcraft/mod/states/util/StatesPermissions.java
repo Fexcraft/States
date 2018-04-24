@@ -135,6 +135,12 @@ public class StatesPermissions {
 		PERMISSIONS.put("state.set.color", new Permission(PermissionGroup.STATE, PermissionLevel.STATE_COUNCIL, PermissionLevel.ADMIN));
 		PERMISSIONS.put("municipality.buy", new Permission(PermissionGroup.STATE, PermissionLevel.STATE_COUNCIL));
 		PERMISSIONS.put("state.set.capital", new Permission(PermissionGroup.STATE, PermissionLevel.NONE));
+		PERMISSIONS.put("municipality.council.kick", new Permission(PermissionGroup.MUNICIPALITY, PermissionLevel.MUNICIPALITY_COUNCIL, PermissionLevel.ADMIN));
+		PERMISSIONS.put("municipality.council.invite", new Permission(PermissionGroup.MUNICIPALITY, PermissionLevel.MUNICIPALITY_COUNCIL, PermissionLevel.ADMIN));
+		PERMISSIONS.put("municipality.council.vote", new Permission(PermissionGroup.SKIP, PermissionLevel.MUNICIPALITY_COUNCIL, PermissionLevel.MUNICIPALITY_MAYOR));
+		PERMISSIONS.put("municipality.set.icon", new Permission(PermissionGroup.MUNICIPALITY, PermissionLevel.MUNICIPALITY_COUNCIL, PermissionLevel.ADMIN));
+		PERMISSIONS.put("district.set.icon", new Permission(PermissionGroup.DISTRICT, PermissionLevel.MUNICIPALITY_COUNCIL, PermissionLevel.ADMIN));
+		PERMISSIONS.put("state.set.icon", new Permission(PermissionGroup.STATE, PermissionLevel.STATE_COUNCIL, PermissionLevel.ADMIN));
 		
 		
 	}

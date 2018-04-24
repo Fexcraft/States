@@ -10,8 +10,9 @@ import net.fexcraft.mod.fsmm.api.Account;
 import net.fexcraft.mod.states.States;
 import net.fexcraft.mod.states.api.root.BuyableType;
 import net.fexcraft.mod.states.api.root.ColorHolder;
+import net.fexcraft.mod.states.api.root.IconHolder;
 
-public interface Municipality extends ColorHolder, BuyableType {
+public interface Municipality extends ColorHolder, BuyableType, IconHolder {
 	
 	public int getId();
 	

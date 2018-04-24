@@ -52,6 +52,7 @@ public class StateCmd extends CommandBase {
 			Print.chat(sender, "&7/st blacklist <args...>");
 			Print.chat(sender, "&7/st mun <option> <args>");
 			Print.chat(sender, "&7/st create <name...>");
+			Print.chat(sender, "&7/st citizen");
 			Print.chat(sender, "&7/st buy");
 			return;
 		}
@@ -211,6 +212,19 @@ public class StateCmd extends CommandBase {
 			}
 			case "create":{
 				
+				return;
+			}
+			case "citizen":{
+				Print.chat(sender, "&9Citizen: &7" + getCitizens(state).size());
+				for(int id : state.getMunicipalities()){
+					Municipality mun = StateUtil.getMunicipality(id);
+					if(mun != null && mun.getId() >= 0){
+						Print.chat(sender, "&6Municipality: &7" + mun.getName() + "&8(" + mun.getId() + ");");
+						mun.getCitizen().forEach(uuid -> {
+							Print.chat(sender, "&e-> &9" + Static.getPlayerNameByUUID(uuid) + (mun.getCouncil().contains(uuid) ? " &6" + "[CM]" : ""));
+						});
+					}
+				}
 				return;
 			}
 			default:{

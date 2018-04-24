@@ -9,8 +9,9 @@ import com.google.gson.JsonObject;
 import net.fexcraft.mod.states.States;
 import net.fexcraft.mod.states.api.root.BuyableType;
 import net.fexcraft.mod.states.api.root.ColorHolder;
+import net.fexcraft.mod.states.api.root.IconHolder;
 
-public interface District extends ColorHolder, BuyableType {
+public interface District extends ColorHolder, BuyableType, IconHolder {
 	
 	public int getId();
 	

@@ -12,12 +12,13 @@ import net.fexcraft.mod.fsmm.util.AccountManager;
 import net.fexcraft.mod.lib.util.json.JsonUtil;
 import net.fexcraft.mod.lib.util.lang.ArrayList;
 import net.fexcraft.mod.lib.util.math.Time;
+import net.fexcraft.mod.states.States;
 import net.fexcraft.mod.states.api.State;
 
 public class GenericState implements State {
 	
 	private int id, capital;
-	private String name, color;
+	private String name, color, icon;
 	private long created, changed, price;
 	private UUID creator, leader;
 	private Account account;
@@ -40,6 +41,7 @@ public class GenericState implements State {
 		color = JsonUtil.getIfExists(obj, "color", "#ffffff");
 		blacklist = JsonUtil.jsonArrayToIntegerArray(JsonUtil.getIfExists(obj, "blacklist", new JsonArray()).getAsJsonArray());
 		price = JsonUtil.getIfExists(obj, "price", 0).longValue();
+		icon = JsonUtil.getIfExists(obj, "icon", States.DEFAULT_ICON);
 	}
 
 	@Override
@@ -59,6 +61,7 @@ public class GenericState implements State {
 		obj.addProperty("color", color);
 		obj.add("blacklist", JsonUtil.getArrayFromIntegerList(blacklist));
 		obj.addProperty("price", price);
+		if(icon != null){ obj.addProperty("icon", icon); }
 		return obj;
 	}
 
@@ -176,6 +179,16 @@ public class GenericState implements State {
 	@Override
 	public void setPrice(long new_price){
 		price = new_price;
+	}
+
+	@Override
+	public String getIcon(){
+		return icon;
+	}
+
+	@Override
+	public void setIcon(String url){
+		icon = url;
 	}
 	
 }

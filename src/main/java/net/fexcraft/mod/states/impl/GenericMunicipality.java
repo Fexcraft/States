@@ -21,7 +21,7 @@ import net.fexcraft.mod.states.util.StateUtil;
 public class GenericMunicipality implements Municipality {
 	
 	private int id;
-	private String name, color;
+	private String name, color, icon;
 	private long created, changed, price;
 	private UUID creator, mayor;
 	private Account account;
@@ -51,6 +51,7 @@ public class GenericMunicipality implements Municipality {
 		com_blacklist = JsonUtil.jsonArrayToIntegerArray(JsonUtil.getIfExists(obj, "company_blacklist", new JsonArray()).getAsJsonArray());
 		pl_blacklist = JsonUtil.jsonArrayToUUIDArray(JsonUtil.getIfExists(obj, "player_blacklist", new JsonArray()).getAsJsonArray());
 		price = JsonUtil.getIfExists(obj, "price", 0).longValue();
+		icon = JsonUtil.getIfExists(obj, "icon", States.DEFAULT_ICON);
 	}
 
 	@Override
@@ -71,6 +72,7 @@ public class GenericMunicipality implements Municipality {
 		obj.addProperty("color", color);
 		obj.addProperty("open", false);
 		obj.addProperty("price", price);
+		if(icon != null){ obj.addProperty("icon", icon); }
 		return obj;
 	}
 
@@ -225,6 +227,16 @@ public class GenericMunicipality implements Municipality {
 	@Override
 	public void setPrice(long new_price){
 		price = new_price;
+	}
+
+	@Override
+	public String getIcon(){
+		return icon;
+	}
+
+	@Override
+	public void setIcon(String url){
+		icon = url;
 	}
 
 }

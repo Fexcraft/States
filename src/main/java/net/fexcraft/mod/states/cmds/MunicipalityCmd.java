@@ -340,7 +340,7 @@ public class MunicipalityCmd extends CommandBase {
 				return;
 			}
 			case "citizen":{
-				Print.chat(sender, "&9Citizen: &7" + mun.getCouncil().size());
+				Print.chat(sender, "&9Citizen: &7" + mun.getCitizen().size());
 				mun.getCitizen().forEach(uuid -> {
 					Print.chat(sender, "&c-> &9" + Static.getPlayerNameByUUID(uuid) + (mun.getCouncil().contains(uuid) ? " &6" + "[CM]" : ""));
 				});

@@ -12,6 +12,7 @@ import net.fexcraft.mod.lib.util.common.Formatter;
 import net.fexcraft.mod.lib.util.common.Print;
 import net.fexcraft.mod.lib.util.json.JsonUtil;
 import net.fexcraft.mod.lib.util.math.Time;
+import net.fexcraft.mod.states.api.Chunk;
 import net.fexcraft.mod.states.api.District;
 import net.fexcraft.mod.states.api.Municipality;
 import net.fexcraft.mod.states.api.Player;
@@ -26,8 +27,9 @@ public class GenericPlayer implements AttachedData, Player {
 	private String nick;
 	private UUID uuid;
 	private int color;
-	private long lastsave;
+	private long lastsave, lastpos;
 	private Account account;
+	private Chunk last_chunk, current_chunk;
 	//
 	private Municipality municipality;
 	
@@ -72,6 +74,9 @@ public class GenericPlayer implements AttachedData, Player {
 		}
 		else{
 			this.setMunicipality(mun == null ? StateUtil.getMunicipality(-1) : mun);
+			if(!this.municipality.getCitizen().contains(uuid)){
+				this.municipality.getCitizen().add(uuid);
+			}
 		}
 		this.account = AccountManager.INSTANCE.getAccount("player", uuid.toString(), true);
 		return this;
@@ -181,6 +186,32 @@ public class GenericPlayer implements AttachedData, Player {
 			return false;
 		}
 		return true;
+	}
+
+	@Override
+	public Chunk getLastChunk(){
+		return last_chunk;
+	}
+
+	@Override
+	public Chunk getCurrentChunk(){
+		return current_chunk;
+	}
+
+	@Override
+	public void setCurrenkChunk(Chunk chunk){
+		last_chunk = current_chunk;
+		current_chunk = chunk;
+	}
+
+	@Override
+	public long getLastPositionUpdate(){
+		return lastpos;
+	}
+
+	@Override
+	public void setPositionUpdate(long leng){
+		lastpos = leng;
 	}
 
 }

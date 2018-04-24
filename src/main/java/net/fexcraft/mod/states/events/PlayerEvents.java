@@ -1,8 +1,14 @@
 package net.fexcraft.mod.states.events;
 
+import java.util.Arrays;
+import java.util.List;
+
 import net.fexcraft.mod.lib.api.common.LockableObject;
+import net.fexcraft.mod.lib.network.PacketHandler;
+import net.fexcraft.mod.lib.network.packet.PacketNBTTagCompound;
 import net.fexcraft.mod.lib.perms.PermManager;
 import net.fexcraft.mod.lib.util.common.Print;
+import net.fexcraft.mod.lib.util.math.Time;
 import net.fexcraft.mod.states.States;
 import net.fexcraft.mod.states.api.Chunk;
 import net.fexcraft.mod.states.api.Player;
@@ -25,6 +31,8 @@ import net.minecraft.block.BlockSign;
 import net.minecraft.block.ITileEntityProvider;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.entity.player.EntityPlayerMP;
+import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.tileentity.TileEntitySign;
 import net.minecraft.util.EnumHand;
 import net.minecraft.util.math.BlockPos;
@@ -35,6 +43,7 @@ import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.gameevent.PlayerEvent.PlayerLoggedInEvent;
 import net.minecraftforge.fml.common.gameevent.PlayerEvent.PlayerLoggedOutEvent;
+import net.minecraftforge.fml.common.gameevent.TickEvent;
 
 @Mod.EventBusSubscriber
 public class PlayerEvents {
@@ -61,6 +70,7 @@ public class PlayerEvents {
 		int i = StateUtil.getUnreadMailsOf("player", event.player.getGameProfile().getId().toString());
 		Print.chat(event.player, "&6You have &7" + (i <= 0 ? "no" : i) + "&6 new mail" + (i == 1 ? "" : "s") + ".");
 		Print.chat(event.player, "&e====-====-====-====-====-====&0[&2States&0]");
+		sendLocationUpdate(event.player, null, "&6Welcome back " + player.getFormattedNickname(event.player) + "&6!", "", "", 3);
 	}
 	
 	@SubscribeEvent
@@ -172,6 +182,57 @@ public class PlayerEvents {
 			event.setCanceled(true);
 		}
 		return;
+	}
+	
+	@SubscribeEvent
+	public static void onTick(TickEvent.PlayerTickEvent event){
+		Player player = StateUtil.getPlayer(event.player);
+		if(player != null && Time.getDate() > player.getLastPositionUpdate()){
+			player.setPositionUpdate(Time.getDate());
+			player.setCurrenkChunk(StateUtil.getChunk(event.player));
+			//
+			if(player.getCurrentChunk() == null || player.getLastChunk() == null){
+				return;
+			}
+			if(player.getCurrentChunk().getDistrict() != player.getLastChunk().getDistrict()){
+				Chunk chunk = player.getCurrentChunk();
+				sendLocationUpdate(event.player, chunk, chunk.getDistrict().getMunicipality().getState().getName(), chunk.getDistrict().getMunicipality().getName(), chunk.getDistrict().getName(), 0);
+			}
+		}
+	}
+	
+	public static void sendLocationUpdate(EntityPlayer player, Chunk chunk, String line0, String line1, String line2, int time){
+		NBTTagCompound nbt = new NBTTagCompound();
+		nbt.setString("target_listener", "states:gui");
+		nbt.setString("task", "show_location_update");
+		writeIcon(nbt, chunk == null ? "" : chunk.getDistrict().getMunicipality().getState().getIcon(), 0, "red");
+		writeIcon(nbt, chunk == null ? "" : chunk.getDistrict().getMunicipality().getIcon(), 1, "green");
+		writeIcon(nbt, chunk == null ? "" : chunk.getDistrict().getIcon(), 2, "blue");
+		nbt.setString("line0", line0 == null ? " " : line0);
+		nbt.setString("line1", line1 == null ? " " : line1);
+		nbt.setString("line2", line2 == null ? " " : line2);
+		if(time > 0){ nbt.setInteger("time", time); }
+		PacketHandler.getInstance().sendTo(new PacketNBTTagCompound(nbt), (EntityPlayerMP)player);
+	}
+	
+	private static final List<String> colours = Arrays.asList(new String[]{"green", "yellow", "red", "blue"});
+	
+	private static final void writeIcon(NBTTagCompound compound, String icon, int id, String color){
+		if(icon != null && !icon.equals("")){
+			if(colours.contains(icon)){
+				compound.setString("color_" + id, icon);
+			}
+			else{
+				compound.setString("icon_" + id, icon);
+			}
+		}
+		else if(color == null){
+			compound.setInteger("x_" + id, 64);
+			compound.setInteger("y_" + id, 224);
+		}
+		else{
+			compound.setString("color_" + id, color);
+		}
 	}
 
 }

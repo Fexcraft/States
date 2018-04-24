@@ -40,5 +40,15 @@ public interface Player {
 	public boolean isDistrictManagerOf(District district);
 
 	public boolean canLeave(ICommandSender sender);
+	
+	public Chunk getLastChunk();
+	
+	public Chunk getCurrentChunk();
+	
+	public void setCurrenkChunk(Chunk chunk);
+	
+	public long getLastPositionUpdate();
+	
+	public void setPositionUpdate(long leng);
 
 }

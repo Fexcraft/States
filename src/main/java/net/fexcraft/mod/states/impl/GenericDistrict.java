@@ -24,7 +24,7 @@ public class GenericDistrict implements District {
 	private long created, changed, price;
 	private UUID creator, manager;
 	private ArrayList<Integer> neighbors;
-	private String name, color;
+	private String name, color, icon;
 	private Municipality municipality;
 	private boolean cfs;
 	
@@ -42,6 +42,7 @@ public class GenericDistrict implements District {
 		color = JsonUtil.getIfExists(obj, "color", "#ffffff");
 		cfs = JsonUtil.getIfExists(obj, "can_foreigners_settle", false);
 		price = JsonUtil.getIfExists(obj, "price", 0).longValue();
+		icon = JsonUtil.getIfExists(obj, "icon", States.DEFAULT_ICON);
 	}
 
 	@Override
@@ -59,6 +60,7 @@ public class GenericDistrict implements District {
 		obj.addProperty("color", color);
 		obj.addProperty("can_foreigners_settle", cfs);
 		obj.addProperty("price", price);
+		if(icon != null){ obj.addProperty("icon", icon); }
 		return obj;
 	}
 
@@ -183,6 +185,16 @@ public class GenericDistrict implements District {
 	@Override
 	public void setPrice(long new_price){
 		price = new_price;
+	}
+
+	@Override
+	public String getIcon(){
+		return icon;
+	}
+
+	@Override
+	public void setIcon(String url){
+		icon = url;
 	}
 
 }

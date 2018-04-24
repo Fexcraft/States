@@ -7,11 +7,14 @@ import java.util.UUID;
 import com.google.gson.JsonObject;
 import com.mojang.authlib.GameProfile;
 
+import net.fexcraft.mod.fsmm.api.Bank;
+import net.fexcraft.mod.fsmm.util.AccountManager;
 import net.fexcraft.mod.fsmm.util.Config;
 import net.fexcraft.mod.lib.api.common.fCommand;
 import net.fexcraft.mod.lib.util.common.Print;
 import net.fexcraft.mod.lib.util.common.Static;
 import net.fexcraft.mod.lib.util.math.Time;
+import net.fexcraft.mod.states.States;
 import net.fexcraft.mod.states.api.Chunk;
 import net.fexcraft.mod.states.api.Mail;
 import net.fexcraft.mod.states.api.MailType;
@@ -20,7 +23,10 @@ import net.fexcraft.mod.states.api.Player;
 import net.fexcraft.mod.states.api.State;
 import net.fexcraft.mod.states.api.root.AnnounceLevel;
 import net.fexcraft.mod.states.impl.GenericMail;
+import net.fexcraft.mod.states.impl.GenericState;
+import net.fexcraft.mod.states.util.ImageCache;
 import net.fexcraft.mod.states.util.StateUtil;
+import net.fexcraft.mod.states.util.world.WorldCapabilityUtil;
 import net.minecraft.command.CommandBase;
 import net.minecraft.command.CommandException;
 import net.minecraft.command.ICommandSender;
@@ -396,7 +402,70 @@ public class StateCmd extends CommandBase {
 				return;
 			}
 			case "create":{
-				
+				long price = net.fexcraft.mod.states.util.Config.STATE_CREATION_PRICE;
+				if(!hasPerm("state.create", player, chunk)){
+					Print.chat(sender, "&cNo permission.");
+					return;
+				}
+				if(ply.getMunicipality().getState().getId() >= 0){
+					Print.chat(sender, "&cYour Municipality must leave your current state to create a new one.");
+					return;
+				}
+				if(ply.getMunicipality().getAccount().getBalance() < price){
+					Print.chat(sender, "&cMunicipality does not have enough money to create a State.");
+					Print.chat(sender, "(needed: " + Config.getWorthAsString(price, false) + "; available: " + Config.getWorthAsString(ply.getMunicipality().getAccount().getBalance(), false) + ")");
+					return;
+				}
+				if(args.length < 2){
+					Print.chat(sender, "&9No name for new State Specified.");
+					return;
+				}
+				Bank bank = AccountManager.INSTANCE.getBank(ply.getMunicipality().getAccount().getBankId());
+				if(bank == null){
+					Print.chat(sender, "&9Your Municipality Bank couldn't be found.");
+					return;
+				}
+				//TODO permissions check
+				try{
+					String name = args[1];
+					if(args.length > 2){
+						for(int i = 2; i < args.length; i++){
+							name += " " + args[i];
+						}
+					}
+					GenericState newstate = new GenericState(sender.getEntityWorld().getCapability(WorldCapabilityUtil.WORLD_CAPABILITY, null).getNewStateId());
+					if(newstate.getStateFile().exists() || StateUtil.getState(newstate.getId()).getId() >= 0){
+						throw new Exception("Tried to create new State with ID '" + newstate.getId() + "', but savefile already exists.");
+					}
+					else{
+						newstate.setCreator(ply.getUUID());
+						newstate.setName(name);
+						newstate.setLeader(ply.getUUID());
+						newstate.setCapitalId(ply.getMunicipality().getId());
+						newstate.setPrice(0);
+						newstate.getCouncil().add(ply.getUUID());
+						newstate.setChanged(Time.getDate());
+						//
+						//Now let's save stuff.
+						long halfprice = price / 2;
+						if(halfprice == 0 || bank.processTransfer(sender, ply.getMunicipality().getAccount(), halfprice, States.SERVERACCOUNT)){
+							bank.processTransfer(null, ply.getAccount(), halfprice, newstate.getAccount());
+							newstate.save(); States.STATES.put(newstate.getId(), newstate);
+							ply.getMunicipality().setState(newstate);
+							ply.getMunicipality().setChanged(Time.getDate());
+							ply.getMunicipality().save();
+							ImageCache.update(sender.getEntityWorld(), sender.getEntityWorld().getChunkFromBlockCoords(sender.getPosition()), "state_creation", "all");
+							StateUtil.announce(server, "&9New State was created!");
+							StateUtil.announce(server, "&9Created by " + ply.getFormattedNickname(sender));
+							StateUtil.announce(server, "&9Name&0: &7" + newstate.getName());
+						}
+					}
+				}
+				catch(Exception e){
+					Print.chat(sender, "Error: " + e.getMessage());
+					Print.chat(sender, e);
+					Print.debug(e);
+				}
 				return;
 			}
 			case "citizen":{
@@ -404,7 +473,7 @@ public class StateCmd extends CommandBase {
 				for(int id : state.getMunicipalities()){
 					Municipality mun = StateUtil.getMunicipality(id);
 					if(mun != null && mun.getId() >= 0){
-						Print.chat(sender, "&6Municipality: &7" + mun.getName() + "&8(" + mun.getId() + ");");
+						Print.chat(sender, "&6Municipality: &7" + mun.getName() + " &8(" + mun.getId() + ");");
 						mun.getCitizen().forEach(uuid -> {
 							Print.chat(sender, "&e-> &9" + Static.getPlayerNameByUUID(uuid) + (mun.getCouncil().contains(uuid) ? " &6" + "[CM]" : ""));
 						});

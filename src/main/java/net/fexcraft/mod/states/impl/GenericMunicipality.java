@@ -184,7 +184,7 @@ public class GenericMunicipality implements Municipality {
 
 	@Override
 	public void setState(State new_state){
-		state.getMunicipalities().remove(this.getId());
+		state.getMunicipalities().removeIf(pre -> pre == this.getId());
 		state = new_state;
 		state.getMunicipalities().add(this.getId());
 	}

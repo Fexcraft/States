@@ -17,4 +17,6 @@ public interface WorldCapability {
 
 	public int getNewDistrictId() throws Exception;
 
+	public int getNewStateId() throws Exception;
+
 }

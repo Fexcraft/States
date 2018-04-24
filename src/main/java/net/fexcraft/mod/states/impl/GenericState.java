@@ -121,6 +121,10 @@ public class GenericState implements State {
 		return creator;
 	}
 
+	public void setCreator(UUID uuid){
+		creator = uuid;
+	}
+
 	@Override
 	public long getChanged(){
 		return changed;

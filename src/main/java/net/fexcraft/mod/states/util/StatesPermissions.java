@@ -141,6 +141,7 @@ public class StatesPermissions {
 		PERMISSIONS.put("municipality.set.icon", new Permission(PermissionGroup.MUNICIPALITY, PermissionLevel.MUNICIPALITY_COUNCIL, PermissionLevel.ADMIN));
 		PERMISSIONS.put("district.set.icon", new Permission(PermissionGroup.DISTRICT, PermissionLevel.MUNICIPALITY_COUNCIL, PermissionLevel.ADMIN));
 		PERMISSIONS.put("state.set.icon", new Permission(PermissionGroup.STATE, PermissionLevel.STATE_COUNCIL, PermissionLevel.ADMIN));
+		PERMISSIONS.put("state.create", new Permission(PermissionGroup.SKIP, PermissionLevel.MUNICIPALITY_MAYOR, PermissionLevel.ADMIN));
 		
 		
 	}

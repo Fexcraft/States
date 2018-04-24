@@ -13,7 +13,7 @@ import net.minecraftforge.common.capabilities.Capability;
 public class WorldCap implements WorldCapability {
 	
 	private World world;
-	private int municipalities = -1, districts = -1;
+	private int municipalities = -1, districts = -1, states = -1;
 
 	@Override
 	public void setWorld(World world){
@@ -59,6 +59,7 @@ public class WorldCap implements WorldCapability {
 	public void readFromNBT(Capability<WorldCapability> capability, EnumFacing side, NBTBase nbt){
 		if(nbt == null || nbt instanceof NBTTagCompound == false){
 			try{
+				checkStatesAmount();
 				checkMunicipalityAmount();
 				checkDistrictAmount();
 			}
@@ -70,6 +71,35 @@ public class WorldCap implements WorldCapability {
 			NBTTagCompound compound = (NBTTagCompound) nbt;
 			municipalities = compound.getInteger("Municipalities");
 		}
+	}
+
+	private void checkStatesAmount() throws Exception {
+		if(states <= 2){
+			File folder = new File(States.getSaveDirectory(), "states/");
+			if(!folder.exists()){
+				//this bad...
+				throw new Exception("Missing States Save Location for this World.");
+			}
+			if(!folder.isDirectory()){
+				throw new Exception("States File is not Directory.");
+			}
+			int i = 0;
+			for(File file : folder.listFiles()){
+				if(FilenameUtils.isExtension(file.getName(), "json")){
+					i++;
+				}
+				else{
+					throw new Exception("Found file in States Directory which shouldn't be there.");
+				}
+			}
+			states = i - 2;//recompensate for neutral territory & "spawn"
+		}
+	}
+
+	@Override
+	public int getNewStateId() throws Exception {
+		checkStatesAmount();
+		return states + 1;
 	}
 
 	@Override

@@ -130,6 +130,9 @@ public class StatesPermissions {
 		PERMISSIONS.put("municipality.blacklist.edit", new Permission(PermissionGroup.SKIP, PermissionLevel.MUNICIPALITY_COUNCIL));
 		PERMISSIONS.put("municipality.kick", new Permission(PermissionGroup.SKIP, PermissionLevel.MUNICIPALITY_COUNCIL));
 		PERMISSIONS.put("municipality.invite", new Permission(PermissionGroup.SKIP, PermissionLevel.MUNICIPALITY_COUNCIL));
+		PERMISSIONS.put("state.set.name", new Permission(PermissionGroup.STATE, PermissionLevel.ADMIN));
+		PERMISSIONS.put("state.set.price", new Permission(PermissionGroup.STATE, PermissionLevel.ADMIN));
+		PERMISSIONS.put("state.set.color", new Permission(PermissionGroup.STATE, PermissionLevel.STATE_COUNCIL, PermissionLevel.ADMIN));
 		
 		
 		

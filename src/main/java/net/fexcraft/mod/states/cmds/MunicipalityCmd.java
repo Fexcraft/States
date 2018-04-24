@@ -21,6 +21,7 @@ import net.fexcraft.mod.states.api.MailType;
 import net.fexcraft.mod.states.api.Municipality;
 import net.fexcraft.mod.states.api.MunicipalityType;
 import net.fexcraft.mod.states.api.Player;
+import net.fexcraft.mod.states.api.State;
 import net.fexcraft.mod.states.api.root.AnnounceLevel;
 import net.fexcraft.mod.states.impl.GenericDistrict;
 import net.fexcraft.mod.states.impl.GenericMail;
@@ -63,6 +64,7 @@ public class MunicipalityCmd extends CommandBase {
 			Print.chat(sender, "&7/mun info");
 			Print.chat(sender, "&7/mun types");
 			Print.chat(sender, "&7/mun set <option> <value>");
+			Print.chat(sender, "&7/mun buy");
 			Print.chat(sender, "&7/mun council <args...>");
 			Print.chat(sender, "&7/mun blacklist <args...>");
 			Print.chat(sender, "&7/mun citizen");
@@ -74,6 +76,11 @@ public class MunicipalityCmd extends CommandBase {
 			return;
 		}
 		EntityPlayer player = (EntityPlayer)sender.getCommandSenderEntity();
+		Player ply = StateUtil.getPlayer(player);
+		if(ply == null){
+			Print.chat(sender, "&o&4There was an error loading your Playerdata.");
+			return;
+		}
 		Chunk chunk = StateUtil.getChunk(player);
 		Municipality mun = chunk.getDistrict().getMunicipality();
 		switch(args[0]){
@@ -108,6 +115,54 @@ public class MunicipalityCmd extends CommandBase {
 					Print.chat(sender, "&2-> &3 " + type.toDetailedString());
 				}
 				Print.chat(sender, "&9While the numbers mean: &71. required citizen | 2. district limit");
+				return;
+			}
+			case "buy":{
+				if(hasPerm("municipality.buy", player, mun)){
+					if(ply.getMunicipality().getState().getId() < 0){
+						Print.chat(sender, "&7You must be part of a State first!");
+						return;
+					}
+					if(mun.getPrice() <= 0){
+						Print.chat(sender, "&eMunicipality isn't for sale.");
+						return;
+					}
+					if(mun.getPrice() > ply.getMunicipality().getState().getAccount().getBalance()){
+						Print.chat(sender, "&eNot enought money on State Account.");
+						return;
+					}
+					//
+					State playerstate = ply.getMunicipality().getState();
+					Bank bank = AccountManager.INSTANCE.getBank(playerstate.getAccount().getBankId());
+					if(bank == null){
+						Print.chat(sender, "&cState's Bank not found.");
+						return;
+					}
+					if(bank.processTransfer(sender, playerstate.getAccount(), mun.getPrice(), mun.getState().getAccount())){
+						if(mun.isCapital()){
+							if(mun.getState().getMunicipalities().size() > 0){
+								mun.getState().setCapitalId(-1);
+								mun.getState().setChanged(Time.getDate());
+								mun.getState().save();
+							}
+							else{
+								StateUtil.announce(server, "&7The state of &6" + mun.getState().getName() + " has been disbanned!");
+							}
+						}
+						mun.setState(playerstate);
+						mun.getCouncil().clear();
+						mun.setChanged(Time.getDate());
+						mun.setMayor(null);
+						mun.setPrice(0);
+						mun.save();
+						mun.getState().save();
+						StateUtil.announce(server, AnnounceLevel.MUNICIPALITY_ALL, "&6Municipality has been bought!", ply.getMunicipality().getId());
+						StateUtil.announce(server, AnnounceLevel.MUNICIPALITY_ALL, "&9Buyer: " + playerstate.getName() + " (" + playerstate.getId() + ");", ply.getMunicipality().getId());
+					}
+				}
+				else{
+					Print.chat(sender, "&6No permission.");
+				}
 				return;
 			}
 			case "set":{
@@ -341,11 +396,6 @@ public class MunicipalityCmd extends CommandBase {
 					Print.chat(sender, "&eYou are banned from this Municipality.");
 					return;
 				}
-				Player ply = StateUtil.getPlayer(player);
-				if(ply == null){
-					Print.chat(sender, "&cError loading playerdata.");
-					return;
-				}
 				//TODO company check
 				if(mun.getId() == ply.getMunicipality().getId()){
 					Print.chat(sender, "You are already part of this municipality.");
@@ -363,11 +413,6 @@ public class MunicipalityCmd extends CommandBase {
 				return;
 			}
 			case "leave":{
-				Player ply = StateUtil.getPlayer(player);
-				if(ply == null){
-					Print.chat(sender, "&cError loading playerdata.");
-					return;
-				}
 				if(ply.getMunicipality().getId() == -1){
 					Print.chat(sender, "You aren't part of any Municipality.");
 					return;
@@ -421,12 +466,7 @@ public class MunicipalityCmd extends CommandBase {
 				return;
 			}
 			case "create":{
-				Player ply = StateUtil.getPlayer(player);
 				long price = net.fexcraft.mod.states.util.Config.MUNICIPALITY_CREATION_PRICE;
-				if(ply == null){
-					Print.chat(sender, "&o&4There was an error loading your Playerdata.");
-					return;
-				}
 				if(ply.getMunicipality().getId() >= 0){
 					Print.chat(sender, "&cYou must leave your current municipality to create a new one.");
 					return;

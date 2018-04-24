@@ -133,7 +133,8 @@ public class StatesPermissions {
 		PERMISSIONS.put("state.set.name", new Permission(PermissionGroup.STATE, PermissionLevel.ADMIN));
 		PERMISSIONS.put("state.set.price", new Permission(PermissionGroup.STATE, PermissionLevel.ADMIN));
 		PERMISSIONS.put("state.set.color", new Permission(PermissionGroup.STATE, PermissionLevel.STATE_COUNCIL, PermissionLevel.ADMIN));
-		
+		PERMISSIONS.put("municipality.buy", new Permission(PermissionGroup.STATE, PermissionLevel.STATE_COUNCIL));
+		PERMISSIONS.put("state.set.capital", new Permission(PermissionGroup.STATE, PermissionLevel.NONE));
 		
 		
 	}

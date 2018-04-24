@@ -12,6 +12,7 @@ import net.fexcraft.mod.lib.util.math.Time;
 import net.fexcraft.mod.states.api.Chunk;
 import net.fexcraft.mod.states.api.Municipality;
 import net.fexcraft.mod.states.api.State;
+import net.fexcraft.mod.states.api.root.AnnounceLevel;
 import net.fexcraft.mod.states.util.StateUtil;
 import net.minecraft.command.CommandBase;
 import net.minecraft.command.CommandException;
@@ -51,6 +52,7 @@ public class StateCmd extends CommandBase {
 			Print.chat(sender, "&7/st blacklist <args...>");
 			Print.chat(sender, "&7/st mun <option> <args>");
 			Print.chat(sender, "&7/st create <name...>");
+			Print.chat(sender, "&7/st buy");
 			return;
 		}
 		EntityPlayer player = (EntityPlayer)sender.getCommandSenderEntity();
@@ -89,6 +91,7 @@ public class StateCmd extends CommandBase {
 					Print.chat(sender, "&7/mun set name <new name>");
 					Print.chat(sender, "&7/mun set price <price/0>");
 					Print.chat(sender, "&7/mun set color <hex>");
+					Print.chat(sender, "&7/mun set capital <municipality id>");
 					return;
 				}
 				switch(args[1]){
@@ -164,6 +167,27 @@ public class StateCmd extends CommandBase {
 							catch(Exception e){
 								Print.chat(sender, "&2Error: &7" + e.getMessage());
 							}
+						}
+						else{
+							Print.chat(sender, "&cNo permission.");
+						}
+						break;
+					}
+					case "capital":{
+						if(hasPerm("state.set.capital", player, state)){
+							if(args.length < 3){
+								Print.chat(sender, "&9Missing Argument!");
+								break;
+							}
+							Municipality mun = StateUtil.getMunicipality(Integer.parseInt(args[2]));
+							if(mun.getId() <= 0 || mun.getState().getId() != state.getId()){
+								Print.chat(sender, "&cThat Municipality isn't part of our State.");
+								break;
+							}
+							state.setCapitalId(mun.getId());
+							state.setChanged(Time.getDate());
+							StateUtil.announce(server, AnnounceLevel.STATE_ALL, "&6" + mun.getName() + " &9 is now the new Capital!", state.getId());
+							return;
 						}
 						else{
 							Print.chat(sender, "&cNo permission.");

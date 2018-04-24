@@ -7,6 +7,8 @@ import net.fexcraft.mod.lib.util.json.JsonUtil;
 import net.fexcraft.mod.states.States;
 import net.fexcraft.mod.states.api.Chunk;
 import net.fexcraft.mod.states.util.StateUtil;
+import net.fexcraft.mod.states.util.StatesPermissions;
+import net.fexcraft.mod.states.util.StatesPermissions.Permission;
 import net.minecraft.command.CommandBase;
 import net.minecraft.command.CommandException;
 import net.minecraft.command.ICommandSender;
@@ -38,6 +40,8 @@ public class DebugCmd extends CommandBase {
 			Print.chat(sender, "&7/st-debug state");
 			Print.chat(sender, "&7/st-debug states");
 			Print.chat(sender, "&7/st-debug serveraccount");
+			Print.chat(sender, "&7/st-debug permission <string>");
+			Print.chat(sender, "&7/st-debug permissions");
 			return;
 		}
 		if(sender instanceof EntityPlayer == false){
@@ -99,6 +103,23 @@ public class DebugCmd extends CommandBase {
 			}
 			case "serveraccount":{
 				Print.chat(sender, "&9Server Account Balance: &7" + Config.getWorthAsString(States.SERVERACCOUNT.getBalance()));
+				return;
+			}
+			case "permission":{
+				if(args.length < 2){
+					Print.chat(sender, "missing argument");
+					return;
+				}
+				Print.chat(sender, "&6Permission: &7" + args[1]);
+				Permission perm = StatesPermissions.PERMISSIONS.get(args[1]);
+				Print.chat(sender, perm == null ? "not found" : perm.toString());
+				//TODO group information print aswel?
+				return;
+			}
+			case "permissions":{
+				StatesPermissions.PERMISSIONS.forEach((key, value) -> {
+					Print.chat(sender, "&8-> &7" + key);
+				});
 				return;
 			}
 		}

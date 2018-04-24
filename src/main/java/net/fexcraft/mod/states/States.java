@@ -29,6 +29,7 @@ import net.fexcraft.mod.states.impl.capabilities.TESStorage;
 import net.fexcraft.mod.states.packets.ImagePacket;
 import net.fexcraft.mod.states.packets.ImagePacketHandler;
 import net.fexcraft.mod.states.util.Config;
+import net.fexcraft.mod.states.util.StatesPermissions;
 import net.fexcraft.mod.states.util.chunk.ChunkCapability;
 import net.fexcraft.mod.states.util.chunk.ChunkCapabilityUtil;
 import net.fexcraft.mod.states.util.world.WorldCapability;
@@ -88,6 +89,8 @@ public class States {
 		CapabilityManager.INSTANCE.register(TESCapability.class, new TESStorage(), TESImplementation.class);
 		CapabilityManager.INSTANCE.register(ChunkCapability.class, new ChunkCapabilityUtil.Storage(), new ChunkCapabilityUtil.Callable());
 		CapabilityManager.INSTANCE.register(WorldCapability.class, new WorldCapabilityUtil.Storage(), new WorldCapabilityUtil.Callable());
+		//
+		StatesPermissions.init();
 	}
 	
 	public static final File getWorldDirectory(){

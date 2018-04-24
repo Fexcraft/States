@@ -98,8 +98,8 @@ public class StateCmd extends CommandBase {
 		return citizen;
 	}
 
-	private static boolean isAdmin(EntityPlayer player){
-		return ChunkCmd.isAdmin(player);
+	public static final boolean hasPerm(String perm, EntityPlayer player, Object obj){
+		return ChunkCmd.hasPerm(perm, player, obj);
 	}
 	
 }

@@ -101,12 +101,9 @@ public class DistrictCmd extends CommandBase {
 					Print.chat(sender, "&7/dis set can-foreigners-settle <true/false>");
 					return;
 				}
-				boolean can0 = (dis.getManager() != null && dis.getManager().equals(player.getGameProfile().getId())) || (dis.getMunicipality().getMayor() != null && dis.getMunicipality().getMayor().equals(player.getGameProfile().getId())) || isAdmin(player);
-				boolean can1 = (dis.getMunicipality().getMayor() != null && dis.getMunicipality().getMayor().equals(player.getGameProfile().getId())) || dis.getMunicipality().getState().getCouncil().contains(player.getGameProfile().getId()) || (dis.getMunicipality().getState().getLeader() != null && dis.getMunicipality().getState().getLeader().equals(player.getGameProfile().getId())) || isAdmin(player);
-				boolean can2 = dis.getMunicipality().getCouncil().contains(player.getGameProfile().getId());
 				switch(args[1]){
 					case "type":{
-						if(can1){
+						if(hasPerm("district.set.type", player, dis)){
 							if(args.length < 3){
 								Print.chat(sender, "&9Missing Argument!");
 								Print.chat(sender, "&2You can see available types using &7/dis types&2!");
@@ -131,7 +128,7 @@ public class DistrictCmd extends CommandBase {
 						break;
 					}
 					case "name":{
-						if(can0 || can2){
+						if(hasPerm("district.set.name", player, dis)){
 							if(args.length < 3){
 								Print.chat(sender, "&9Missing Arguments!");
 								break;
@@ -157,7 +154,7 @@ public class DistrictCmd extends CommandBase {
 						break;
 					}
 					case "price":{
-						if(can1){
+						if(hasPerm("district.set.price", player, dis)){
 							if(args.length < 3){
 								Print.chat(sender, "&9Missing Argument!");
 								Print.chat(sender, "&7Setting the price to \"0\" makes the district not buyable.");
@@ -181,7 +178,7 @@ public class DistrictCmd extends CommandBase {
 						break;
 					}
 					case "manager":{
-						if(can1 || can2){
+						if(hasPerm("district.set.manager", player, dis)){
 							if(args.length < 3){
 								Print.chat(sender, "&9Missing Argument!");
 								break;
@@ -202,7 +199,7 @@ public class DistrictCmd extends CommandBase {
 						break;
 					}
 					case "color":{
-						if(can0 || can2){
+						if(hasPerm("district.set.color", player, dis)){
 							if(args.length < 3){
 								Print.chat(sender, "&9Missing Argument!");
 								break;
@@ -230,7 +227,7 @@ public class DistrictCmd extends CommandBase {
 						break;
 					}
 					case "can-foreigners-settle":{
-						if(can0 || can2){
+						if(hasPerm("district.set.cfs", player, dis)){
 							if(args.length < 3){
 								Print.chat(sender, "&9Missing Argument!");
 								break;
@@ -259,8 +256,8 @@ public class DistrictCmd extends CommandBase {
 		}
 	}
 	
-	private static boolean isAdmin(EntityPlayer player){
-		return ChunkCmd.isAdmin(player);
+	public static final boolean hasPerm(String perm, EntityPlayer player, Object obj){
+		return ChunkCmd.hasPerm(perm, player, obj);
 	}
 	
 }

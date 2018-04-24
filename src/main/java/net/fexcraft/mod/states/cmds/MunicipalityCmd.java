@@ -118,12 +118,9 @@ public class MunicipalityCmd extends CommandBase {
 					Print.chat(sender, "&7/mun set color <hex>");
 					return;
 				}
-				boolean can0 = (mun.getMayor() != null && mun.getMayor().equals(player.getGameProfile().getId())) || isAdmin(player);
-				boolean can1 = (mun.getMayor() != null && mun.getMayor().equals(player.getGameProfile().getId())) || mun.getState().getCouncil().contains(player.getGameProfile().getId()) || (mun.getState().getLeader() != null && mun.getState().getLeader().equals(player.getGameProfile().getId())) || isAdmin(player);
-				boolean can2 = mun.getCouncil().contains(player.getGameProfile().getId());
 				switch(args[1]){
 					case "name":{
-						if(can0){
+						if(hasPerm("municipality.set.name", player, mun)){
 							if(args.length < 3){
 								Print.chat(sender, "&9Missing Arguments!");
 								break;
@@ -149,7 +146,7 @@ public class MunicipalityCmd extends CommandBase {
 						break;
 					}
 					case "price":{
-						if(can1){
+						if(hasPerm("municipality.set.price", player, mun)){
 							if(args.length < 3){
 								Print.chat(sender, "&9Missing Argument!");
 								Print.chat(sender, "&7Setting the price to \"0\" makes the municipality not buyable.");
@@ -173,7 +170,7 @@ public class MunicipalityCmd extends CommandBase {
 						break;
 					}
 					case "color":{
-						if(can0 || can2){
+						if(hasPerm("municipality.set.color", player, mun)){
 							if(args.length < 3){
 								Print.chat(sender, "&9Missing Argument!");
 								break;
@@ -201,7 +198,7 @@ public class MunicipalityCmd extends CommandBase {
 						break;
 					}
 					case "open":{
-						if(can0){
+						if(hasPerm("municipality.set.open", player, mun)){
 							if(args.length < 3){
 								Print.chat(sender, "&9Missing Argument!");
 								break;
@@ -252,7 +249,7 @@ public class MunicipalityCmd extends CommandBase {
 					});//TODO
 					return;
 				}
-				if(!mun.getCouncil().contains(player.getGameProfile().getId())){
+				if(!hasPerm("municipality.blacklist.edit", player, mun)){
 					Print.chat(sender, "&cNo permission!");
 					return;
 				}
@@ -295,7 +292,7 @@ public class MunicipalityCmd extends CommandBase {
 				return;
 			}
 			case "kick":{
-				if(!mun.getCouncil().contains(player.getGameProfile().getId())){
+				if(!hasPerm("municipality.kick", player, mun)){
 					Print.chat(sender, "&cNo permission!");
 					return;
 				}
@@ -386,7 +383,7 @@ public class MunicipalityCmd extends CommandBase {
 				return;
 			}
 			case "invite":{
-				if(!mun.getCouncil().contains(player.getGameProfile().getId())){
+				if(!hasPerm("municipality.invite", player, mun)){
 					Print.chat(sender, "&cNo permission!");
 					return;
 				}
@@ -519,8 +516,8 @@ public class MunicipalityCmd extends CommandBase {
 		}
 	}
 	
-	private static boolean isAdmin(EntityPlayer player){
-		return ChunkCmd.isAdmin(player);
+	public static final boolean hasPerm(String perm, EntityPlayer player, Object obj){
+		return ChunkCmd.hasPerm(perm, player, obj);
 	}
 	
 }

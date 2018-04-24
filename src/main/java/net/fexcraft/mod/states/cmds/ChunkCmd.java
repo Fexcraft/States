@@ -8,7 +8,6 @@ import net.fexcraft.mod.fsmm.api.Account;
 import net.fexcraft.mod.fsmm.util.AccountManager;
 import net.fexcraft.mod.fsmm.util.Config;
 import net.fexcraft.mod.lib.api.common.fCommand;
-import net.fexcraft.mod.lib.perms.PermManager;
 import net.fexcraft.mod.lib.util.common.Print;
 import net.fexcraft.mod.lib.util.common.Static;
 import net.fexcraft.mod.lib.util.math.Time;
@@ -19,6 +18,7 @@ import net.fexcraft.mod.states.api.District;
 import net.fexcraft.mod.states.api.Player;
 import net.fexcraft.mod.states.util.ImageCache;
 import net.fexcraft.mod.states.util.StateUtil;
+import net.fexcraft.mod.states.util.StatesPermissions;
 import net.minecraft.command.CommandBase;
 import net.minecraft.command.CommandException;
 import net.minecraft.command.ICommandSender;
@@ -87,8 +87,7 @@ public class ChunkCmd extends CommandBase {
 					Print.chat(sender, "&7District not found. (" + disid + ");");
 					return;
 				}
-				boolean can = (district.getManager() != null && district.getManager().equals(player.getGameProfile().getId())) || (district.getMunicipality().getMayor() != null && district.getMunicipality().getMayor().equals(player.getGameProfile().getId())) || isAdmin(player);
-				if(can){
+				if(hasPerm("chunk.claim", player, district)){
 					if(range > 3){
 						Print.chat(sender, "Invalid range, setting to \"3\"!");
 						range = 3;
@@ -208,7 +207,7 @@ public class ChunkCmd extends CommandBase {
 				return;
 			}
 			case "update":{
-				if(isAdmin(player)){
+				if(hasPerm("admin", player, chunk)){
 					int range = args.length > 1 ? Integer.parseInt(args[1]) : 0;
 					if(range <= 0){
 						ImageCache.update(player.world, player.world.getChunkFromChunkCoords(chunk.xCoord(), chunk.zCoord()), "update", "all");
@@ -244,7 +243,7 @@ public class ChunkCmd extends CommandBase {
 				return;
 			}
 			case "unclaim":{
-				if(isAdmin(player)){
+				if(hasPerm("admin", player, chunk)){
 					int range = args.length > 1 ? Integer.parseInt(args[1]) : 0;
 					if(range <= 0){
 						chunk.setClaimer(player.getGameProfile().getId());
@@ -424,7 +423,7 @@ public class ChunkCmd extends CommandBase {
 					}
 					switch(args[1]){
 						case "district":{
-							if(isAdmin(player)){
+							if(hasPerm("admin", player, chunk)){
 								try{
 									chunk.setDistrict(StateUtil.getDistrict(Integer.parseInt(args[2])));
 									Print.chat(sender, "&2District set to: " + chunk.getDistrict().getName() + " (" + chunk.getDistrict().getId() + ");");
@@ -664,7 +663,7 @@ public class ChunkCmd extends CommandBase {
 			Print.chat(player, "&7Alternatively unlink this chunk.");
 			return false;
 		}
-		if(isAdmin(player)){
+		if(hasPerm("admin", player, chunk)){
 			Print.chat(player, "&7&oAdmin bypass.");
 			return true;
 		}
@@ -700,7 +699,7 @@ public class ChunkCmd extends CommandBase {
 			Print.chat(player, "&7Alternatively unlink this chunk.");
 			return false;
 		}
-		if(isAdmin(player)){
+		if(hasPerm("admin", player, chunk)){
 			Print.chat(player, "&7&oAdmin bypass.");
 			return true;
 		}
@@ -728,8 +727,8 @@ public class ChunkCmd extends CommandBase {
 		return result;
 	}
 
-	public static final boolean isAdmin(EntityPlayer player){
-		return PermManager.getPlayerPerms(player).hasPermission(States.ADMIN_PERM);
+	public static final boolean hasPerm(String perm, EntityPlayer player, Object obj){
+		return StatesPermissions.hasPermission(player, perm, obj);
 	}
 
 }

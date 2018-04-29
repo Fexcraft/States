@@ -3,7 +3,6 @@ package net.fexcraft.mod.states.util;
 import java.awt.Color;
 import java.awt.image.BufferedImage;
 import java.io.File;
-import java.io.IOException;
 import java.util.LinkedList;
 import java.util.Queue;
 
@@ -68,6 +67,7 @@ public class ImageCache {
 	
 	private static final void updateImage(World world, net.minecraft.world.chunk.Chunk chunk, String event, String type){
 		BufferedImage img = getImage(chunk.x, chunk.z, type, false);
+		if(img == null){ return; }
 		int rx = (int)Math.floor(chunk.x / 32.0), rz = (int)Math.floor(chunk.z / 32.0);
 		int x = (chunk.x * 16) - (rx * 512), z = (chunk.z * 16) - (rz * 512);
 		if(type.contains("surface")){
@@ -149,7 +149,7 @@ public class ImageCache {
 		return;
 	}
 	
-	private static boolean borders(String type, Chunk ck, Chunk st_chunk) {
+	private static boolean borders(String type, Chunk ck, Chunk st_chunk){
 		switch(type){
 			case "surface_states":
 			case "states":{
@@ -319,7 +319,7 @@ public class ImageCache {
 	public static final void saveImage(BufferedImage image, int x, int z, String type){
 		File file = new File(States.getSaveDirectory(), "image_cache/" + type + "/" + getChunkRegion(x, z) + ".png");
 		if(!file.getParentFile().exists()){ file.getParentFile().mkdirs(); }
-		try{ ImageIO.write(image, "png", file); } catch(IOException e){ e.printStackTrace(); }
+		try{ ImageIO.write(image, "png", file); } catch(Exception e){ e.printStackTrace(); }
 	}
 
 	private static final BlockPos getPos(World world, int x, int z){

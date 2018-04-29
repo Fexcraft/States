@@ -177,6 +177,7 @@ public class StateUtil {
 		switch(level){
 			case ALL:
 				server.getPlayerList().sendMessage(new TextComponentString(Formatter.format(string)), true);
+				Sender.sendToWebhook(null, string);
 				break;
 			case UNION:
 				//TODO doesn't exists yet.

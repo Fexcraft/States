@@ -3,8 +3,11 @@ package net.fexcraft.mod.states.util;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
+import net.fexcraft.mod.lib.util.common.Static;
 import net.fexcraft.mod.lib.util.json.JsonUtil;
+import net.fexcraft.mod.states.States;
 import net.fexcraft.mod.states.api.MunicipalityType;
 import net.minecraftforge.common.config.ConfigElement;
 import net.minecraftforge.common.config.Configuration;
@@ -15,8 +18,9 @@ public class Config {
 	
 	public static File CONFIG_PATH;
 	public static long DEFAULT_CHUNK_PRICE, MUNICIPALITY_CREATION_PRICE, STATE_CREATION_PRICE;
-	public static int MAP_UPDATES_PER_TICK;
+	public static int MAP_UPDATES_PER_TICK, BOT_PORT;
 	public static boolean ALLOW_WILDERNESS_ACCESS;
+	public static String WEBHOOK, BOT_KEY, WEBHOOK_ICON;
 	//
 	public static final String DEFAULT_CAT = "Default Settings";
 	//
@@ -54,6 +58,24 @@ public class Config {
 		ALLOW_WILDERNESS_ACCESS = config.getBoolean("allow_wilderness_access", DEFAULT_CAT, false, "Should players be able to break, place or interact with blocks in Wilderness? (District:-1)");
 		MUNICIPALITY_CREATION_PRICE = config.getInt("municipality_creation_price", DEFAULT_CAT, 2500000, 0, Integer.MAX_VALUE, "Amount of Money needed to create a municipality. (1000 == 1F$)");
 		STATE_CREATION_PRICE = config.getInt("state_creation_price", DEFAULT_CAT, 52000000, 0, Integer.MAX_VALUE, "Amount of Money needed to create a state. (1000 == 1F$)");
+		WEBHOOK = config.getString("discord_webhook", DEFAULT_CAT, "null", "Discord Webhook, set to 'null' to disable!");
+		BOT_KEY = config.getString("discord_botkey", DEFAULT_CAT, UUID.randomUUID().toString().replace("-", ""), "A key/token so only an authorized bot can send messages to this server. Can be changed as wanted.");
+		BOT_PORT = config.getInt("discord_botport", DEFAULT_CAT, 9910, 8000, Integer.MAX_VALUE, "Port for receiving messages from the bot, set to -1 to disable.");
+		WEBHOOK_ICON = config.getString("discord_webhook_icon", DEFAULT_CAT, States.DEFAULT_ICON, "Icon for the Server Broadcaster, in discord.");
+		updateWebHook();
+	}
+
+	public static void updateWebHook(){
+		if(WEBHOOK.equals("null")){
+			WEBHOOK = null;
+		}
+		if(Sender.RECEIVER != null){
+			Sender.RECEIVER.halt();
+		}
+		if(WEBHOOK != null && BOT_PORT != -1 && Static.getServer() != null){
+			Sender.RECEIVER = new Sender.Receiver();
+			Sender.RECEIVER.start();
+		}
 	}
 	
 }

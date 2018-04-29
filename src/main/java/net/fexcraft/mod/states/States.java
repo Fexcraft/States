@@ -29,6 +29,7 @@ import net.fexcraft.mod.states.impl.capabilities.TESStorage;
 import net.fexcraft.mod.states.packets.ImagePacket;
 import net.fexcraft.mod.states.packets.ImagePacketHandler;
 import net.fexcraft.mod.states.util.Config;
+import net.fexcraft.mod.states.util.Sender;
 import net.fexcraft.mod.states.util.StatesPermissions;
 import net.fexcraft.mod.states.util.chunk.ChunkCapability;
 import net.fexcraft.mod.states.util.chunk.ChunkCapabilityUtil;
@@ -39,6 +40,8 @@ import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.event.FMLInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLPostInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
+import net.minecraftforge.fml.common.event.FMLServerStartingEvent;
+import net.minecraftforge.fml.common.event.FMLServerStoppingEvent;
 import net.minecraftforge.fml.common.network.NetworkRegistry;
 import net.minecraftforge.fml.relauncher.Side;
 
@@ -100,6 +103,20 @@ public class States {
 	
 	public static final File getSaveDirectory(){
 		return new File(Static.getServer().getEntityWorld().getSaveHandler().getWorldDirectory(), "states/");
+	}
+	
+	@Mod.EventHandler
+	public void serverStarting(FMLServerStartingEvent event){
+		if(Sender.RECEIVER == null){
+			Config.updateWebHook();
+		}
+	}
+	
+	@Mod.EventHandler
+	public void serverStopping(FMLServerStoppingEvent event){
+		if(Sender.RECEIVER != null){
+			Sender.RECEIVER.halt();
+		}
 	}
 
 }

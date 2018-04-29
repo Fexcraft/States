@@ -15,6 +15,7 @@ import net.fexcraft.mod.states.api.Player;
 import net.fexcraft.mod.states.impl.GenericPlayer;
 import net.fexcraft.mod.states.impl.capabilities.TESCapability;
 import net.fexcraft.mod.states.util.Config;
+import net.fexcraft.mod.states.util.Sender;
 import net.fexcraft.mod.states.util.StateUtil;
 import net.fexcraft.mod.states.util.chunk.ChunkCapabilityUtil;
 import net.minecraft.block.BlockButton;
@@ -37,6 +38,7 @@ import net.minecraft.tileentity.TileEntitySign;
 import net.minecraft.util.EnumHand;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
+import net.minecraftforge.event.ServerChatEvent;
 import net.minecraftforge.event.entity.player.PlayerInteractEvent;
 import net.minecraftforge.event.world.BlockEvent;
 import net.minecraftforge.fml.common.Mod;
@@ -182,6 +184,12 @@ public class PlayerEvents {
 			event.setCanceled(true);
 		}
 		return;
+	}
+	
+	@SubscribeEvent
+	public static void onMessage(ServerChatEvent event){
+		event.setCanceled(true);
+		Sender.sendAs(event.getPlayer(), event.getMessage());
 	}
 	
 	@SubscribeEvent

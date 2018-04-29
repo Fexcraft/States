@@ -21,7 +21,7 @@ import net.minecraft.command.ICommandSender;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.TextComponentString;
-import net.minecraftforge.common.ForgeHooks;
+import net.minecraft.util.text.event.ClickEvent;
 
 public class Sender {
 	
@@ -44,13 +44,14 @@ public class Sender {
 	}
 
 	public static void sendFromDiscord(JsonObject obj){
-		String name = "&5#&8] &2" + obj.get("username").getAsString() + "&0: &7";
+		String name = "&5#&8] &2" + obj.get("username").getAsString();
 		ITextComponent text = null;
-		if(obj.get("content").getAsString().startsWith("[IMG]")){
-			text = new TextComponentString(Formatter.format(name)).appendSibling(ForgeHooks.newChatWithLinks(obj.get("content").getAsString()));
+		if(obj.get("content").isJsonArray()){
+			text = new TextComponentString(Formatter.format(name + "&0: " + obj.get("content").getAsJsonArray().get(0).getAsString()));
+			text.getStyle().setClickEvent(new ClickEvent(ClickEvent.Action.OPEN_URL, obj.get("content").getAsJsonArray().get(1).getAsString()));
 		}
 		else{
-			text = new TextComponentString(Formatter.format(name + obj.get("content").getAsString()));
+			text = new TextComponentString(Formatter.format(name + "&0: &7" + obj.get("content").getAsString()));
 		}
 		Static.getServer().getPlayerList().sendMessage(text);
 	}

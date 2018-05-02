@@ -12,21 +12,20 @@ import net.fexcraft.mod.lib.network.PacketHandler;
 import net.fexcraft.mod.lib.network.handlers.NBTTagCompoundPacketHandler;
 import net.fexcraft.mod.lib.perms.PermManager;
 import net.fexcraft.mod.lib.perms.PermissionNode;
-import net.fexcraft.mod.lib.perms.player.PlayerPerms;
 import net.fexcraft.mod.lib.util.common.Static;
 import net.fexcraft.mod.states.api.Chunk;
 import net.fexcraft.mod.states.api.District;
 import net.fexcraft.mod.states.api.Municipality;
-import net.fexcraft.mod.states.api.Player;
 import net.fexcraft.mod.states.api.State;
 import net.fexcraft.mod.states.api.capabilities.ChunkCapability;
+import net.fexcraft.mod.states.api.capabilities.PlayerCapability;
 import net.fexcraft.mod.states.api.capabilities.SignTileEntityCapability;
 import net.fexcraft.mod.states.api.capabilities.WorldCapability;
 import net.fexcraft.mod.states.guis.GuiHandler;
 import net.fexcraft.mod.states.guis.Listener;
 import net.fexcraft.mod.states.guis.Receiver;
-import net.fexcraft.mod.states.impl.GenericPlayer;
 import net.fexcraft.mod.states.impl.capabilities.ChunkCapabilityUtil;
+import net.fexcraft.mod.states.impl.capabilities.PlayerCapabilityUtil;
 import net.fexcraft.mod.states.impl.capabilities.SignTileEntityCapabilityUtil;
 import net.fexcraft.mod.states.impl.capabilities.WorldCapabilityUtil;
 import net.fexcraft.mod.states.packets.ImagePacket;
@@ -50,13 +49,12 @@ public class States {
 	public static final String VERSION = "1.0";
 	public static final String MODID = "states";
 	public static String ADMIN_PERM = "states.admin";
-	public static String PLAYER_DATA = "states";
 	//
 	public static final TreeBasedTable<Integer, Integer, Chunk> CHUNKS = TreeBasedTable.create();
 	public static final TreeMap<Integer, District> DISTRICTS = new TreeMap<Integer, District>();
 	public static final TreeMap<Integer, Municipality> MUNICIPALITIES = new TreeMap<Integer, Municipality>();
 	public static final TreeMap<Integer, State> STATES = new TreeMap<Integer, State>();
-	public static final TreeMap<UUID, Player> PLAYERS = new TreeMap<UUID, Player>();
+	public static final TreeMap<UUID, PlayerCapability> PLAYERS = new TreeMap<UUID, PlayerCapability>();
 	//
 	public static final String DEF_UUID = "66e70cb7-1d96-487c-8255-5c2d7a2b6a0e";
 	public static final String CONSOLE_UUID = "f78a4d8d-d51b-4b39-98a3-230f2de0c670";
@@ -86,12 +84,13 @@ public class States {
 		//
 		PermManager.setEnabled(MODID);
 		PermManager.add(ADMIN_PERM, PermissionNode.Type.BOOLEAN, false, true);
-		PlayerPerms.addAdditionalData(GenericPlayer.class);
+		//PlayerPerms.addAdditionalData(GenericPlayer.class);
 		//
 		SERVERACCOUNT = AccountManager.INSTANCE.getAccount("server", "states", true);
 		CapabilityManager.INSTANCE.register(SignTileEntityCapability.class, new SignTileEntityCapabilityUtil.Storage(), new SignTileEntityCapabilityUtil.Callable());
 		CapabilityManager.INSTANCE.register(ChunkCapability.class, new ChunkCapabilityUtil.Storage(), new ChunkCapabilityUtil.Callable());
 		CapabilityManager.INSTANCE.register(WorldCapability.class, new WorldCapabilityUtil.Storage(), new WorldCapabilityUtil.Callable());
+		CapabilityManager.INSTANCE.register(PlayerCapability.class, new PlayerCapabilityUtil.Storage(), new PlayerCapabilityUtil.Callable());
 		//
 		StatesPermissions.init();
 	}

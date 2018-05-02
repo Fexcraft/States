@@ -15,7 +15,8 @@ import net.fexcraft.mod.states.States;
 import net.fexcraft.mod.states.api.Chunk;
 import net.fexcraft.mod.states.api.ChunkType;
 import net.fexcraft.mod.states.api.District;
-import net.fexcraft.mod.states.api.Player;
+import net.fexcraft.mod.states.api.capabilities.PlayerCapability;
+import net.fexcraft.mod.states.api.capabilities.StatesCapabilities;
 import net.fexcraft.mod.states.util.ImageCache;
 import net.fexcraft.mod.states.util.StateUtil;
 import net.fexcraft.mod.states.util.StatesPermissions;
@@ -71,7 +72,7 @@ public class ChunkCmd extends CommandBase {
 			return;
 		}
 		EntityPlayer player = (EntityPlayer)sender.getCommandSenderEntity();
-		Player playerdata = StateUtil.getPlayer(player);
+		PlayerCapability playerdata = player.getCapability(StatesCapabilities.PLAYER, null);
 		Chunk chunk = StateUtil.getChunk(player);
 		switch(args[0]){
 			case "claim":{
@@ -359,7 +360,7 @@ public class ChunkCmd extends CommandBase {
 							return;
 						}
 					}
-					Account ac_sender = StateUtil.getPlayer(player).getAccount();
+					Account ac_sender = playerdata.getAccount();
 					if(!AccountManager.INSTANCE.getBank(ac_sender.getBankId()).processTransfer(sender, ac_sender, chunk.getPrice(), receiver)){
 						return;
 					}

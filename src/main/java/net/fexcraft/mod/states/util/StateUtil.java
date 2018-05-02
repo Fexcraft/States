@@ -7,21 +7,17 @@ import java.util.UUID;
 
 import javax.annotation.Nullable;
 
-import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
-
-import net.fexcraft.mod.lib.perms.PermManager;
 import net.fexcraft.mod.lib.util.common.Formatter;
 import net.fexcraft.mod.lib.util.common.Print;
 import net.fexcraft.mod.lib.util.common.Static;
-import net.fexcraft.mod.lib.util.json.JsonUtil;
 import net.fexcraft.mod.states.States;
 import net.fexcraft.mod.states.api.Chunk;
 import net.fexcraft.mod.states.api.District;
 import net.fexcraft.mod.states.api.Mail;
 import net.fexcraft.mod.states.api.Municipality;
-import net.fexcraft.mod.states.api.Player;
 import net.fexcraft.mod.states.api.State;
+import net.fexcraft.mod.states.api.capabilities.PlayerCapability;
+import net.fexcraft.mod.states.api.capabilities.StatesCapabilities;
 import net.fexcraft.mod.states.api.root.AnnounceLevel;
 import net.fexcraft.mod.states.impl.GenericChunk;
 import net.fexcraft.mod.states.impl.GenericDistrict;
@@ -112,26 +108,8 @@ public class StateUtil {
 	}
 	
 	@Nullable
-	public static Player getPlayer(UUID uuid, boolean loadtemp){
-		return States.PLAYERS.containsKey(uuid) ? States.PLAYERS.get(uuid) : loadtemp ? getOfflinePlayer(uuid) : null;
-	}
-
-	private static Player getOfflinePlayer(UUID uuid){
-		JsonElement elm = JsonUtil.read(new File(PermManager.userDir, "/" + uuid.toString() + ".perm"), false);
-		if(elm == null){
-			return null;
-		}
-		else{
-			JsonObject obj = elm.getAsJsonObject();
-			if(!obj.has("AttachedData") || !obj.get("AttachedData").getAsJsonObject().has(States.PLAYER_DATA)){
-				return null;
-			}
-			return GenericPlayer.getOfflineInstance(uuid, obj.get("AttachedData").getAsJsonObject().get(States.PLAYER_DATA).getAsJsonObject());
-		}
-	}
-
-	public static Player getPlayer(EntityPlayer player){
-		return PermManager.getPlayerPerms(player).getAdditionalData(GenericPlayer.class);
+	public static PlayerCapability getPlayer(UUID uuid, boolean loadtemp){
+		return States.PLAYERS.containsKey(uuid) ? States.PLAYERS.get(uuid) : loadtemp ? GenericPlayer.getOfflineInstance(uuid) : null;
 	}
 
 	public static void sendMail(Mail mail){
@@ -184,8 +162,8 @@ public class StateUtil {
 				break;
 			case STATE:
 				server.getPlayerList().getPlayers().forEach(player -> {
-					Player playerdata;
-					if((playerdata = StateUtil.getPlayer(player)) != null && playerdata.getMunicipality().getState().getId() == range){
+					PlayerCapability playerdata;
+					if((playerdata = player.getCapability(StatesCapabilities.PLAYER, null)) != null && playerdata.getMunicipality().getState().getId() == range){
 						Print.chat(player, string);
 					}
 				});
@@ -199,8 +177,8 @@ public class StateUtil {
 				break;
 			case MUNICIPALITY:
 				server.getPlayerList().getPlayers().forEach(player -> {
-					Player playerdata;
-					if((playerdata = StateUtil.getPlayer(player)) != null && playerdata.getMunicipality().getId() == range){
+					PlayerCapability playerdata;
+					if((playerdata = player.getCapability(StatesCapabilities.PLAYER, null)) != null && playerdata.getMunicipality().getId() == range){
 						Print.chat(player, string);
 					}
 				});

@@ -20,8 +20,8 @@ import net.fexcraft.mod.states.api.Mail;
 import net.fexcraft.mod.states.api.MailType;
 import net.fexcraft.mod.states.api.Municipality;
 import net.fexcraft.mod.states.api.MunicipalityType;
-import net.fexcraft.mod.states.api.Player;
 import net.fexcraft.mod.states.api.State;
+import net.fexcraft.mod.states.api.capabilities.PlayerCapability;
 import net.fexcraft.mod.states.api.capabilities.StatesCapabilities;
 import net.fexcraft.mod.states.api.root.AnnounceLevel;
 import net.fexcraft.mod.states.impl.GenericDistrict;
@@ -76,7 +76,7 @@ public class MunicipalityCmd extends CommandBase {
 			return;
 		}
 		EntityPlayer player = (EntityPlayer)sender.getCommandSenderEntity();
-		Player ply = StateUtil.getPlayer(player);
+		PlayerCapability ply = player.getCapability(StatesCapabilities.PLAYER, null);
 		if(ply == null){
 			Print.chat(sender, "&o&4There was an error loading your Playerdata.");
 			return;
@@ -482,7 +482,7 @@ public class MunicipalityCmd extends CommandBase {
 				mun.getCitizen().remove(gp.getId());
 				String kickmsg = "You have been kicked from the Municipality (" + mun.getId() + ") for: " + (reason == null ? "No Kick reason given." : reason);
 				Mail mail = new GenericMail("player", gp.getId().toString(), player.getGameProfile().getId().toString(), kickmsg, MailType.SYSTEM, null);
-				Player playr = StateUtil.getPlayer(gp.getId(), false);
+				PlayerCapability playr = StateUtil.getPlayer(gp.getId(), false);
 				if(playr != null){ playr.setMunicipality(StateUtil.getMunicipality(-1)); }
 				StateUtil.sendMail(mail);
 				Print.chat(sender, "&7Player &9" + gp.getName() + "&7 kicked from the Municipality!");

@@ -9,8 +9,9 @@ import net.fexcraft.mod.states.States;
 import net.fexcraft.mod.states.api.Chunk;
 import net.fexcraft.mod.states.api.District;
 import net.fexcraft.mod.states.api.Municipality;
-import net.fexcraft.mod.states.api.Player;
 import net.fexcraft.mod.states.api.State;
+import net.fexcraft.mod.states.api.capabilities.PlayerCapability;
+import net.fexcraft.mod.states.api.capabilities.StatesCapabilities;
 import net.minecraft.entity.player.EntityPlayer;
 
 public class StatesPermissions {
@@ -19,7 +20,7 @@ public class StatesPermissions {
 	
 	public static final boolean hasPermission(EntityPlayer entity, String permission, Object obj){
 		if(obj == null){ obj = StateUtil.getChunk(entity); }
-		Player player = StateUtil.getPlayer(entity);
+		PlayerCapability player = entity.getCapability(StatesCapabilities.PLAYER, null);
 		Permission perm = PERMISSIONS.get(permission);
 		if(perm == null){
 			Print.log("Permission with ID '" + permission + "' doesn't exists.");

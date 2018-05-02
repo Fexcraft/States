@@ -6,6 +6,7 @@ import net.fexcraft.mod.lib.util.common.Print;
 import net.fexcraft.mod.lib.util.json.JsonUtil;
 import net.fexcraft.mod.states.States;
 import net.fexcraft.mod.states.api.Chunk;
+import net.fexcraft.mod.states.api.capabilities.StatesCapabilities;
 import net.fexcraft.mod.states.util.StateUtil;
 import net.fexcraft.mod.states.util.StatesPermissions;
 import net.fexcraft.mod.states.util.StatesPermissions.Permission;
@@ -42,6 +43,7 @@ public class DebugCmd extends CommandBase {
 			Print.chat(sender, "&7/st-debug serveraccount");
 			Print.chat(sender, "&7/st-debug permission <string>");
 			Print.chat(sender, "&7/st-debug permissions");
+			Print.chat(sender, "&7/st-debug self");
 			return;
 		}
 		if(sender instanceof EntityPlayer == false){
@@ -120,6 +122,10 @@ public class DebugCmd extends CommandBase {
 				StatesPermissions.PERMISSIONS.forEach((key, value) -> {
 					Print.chat(sender, "&8-> &7" + key);
 				});
+				return;
+			}
+			case "self":{
+				Print.chat(sender, sender.getCommandSenderEntity().getCapability(StatesCapabilities.PLAYER, null).toJsonObject());
 				return;
 			}
 		}

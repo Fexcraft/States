@@ -6,15 +6,13 @@ import java.util.List;
 import net.fexcraft.mod.lib.api.common.LockableObject;
 import net.fexcraft.mod.lib.network.PacketHandler;
 import net.fexcraft.mod.lib.network.packet.PacketNBTTagCompound;
-import net.fexcraft.mod.lib.perms.PermManager;
 import net.fexcraft.mod.lib.util.common.Print;
 import net.fexcraft.mod.lib.util.math.Time;
 import net.fexcraft.mod.states.States;
 import net.fexcraft.mod.states.api.Chunk;
-import net.fexcraft.mod.states.api.Player;
+import net.fexcraft.mod.states.api.capabilities.PlayerCapability;
 import net.fexcraft.mod.states.api.capabilities.SignTileEntityCapability;
 import net.fexcraft.mod.states.api.capabilities.StatesCapabilities;
-import net.fexcraft.mod.states.impl.GenericPlayer;
 import net.fexcraft.mod.states.util.Config;
 import net.fexcraft.mod.states.util.Sender;
 import net.fexcraft.mod.states.util.StateUtil;
@@ -52,7 +50,7 @@ public class PlayerEvents {
 	
 	@SubscribeEvent
 	public static void onLogin(PlayerLoggedInEvent event){
-		Player player = PermManager.getPlayerPerms(event.player).getAdditionalData(GenericPlayer.class);
+		PlayerCapability player = event.player.getCapability(StatesCapabilities.PLAYER, null);
 		if(player == null){
 			Print.chat(event.player, "Player data couldn't be loaded.");
 			return;
@@ -144,7 +142,7 @@ public class PlayerEvents {
 	}
 	
 	private static boolean checkAccess(World world, BlockPos pos, IBlockState state, EntityPlayer player){
-		Player pl = StateUtil.getPlayer(player);
+		PlayerCapability pl = player.getCapability(StatesCapabilities.PLAYER, null);
 		if(pl.getPermissions().hasPermission(States.ADMIN_PERM)){
 			return false;
 		}
@@ -194,7 +192,7 @@ public class PlayerEvents {
 	
 	@SubscribeEvent
 	public static void onTick(TickEvent.PlayerTickEvent event){
-		Player player = StateUtil.getPlayer(event.player);
+		PlayerCapability player = event.player.getCapability(StatesCapabilities.PLAYER, null);
 		if(player != null && Time.getDate() > player.getLastPositionUpdate()){
 			player.setPositionUpdate(Time.getDate());
 			player.setCurrenkChunk(StateUtil.getChunk(event.player));

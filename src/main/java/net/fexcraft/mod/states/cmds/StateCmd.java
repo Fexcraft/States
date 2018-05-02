@@ -19,8 +19,8 @@ import net.fexcraft.mod.states.api.Chunk;
 import net.fexcraft.mod.states.api.Mail;
 import net.fexcraft.mod.states.api.MailType;
 import net.fexcraft.mod.states.api.Municipality;
-import net.fexcraft.mod.states.api.Player;
 import net.fexcraft.mod.states.api.State;
+import net.fexcraft.mod.states.api.capabilities.PlayerCapability;
 import net.fexcraft.mod.states.api.capabilities.StatesCapabilities;
 import net.fexcraft.mod.states.api.root.AnnounceLevel;
 import net.fexcraft.mod.states.impl.GenericMail;
@@ -70,7 +70,7 @@ public class StateCmd extends CommandBase {
 			return;
 		}
 		EntityPlayer player = (EntityPlayer)sender.getCommandSenderEntity();
-		Player ply = StateUtil.getPlayer(player);
+		PlayerCapability ply = player.getCapability(StatesCapabilities.PLAYER, null);
 		if(ply == null){
 			Print.chat(sender, "&o&4There was an error loading your Playerdata.");
 			return;

@@ -4,7 +4,12 @@ import java.io.File;
 
 import org.apache.commons.io.FilenameUtils;
 
+import com.google.common.collect.ImmutableMap;
+
 import net.fexcraft.mod.states.States;
+import net.fexcraft.mod.states.api.District;
+import net.fexcraft.mod.states.api.Municipality;
+import net.fexcraft.mod.states.api.State;
 import net.fexcraft.mod.states.api.capabilities.StatesCapabilities;
 import net.fexcraft.mod.states.api.capabilities.WorldCapability;
 import net.minecraft.nbt.NBTBase;
@@ -194,6 +199,21 @@ public class WorldCapabilityUtil implements ICapabilitySerializable<NBTBase>{
 				}
 				districts = i - 2;//recompensate for wilderness & "spawn"
 			}
+		}
+
+		@Override
+		public ImmutableMap<Integer, District> getDistricts(){
+			return ImmutableMap.copyOf(States.DISTRICTS);
+		}
+
+		@Override
+		public ImmutableMap<Integer, Municipality> getMunicipalities(){
+			return ImmutableMap.copyOf(States.MUNICIPALITIES);
+		}
+
+		@Override
+		public ImmutableMap<Integer, State> getStates(){
+			return ImmutableMap.copyOf(States.STATES);
 		}
 		
 	}

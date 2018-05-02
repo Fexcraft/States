@@ -13,10 +13,11 @@ import net.fexcraft.mod.states.impl.GenericDistrict;
 import net.fexcraft.mod.states.impl.GenericMunicipality;
 import net.fexcraft.mod.states.impl.GenericState;
 import net.fexcraft.mod.states.impl.capabilities.ChunkCapabilityUtil;
+import net.fexcraft.mod.states.impl.capabilities.PlayerCapabilityUtil;
 import net.fexcraft.mod.states.impl.capabilities.SignTileEntityCapabilityUtil;
 import net.fexcraft.mod.states.impl.capabilities.WorldCapabilityUtil;
 import net.fexcraft.mod.states.util.ImageCache;
-import net.minecraft.tileentity.TileEntity;
+import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.tileentity.TileEntitySign;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.event.AttachCapabilitiesEvent;
@@ -139,9 +140,16 @@ public class WorldEvents {
 	//
 	
 	@SubscribeEvent
-	public static void onAttachEventTileEntity(AttachCapabilitiesEvent<TileEntity> event){
+	public static void onAttachEventTileEntity(AttachCapabilitiesEvent<net.minecraft.tileentity.TileEntity> event){
 		if(event.getObject() instanceof TileEntitySign){
 			event.addCapability(new ResourceLocation("states", "sign"), new SignTileEntityCapabilityUtil(event.getObject()));
+		}
+	}
+	
+	@SubscribeEvent
+	public static void onAttachEventEntityPlayer(AttachCapabilitiesEvent<net.minecraft.entity.Entity> event){
+		if(event.getObject() instanceof EntityPlayer){
+			event.addCapability(PlayerCapabilityUtil.REGISTRY_NAME, new PlayerCapabilityUtil((EntityPlayer)event.getObject()));
 		}
 	}
 	

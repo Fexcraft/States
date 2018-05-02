@@ -12,11 +12,13 @@ import java.net.URL;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 
+import net.fexcraft.mod.lib.perms.PermManager;
 import net.fexcraft.mod.lib.util.common.Formatter;
 import net.fexcraft.mod.lib.util.common.Print;
 import net.fexcraft.mod.lib.util.common.Static;
 import net.fexcraft.mod.lib.util.json.JsonUtil;
 import net.fexcraft.mod.states.States;
+import net.fexcraft.mod.states.api.capabilities.StatesCapabilities;
 import net.minecraft.command.ICommandSender;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.util.text.ITextComponent;
@@ -38,7 +40,7 @@ public class Sender {
 	
 	public static void sendAs(EntityPlayer sender, String message, boolean webhook){
 		if(sender == null){ Print.log("SENDER NULL || " + message); }
-		String name = "&" + (StateUtil.getPlayer(sender).getPermissions().hasPermission(States.ADMIN_PERM) ? "4" : "6" + "#&8] " + StateUtil.getPlayer(sender).getFormattedNickname(sender));
+		String name = "&" + (PermManager.getPlayerPerms(sender).hasPermission(States.ADMIN_PERM) ? "4" : "6" + "#&8] " + sender.getCapability(StatesCapabilities.PLAYER, null).getFormattedNickname(sender));
 		Static.getServer().getPlayerList().sendMessage(new TextComponentString(Formatter.format(name + "&0: &7" + message)));
 		if(webhook){ sendToWebhook(sender, message); }
 	}

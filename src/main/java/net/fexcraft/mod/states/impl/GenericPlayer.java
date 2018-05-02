@@ -6,7 +6,7 @@ import com.google.gson.JsonObject;
 
 import net.fexcraft.mod.fsmm.api.Account;
 import net.fexcraft.mod.fsmm.util.AccountManager;
-import net.fexcraft.mod.lib.perms.player.AttachedData;
+import net.fexcraft.mod.lib.perms.PermManager;
 import net.fexcraft.mod.lib.perms.player.PlayerPerms;
 import net.fexcraft.mod.lib.util.common.Formatter;
 import net.fexcraft.mod.lib.util.common.Print;
@@ -15,60 +15,61 @@ import net.fexcraft.mod.lib.util.math.Time;
 import net.fexcraft.mod.states.api.Chunk;
 import net.fexcraft.mod.states.api.District;
 import net.fexcraft.mod.states.api.Municipality;
-import net.fexcraft.mod.states.api.Player;
 import net.fexcraft.mod.states.api.State;
+import net.fexcraft.mod.states.api.capabilities.PlayerCapability;
 import net.fexcraft.mod.states.util.StateUtil;
 import net.minecraft.command.ICommandSender;
+import net.minecraft.entity.player.EntityPlayer;
 
-public class GenericPlayer implements AttachedData, Player {
+public class GenericPlayer implements PlayerCapability {
 	
-	private PlayerPerms perms;
-	private boolean online_instance;
+	private EntityPlayer entity;
 	private String nick;
 	private UUID uuid;
-	private int color;
+	private int color = 2;
 	private long lastsave, lastpos;
 	private Account account;
 	private Chunk last_chunk, current_chunk;
 	//
 	private Municipality municipality;
 	
-	/** Internal Use Only. */
-	private GenericPlayer(){}
-	
-	public GenericPlayer(PlayerPerms pp){
-		perms = pp;
+	public GenericPlayer(){
+		//
+	}
+
+	public GenericPlayer(UUID uuid){
+		this.uuid = uuid;
+		this.load();
 	}
 
 	@Override
-	public String getId(){
-		return net.fexcraft.mod.states.States.PLAYER_DATA;
+	public void save(){
+		JsonObject obj = this.toJsonObject();
+		obj.addProperty("lastsave", lastsave = Time.getDate());
+		JsonUtil.write(this.getPlayerFile(), obj);
 	}
 
 	@Override
-	public JsonObject save(UUID uuid){
+	public JsonObject toJsonObject(){
 		JsonObject obj = new JsonObject();
-		obj.addProperty("UUID", (this.uuid = uuid).toString());
+		obj.addProperty("uuid", this.getUUIDAsString());
 		if(nick != null){
-			obj.addProperty("Nick", nick);
+			obj.addProperty("nick", nick);
 		}
-		obj.addProperty("Color", color);
-		obj.addProperty("Municipality", municipality.getId());
-		obj.addProperty("LastSave", lastsave = Time.getDate());
+		obj.addProperty("color", color);
+		obj.addProperty("municipality", municipality.getId());
 		return obj;
 	}
 
 	@Override
-	public AttachedData load(UUID uuid, JsonObject obj){
-		if(obj == null){
-			obj = new JsonObject();
+	public void load(){
+		if(this.isOnlinePlayer()){
+			uuid = entity.getGameProfile().getId();
 		}
-		online_instance = true;
-		this.uuid = uuid;
-		this.nick = obj.has("Nickname") ? obj.get("Nickname").getAsString() : null;
-		this.color = JsonUtil.getIfExists(obj, "Color", 2).intValue();
-		//this.municipality = StateUtil.getMunicipality(JsonUtil.getIfExists(obj, "Municipality", -1).intValue());
-		Municipality mun = StateUtil.getMunicipality(JsonUtil.getIfExists(obj, "Municipality", -1).intValue());
+		JsonObject obj = JsonUtil.get(this.getPlayerFile());
+		this.nick = obj.has("nickname") ? obj.get("nickname").getAsString() : null;
+		this.color = JsonUtil.getIfExists(obj, "color", 2).intValue();
+		Municipality mun = StateUtil.getMunicipality(JsonUtil.getIfExists(obj, "municipality", -1).intValue());
 		if(mun.getId() >= 0 && mun.getCitizen().contains(uuid)){
 			this.setMunicipality(mun);
 		}
@@ -79,7 +80,6 @@ public class GenericPlayer implements AttachedData, Player {
 			}
 		}
 		this.account = AccountManager.INSTANCE.getAccount("player", uuid.toString(), true);
-		return this;
 	}
 
 	@Override
@@ -90,33 +90,30 @@ public class GenericPlayer implements AttachedData, Player {
 	@Override
 	public void setMunicipality(Municipality mun){
 		if(this.municipality != null){
-			this.municipality.getCitizen().remove(uuid);
+			this.municipality.getCitizen().remove(this.getUUID());
 			//
 			for(int id : this.municipality.getDistricts()){
 				District dis = StateUtil.getDistrict(id);
 				if(dis == null){ continue; }
-				if(dis.getManager().equals(uuid)){
+				if(dis.getManager().equals(this.getUUID())){
 					dis.setManager(null);
 					dis.save();
 				}
 			}
 		}
 		this.municipality = mun;
-		if(!this.municipality.getCitizen().contains(uuid)){
-			this.municipality.getCitizen().add(uuid);
+		if(!this.municipality.getCitizen().contains(this.getUUID())){
+			this.municipality.getCitizen().add(this.getUUID());
 		}
 	}
 
 	@Override
 	public boolean isOnlinePlayer(){
-		return online_instance;
+		return entity != null;
 	}
 	
-	public static Player getOfflineInstance(UUID uuid, JsonObject obj){
-		GenericPlayer player = new GenericPlayer();
-		player.load(uuid, obj);
-		player.online_instance = false;
-		return player;
+	public static PlayerCapability getOfflineInstance(UUID uuid){
+		return new GenericPlayer(uuid);
 	}
 
 	@Override
@@ -141,7 +138,7 @@ public class GenericPlayer implements AttachedData, Player {
 
 	@Override
 	public PlayerPerms getPermissions(){
-		return perms;
+		return PermManager.getPlayerPerms(entity);
 	}
 
 	@Override
@@ -156,7 +153,7 @@ public class GenericPlayer implements AttachedData, Player {
 
 	@Override
 	public String getUUIDAsString(){
-		return uuid.toString();//TODO
+		return uuid.toString();
 	}
 
 	@Override
@@ -212,6 +209,16 @@ public class GenericPlayer implements AttachedData, Player {
 	@Override
 	public void setPositionUpdate(long leng){
 		lastpos = leng;
+	}
+
+	@Override
+	public void setEntityPlayer(EntityPlayer player){
+		this.entity = player;
+	}
+
+	@Override
+	public EntityPlayer getEntityPlayer(){
+		return entity;
 	}
 
 }

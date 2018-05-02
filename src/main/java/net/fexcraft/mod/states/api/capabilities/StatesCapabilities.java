@@ -14,4 +14,7 @@ public class StatesCapabilities {
 	@CapabilityInject(SignTileEntityCapability.class)
 	public static final Capability<SignTileEntityCapability> SIGN_TE = null;
 	
+	@CapabilityInject(PlayerCapability.class)
+	public static final Capability<PlayerCapability> PLAYER = null;
+	
 }

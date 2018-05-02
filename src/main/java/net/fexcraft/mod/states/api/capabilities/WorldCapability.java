@@ -1,5 +1,10 @@
 package net.fexcraft.mod.states.api.capabilities;
 
+import com.google.common.collect.ImmutableMap;
+
+import net.fexcraft.mod.states.api.District;
+import net.fexcraft.mod.states.api.Municipality;
+import net.fexcraft.mod.states.api.State;
 import net.minecraft.nbt.NBTBase;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.world.World;
@@ -18,5 +23,11 @@ public interface WorldCapability {
 	public int getNewDistrictId() throws Exception;
 
 	public int getNewStateId() throws Exception;
+	
+	public ImmutableMap<Integer, District> getDistricts();
+	
+	public ImmutableMap<Integer, Municipality> getMunicipalities();
+	
+	public ImmutableMap<Integer, State> getStates();
 
 }

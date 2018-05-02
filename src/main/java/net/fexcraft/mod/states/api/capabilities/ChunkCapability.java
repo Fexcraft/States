@@ -1,4 +1,4 @@
-package net.fexcraft.mod.states.util.chunk;
+package net.fexcraft.mod.states.api.capabilities;
 
 import net.minecraft.world.chunk.Chunk;
 

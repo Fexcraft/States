@@ -19,22 +19,21 @@ import net.fexcraft.mod.states.api.District;
 import net.fexcraft.mod.states.api.Municipality;
 import net.fexcraft.mod.states.api.Player;
 import net.fexcraft.mod.states.api.State;
+import net.fexcraft.mod.states.api.capabilities.ChunkCapability;
+import net.fexcraft.mod.states.api.capabilities.SignTileEntityCapability;
+import net.fexcraft.mod.states.api.capabilities.WorldCapability;
 import net.fexcraft.mod.states.guis.GuiHandler;
 import net.fexcraft.mod.states.guis.Listener;
 import net.fexcraft.mod.states.guis.Receiver;
 import net.fexcraft.mod.states.impl.GenericPlayer;
-import net.fexcraft.mod.states.impl.capabilities.TESCapability;
-import net.fexcraft.mod.states.impl.capabilities.TESImplementation;
-import net.fexcraft.mod.states.impl.capabilities.TESStorage;
+import net.fexcraft.mod.states.impl.capabilities.ChunkCapabilityUtil;
+import net.fexcraft.mod.states.impl.capabilities.SignTileEntityCapabilityUtil;
+import net.fexcraft.mod.states.impl.capabilities.WorldCapabilityUtil;
 import net.fexcraft.mod.states.packets.ImagePacket;
 import net.fexcraft.mod.states.packets.ImagePacketHandler;
 import net.fexcraft.mod.states.util.Config;
 import net.fexcraft.mod.states.util.Sender;
 import net.fexcraft.mod.states.util.StatesPermissions;
-import net.fexcraft.mod.states.util.chunk.ChunkCapability;
-import net.fexcraft.mod.states.util.chunk.ChunkCapabilityUtil;
-import net.fexcraft.mod.states.util.world.WorldCapability;
-import net.fexcraft.mod.states.util.world.WorldCapabilityUtil;
 import net.minecraftforge.common.capabilities.CapabilityManager;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.event.FMLInitializationEvent;
@@ -90,7 +89,7 @@ public class States {
 		PlayerPerms.addAdditionalData(GenericPlayer.class);
 		//
 		SERVERACCOUNT = AccountManager.INSTANCE.getAccount("server", "states", true);
-		CapabilityManager.INSTANCE.register(TESCapability.class, new TESStorage(), TESImplementation.class);
+		CapabilityManager.INSTANCE.register(SignTileEntityCapability.class, new SignTileEntityCapabilityUtil.Storage(), new SignTileEntityCapabilityUtil.Callable());
 		CapabilityManager.INSTANCE.register(ChunkCapability.class, new ChunkCapabilityUtil.Storage(), new ChunkCapabilityUtil.Callable());
 		CapabilityManager.INSTANCE.register(WorldCapability.class, new WorldCapabilityUtil.Storage(), new WorldCapabilityUtil.Callable());
 		//

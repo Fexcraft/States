@@ -21,12 +21,12 @@ import net.fexcraft.mod.states.api.MailType;
 import net.fexcraft.mod.states.api.Municipality;
 import net.fexcraft.mod.states.api.Player;
 import net.fexcraft.mod.states.api.State;
+import net.fexcraft.mod.states.api.capabilities.StatesCapabilities;
 import net.fexcraft.mod.states.api.root.AnnounceLevel;
 import net.fexcraft.mod.states.impl.GenericMail;
 import net.fexcraft.mod.states.impl.GenericState;
 import net.fexcraft.mod.states.util.ImageCache;
 import net.fexcraft.mod.states.util.StateUtil;
-import net.fexcraft.mod.states.util.world.WorldCapabilityUtil;
 import net.minecraft.command.CommandBase;
 import net.minecraft.command.CommandException;
 import net.minecraft.command.ICommandSender;
@@ -433,7 +433,7 @@ public class StateCmd extends CommandBase {
 							name += " " + args[i];
 						}
 					}
-					GenericState newstate = new GenericState(sender.getEntityWorld().getCapability(WorldCapabilityUtil.WORLD_CAPABILITY, null).getNewStateId());
+					GenericState newstate = new GenericState(sender.getEntityWorld().getCapability(StatesCapabilities.WORLD, null).getNewStateId());
 					if(newstate.getStateFile().exists() || StateUtil.getState(newstate.getId()).getId() >= 0){
 						throw new Exception("Tried to create new State with ID '" + newstate.getId() + "', but savefile already exists.");
 					}

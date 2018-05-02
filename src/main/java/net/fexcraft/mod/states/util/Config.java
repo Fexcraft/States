@@ -66,7 +66,7 @@ public class Config {
 	}
 
 	public static void updateWebHook(){
-		if(WEBHOOK.equals("null")){
+		if(WEBHOOK != null && WEBHOOK.equals("null")){
 			WEBHOOK = null;
 		}
 		if(Sender.RECEIVER != null){

@@ -1,4 +1,4 @@
-package net.fexcraft.mod.states.impl.capabilities;
+package net.fexcraft.mod.states.api.capabilities;
 
 import javax.annotation.Nullable;
 
@@ -8,12 +8,8 @@ import net.minecraft.nbt.NBTBase;
 import net.minecraft.tileentity.TileEntitySign;
 import net.minecraft.util.EnumFacing;
 import net.minecraftforge.common.capabilities.Capability;
-import net.minecraftforge.common.capabilities.CapabilityInject;
 
-public interface TESCapability {
-
-	@CapabilityInject(TESCapability.class)
-	public static final Capability<TESCapability> CAPINJ = null;
+public interface SignTileEntityCapability {
 
 	public void setup(Chunk chunk);
 
@@ -23,9 +19,9 @@ public interface TESCapability {
 	
 	public void update(Chunk chunk, @Nullable String task, boolean sendupdatepacket);
 
-	public NBTBase writeToNBT(Capability<TESCapability> capability, EnumFacing side);
+	public NBTBase writeToNBT(Capability<SignTileEntityCapability> capability, EnumFacing side);
 
-	public void readNBT(Capability<TESCapability> capability, EnumFacing side, NBTBase nbt);
+	public void readNBT(Capability<SignTileEntityCapability> capability, EnumFacing side, NBTBase nbt);
 
 	public boolean isStatesSign();
 

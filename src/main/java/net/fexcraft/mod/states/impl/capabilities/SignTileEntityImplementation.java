@@ -9,6 +9,7 @@ import net.fexcraft.mod.lib.util.common.Static;
 import net.fexcraft.mod.states.States;
 import net.fexcraft.mod.states.api.Chunk;
 import net.fexcraft.mod.states.api.ChunkType;
+import net.fexcraft.mod.states.api.capabilities.SignTileEntityCapability;
 import net.fexcraft.mod.states.util.ImageCache;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.nbt.NBTBase;
@@ -18,7 +19,7 @@ import net.minecraft.util.EnumFacing;
 import net.minecraft.util.text.TextComponentString;
 import net.minecraftforge.common.capabilities.Capability;
 
-public class TESImplementation implements TESCapability {
+public class SignTileEntityImplementation implements SignTileEntityCapability {
 	
 	private TileEntitySign tileentity;
 	private boolean isStatesSign = false;
@@ -142,7 +143,7 @@ public class TESImplementation implements TESCapability {
 	}
 
 	@Override
-	public NBTBase writeToNBT(Capability<TESCapability> capability, EnumFacing side){
+	public NBTBase writeToNBT(Capability<SignTileEntityCapability> capability, EnumFacing side){
 		NBTTagCompound compound = new NBTTagCompound();
 		compound.setBoolean("StatesSign", isStatesSign);
 		if(isStatesSign){
@@ -154,7 +155,7 @@ public class TESImplementation implements TESCapability {
 	}
 
 	@Override
-	public void readNBT(Capability<TESCapability> capability, EnumFacing side, NBTBase nbt){
+	public void readNBT(Capability<SignTileEntityCapability> capability, EnumFacing side, NBTBase nbt){
 		NBTTagCompound compound = (NBTTagCompound)nbt;
 		if(isStatesSign = compound.getBoolean("StatesSign")){
 			mode = compound.getString("Mode");

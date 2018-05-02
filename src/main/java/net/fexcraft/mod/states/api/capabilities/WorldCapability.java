@@ -1,4 +1,4 @@
-package net.fexcraft.mod.states.util.world;
+package net.fexcraft.mod.states.api.capabilities;
 
 import net.minecraft.nbt.NBTBase;
 import net.minecraft.util.EnumFacing;

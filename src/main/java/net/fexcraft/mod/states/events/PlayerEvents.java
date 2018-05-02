@@ -12,12 +12,12 @@ import net.fexcraft.mod.lib.util.math.Time;
 import net.fexcraft.mod.states.States;
 import net.fexcraft.mod.states.api.Chunk;
 import net.fexcraft.mod.states.api.Player;
+import net.fexcraft.mod.states.api.capabilities.SignTileEntityCapability;
+import net.fexcraft.mod.states.api.capabilities.StatesCapabilities;
 import net.fexcraft.mod.states.impl.GenericPlayer;
-import net.fexcraft.mod.states.impl.capabilities.TESCapability;
 import net.fexcraft.mod.states.util.Config;
 import net.fexcraft.mod.states.util.Sender;
 import net.fexcraft.mod.states.util.StateUtil;
-import net.fexcraft.mod.states.util.chunk.ChunkCapabilityUtil;
 import net.minecraft.block.BlockButton;
 import net.minecraft.block.BlockChest;
 import net.minecraft.block.BlockDispenser;
@@ -93,7 +93,7 @@ public class PlayerEvents {
 				return;
 			}
 			Chunk chunk = StateUtil.getChunk(event.getWorld(), event.getPos());
-			TESCapability cap = te_sign.getCapability(TESCapability.CAPINJ, null);
+			SignTileEntityCapability cap = te_sign.getCapability(StatesCapabilities.SIGN_TE, null);
 			if(te_sign.signText[0].getUnformattedText().equalsIgnoreCase("[States]")){
 				if(cap != null){ cap.setup(chunk); }
 			}
@@ -148,7 +148,7 @@ public class PlayerEvents {
 		if(pl.getPermissions().hasPermission(States.ADMIN_PERM)){
 			return false;
 		}
-		Chunk chunk = world.getChunkFromBlockCoords(pos).getCapability(ChunkCapabilityUtil.CHUNK_CAPABILITY, null).getStatesChunk();
+		Chunk chunk = world.getChunkFromBlockCoords(pos).getCapability(StatesCapabilities.CHUNK, null).getStatesChunk();
 		if(chunk.getDistrict().getId() == -1){
 			return Config.ALLOW_WILDERNESS_ACCESS;
 		}

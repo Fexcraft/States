@@ -22,13 +22,13 @@ import net.fexcraft.mod.states.api.Municipality;
 import net.fexcraft.mod.states.api.MunicipalityType;
 import net.fexcraft.mod.states.api.Player;
 import net.fexcraft.mod.states.api.State;
+import net.fexcraft.mod.states.api.capabilities.StatesCapabilities;
 import net.fexcraft.mod.states.api.root.AnnounceLevel;
 import net.fexcraft.mod.states.impl.GenericDistrict;
 import net.fexcraft.mod.states.impl.GenericMail;
 import net.fexcraft.mod.states.impl.GenericMunicipality;
 import net.fexcraft.mod.states.util.ImageCache;
 import net.fexcraft.mod.states.util.StateUtil;
-import net.fexcraft.mod.states.util.world.WorldCapabilityUtil;
 import net.minecraft.command.CommandBase;
 import net.minecraft.command.CommandException;
 import net.minecraft.command.ICommandSender;
@@ -598,7 +598,7 @@ public class MunicipalityCmd extends CommandBase {
 							name += " " + args[i];
 						}
 					}
-					GenericMunicipality newmun = new GenericMunicipality(sender.getEntityWorld().getCapability(WorldCapabilityUtil.WORLD_CAPABILITY, null).getNewMunicipalityId());
+					GenericMunicipality newmun = new GenericMunicipality(sender.getEntityWorld().getCapability(StatesCapabilities.WORLD, null).getNewMunicipalityId());
 					if(newmun.getMunicipalityFile().exists() || StateUtil.getMunicipality(newmun.getId()).getId() >= 0){
 						throw new Exception("Tried to create new Municipality with ID '" + newmun.getId() + "', but savefile already exists.");
 					}
@@ -611,7 +611,7 @@ public class MunicipalityCmd extends CommandBase {
 						newmun.getCitizen().add(ply.getUUID());
 						newmun.setChanged(Time.getDate());
 						//
-						GenericDistrict newdis = new GenericDistrict(sender.getEntityWorld().getCapability(WorldCapabilityUtil.WORLD_CAPABILITY, null).getNewDistrictId());
+						GenericDistrict newdis = new GenericDistrict(sender.getEntityWorld().getCapability(StatesCapabilities.WORLD, null).getNewDistrictId());
 						if(newdis.getDistrictFile().exists() || StateUtil.getDistrict(newdis.getId()).getId() >= 0){
 							throw new Exception("Tried to create new Municipality with ID '" + newmun.getId() + "', but savefile already exists.");
 						}

@@ -66,7 +66,8 @@ public class ImageCache {
 	}
 	
 	private static final void updateImage(World world, net.minecraft.world.chunk.Chunk chunk, String event, String type){
-		BufferedImage img = getImage(chunk.x, chunk.z, type, false);
+		return;
+		/*BufferedImage img = getImage(chunk.x, chunk.z, type, false);
 		if(img == null){ return; }
 		int rx = (int)Math.floor(chunk.x / 32.0), rz = (int)Math.floor(chunk.z / 32.0);
 		int x = (chunk.x * 16) - (rx * 512), z = (chunk.z * 16) - (rz * 512);
@@ -146,7 +147,7 @@ public class ImageCache {
 			//TODO
 		}
 		saveImage(img, chunk.x, chunk.z, type);
-		return;
+		return;*/
 	}
 	
 	private static boolean borders(String type, Chunk ck, Chunk st_chunk){

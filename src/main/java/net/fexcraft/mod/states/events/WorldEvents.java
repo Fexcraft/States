@@ -21,6 +21,7 @@ import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.tileentity.TileEntitySign;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.event.AttachCapabilitiesEvent;
+import net.minecraftforge.event.world.ExplosionEvent;
 import net.minecraftforge.event.world.WorldEvent;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
@@ -135,6 +136,16 @@ public class WorldEvents {
 		States.MUNICIPALITIES.values().forEach(elm -> { elm.save(); });
 		States.STATES.values().forEach(elm -> { elm.save(); });
 		ImageCache.saveQueue();
+	}
+	
+	@SubscribeEvent
+	public static void onExplosion(ExplosionEvent event){
+		/*for(BlockPos pos : event.getExplosion().getAffectedBlockPositions()){
+			if(StateUtil.getChunk(event.getWorld(), pos).getDistrict().getId() >= 0){
+				event.getExplosion().getAffectedBlockPositions().remove(pos);
+			}
+		}*/
+		event.setCanceled(true);
 	}
 	
 	//

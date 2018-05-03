@@ -634,6 +634,8 @@ public class MunicipalityCmd extends CommandBase {
 								chunk.setDistrict(newdis); chunk.save();
 								chunk.setType(ChunkType.MUNICIPAL);
 								chunk.setChanged(Time.getDate());
+								chunk.setPrice(0);
+								chunk.setClaimer(ply.getUUID());
 								ply.setMunicipality(newmun);
 								ImageCache.update(sender.getEntityWorld(), sender.getEntityWorld().getChunkFromBlockCoords(sender.getPosition()), "municipality_creation", "all");
 								StateUtil.announce(server, "&9New Municipality and District was created!");

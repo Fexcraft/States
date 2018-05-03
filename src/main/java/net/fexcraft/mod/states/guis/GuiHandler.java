@@ -17,6 +17,7 @@ public class GuiHandler implements IGuiHandler{
 	 * 7 Companies
 	 * 8 Player Data
 	 * 9 empty
+	 * 10 Chunk claiming.
 	 * */
 
 	@Override
@@ -33,6 +34,10 @@ public class GuiHandler implements IGuiHandler{
 			}
 			case 1:{
 				return new AreaView(player, world, x, y, z);
+			}
+			//
+			case 10:{
+				return new ClaimMap(player, world, x, y, z);
 			}
 		}
 		return null;

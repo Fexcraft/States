@@ -55,6 +55,13 @@ public class Receiver implements IPacketListener<PacketNBTTagCompound> {
 				}
 				break;
 			}
+			case "get_map_return":{
+				ClaimMap.update(packet.nbt);
+				return;
+			}
+			case "claim_return":{
+				ClaimMap.update(packet.nbt.hasKey("claimed") && packet.nbt.getBoolean("claimed"), packet.nbt.getString("result"), packet.nbt.getInteger("x"), packet.nbt.getInteger("z"), packet.nbt.hasKey("color") ? packet.nbt.getInteger("color") : null);
+			}
 		}
 	}
 

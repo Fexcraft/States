@@ -14,7 +14,6 @@ import net.fexcraft.mod.lib.util.math.Time;
 import net.fexcraft.mod.states.States;
 import net.fexcraft.mod.states.api.Chunk;
 import net.fexcraft.mod.states.api.ChunkType;
-import net.fexcraft.mod.states.api.District;
 import net.fexcraft.mod.states.api.capabilities.PlayerCapability;
 import net.fexcraft.mod.states.api.capabilities.StatesCapabilities;
 import net.fexcraft.mod.states.util.ImageCache;
@@ -76,91 +75,11 @@ public class ChunkCmd extends CommandBase {
 		Chunk chunk = StateUtil.getChunk(player);
 		switch(args[0]){
 			case "claim":{
-				//TODO add check if claims are connected.
 				if(args.length == 1){
-					Print.chat(sender, "&7/ck claim <district> <optinal:range>");
+					Print.chat(sender, "&7/ck claim <district>");
 					return;
 				}
-				int disid = Integer.parseInt(args[1]);
-				int range = args.length == 3 ? Integer.parseInt(args[2]) : 0;
-				District district = StateUtil.getDistrict(disid);
-				if(district.getId() == -1){
-					Print.chat(sender, "&7District not found. (" + disid + ");");
-					return;
-				}
-				if(hasPerm("chunk.claim", player, district)){
-					if(range > 3){
-						Print.chat(sender, "Invalid range, setting to \"3\"!");
-						range = 3;
-					}
-					if(range == 0){
-						if(district.getMunicipality().getAccount().getBalance() < chunk.getPrice()){
-							Print.chat(sender, "&7Municipality does not have enough money to claim this chunk.");
-							Print.chat(sender, "&7Required: &9" + Config.getWorthAsString(chunk.getPrice()) + " &8|| &7Available: &9" + Config.getWorthAsString(district.getMunicipality().getAccount().getBalance()));
-							return;
-						}
-						if(chunk.getDistrict().getId() < 0){
-							if(chunk.getPrice() > 0 && !AccountManager.INSTANCE.getBank(district.getMunicipality().getAccount().getBankId()).processTransfer(sender, district.getMunicipality().getAccount(), chunk.getPrice(), States.SERVERACCOUNT)){
-								return;
-							}
-							chunk.setDistrict(district);
-							chunk.setClaimer(player.getGameProfile().getId());
-							chunk.setChanged(Time.getDate());
-							chunk.setPrice(0);
-							chunk.save();
-							ImageCache.update(player.world, player.world.getChunkFromChunkCoords(chunk.xCoord(), chunk.zCoord()), "claim", "all");
-							Print.chat(sender, "&7Chunk Claimed. (" + district.getId() + ");");
-						}
-						else{
-							Print.chat(sender, "&7Chunk is already claimed.");
-						}
-					}
-					else{
-						int r = range == 1 ? 3 : range == 2 ? 5 : 7;
-						Print.chat(sender, "&6Result: &7(" + district.getId() + ")");
-						for(int i = 0; i < r; i++){
-							String str = "&0[";
-							for(int j = 0; j < r; j++){
-								int x = (chunk.xCoord() - range) + i;
-								int z = (chunk.zCoord() - range) + j;
-								String sign = x == chunk.xCoord() && z == chunk.zCoord() ? "+" : "#";
-								Chunk ck = StateUtil.getChunk(x, z);
-								if(ck == null){
-									//Print.chat(sender, "&7Chunk at " + x + "x, " + z + "z &creturned null&7!");
-									str += "&4" + sign;
-									continue;
-								}
-								if(ck.getDistrict().getId() >= 0){
-									//Print.chat(sender, "&7Chunk at " + x + "x, " + z + "z is &calready claimed&7.");
-									str += "&c" + sign;
-									continue;
-								}
-								if(district.getMunicipality().getAccount().getBalance() < chunk.getPrice()){
-									str += "&b" + sign;
-									continue;
-								}
-								if(chunk.getPrice() > 0 && !AccountManager.INSTANCE.getBank(district.getMunicipality().getAccount().getBankId()).processTransfer(sender, district.getMunicipality().getAccount(), chunk.getPrice(), States.SERVERACCOUNT)){
-									str += "&3" + sign;
-									continue;
-								}
-								ck.setDistrict(district);
-								ck.setClaimer(player.getGameProfile().getId());
-								ck.setChanged(Time.getDate());
-								ck.setPrice(0);
-								ck.save();
-								ImageCache.update(player.world, player.world.getChunkFromChunkCoords(ck.xCoord(), ck.zCoord()), "claim", "all");
-								//Print.chat(sender, "&7Chunk at " + x + "x, " + z + "z &2claimed&7!");
-								str += "&2" + sign;
-							}
-							Print.chat(sender, str + "&0]");
-						}
-						Print.chat(sender, "&4#&7 - chunk data returned null &8| &3#&7 transfer error &8| &7+ your position");
-						Print.chat(sender, "&c#&7 - chunk already claimed &8| &b#&7 - no money &8| &2#&7 - chunk claimed.");
-					}
-				}
-				else{
-					Print.chat(sender, "&7No permission.");
-				}
+				player.openGui(States.INSTANCE, 10, player.world, Integer.parseInt(args[1]), 0, 0);
 				return;
 			}
 			case "map":{

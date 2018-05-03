@@ -192,6 +192,7 @@ public class PlayerEvents {
 	
 	@SubscribeEvent
 	public static void onTick(TickEvent.PlayerTickEvent event){
+		if(event.player.world.isRemote){ return; }
 		PlayerCapability player = event.player.getCapability(StatesCapabilities.PLAYER, null);
 		if(player != null && Time.getDate() > player.getLastPositionUpdate()){
 			player.setPositionUpdate(Time.getDate());

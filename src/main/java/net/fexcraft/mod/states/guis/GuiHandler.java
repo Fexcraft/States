@@ -33,7 +33,7 @@ public class GuiHandler implements IGuiHandler{
 				return new WelcomeGui(player, world, x, y, z);
 			}
 			case 1:{
-				return new AreaView(player, world, x, y, z);
+				return new AreaView2(player, world, x, y, z);
 			}
 			//
 			case 10:{

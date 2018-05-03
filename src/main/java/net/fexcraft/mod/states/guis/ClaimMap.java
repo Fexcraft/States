@@ -1,9 +1,12 @@
 package net.fexcraft.mod.states.guis;
 
 import java.awt.Color;
+import java.util.ArrayList;
 
+import net.fexcraft.mod.fsmm.util.Config;
 import net.fexcraft.mod.lib.network.PacketHandler;
 import net.fexcraft.mod.lib.network.packet.PacketNBTTagCompound;
+import net.fexcraft.mod.lib.util.common.Formatter;
 import net.fexcraft.mod.lib.util.common.Print;
 import net.fexcraft.mod.lib.util.render.RGB;
 import net.minecraft.block.material.MapColor;
@@ -22,19 +25,21 @@ public class ClaimMap extends GuiContainer {
 	//private EntityPlayer player;
 	//private World world;
 	//private int x, y, z;
-	private static int district;
+	private static int district, mode, m;
 	private static NBTTagList list;
 	private MapButton map;
 	private static String result = "";
+	private static ClaimMap instance;
 	
 	public ClaimMap(EntityPlayer player, World world, int x, int y, int z){
 		super(new PlaceholderContainer());
 		xSize = 130; ySize = 146;
 		//this.player = player; this.world = world;
 		//this.x = x; this.y = y; this.z = z;
-		district = x;
+		district = x; mode = y;
 		list = null;
 		requestData();
+		instance = this;
 	}
 
 	@Override
@@ -57,6 +62,7 @@ public class ClaimMap extends GuiContainer {
         district = -1;
         result = "";
         list = null;
+        mode = -1;
     }
 	
 	@Override
@@ -72,7 +78,7 @@ public class ClaimMap extends GuiContainer {
 			while((j -= 10) > 0){ l++; }
 			l += j > 0 ? 1 : 0;
 			NBTTagCompound compound = list.getCompoundTagAt(k + (l * 11));
-			if(compound.getBoolean("claimable") && compound.getInteger("district") < 0){
+			if(mode == 1 ? compound.getInteger("district") >= 0 : (compound.getBoolean("claimable") && compound.getInteger("district") < 0)){
 				sendClaimRequest(compound.getInteger("x"), compound.getInteger("z"));
 			}
 		}
@@ -84,7 +90,7 @@ public class ClaimMap extends GuiContainer {
 		compound.setString("target_listener", "states:gui");
 		compound.setInteger("from", 10);
 		compound.setString("request", "claim");
-		compound.setIntArray("data", new int[] { district, x, z });
+		compound.setIntArray("data", new int[] { district, x, z, mode });
 		Print.debug(compound);
 		PacketHandler.getInstance().sendToServer(new PacketNBTTagCompound(compound));
 	}
@@ -120,7 +126,7 @@ public class ClaimMap extends GuiContainer {
             xx = mouseX - x; yy = mouseY - this.y;
             if(xx >= 110){ xx = -1; } if(yy >= 110){ yy = -1; }
             if(list == null){ return; }
-            int m = -1;
+            m = -1;
             if(xx >= 0 && yy >= 0){
     			int i = xx, j = yy, k = 0, l = 0;
     			while((i -= 10) > 0){ k++; }
@@ -129,6 +135,7 @@ public class ClaimMap extends GuiContainer {
     			l += j > 0 ? 1 : 0;
     			m = k + (l * 11);
             }
+            //
             int k = 0;
             for(int i = 0; i < 11; i++){
             	for(int j = 0; j < 11; j++){
@@ -144,11 +151,28 @@ public class ClaimMap extends GuiContainer {
             		k++;
             	}
             }
+            //
+            if(m >= 0){
+            	ArrayList<String> arr = new ArrayList<String>();
+            	NBTTagCompound compound = list.getCompoundTagAt(m);
+            	arr.add(Formatter.PARAGRAPH_SIGN + "7Coords: " + compound.getInteger("x") + "x, " + compound.getInteger("z") + "z");
+            	arr.add(Formatter.PARAGRAPH_SIGN + "7District: " + compound.getInteger("district"));
+            	if(compound.hasKey("linked") && compound.getBoolean("linked")){
+            		arr.add(Formatter.PARAGRAPH_SIGN + "&7Linked: " + compound.getIntArray("link")[0] + "x, " + compound.getIntArray("link")[1] + "z");
+            	}
+            	if(compound.hasKey("owned") && compound.getBoolean("owned")){
+            		arr.add(Formatter.PARAGRAPH_SIGN + "9Owner: " + compound.getString("owner"));
+            	}
+            	if(compound.hasKey("price") && compound.getLong("price") > 0){
+            		arr.add(Formatter.PARAGRAPH_SIGN + "6Price: " + Config.getWorthAsString(compound.getLong("price")));
+            	}
+    		    instance.drawHoveringText(arr, mouseX, mouseY, mc.fontRenderer);
+            }
 	    }
 		
 	}
 
-	public static void update(boolean claimed, String rs, int x, int z, Integer color){
+	public static void update(boolean claimed, String rs, int x, int z, NBTTagCompound nbt){
 		if(claimed && list != null){
 			list.forEach(nbtbase -> {
 				if(nbtbase instanceof NBTTagCompound){
@@ -156,8 +180,15 @@ public class ClaimMap extends GuiContainer {
 					if(compound.getInteger("x") == x && compound.getInteger("z") == z){
 						compound.setBoolean("claimable", false);
 						compound.setInteger("district", district);
-						if(color != null){
-							compound.setInteger("color", color);
+						if(nbt.hasKey("color")){
+							compound.setInteger("color", nbt.getInteger("color"));
+						}
+						if(nbt.hasKey("owned") && nbt.getBoolean("owned")){
+							compound.setBoolean("owned", true);
+							compound.setString("owner", nbt.getString("owner"));
+						}
+						if(nbt.hasKey("price")){
+							compound.setLong("price", nbt.getLong("price"));
 						}
 					}
 				}

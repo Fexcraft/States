@@ -3,7 +3,6 @@ package net.fexcraft.mod.states.events;
 import java.util.Arrays;
 import java.util.List;
 
-import net.fexcraft.mod.lib.api.common.LockableObject;
 import net.fexcraft.mod.lib.network.PacketHandler;
 import net.fexcraft.mod.lib.network.packet.PacketNBTTagCompound;
 import net.fexcraft.mod.lib.util.common.Print;
@@ -27,7 +26,6 @@ import net.minecraft.block.BlockPressurePlate;
 import net.minecraft.block.BlockRedstoneComparator;
 import net.minecraft.block.BlockRedstoneRepeater;
 import net.minecraft.block.BlockSign;
-import net.minecraft.block.ITileEntityProvider;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
@@ -100,24 +98,6 @@ public class PlayerEvents {
 			}
 			else return;
 		}
-		else if(state.getBlock() instanceof LockableObject || (state.getBlock() instanceof ITileEntityProvider && event.getWorld().getTileEntity(event.getPos()) instanceof LockableObject)){
-			/*LockableObject obj = state.getBlock() instanceof LockableObject ? (LockableObject)state.getBlock() : (LockableObject)te;
-			if(event.getItemStack().getItem() instanceof KeyItem){
-				if(obj.isLocked()){
-					obj.unlock(event.getWorld(), event.getEntityPlayer(), event.getItemStack(), (KeyItem)event.getItemStack().getItem());
-				}
-				else{
-					obj.lock(event.getWorld(), event.getEntityPlayer(), event.getItemStack(), (KeyItem)event.getItemStack().getItem());
-				}
-			}
-			else{
-				if(obj.isLocked()){
-					event.setCanceled(true);
-					Print.chat(event.getEntityPlayer(), "This Block is locked.");
-				}
-			}*/
-			//Actually this should be obsolete as the Item should check this.
-		}
 		else if(state.getBlock() instanceof BlockChest || state.getBlock() instanceof BlockFurnace
 				|| state.getBlock() instanceof BlockHopper || state.getBlock() instanceof BlockDispenser
 				|| state.getBlock() instanceof BlockDropper || state.getBlock() instanceof BlockLever
@@ -132,10 +112,19 @@ public class PlayerEvents {
 		else return;
 	}
 	
-	//@SubscribeEvent
+	@SubscribeEvent
 	public static void onBlockBreak(BlockEvent.BreakEvent event){
 		if(!checkAccess(event.getWorld(), event.getPos(), event.getState(), event.getPlayer())){
-			Print.chat(event.getPlayer(), "No permission to break blocks here.");
+			Print.bar(event.getPlayer(), "No permission to break blocks here.");
+			event.setCanceled(true);
+		}
+		return;
+	}
+
+	@SubscribeEvent
+	public static void onBlockPlace(BlockEvent.PlaceEvent event){
+		if(!checkAccess(event.getWorld(), event.getPos(), event.getState(), event.getPlayer())){
+			Print.bar(event.getPlayer(), "No permission to place blocks here.");
 			event.setCanceled(true);
 		}
 		return;
@@ -173,15 +162,6 @@ public class PlayerEvents {
 				return false;
 			}
 		}
-	}
-
-	//@SubscribeEvent
-	public static void onBlockPlace(BlockEvent.PlaceEvent event){
-		if(!checkAccess(event.getWorld(), event.getPos(), event.getState(), event.getPlayer())){
-			Print.chat(event.getPlayer(), "No permission to place blocks here.");
-			event.setCanceled(true);
-		}
-		return;
 	}
 	
 	@SubscribeEvent

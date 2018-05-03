@@ -53,6 +53,7 @@ public class ChunkCmd extends CommandBase {
 	public void execute(MinecraftServer server, ICommandSender sender, String[] args) throws CommandException {
 		if(args.length == 0){
 			Print.chat(sender, "&7/ck claim <args>");
+			Print.chat(sender, "&7/ck reclaim <args>");
 			Print.chat(sender, "&7/ck info");
 			Print.chat(sender, "&7/ck map");
 			Print.chat(sender, "&7/ck buy");
@@ -74,12 +75,12 @@ public class ChunkCmd extends CommandBase {
 		PlayerCapability playerdata = player.getCapability(StatesCapabilities.PLAYER, null);
 		Chunk chunk = StateUtil.getChunk(player);
 		switch(args[0]){
-			case "claim":{
+			case "claim": case "reclaim":{
 				if(args.length == 1){
 					Print.chat(sender, "&7/ck claim <district>");
 					return;
 				}
-				player.openGui(States.INSTANCE, 10, player.world, Integer.parseInt(args[1]), 0, 0);
+				player.openGui(States.INSTANCE, 10, player.world, Integer.parseInt(args[1]), args[0].equals("claim") ? 0 : 1, 0);
 				return;
 			}
 			case "map":{

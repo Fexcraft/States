@@ -124,7 +124,7 @@ public class AreaView extends GuiContainer {
 		PacketHandler.getInstance().sendToServer(new PacketNBTTagCompound(compound));
 	}
 	
-	public class Button extends GuiButton {
+	public static class Button extends GuiButton {
 		
 		private int texx, texy;
 		

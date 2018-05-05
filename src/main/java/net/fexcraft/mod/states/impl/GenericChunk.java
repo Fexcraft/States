@@ -79,20 +79,20 @@ public class GenericChunk implements Chunk {
 		World world = Static.getServer().getWorld(0);
 		if(!getChunkFile().exists() && create){
 			save();
-			ImageCache.update(world, world.getChunkFromChunkCoords(x, z), "create", "all");
+			ImageCache.update(world, world.getChunkFromChunkCoords(x, z));
 		}
-		if(this.district.getChanged() > this.changed){
-			ImageCache.update(world, world.getChunkFromChunkCoords(x, z), "sync", "surface_districts");
-			ImageCache.update(world, world.getChunkFromChunkCoords(x, z), "sync", "districts");
+		if(Time.getDate() - JsonUtil.getIfExists(obj, "last_save", 0).longValue() > Time.DAY_MS){
+			ImageCache.update(world, world.getChunkFromChunkCoords(x, z));
+		}
+		/*if(this.district.getChanged() > this.changed){
+			ImageCache.update(world, world.getChunkFromChunkCoords(x, z), "sync");
 		}
 		if(this.district.getMunicipality().getChanged() > this.changed){
-			ImageCache.update(world, world.getChunkFromChunkCoords(x, z), "sync", "surface_municipalities");
-			ImageCache.update(world, world.getChunkFromChunkCoords(x, z), "sync", "municipalities");
+			ImageCache.update(world, world.getChunkFromChunkCoords(x, z), "sync");
 		}
 		if(this.district.getMunicipality().getState().getChanged() > this.changed){
-			ImageCache.update(world, world.getChunkFromChunkCoords(x, z), "sync", "surface_states");
-			ImageCache.update(world, world.getChunkFromChunkCoords(x, z), "sync", "states");
-		}
+			ImageCache.update(world, world.getChunkFromChunkCoords(x, z), "sync");
+		}*/
 	}
 
 	public GenericChunk(int x, int z){

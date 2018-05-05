@@ -27,7 +27,6 @@ import net.fexcraft.mod.states.api.root.AnnounceLevel;
 import net.fexcraft.mod.states.impl.GenericDistrict;
 import net.fexcraft.mod.states.impl.GenericMail;
 import net.fexcraft.mod.states.impl.GenericMunicipality;
-import net.fexcraft.mod.states.util.ImageCache;
 import net.fexcraft.mod.states.util.StateUtil;
 import net.minecraft.command.CommandBase;
 import net.minecraft.command.CommandException;
@@ -637,7 +636,6 @@ public class MunicipalityCmd extends CommandBase {
 								chunk.setPrice(0);
 								chunk.setClaimer(ply.getUUID());
 								ply.setMunicipality(newmun);
-								ImageCache.update(sender.getEntityWorld(), sender.getEntityWorld().getChunkFromBlockCoords(sender.getPosition()), "municipality_creation", "all");
 								StateUtil.announce(server, "&9New Municipality and District was created!");
 								StateUtil.announce(server, "&9Created by " + ply.getFormattedNickname(sender));
 								StateUtil.announce(server, "&9Name&0: &7" + newmun.getName());

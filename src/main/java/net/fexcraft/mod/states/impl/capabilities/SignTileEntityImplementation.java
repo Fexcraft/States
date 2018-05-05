@@ -10,7 +10,7 @@ import net.fexcraft.mod.states.States;
 import net.fexcraft.mod.states.api.Chunk;
 import net.fexcraft.mod.states.api.ChunkType;
 import net.fexcraft.mod.states.api.capabilities.SignTileEntityCapability;
-import net.fexcraft.mod.states.util.ImageCache;
+import net.fexcraft.mod.states.guis.Listener;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.nbt.NBTBase;
 import net.minecraft.nbt.NBTTagCompound;
@@ -111,11 +111,9 @@ public class SignTileEntityImplementation implements SignTileEntityCapability {
 				tileentity.signText[0] = new TextComponentString(Formatter.format("&0[&9States&0]&2> &8Map"));
 				String str = tileentity.signText[2].getUnformattedText().toLowerCase();
 				boolean found = false;
-				str = str.replace("s.", "surface_");
-				for(String string : ImageCache.TYPES){
+				for(String string : Listener.MAP_VIEW_MODES){
 					if(str.equals(string)){
 						found = true;
-						str = string.replace("surface_", "s.");
 						break;
 					}
 				}
@@ -197,8 +195,8 @@ public class SignTileEntityImplementation implements SignTileEntityCapability {
 			case "map":{
 				String str = tileentity.signText[1].getUnformattedText().toLowerCase().replace("s.", "surface_");
 				int j = -1;
-				for(int i = 0; i < ImageCache.TYPES.length; i++){
-					if(ImageCache.TYPES[i].equals(str)){
+				for(int i = 0; i < Listener.MAP_VIEW_MODES.length; i++){
+					if(Listener.MAP_VIEW_MODES[i].equals(str)){
 						j = i;
 						break;
 					}

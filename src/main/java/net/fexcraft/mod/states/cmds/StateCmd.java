@@ -25,7 +25,6 @@ import net.fexcraft.mod.states.api.capabilities.StatesCapabilities;
 import net.fexcraft.mod.states.api.root.AnnounceLevel;
 import net.fexcraft.mod.states.impl.GenericMail;
 import net.fexcraft.mod.states.impl.GenericState;
-import net.fexcraft.mod.states.util.ImageCache;
 import net.fexcraft.mod.states.util.StateUtil;
 import net.minecraft.command.CommandBase;
 import net.minecraft.command.CommandException;
@@ -454,7 +453,6 @@ public class StateCmd extends CommandBase {
 							ply.getMunicipality().setState(newstate);
 							ply.getMunicipality().setChanged(Time.getDate());
 							ply.getMunicipality().save();
-							ImageCache.update(sender.getEntityWorld(), sender.getEntityWorld().getChunkFromBlockCoords(sender.getPosition()), "state_creation", "all");
 							StateUtil.announce(server, "&9New State was created!");
 							StateUtil.announce(server, "&9Created by " + ply.getFormattedNickname(sender));
 							StateUtil.announce(server, "&9Name&0: &7" + newstate.getName());

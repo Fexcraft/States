@@ -39,7 +39,7 @@ public class ChunkEvents {
 				boolean matches = file.exists() && JsonUtil.get(file).get("changed").getAsLong() == chunk.getChanged();
 				chunk.save();
 				if(!matches){
-					ImageCache.update(event.getWorld(), event.getChunk(), "unload", "all");
+					ImageCache.update(event.getWorld(), event.getChunk());
 				}
 			}
 		}

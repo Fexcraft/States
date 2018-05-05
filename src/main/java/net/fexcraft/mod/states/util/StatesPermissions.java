@@ -56,6 +56,7 @@ public class StatesPermissions {
 					case STATE_COUNCIL: exit = state(obj).getCouncil().contains(player.getUUID()); break;
 					case STATE_LEADER: exit = player.isStateLeaderOf(state(obj)); break;
 					case STATE_MEMBER: exit = player.getMunicipality().getState().getId() == state(obj).getId(); break;
+					case OWNER: exit = chunk(obj).getOwner().equals(player.getUUID().toString()); break;
 					default: break;
 				}
 			}
@@ -64,6 +65,10 @@ public class StatesPermissions {
 		Print.debug(entity.getName() + " | " + permission + " | PS: " + group);
 		Print.debug("Perm Check End;");
 		return group;
+	}
+	
+	private static Chunk chunk(Object obj){
+		return (Chunk)obj;
 	}
 	
 	private static District district(Object obj){
@@ -108,7 +113,7 @@ public class StatesPermissions {
 	}
 	
 	private static enum PermissionLevel {
-		NONE, SKIP, ADMIN, OPERATOR, DIS_MANAGER, MUNICIPALITY_MEMBER, MUNICIPALITY_COUNCIL, MUNICIPALITY_MAYOR, STATE_MEMBER, STATE_COUNCIL, STATE_LEADER;
+		NONE, SKIP, ADMIN, OPERATOR, OWNER, DIS_MANAGER, MUNICIPALITY_MEMBER, MUNICIPALITY_COUNCIL, MUNICIPALITY_MAYOR, STATE_MEMBER, STATE_COUNCIL, STATE_LEADER;
 	}
 	
 	private static enum PermissionGroup {
@@ -143,6 +148,7 @@ public class StatesPermissions {
 		PERMISSIONS.put("district.set.icon", new Permission(PermissionGroup.DISTRICT, PermissionLevel.MUNICIPALITY_COUNCIL, PermissionLevel.ADMIN));
 		PERMISSIONS.put("state.set.icon", new Permission(PermissionGroup.STATE, PermissionLevel.STATE_COUNCIL, PermissionLevel.ADMIN));
 		PERMISSIONS.put("state.create", new Permission(PermissionGroup.SKIP, PermissionLevel.MUNICIPALITY_MAYOR, PermissionLevel.ADMIN));
+		PERMISSIONS.put("chunk.update", new Permission(PermissionGroup.SKIP, PermissionLevel.OWNER, PermissionLevel.DIS_MANAGER, PermissionLevel.MUNICIPALITY_MAYOR, PermissionLevel.STATE_LEADER, PermissionLevel.ADMIN));
 		
 		
 	}

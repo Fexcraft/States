@@ -128,13 +128,17 @@ public class ChunkCmd extends CommandBase {
 				return;
 			}
 			case "update":{
-				if(hasPerm("admin", player, chunk)){
+				if(hasPerm("chunk.update", player, chunk)){
 					int range = args.length > 1 ? Integer.parseInt(args[1]) : 0;
 					if(range <= 0){
-						ImageCache.update(player.world, player.world.getChunkFromChunkCoords(chunk.xCoord(), chunk.zCoord()), "update", "all");
+						ImageCache.update(player.world, player.world.getChunkFromChunkCoords(chunk.xCoord(), chunk.zCoord()));
 						Print.chat(sender, "&9Queued for map update.");
 					}
 					else{
+						if(range > 3 && !hasPerm("admin", player, chunk)){
+							Print.chat(sender, "&cNo permission for larger update requests.");
+							return;
+						}
 						int r = (range * 2) + 1;
 						int c = 0;
 						for(int i = 0; i < r; i++){
@@ -146,11 +150,11 @@ public class ChunkCmd extends CommandBase {
 									continue;
 								}
 								c++;
-								ImageCache.update(player.world, player.world.getChunkFromChunkCoords(x, z), "update", "all");
+								ImageCache.update(player.world, player.world.getChunkFromChunkCoords(x, z));
 							}
 						}
 						Print.chat(sender, "&2" + c + " &9chunks queued for map update.");
-						Print.chat(sender, "&9There are &2" + ImageCache.TYPES.length + " &9map modes activated.");
+						Print.chat(sender, "&9There is &21 &9map mode activated.");
 					}
 				}
 				else{
@@ -173,7 +177,7 @@ public class ChunkCmd extends CommandBase {
 						chunk.setType(ChunkType.NORMAL);
 						chunk.setPrice(net.fexcraft.mod.states.util.Config.DEFAULT_CHUNK_PRICE);
 						chunk.save();
-						ImageCache.update(player.world, player.world.getChunkFromChunkCoords(chunk.xCoord(), chunk.zCoord()), "unclaim", "all");
+						ImageCache.update(player.world, player.world.getChunkFromChunkCoords(chunk.xCoord(), chunk.zCoord()));
 						Print.chat(sender, "&9Chunk unclaimed and resseted.");
 					}
 					else{
@@ -194,7 +198,7 @@ public class ChunkCmd extends CommandBase {
 								ck.setPrice(net.fexcraft.mod.states.util.Config.DEFAULT_CHUNK_PRICE);
 								ck.save();
 								c++;
-								ImageCache.update(player.world, player.world.getChunkFromChunkCoords(x, z), "unclaim", "all");
+								ImageCache.update(player.world, player.world.getChunkFromChunkCoords(x, z));
 							}
 						}
 						Print.chat(sender, "&2" + c + " &9chunks have been resseted.");
@@ -290,7 +294,6 @@ public class ChunkCmd extends CommandBase {
 					chunk.setType(ChunkType.PRIVATE);
 					chunk.setChanged(time);
 					chunk.save();
-					ImageCache.update(player.world, player.world.getChunkFromChunkCoords(chunk.xCoord(), chunk.zCoord()), "bought", "chunk_types");
 					Print.chat(sender, "&aChunk bought!");
 					if(chunk.getLinkedChunks().size() > 0){
 						chunk.getLinkedChunks().forEach(ckpos -> {
@@ -300,7 +303,6 @@ public class ChunkCmd extends CommandBase {
 							ck.setType(ChunkType.PRIVATE);
 							ck.setChanged(time);
 							ck.save();
-							ImageCache.update(player.world, player.world.getChunkFromChunkCoords(ck.xCoord(), ck.zCoord()), "bought", "chunk_types");
 						});
 						Print.chat(sender, "&7" + chunk.getLinkedChunks().size() + "&a linked chunks bought!");
 					}
@@ -427,10 +429,6 @@ public class ChunkCmd extends CommandBase {
 										break;
 									}
 								}
-								ImageCache.update(player.world, player.world.getChunkFromChunkCoords(chunk.hashCode(), chunk.zCoord()), "type_changed", "chunk_types");
-								chunk.getLinkedChunks().forEach(link -> {
-									ImageCache.update(player.world, player.world.getChunkFromChunkCoords(Integer.parseInt(link.getResourceDomain()), Integer.parseInt(link.getResourcePath())), "type_changed", "chunk_types");
-								});
 							}
 							break;
 						}

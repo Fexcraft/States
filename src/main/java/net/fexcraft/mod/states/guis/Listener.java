@@ -31,6 +31,8 @@ public class Listener implements IPacketListener<PacketNBTTagCompound> {
 	public String getId(){
 		return "states:gui";
 	}
+	
+	public static final String[] MAP_VIEW_MODES = new String[]{ "none", "districts", "municipalities", "states", "chunk_types", "chunk_properties"};
 
 	@Override
 	public void process(PacketNBTTagCompound packet, Object[] objs){
@@ -44,8 +46,16 @@ public class Listener implements IPacketListener<PacketNBTTagCompound> {
 				return;
 			}
 			case 1:{
-				BufferedImage image = ImageCache.getImage(packet.nbt.getInteger("chunk_x"), packet.nbt.getInteger("chunk_z"), packet.nbt.getString("view"), true);
-				PacketHandler.getInstance().sendTo(new ImagePacket("area_view", image), player);
+				if(packet.nbt.hasKey("terrain")){
+					BufferedImage image = ImageCache.getImage(packet.nbt.getInteger("chunk_x"), packet.nbt.getInteger("chunk_z"), true);
+					PacketHandler.getInstance().sendTo(new ImagePacket("area_view", image), player);
+				}
+				switch(packet.nbt.getInteger("mode")){
+					case 0:{
+						
+						break;
+					}
+				}
 				return;
 			}
 			case 10:{
@@ -159,7 +169,7 @@ public class Listener implements IPacketListener<PacketNBTTagCompound> {
 					ck.setChanged(Time.getDate());
 					ck.setPrice(0);
 					ck.save();
-					ImageCache.update(world, ch, "claim", "all");
+					ImageCache.update(world, ch);
 					compound.setString("result", "Chunk Claimed. (" + dis.getId() + ");");
 					compound.setBoolean("claimed", true);
 					compound.setInteger("color", Color.decode(ck.getDistrict().getColor()).getRGB());
@@ -192,7 +202,7 @@ public class Listener implements IPacketListener<PacketNBTTagCompound> {
 			ck.setClaimer(player.getGameProfile().getId());
 			ck.setChanged(Time.getDate());
 			ck.save();
-			ImageCache.update(world, ch, "claim", "all");
+			ImageCache.update(world, ch);
 			if(ck.getLinkedChunks().size() > 0){
 				for(ResourceLocation loc : ck.getLinkedChunks()){
 					Chunk chunk = StateUtil.getTempChunk(loc);
@@ -201,7 +211,7 @@ public class Listener implements IPacketListener<PacketNBTTagCompound> {
 						chunk.setClaimer(player.getGameProfile().getId());
 						chunk.setChanged(Time.getDate());
 						chunk.save();
-						ImageCache.update(world, world.getChunkFromChunkCoords(chunk.xCoord(), chunk.zCoord()), "claim", "all");
+						ImageCache.update(world, world.getChunkFromChunkCoords(chunk.xCoord(), chunk.zCoord()));
 					}
 				}
 			}

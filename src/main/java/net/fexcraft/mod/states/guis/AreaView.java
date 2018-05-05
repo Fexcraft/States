@@ -77,10 +77,10 @@ public class AreaView extends GuiContainer {
 	public void initGui(){
 		super.initGui();
 		this.buttonList.clear();
-		this.buttonList.add(new AGB(0, guiLeft, 238, guiTop, 21));
-		this.buttonList.add(new AGB(1, guiLeft, 238, guiTop, 37));
-		this.buttonList.add(new AGB(2, guiLeft, 238, guiTop, 53));
-		this.buttonList.add(new GuiButton(3, guiLeft + 238, guiTop + 69, 14, 14, ""){
+		this.buttonList.add(new AGB(0, guiLeft, 238, guiTop, 21, "<< West"));
+		this.buttonList.add(new AGB(1, guiLeft, 238, guiTop, 37, "Refresh"));
+		this.buttonList.add(new AGB(2, guiLeft, 238, guiTop, 53, "East >>"));
+		this.buttonList.add(new GuiButton(3, guiLeft + 238, guiTop + 69, 14, 14, ""){			
 			@Override
 			public void drawButton(Minecraft mc, int mouseX, int mouseY, float f){
 				if(!this.visible){ return; }
@@ -91,13 +91,16 @@ public class AreaView extends GuiContainer {
 				else{ if(terrain){ ONCLR.glColorApply(); } else { OFFCLR.glColorApply(); }}
 				this.drawTexturedModalRect(this.x, this.y, 238, 69, this.width, this.height);
 				RGB.glColorReset();
+				if(hovered){
+					instance.drawHoveringText((!instance.terrain ? "Enable" : "Disable") + " Terrain", mouseX, mouseY);
+				}
 			}
 		});
-		this.buttonList.add(new AGB(4, guiLeft, 238, guiTop, 83));
-		this.buttonList.add(new AGB(5, guiLeft, 238, guiTop, 97));
-		this.buttonList.add(new AGB(6, guiLeft, 238, guiTop, 113));
-		this.buttonList.add(new AGB(7, guiLeft, 238, guiTop, 129));
-		this.buttonList.add(new AGB(8, guiLeft, 238, guiTop, 145));
+		this.buttonList.add(new AGB(4, guiLeft, 238, guiTop, 83, "Prev Map Mode"));
+		this.buttonList.add(new AGB(5, guiLeft, 238, guiTop, 97, "Next Map Mode"));
+		this.buttonList.add(new AGB(6, guiLeft, 238, guiTop, 113, "North"));
+		this.buttonList.add(new AGB(7, guiLeft, 238, guiTop, 129, "Refresh"));
+		this.buttonList.add(new AGB(8, guiLeft, 238, guiTop, 145, "South"));
 		this.buttonList.add(new MapButton(9, guiLeft + 10, guiTop + 10));
 	}
 	
@@ -162,8 +165,8 @@ public class AreaView extends GuiContainer {
 		
 		private int tx, ty;
 
-		public AGB(int buttonId, int x, int tx, int y, int ty){
-			super(buttonId, x + tx, y + ty, 14, 14, "");
+		public AGB(int buttonId, int x, int tx, int y, int ty, String string){
+			super(buttonId, x + tx, y + ty, 14, 14, string);
 			this.tx = tx; this.ty = ty;
 		}
 		
@@ -176,6 +179,9 @@ public class AreaView extends GuiContainer {
 			if(this.hovered){ HOVERCLR.glColorApply(); }
 			this.drawTexturedModalRect(this.x, this.y, tx, ty, this.width, this.height);
 			if(this.hovered){ RGB.glColorReset(); }
+			if(hovered){
+				instance.drawHoveringText(this.displayString, mouseX, mouseY);
+			}
 		}
 		
 	}

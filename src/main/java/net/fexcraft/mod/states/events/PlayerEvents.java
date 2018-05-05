@@ -136,8 +136,17 @@ public class PlayerEvents {
 			return false;
 		}
 		Chunk chunk = world.getChunkFromBlockCoords(pos).getCapability(StatesCapabilities.CHUNK, null).getStatesChunk();
-		if(chunk.getDistrict().getId() == -1){
-			return Config.ALLOW_WILDERNESS_ACCESS;
+		if(chunk.getDistrict().getId() < 0){
+			if(chunk.getDistrict().getId() == -1){
+				return Config.ALLOW_WILDERNESS_ACCESS;
+			}
+			else if(chunk.getDistrict().getId() == -2){
+				return true;//TODO
+			}
+			else{
+				Print.chat(player, "Unknown district type.");
+				return false;
+			}
 		}
 		//TODO company check
 		switch(chunk.getType()){

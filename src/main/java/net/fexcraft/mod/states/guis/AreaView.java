@@ -1,7 +1,12 @@
 package net.fexcraft.mod.states.guis;
 
+import java.awt.Color;
+import java.util.ArrayList;
+
+import net.fexcraft.mod.fsmm.util.Config;
 import net.fexcraft.mod.lib.network.PacketHandler;
 import net.fexcraft.mod.lib.network.packet.PacketNBTTagCompound;
+import net.fexcraft.mod.lib.util.common.Formatter;
 import net.fexcraft.mod.lib.util.common.Print;
 import net.fexcraft.mod.lib.util.render.RGB;
 import net.fexcraft.mod.states.util.ImageCache;
@@ -25,9 +30,11 @@ public class AreaView extends GuiContainer {
 	public static final ResourceLocation texture = new ResourceLocation("states:textures/gui/area_view_new.png");
 	public static final ResourceLocation empty_tex = new ResourceLocation("states:textures/gui/empty.png");
 	public static final ResourceLocation map_texture = new ResourceLocation("states:temp/area_view_map.png");
-	protected int x, z, px, pz, mode;
+	protected int x, z, px, pz, mode, m;
 	private boolean terrain, sent;
 	private NBTTagList list;
+	private NBTTagCompound namelist;
+	private static AreaView instance;
 	
 	private static final RGB HOVERCLR = new RGB(0x81B539);
 	private static final RGB OFFCLR = new RGB(RGB.RED);
@@ -44,6 +51,7 @@ public class AreaView extends GuiContainer {
 		int[] i = ImageCache.getRegion(chunk.x, chunk.z);
 		this.x = px = i[0]; this.z = pz = i[1];
 		terrain = false; mode = 0;
+		instance = this;
 		requestData();
 	}
 
@@ -63,13 +71,6 @@ public class AreaView extends GuiContainer {
         bufferbuilder.pos((double)(x + 224), (double)(y +   0), (double)this.zLevel).tex((double)((float)(0 + 256) * 0.00390625F), (double)((float)(0 +   0) * 0.00390625F)).endVertex();
         bufferbuilder.pos((double)(x +   0), (double)(y +   0), (double)this.zLevel).tex((double)((float)(0 +   0) * 0.00390625F), (double)((float)(0 +   0) * 0.00390625F)).endVertex();
         tessellator.draw();
-        //
-		this.fontRenderer.drawString("View Mode: " + Listener.MAP_VIEW_MODES[mode], 7, 7, MapColor.SNOW.colorValue);
-		this.fontRenderer.drawString("Terrain: " + (terrain ? "shown" : "hidden"), 7, 16, MapColor.SNOW.colorValue);
-		this.fontRenderer.drawString(this.x + "x", 7, 25, MapColor.SNOW.colorValue);
-		this.fontRenderer.drawString(this.z + "z", 7, 34, MapColor.SNOW.colorValue);
-		this.fontRenderer.drawString("SyncRQ: " + (sent ? "true" : "false"), 7, 43, MapColor.SNOW.colorValue);
-		//
 	}
 	
 	@Override
@@ -97,12 +98,14 @@ public class AreaView extends GuiContainer {
 		this.buttonList.add(new AGB(6, guiLeft, 238, guiTop, 113));
 		this.buttonList.add(new AGB(7, guiLeft, 238, guiTop, 129));
 		this.buttonList.add(new AGB(8, guiLeft, 238, guiTop, 145));
+		this.buttonList.add(new MapButton(9, guiLeft + 10, guiTop + 10));
 	}
 	
 	@Override
     public void onGuiClosed(){
         super.onGuiClosed();
     	mc.getTextureManager().deleteTexture(map_texture);
+    	instance = null;
     }
 	
 	@Override
@@ -121,6 +124,18 @@ public class AreaView extends GuiContainer {
 			case 6:{ z--; break; }
 			case 7:{ requestData(); break; }
 			case 8:{ z++; break; }
+			case 9:{
+				NBTTagCompound nbt = list.getCompoundTagAt(m);
+				NBTTagCompound compound = new NBTTagCompound();
+				compound.setString("target_listener", "states:gui");
+				compound.setInteger("from", 1);
+				compound.setInteger("x", nbt.getInteger("x"));
+				compound.setInteger("z", nbt.getInteger("z"));
+				compound.setBoolean("cmd", true);
+				PacketHandler.getInstance().sendToServer(new PacketNBTTagCompound(compound));
+				sent = true;
+				break;
+			}
 			default: break;
 		}
 	}
@@ -134,8 +149,8 @@ public class AreaView extends GuiContainer {
 		NBTTagCompound compound = new NBTTagCompound();
 		compound.setString("target_listener", "states:gui");
 		compound.setInteger("from", 1);
-		compound.setInteger("chunk_x", x);
-		compound.setInteger("chunk_z", z);
+		compound.setInteger("x", x);
+		compound.setInteger("z", z);
 		compound.setBoolean("terrain", terrain);
 		compound.setInteger("mode", mode);
 		Print.debug(compound);
@@ -162,6 +177,110 @@ public class AreaView extends GuiContainer {
 			this.drawTexturedModalRect(this.x, this.y, tx, ty, this.width, this.height);
 			if(this.hovered){ RGB.glColorReset(); }
 		}
+		
+	}
+
+	public static void update(NBTTagCompound nbt){
+		instance.list = (NBTTagList)nbt.getTag("list");
+		instance.namelist = (NBTTagCompound)nbt.getTag("namelist");
+	}
+	
+	private static class MapButton extends GuiButton {
+		
+		private int xx = -1, yy = -1;
+
+		public MapButton(int buttonId, int x, int y){
+			super(buttonId, x, y, 224, 224, "");
+		}
+		
+		@Override
+		public void drawButton(Minecraft mc, int mouseX, int mouseY, float partialTicks){
+			if(!visible){ return; }
+			mc.getTextureManager().bindTexture(instance.terrain ? map_texture : empty_tex);
+            this.hovered = mouseX >= this.x && mouseY >= this.y && mouseX < this.x + this.width && mouseY < this.y + this.height;
+            xx = mouseX - x; yy = mouseY - this.y;
+            if(xx >= 224){ xx = -1; } if(yy >= 224){ yy = -1; }
+            if(instance.list == null){ return; }
+            instance.m = -1;
+            if(xx >= 0 && yy >= 0){
+    			int i = xx, j = yy, k = 0, l = 0;
+    			while((i -= 7) > 0){ k++; }
+    			k += i > 0 ? 1 : 0;
+    			while((j -= 7) > 0){ l++; }
+    			l += j > 0 ? 1 : 0;
+    			instance.m = l + (k * 32);
+            }
+            //
+            if(instance.mode != 0){
+            	for(int yy = 0; yy < 32; yy++){
+            		for(int xx = 0; xx < 32; xx++){
+            			int i = xx * 32 + yy;
+            			RGB rgb = null;
+            			if(instance.m == i){
+                			Color color = new Color(instance.list.getCompoundTagAt(i).getInteger("color"));
+                			rgb = new RGB(color.getRed() + 255 / 2, color.getGreen() + 255 / 2, + color.getBlue() + 255 / 2);
+                		}
+                		else{
+                			rgb = new RGB(instance.list.getCompoundTagAt(i).getInteger("color"));
+                		}
+            			rgb.glColorApply();
+            			int x = this.x + (xx * 7), y = this.y + (yy * 7);
+            			int tx = xx * 8, ty = yy * 8;
+            			Tessellator tessellator = Tessellator.getInstance();
+                        BufferBuilder bufferbuilder = tessellator.getBuffer();
+                        bufferbuilder.begin(7, DefaultVertexFormats.POSITION_TEX);
+                        bufferbuilder.pos((double)(x + 0), (double)(y + 7), (double)this.zLevel).tex((double)((float)(tx + 0) * 0.00390625F), (double)((float)(ty + 8) * 0.00390625F)).endVertex();
+                        bufferbuilder.pos((double)(x + 7), (double)(y + 7), (double)this.zLevel).tex((double)((float)(tx + 8) * 0.00390625F), (double)((float)(ty + 8) * 0.00390625F)).endVertex();
+                        bufferbuilder.pos((double)(x + 7), (double)(y + 0), (double)this.zLevel).tex((double)((float)(tx + 8) * 0.00390625F), (double)((float)(ty + 0) * 0.00390625F)).endVertex();
+                        bufferbuilder.pos((double)(x + 0), (double)(y + 0), (double)this.zLevel).tex((double)((float)(tx + 0) * 0.00390625F), (double)((float)(ty + 0) * 0.00390625F)).endVertex();
+                        tessellator.draw();
+        				RGB.glColorReset();
+            		}
+            	}
+            }
+            //
+            if(instance.m >= 0){
+            	ArrayList<String> arr = new ArrayList<String>();
+            	NBTTagCompound compound = instance.list.getCompoundTagAt(instance.m);
+            	arr.add(Formatter.PARAGRAPH_SIGN + "7Coords: " + compound.getInteger("x") + "x, " + compound.getInteger("z") + "z");
+            	switch(instance.mode){
+	            	case 1:{
+	            		int dis = compound.getInteger("district");
+	            		arr.add(Formatter.PARAGRAPH_SIGN + "7District: " + instance.namelist.getString("district:" + dis) + " (" + dis + ");");
+	            		break;
+	            	}
+	            	case 2:{
+	            		int mun = compound.getInteger("municipality");
+	            		arr.add(Formatter.PARAGRAPH_SIGN + "7Municipality: " + instance.namelist.getString("municipality:" + mun) + " (" + mun + ");");
+	            		break;
+	            	}
+	            	case 3:{
+	            		int st = compound.getInteger("state");
+	            		arr.add(Formatter.PARAGRAPH_SIGN + "7State: " + instance.namelist.getString("state:" + st) + " (" + st + ");");
+	            		break;
+	            	}
+	            	case 4:{
+	            		arr.add(Formatter.PARAGRAPH_SIGN + "7Type: " + compound.getInteger("type"));
+	            		break;
+	            	}
+            	}
+            	if(compound.hasKey("linked") && compound.getBoolean("linked")){
+            		arr.add(Formatter.PARAGRAPH_SIGN + "&7Linked: " + compound.getIntArray("link")[0] + "x, " + compound.getIntArray("link")[1] + "z");
+            	}
+            	if(compound.hasKey("owned") && compound.getBoolean("owned")){
+            		arr.add(Formatter.PARAGRAPH_SIGN + "9Owner: " + compound.getString("owner"));
+            	}
+            	if(compound.hasKey("price") && compound.getLong("price") > 0){
+            		arr.add(Formatter.PARAGRAPH_SIGN + "6Price: " + Config.getWorthAsString(compound.getLong("price")));
+            	}
+    		    instance.drawHoveringText(arr, mouseX, mouseY, mc.fontRenderer);
+            }
+    		mc.fontRenderer.drawString("View Mode: " + Listener.MAP_VIEW_MODES[instance.mode], 7, 7, MapColor.SNOW.colorValue);
+    		mc.fontRenderer.drawString("Terrain: " + (instance.terrain ? "shown" : "hidden"), 7, 16, MapColor.SNOW.colorValue);
+    		mc.fontRenderer.drawString(instance.x + "x", 7, 25, MapColor.SNOW.colorValue);
+    		mc.fontRenderer.drawString(instance.z + "z", 7, 34, MapColor.SNOW.colorValue);
+    		mc.fontRenderer.drawString("SyncRQ: " + (instance.sent ? "true" : "false"), 7, 43, MapColor.SNOW.colorValue);
+	    }
 		
 	}
 

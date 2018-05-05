@@ -9,6 +9,7 @@ import net.fexcraft.mod.lib.api.network.IPacketListener;
 import net.fexcraft.mod.lib.network.PacketHandler;
 import net.fexcraft.mod.lib.network.packet.PacketNBTTagCompound;
 import net.fexcraft.mod.lib.util.common.Print;
+import net.fexcraft.mod.lib.util.common.Static;
 import net.fexcraft.mod.lib.util.math.Time;
 import net.fexcraft.mod.states.States;
 import net.fexcraft.mod.states.api.Chunk;
@@ -47,15 +48,84 @@ public class Listener implements IPacketListener<PacketNBTTagCompound> {
 			}
 			case 1:{
 				if(packet.nbt.hasKey("terrain")){
-					BufferedImage image = ImageCache.getImage(packet.nbt.getInteger("chunk_x"), packet.nbt.getInteger("chunk_z"), true);
+					BufferedImage image = ImageCache.getImage(packet.nbt.getInteger("x"), packet.nbt.getInteger("z"), true);
 					PacketHandler.getInstance().sendTo(new ImagePacket("area_view", image), player);
 				}
-				switch(packet.nbt.getInteger("mode")){
-					case 0:{
-						
-						break;
+				if(packet.nbt.hasKey("cmd")){
+					Static.getServer().commandManager.executeCommand(player, "/ck info " + packet.nbt.getInteger("x") + " " + packet.nbt.getInteger("z"));
+					return;
+				}
+				NBTTagList list = new NBTTagList();
+				NBTTagCompound namelist = new NBTTagCompound();
+				int x = packet.nbt.getInteger("x"); int z = packet.nbt.getInteger("z");
+				int mode = packet.nbt.getInteger("mode");
+				if(mode > 0 && mode < MAP_VIEW_MODES.length){
+					for(int i = 0; i < 32; i++){
+						for(int j = 0; j < 32; j++){
+							NBTTagCompound compound = new NBTTagCompound();
+							Chunk chunk = StateUtil.getTempChunk(i + (x * 32), j + (z * 32));
+							if(chunk != null){
+								switch(mode){
+									case 0: { break; }
+									case 1: {
+										compound.setInteger("color", Color.decode(chunk.getDistrict().getColor()).getRGB());
+										compound.setInteger("district", chunk.getDistrict().getId());
+										if(!namelist.hasKey("district:" + chunk.getDistrict().getId())){
+											namelist.setString("district:" + chunk.getDistrict().getId(), chunk.getDistrict().getName());
+										}
+										break;
+									}
+									case 2:{
+										compound.setInteger("color", Color.decode(chunk.getDistrict().getMunicipality().getColor()).getRGB());
+										compound.setInteger("municipality", chunk.getDistrict().getMunicipality().getId());
+										if(!namelist.hasKey("municipality:" + chunk.getDistrict().getMunicipality().getId())){
+											namelist.setString("municipality:" + chunk.getDistrict().getMunicipality().getId(), chunk.getDistrict().getMunicipality().getName());
+										}
+										break;
+									}
+									case 3:{
+										compound.setInteger("color", Color.decode(chunk.getDistrict().getMunicipality().getState().getColor()).getRGB());
+										compound.setInteger("state", chunk.getDistrict().getMunicipality().getState().getId());
+										if(!namelist.hasKey("state:" + chunk.getDistrict().getMunicipality().getState().getId())){
+											namelist.setString("state:" + chunk.getDistrict().getMunicipality().getState().getId(), chunk.getDistrict().getMunicipality().getState().getName());
+										}
+										break;
+									}
+									case 4:{
+										compound.setInteger("color", Color.decode(chunk.getType().getColor()).getRGB());
+										compound.setString("type", chunk.getType().name().toLowerCase());
+										break;
+									}
+									case 5:{
+										compound.setInteger("color", Color.white.getRGB());
+										break;
+									}
+								}
+								compound.setInteger("x", chunk.xCoord());
+								compound.setInteger("z", chunk.zCoord());
+								compound.setBoolean("linked", chunk.getLink() != null);
+								if(compound.getBoolean("linked")){
+									compound.setIntArray("link", chunk.getLink());
+								}
+								compound.setBoolean("owned", chunk.getOwner() != null && !chunk.getOwner().equals("null"));
+								if(compound.getBoolean("owned")){
+									compound.setString("owner", chunk.getOwner());
+								}
+								compound.setLong("price", chunk.getPrice());
+							}
+							else{
+								compound.setInteger("color", Color.BLACK.getRGB());
+							}
+							list.appendTag(compound);
+						}
 					}
 				}
+				NBTTagCompound compound = new NBTTagCompound();
+				compound.setString("target_listener", "states:gui");
+				compound.setString("task", "area_view_list");
+				compound.setTag("list", list);
+				compound.setTag("namelist", namelist);
+				PacketHandler.getInstance().sendTo(new PacketNBTTagCompound(compound), player);
 				return;
 			}
 			case 10:{

@@ -76,23 +76,17 @@ public class GenericChunk implements Chunk {
 			}
 		}
 		//
-		World world = Static.getServer().getWorld(0);
 		if(!getChunkFile().exists() && create){
 			save();
-			ImageCache.update(world, world.getChunkFromChunkCoords(x, z));
+			//ImageCache.update(world, world.getChunkFromChunkCoords(x, z));
+			World world = Static.getServer().getWorld(0);
+			ImageCache.update(world, world.getChunkProvider().getLoadedChunk(x, z));
 		}
 		if(Time.getDate() - JsonUtil.getIfExists(obj, "last_save", 0).longValue() > Time.DAY_MS){
-			ImageCache.update(world, world.getChunkFromChunkCoords(x, z));
+			//ImageCache.update(world, world.getChunkFromChunkCoords(x, z));
+			World world = Static.getServer().getWorld(0);
+			ImageCache.update(world, world.getChunkProvider().getLoadedChunk(x, z));
 		}
-		/*if(this.district.getChanged() > this.changed){
-			ImageCache.update(world, world.getChunkFromChunkCoords(x, z), "sync");
-		}
-		if(this.district.getMunicipality().getChanged() > this.changed){
-			ImageCache.update(world, world.getChunkFromChunkCoords(x, z), "sync");
-		}
-		if(this.district.getMunicipality().getState().getChanged() > this.changed){
-			ImageCache.update(world, world.getChunkFromChunkCoords(x, z), "sync");
-		}*/
 	}
 
 	public GenericChunk(int x, int z){

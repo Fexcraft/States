@@ -22,6 +22,7 @@ import net.minecraft.block.state.IBlockState;
 import net.minecraft.init.Blocks;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
+import net.minecraft.world.chunk.Chunk;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.gameevent.TickEvent;
@@ -31,7 +32,7 @@ public class ImageCache {
 	
 	private static final int IMGSIZE = 512;
 	//private static BufferedImage NOIMG;
-	private static final Queue<Object[]> QUEUE = new LinkedList<>();
+	private static final Queue<QueueObj> QUEUE = new LinkedList<>();
 	private static final TreeMap<String, TempImg> LOADED_CACHE = new TreeMap<>();
 	
 	@Mod.EventBusSubscriber
@@ -42,9 +43,9 @@ public class ImageCache {
 			if(event.phase == Phase.START){
 				if(QUEUE.size() == 0){ return; }
 				for(int i = 0; i < Config.MAP_UPDATES_PER_TICK; i++){
-					Object[] objs = QUEUE.poll();
-					if(objs != null){
-						updateImage((World)objs[0], (net.minecraft.world.chunk.Chunk)objs[1]);
+					QueueObj obj = QUEUE.poll();
+					if(obj != null){
+						updateImage(obj.world, obj.chunk);
 					}
 				}
 			}
@@ -64,15 +65,15 @@ public class ImageCache {
 		
 	}
 	
-	public static void update(World world, net.minecraft.world.chunk.Chunk chunk){
-		if(Config.MAP_UPDATES_PER_TICK == 0){
+	public static void update(World world, Chunk chunk){
+		if(Config.MAP_UPDATES_PER_TICK == 0 || chunk == null){
 			return;
 		}
-		QUEUE.add(new Object[]{world, chunk});
+		QUEUE.add(new QueueObj(world, chunk));
 		return;
 	}
 	
-	private static final void updateImage(World world, net.minecraft.world.chunk.Chunk chunk){
+	private static final void updateImage(World world, Chunk chunk){
 		BufferedImage img = getImage(chunk.x, chunk.z, false);
 		if(img == null){ return; }
 		int rx = (int)Math.floor(chunk.x / 32.0), rz = (int)Math.floor(chunk.z / 32.0);
@@ -157,12 +158,11 @@ public class ImageCache {
 
 	public static void saveQueue(){
 		JsonArray array = new JsonArray();
-		Object[] entry = null;
+		QueueObj entry = null;
 		while((entry = QUEUE.poll()) != null){
 			JsonObject obj = new JsonObject();
-			obj.addProperty("dimension", ((World)entry[0]).provider.getDimension());
-			net.minecraft.world.chunk.Chunk chunk = (net.minecraft.world.chunk.Chunk) entry[1];
-			obj.addProperty("chunk", chunk.x + ":" + chunk.z);
+			obj.addProperty("dimension", entry.world.provider.getDimension());
+			obj.addProperty("chunk", entry.chunk.x + ":" + entry.chunk.z);
 			array.add(obj);
 		}
 		JsonObject obj = new JsonObject();
@@ -186,13 +186,13 @@ public class ImageCache {
 				JsonObject object = elm.getAsJsonObject();
 				World world = Static.getServer().getWorld(object.get("dimension").getAsInt());
 				String[] ckarr = object.get("chunk").getAsString().split(":");
-				net.minecraft.world.chunk.Chunk chunk = world.getChunkFromChunkCoords(Integer.parseInt(ckarr[0]), Integer.parseInt(ckarr[1]));
-				QUEUE.add(new Object[]{ world, chunk });
+				Chunk chunk = world.getChunkFromChunkCoords(Integer.parseInt(ckarr[0]), Integer.parseInt(ckarr[1]));
+				QUEUE.add(new QueueObj(world, chunk));
 			});
 		}
 	}
 
-	public static Queue<Object[]> getQueue(){
+	public static Queue<QueueObj> getQueue(){
 		return QUEUE;
 	}
 	
@@ -205,6 +205,17 @@ public class ImageCache {
 		
 		private BufferedImage image;
 		private long last_access;
+		
+	}
+	
+	private static class QueueObj {
+		
+		public QueueObj(World world, Chunk chunk){
+			this.world = world; this.chunk = chunk;
+		}
+		
+		private World world;
+		private Chunk chunk;
 		
 	}
 	

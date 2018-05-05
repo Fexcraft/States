@@ -69,15 +69,15 @@ public class ClaimMap extends GuiContainer {
 	public void actionPerformed(GuiButton button){
 		if(list == null || map == null){ return; }
 		if(button.id == 0){
-			if(map.xx == -1 || map.yy == -1){
+			if(map.xx == -1 || map.yy == -1 || m == -1){
 				return;
 			}
-			int i = map.xx, j = map.yy, k = 0, l = 0;
+			/*int i = map.xx, j = map.yy, k = 0, l = 0;
 			while((i -= 10) > 0){ k++; }
 			k += i > 0 ? 1 : 0;
 			while((j -= 10) > 0){ l++; }
-			l += j > 0 ? 1 : 0;
-			NBTTagCompound compound = list.getCompoundTagAt(k + (l * 11));
+			l += j > 0 ? 1 : 0;*/
+			NBTTagCompound compound = list.getCompoundTagAt(m/*k + (l * 11)*/);
 			if(mode == 1 ? compound.getInteger("district") >= 0 : (compound.getBoolean("claimable") && compound.getInteger("district") < 0)){
 				sendClaimRequest(compound.getInteger("x"), compound.getInteger("z"));
 			}
@@ -133,12 +133,12 @@ public class ClaimMap extends GuiContainer {
     			k += i > 0 ? 1 : 0;
     			while((j -= 10) > 0){ l++; }
     			l += j > 0 ? 1 : 0;
-    			m = k + (l * 11);
+    			m = l + (k * 11);
             }
             //
             int k = 0;
-            for(int i = 0; i < 11; i++){
-            	for(int j = 0; j < 11; j++){
+            for(int j = 0; j < 11; j++){
+            	for(int i = 0; i < 11; i++){
             		if(m == k){
             			Color color = new Color(list.getCompoundTagAt(k).getInteger("color"));
             			new RGB(color.getRed() + 255 / 2, color.getGreen() + 255 / 2, + color.getBlue() + 255 / 2).glColorApply();

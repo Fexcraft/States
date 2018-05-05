@@ -110,6 +110,11 @@ public class ChunkCmd extends CommandBase {
 				return;
 			}
 			case "info":{
+				if(args.length >= 3){
+					int x = Integer.parseInt(args[1]);
+					int z = Integer.parseInt(args[2]);
+					chunk = StateUtil.getTempChunk(x, z);
+				}
 				Print.chat(sender, "&e====-====-====-====-====-====&0[&2States&0]");
 				Print.chat(sender, "&6Info of chunk &7" + chunk.xCoord() + "x&2, &7" + chunk.zCoord() + "z&2:");
 				Print.chat(sender, "&9District: &7" + chunk.getDistrict().getName() + " (" + chunk.getDistrict().getId() + ")");

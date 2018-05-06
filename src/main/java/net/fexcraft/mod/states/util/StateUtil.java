@@ -49,8 +49,12 @@ public class StateUtil {
 	public static Chunk getChunk(World world, BlockPos pos){
 		return States.CHUNKS.get(pos.getX() >> 4, pos.getZ() >> 4);
 	}
-
+	
 	public static District getDistrict(int value){
+		return getDistrict(value, true);
+	}
+
+	public static District getDistrict(int value, boolean wilderness){
 		if(States.DISTRICTS.containsKey(value)){
 			return States.DISTRICTS.get(value);
 		}
@@ -59,10 +63,14 @@ public class StateUtil {
 			States.DISTRICTS.put(value, district);
 			return district;
 		}
-		else return States.DISTRICTS.get(-1);
+		else return wilderness ? States.DISTRICTS.get(-1) : null;
+	}
+	
+	public static Municipality getMunicipality(int value){
+		return getMunicipality(value, true);
 	}
 
-	public static Municipality getMunicipality(int value){
+	public static Municipality getMunicipality(int value, boolean bool){
 		if(States.MUNICIPALITIES.containsKey(value)){
 			return States.MUNICIPALITIES.get(value);
 		}
@@ -71,10 +79,14 @@ public class StateUtil {
 			States.MUNICIPALITIES.put(value, municipality);
 			return municipality;
 		}
-		else return States.MUNICIPALITIES.get(-1);
+		else return bool ? States.MUNICIPALITIES.get(-1) : null;
+	}
+	
+	public static State getState(int value){
+		return getState(value, true);
 	}
 
-	public static State getState(int value){
+	public static State getState(int value, boolean bool){
 		if(States.STATES.containsKey(value)){
 			return States.STATES.get(value);
 		}
@@ -83,7 +95,7 @@ public class StateUtil {
 			States.STATES.put(value, state);
 			return state;
 		}
-		else return States.STATES.get(-1);
+		else return bool ? States.STATES.get(-1) : null;
 	}
 
 	public static Chunk getTempChunk(int x, int z){

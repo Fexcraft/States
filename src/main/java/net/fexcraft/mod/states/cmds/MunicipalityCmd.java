@@ -27,6 +27,7 @@ import net.fexcraft.mod.states.api.root.AnnounceLevel;
 import net.fexcraft.mod.states.impl.GenericDistrict;
 import net.fexcraft.mod.states.impl.GenericMail;
 import net.fexcraft.mod.states.impl.GenericMunicipality;
+import net.fexcraft.mod.states.util.StateLogger;
 import net.fexcraft.mod.states.util.StateUtil;
 import net.minecraft.command.CommandBase;
 import net.minecraft.command.CommandException;
@@ -157,6 +158,7 @@ public class MunicipalityCmd extends CommandBase {
 						mun.getState().save();
 						StateUtil.announce(server, AnnounceLevel.MUNICIPALITY_ALL, "&6Municipality has been bought!", ply.getMunicipality().getId());
 						StateUtil.announce(server, AnnounceLevel.MUNICIPALITY_ALL, "&9Buyer: " + playerstate.getName() + " (" + playerstate.getId() + ");", ply.getMunicipality().getId());
+						StateLogger.log(StateLogger.LoggerType.MUNICIPALITY, StateLogger.player(player) + " bought " + StateLogger.municipality(mun) + ", it is now part of " + StateLogger.state(mun.getState()) + ".");
 					}
 				}
 				else{
@@ -194,6 +196,7 @@ public class MunicipalityCmd extends CommandBase {
 							mun.setChanged(Time.getDate());
 							mun.save();
 							Print.chat(sender, "&6Name set to: &7" + mun.getName());
+							StateLogger.log(StateLogger.LoggerType.MUNICIPALITY, StateLogger.player(player) + " changed name of " + StateLogger.municipality(mun) + " to " + mun.getName() + ".");
 						}
 						else{
 							Print.chat(sender, "&cNo permission.");
@@ -214,6 +217,7 @@ public class MunicipalityCmd extends CommandBase {
 								mun.setChanged(Time.getDate());
 								mun.save();
 								Print.chat(sender, "&2Price set to: &7" + Config.getWorthAsString(mun.getPrice()));
+								StateLogger.log(StateLogger.LoggerType.MUNICIPALITY, StateLogger.player(player) + " changed price of " + StateLogger.municipality(mun) + " to " + mun.getPrice() + ".");
 							}
 							catch(Exception e){
 								Print.chat(sender, "&cError: &7" + e.getMessage());
@@ -242,6 +246,7 @@ public class MunicipalityCmd extends CommandBase {
 								mun.setChanged(Time.getDate());
 								mun.save();
 								Print.chat(sender, "&6Color set to &7" + str + "&6! (" + color.getRed() + ", " + color.getGreen() + ", " + color.getBlue() + ");");
+								StateLogger.log(StateLogger.LoggerType.MUNICIPALITY, StateLogger.player(player) + " changed color of " + StateLogger.municipality(mun) + " to " + mun.getColor() + ".");
 							}
 							catch(Exception e){
 								Print.chat(sender, "&2Error: &7" + e.getMessage());
@@ -262,6 +267,7 @@ public class MunicipalityCmd extends CommandBase {
 							mun.setChanged(Time.getDate());
 							mun.save();
 							Print.chat(sender, "&2Open: &7" + mun.isOpen());
+							StateLogger.log(StateLogger.LoggerType.MUNICIPALITY, StateLogger.player(player) + " set " + StateLogger.municipality(mun) + " to " + (mun.isOpen() ? "OPEN" : "CLOSED") + ".");
 						}
 						else{
 							Print.chat(sender, "&cNo permission.");
@@ -279,6 +285,7 @@ public class MunicipalityCmd extends CommandBase {
 								mun.setChanged(Time.getDate());
 								mun.save();
 								Print.chat(sender, "&6Icon set to &7" + args[2] + "&6!");
+								StateLogger.log(StateLogger.LoggerType.MUNICIPALITY, StateLogger.player(player) + " changed icon of " + StateLogger.municipality(mun) + " to " + mun.getIcon() + ".");
 							}
 							catch(Exception e){
 								Print.chat(sender, "&2Error: &7" + e.getMessage());
@@ -334,6 +341,7 @@ public class MunicipalityCmd extends CommandBase {
 						mun.getCouncil().remove(gp.getId());
 						mun.save();
 						StateUtil.announce(server, AnnounceLevel.MUNICIPALITY, gp.getName() + " &9was removed from the Municipality Council!", mun.getId());
+						StateLogger.log(StateLogger.LoggerType.MUNICIPALITY, StateLogger.player(player) + " removed " + StateLogger.player(gp) + " from the council of " + StateLogger.municipality(mun) + ".");
 						break;
 					}
 					case "leave":{
@@ -344,6 +352,7 @@ public class MunicipalityCmd extends CommandBase {
 						mun.getCouncil().remove(ply.getUUID());
 						mun.save();
 						StateUtil.announce(server, AnnounceLevel.MUNICIPALITY, ply.getFormattedNickname(sender) + " &9left the Municipality Council!", mun.getId());
+						StateLogger.log(StateLogger.LoggerType.MUNICIPALITY, StateLogger.player(player) + " left of the council of " + StateLogger.municipality(mun) + ".");
 					}
 					case "invite":{
 						if(!hasPerm("municipality.council.invite", player, mun)){
@@ -381,6 +390,7 @@ public class MunicipalityCmd extends CommandBase {
 						Mail mail = new GenericMail("player", gp.getId().toString(), player.getGameProfile().getId().toString(), invmsg, MailType.INVITE, obj);
 						StateUtil.sendMail(mail);
 						Print.chat(sender, "&7&oInvite sent! (Will be valid for 5 days.)");
+						StateLogger.log(StateLogger.LoggerType.MUNICIPALITY, StateLogger.player(player) + " invited " + StateLogger.player(gp) + " to the council of " + StateLogger.municipality(mun) + ".");
 						return;
 					}
 				}
@@ -426,11 +436,14 @@ public class MunicipalityCmd extends CommandBase {
 					if(args[1].equals("add")){
 						mun.getPlayerBlacklist().add(gp.getId());
 						Print.chat(sender, "&9Player &7" + gp.getName() + "&9 added to blacklist!");
+
+						StateLogger.log(StateLogger.LoggerType.MUNICIPALITY, StateLogger.player(player) + " added " + StateLogger.player(gp) + " to the blacklist of " + StateLogger.municipality(mun) + ".");
 						return;
 					}
 					else{
 						mun.getPlayerBlacklist().remove(gp.getId());
 						Print.chat(sender, "&9Player &7" + gp.getName() + "&9 removed from blacklist!");
+						StateLogger.log(StateLogger.LoggerType.MUNICIPALITY, StateLogger.player(player) + " removed " + StateLogger.player(gp) + " from the blacklist of " + StateLogger.municipality(mun) + ".");
 						return;
 					}
 				}
@@ -485,6 +498,7 @@ public class MunicipalityCmd extends CommandBase {
 				if(playr != null){ playr.setMunicipality(StateUtil.getMunicipality(-1)); }
 				StateUtil.sendMail(mail);
 				Print.chat(sender, "&7Player &9" + gp.getName() + "&7 kicked from the Municipality!");
+				StateLogger.log(StateLogger.LoggerType.MUNICIPALITY, StateLogger.player(player) + " kicked " + StateLogger.player(gp) + " from " + StateLogger.municipality(mun) + ".");
 				return;
 			}
 			case "join":{
@@ -505,11 +519,13 @@ public class MunicipalityCmd extends CommandBase {
 					return;
 				}
 				StateUtil.announce(server, AnnounceLevel.MUNICIPALITY, "&o" + ply.getFormattedNickname(sender) + " &e&oleft the Municipality!", ply.getMunicipality().getId());
+				StateLogger.log(StateLogger.LoggerType.MUNICIPALITY, StateLogger.player(player) + " left " + StateLogger.municipality(ply.getMunicipality()) + ".");
 				ply.setMunicipality(mun);
 				if(mun.getMayor() != null){
 					StateUtil.sendMail(new GenericMail("player", States.CONSOLE_UUID, mun.getMayor().toString(), player.getGameProfile().getName() + " joined the Municipality. At " + Time.getAsString(-1), MailType.SYSTEM, null));
 				}
 				StateUtil.announce(server, AnnounceLevel.MUNICIPALITY, "&o" + ply.getFormattedNickname(sender) + " &2&ojoined the Municipality!", ply.getMunicipality().getId());
+				StateLogger.log(StateLogger.LoggerType.MUNICIPALITY, StateLogger.player(player) + " joined " + StateLogger.municipality(ply.getMunicipality()) + ".");
 				return;
 			}
 			case "leave":{
@@ -524,6 +540,7 @@ public class MunicipalityCmd extends CommandBase {
 					StateUtil.sendMail(new GenericMail("player", States.CONSOLE_UUID, ply.getMunicipality().getMayor().toString(), player.getGameProfile().getName() + " left the Municipality. At " + Time.getAsString(-1), MailType.SYSTEM, null));
 				}
 				StateUtil.announce(server, AnnounceLevel.MUNICIPALITY, "&o" + ply.getFormattedNickname(sender) + " &e&oleft the Municipality!", ply.getMunicipality().getId());
+				StateLogger.log(StateLogger.LoggerType.MUNICIPALITY, StateLogger.player(player) + " left " + StateLogger.municipality(mun) + ".");
 				ply.setMunicipality(StateUtil.getMunicipality(-1));
 				return;
 			}
@@ -563,6 +580,7 @@ public class MunicipalityCmd extends CommandBase {
 				Mail mail = new GenericMail("player", gp.getId().toString(), player.getGameProfile().getId().toString(), invmsg, MailType.INVITE, obj);
 				StateUtil.sendMail(mail);
 				Print.chat(sender, "&7&oInvite sent! (Will be valid for 2 days.)");
+				StateLogger.log(StateLogger.LoggerType.MUNICIPALITY, StateLogger.player(player) + " invited " + StateLogger.player(gp) + " to join "+ StateLogger.municipality(mun) + ".");
 				return;
 			}
 			case "create":{
@@ -639,6 +657,9 @@ public class MunicipalityCmd extends CommandBase {
 								StateUtil.announce(server, "&9New Municipality and District was created!");
 								StateUtil.announce(server, "&9Created by " + ply.getFormattedNickname(sender));
 								StateUtil.announce(server, "&9Name&0: &7" + newmun.getName());
+								StateLogger.log(StateLogger.LoggerType.MUNICIPALITY, StateLogger.player(player) + " created " + StateLogger.municipality(newmun) + ".");
+								StateLogger.log(StateLogger.LoggerType.DISRICT, StateLogger.player(player) + " created " + StateLogger.district(newdis) + ".");
+								StateLogger.log(StateLogger.LoggerType.DISRICT, StateLogger.player(player) + " created a Municipality at " + StateLogger.chunk(chunk) + ".");
 							}
 						}
 					}

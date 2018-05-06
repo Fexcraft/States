@@ -18,6 +18,7 @@ import net.fexcraft.mod.states.api.District;
 import net.fexcraft.mod.states.api.capabilities.StatesCapabilities;
 import net.fexcraft.mod.states.packets.ImagePacket;
 import net.fexcraft.mod.states.util.ImageCache;
+import net.fexcraft.mod.states.util.StateLogger;
 import net.fexcraft.mod.states.util.StateUtil;
 import net.fexcraft.mod.states.util.StatesPermissions;
 import net.minecraft.entity.player.EntityPlayerMP;
@@ -252,6 +253,7 @@ public class Listener implements IPacketListener<PacketNBTTagCompound> {
 						ck.setPrice(0);
 					}
 					ck.save();
+					StateLogger.log(StateLogger.LoggerType.CHUNK, StateLogger.player(player) + " claimed " + StateLogger.chunk(ck) + ", it is now part of " + StateLogger.district(dis) + ".");
 					ImageCache.update(world, ch);
 					compound.setString("result", "Chunk Claimed. (" + dis.getId() + ");");
 					compound.setBoolean("claimed", true);
@@ -285,6 +287,7 @@ public class Listener implements IPacketListener<PacketNBTTagCompound> {
 			ck.setClaimer(player.getGameProfile().getId());
 			ck.setChanged(Time.getDate());
 			ck.save();
+			StateLogger.log(StateLogger.LoggerType.CHUNK, StateLogger.player(player) + " re-claimed " + StateLogger.chunk(ck) + ", it is now part of " + StateLogger.district(dis) + ".");
 			ImageCache.update(world, ch);
 			if(ck.getLinkedChunks().size() > 0){
 				for(ResourceLocation loc : ck.getLinkedChunks()){

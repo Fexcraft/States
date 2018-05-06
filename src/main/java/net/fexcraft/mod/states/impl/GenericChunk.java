@@ -19,6 +19,7 @@ import net.fexcraft.mod.states.api.District;
 import net.fexcraft.mod.states.impl.capabilities.SignTileEntityCapabilityUtil;
 import net.fexcraft.mod.states.util.Config;
 import net.fexcraft.mod.states.util.ImageCache;
+import net.fexcraft.mod.states.util.StateLogger;
 import net.fexcraft.mod.states.util.StateUtil;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.world.World;
@@ -88,6 +89,7 @@ public class GenericChunk implements Chunk {
 			ImageCache.update(world, world.getChunkProvider().getLoadedChunk(x, z));
 		}
 		if(this.district.getId() == -2 && this.getChanged() + Time.DAY_MS < Time.getDate()){
+			StateLogger.log(StateLogger.LoggerType.CHUNK, StateLogger.district(-2) + " time of " + StateLogger.chunk(this) + " expired! Setting back to " + StateLogger.district(-1) + "!");
 			this.setDistrict(StateUtil.getDistrict(-1));
 		}
 	}

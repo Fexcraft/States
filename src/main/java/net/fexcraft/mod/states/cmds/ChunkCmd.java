@@ -17,6 +17,7 @@ import net.fexcraft.mod.states.api.ChunkType;
 import net.fexcraft.mod.states.api.capabilities.PlayerCapability;
 import net.fexcraft.mod.states.api.capabilities.StatesCapabilities;
 import net.fexcraft.mod.states.util.ImageCache;
+import net.fexcraft.mod.states.util.StateLogger;
 import net.fexcraft.mod.states.util.StateUtil;
 import net.fexcraft.mod.states.util.StatesPermissions;
 import net.minecraft.command.CommandBase;
@@ -24,6 +25,7 @@ import net.minecraft.command.CommandException;
 import net.minecraft.command.ICommandSender;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.server.MinecraftServer;
+import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
 
 @fCommand
@@ -89,7 +91,7 @@ public class ChunkCmd extends CommandBase {
 				return;
 			}
 			case "map":{
-				int r = 9, rh = 4;
+				/*int r = 9, rh = 4;
 				for(int i = 0; i < r; i++){
 					String str = "&0[";
 					for(int j = 0; j < r; j++){
@@ -111,7 +113,8 @@ public class ChunkCmd extends CommandBase {
 					}
 					Print.chat(sender, str + "&0]");
 				}
-				Print.chat(sender, "&4#&7 - null &8| &9#&7 - claimed &8| &2#&7 - not claimed &8| &7+ your position.");
+				Print.chat(sender, "&4#&7 - null &8| &9#&7 - claimed &8| &2#&7 - not claimed &8| &7+ your position.");*/
+				player.openGui(States.INSTANCE, 1, player.world, 0, 0, 0);
 				return;
 			}
 			case "info":{
@@ -135,6 +138,9 @@ public class ChunkCmd extends CommandBase {
 				}
 				Print.chat(sender, "&9Linked: &7" + (chunk.getLink() == null ? "false" : chunk.getLink()[0] + "x, " + chunk.getLink()[1] + "z"));
 				Print.chat(sender, "&2Claimed by &7" + Static.getPlayerNameByUUID(chunk.getClaimer()) + "&2 at &8" + Time.getAsString(chunk.getCreated()));
+				if(chunk.getDistrict().getId() == -2){
+					Print.chat(sender, "&9Transit Zone till: &7" + Time.getAsString(chunk.getChanged() + Time.DAY_MS));
+				}
 				return;
 			}
 			case "update":{
@@ -143,6 +149,7 @@ public class ChunkCmd extends CommandBase {
 					if(range <= 0){
 						ImageCache.update(player.world, player.world.getChunkFromChunkCoords(chunk.xCoord(), chunk.zCoord()));
 						Print.chat(sender, "&9Queued for map update.");
+						StateLogger.log(StateLogger.LoggerType.CHUNK, StateLogger.player(player) + " queued " + StateLogger.chunk(chunk) + " for map update.");
 					}
 					else{
 						if(range > 3 && !hasPerm("admin", player, chunk)){
@@ -165,6 +172,7 @@ public class ChunkCmd extends CommandBase {
 						}
 						Print.chat(sender, "&2" + c + " &9chunks queued for map update.");
 						Print.chat(sender, "&9There is &21 &9map mode activated.");
+						StateLogger.log(StateLogger.LoggerType.CHUNK, StateLogger.player(player) + " queued " + c + " chunks for map update, with the center being " + StateLogger.chunk(chunk) + ".");
 					}
 				}
 				else{
@@ -189,6 +197,7 @@ public class ChunkCmd extends CommandBase {
 						chunk.save();
 						ImageCache.update(player.world, player.world.getChunkFromChunkCoords(chunk.xCoord(), chunk.zCoord()));
 						Print.chat(sender, "&9Chunk unclaimed and resseted.");
+						StateLogger.log(StateLogger.LoggerType.CHUNK, StateLogger.player(player) + " unclaimed " + StateLogger.chunk(chunk) + ".");
 					}
 					else{
 						int r = (range * 2) + 1;
@@ -212,12 +221,21 @@ public class ChunkCmd extends CommandBase {
 							}
 						}
 						Print.chat(sender, "&2" + c + " &9chunks have been resseted.");
+						StateLogger.log(StateLogger.LoggerType.CHUNK, StateLogger.player(player) + " unclaimed " + c + " chunks, with the center being " + StateLogger.chunk(chunk) + ".");
 					}
 				}
 				return;
 			}
 			case "buy":{
 				//TODO add check for companies, based on their type
+				if(args.length >= 3 && args[1].equals("via-sign")){
+					try{
+						chunk = StateUtil.getChunk(player.world, BlockPos.fromLong(Long.parseLong(args[2])));
+					}
+					catch(Exception e){
+						Print.chat(sender, "&9Error: &7" + e.getMessage());
+					}
+				}
 				if(chunk.getDistrict().getId() < 0){
 					Print.chat(sender, "Not claimed chunks can not be bought.");
 					return;
@@ -250,14 +268,6 @@ public class ChunkCmd extends CommandBase {
 				if(chunk.getDistrict().getMunicipality().getState().getBlacklist().contains(playerdata.getMunicipality().getState().getId())){
 					Print.chat(sender, "&cPlayers from your State can not buy chunks here.");
 					return;
-				}
-				if(args.length >= 3 && args[1].equals("via-sign")){
-					try{
-						chunk = StateUtil.getChunk(player.world, BlockPos.fromLong(Long.parseLong(args[2])));
-					}
-					catch(Exception e){
-						Print.chat(sender, "&9Error: &7" + e.getMessage());
-					}
 				}
 				if(chunk.getPrice() <= 0){
 					Print.chat(sender, "&cChunk isn't for sale.");
@@ -305,15 +315,17 @@ public class ChunkCmd extends CommandBase {
 					chunk.setChanged(time);
 					chunk.save();
 					Print.chat(sender, "&aChunk bought!");
+					StateLogger.log(StateLogger.LoggerType.CHUNK, StateLogger.player(player) + " bought the " + StateLogger.chunk(chunk) + "!");
 					if(chunk.getLinkedChunks().size() > 0){
-						chunk.getLinkedChunks().forEach(ckpos -> {
+						for(ResourceLocation ckpos : chunk.getLinkedChunks()){
 							Chunk ck = StateUtil.getTempChunk(ckpos);
 							ck.setOwner(player.getGameProfile().getId().toString());
 							ck.setPrice(0);
 							ck.setType(ChunkType.PRIVATE);
 							ck.setChanged(time);
 							ck.save();
-						});
+							StateLogger.log(StateLogger.LoggerType.CHUNK, StateLogger.player(player) + " received the " + StateLogger.chunk(ck) + " which was linked to " + StateLogger.chunk(chunk) + "!");
+						}
 						Print.chat(sender, "&7" + chunk.getLinkedChunks().size() + "&a linked chunks bought!");
 					}
 					if(!wasloadedin){
@@ -340,6 +352,7 @@ public class ChunkCmd extends CommandBase {
 						chunk.setChanged(Time.getDate());
 						chunk.save();
 						Print.chat(sender, "&9Price set to &7" + Config.getWorthAsString(price));
+						StateLogger.log(StateLogger.LoggerType.CHUNK, StateLogger.player(player) + " set the price of the " + StateLogger.chunk(chunk) + " to " + chunk.getPrice() + ".");
 					}
 					catch(Exception e){
 						Print.chat(sender, "&9Error: &7" + e.getMessage());
@@ -360,6 +373,7 @@ public class ChunkCmd extends CommandBase {
 								try{
 									chunk.setDistrict(StateUtil.getDistrict(Integer.parseInt(args[2])));
 									Print.chat(sender, "&2District set to: " + chunk.getDistrict().getName() + " (" + chunk.getDistrict().getId() + ");");
+									StateLogger.log(StateLogger.LoggerType.CHUNK, StateLogger.player(player) + " set the district of " + StateLogger.chunk(chunk) + " to " + StateLogger.district(chunk.getDistrict()) + ".");
 								}
 								catch(Exception e){
 									Print.chat(sender, "&9Error: &7" + e.getMessage());
@@ -414,6 +428,7 @@ public class ChunkCmd extends CommandBase {
 										chunk.save();
 										String to = type == ChunkType.NORMAL || type == ChunkType.DISTRICT ? "District" : type == ChunkType.MUNICIPAL ? "Municipality" : type == ChunkType.STATEOWNED ? "State" : "ERROR";
 										Print.chat(sender, "&9Chunk given to the &2" + to + "&9!");
+										StateLogger.log(StateLogger.LoggerType.CHUNK, StateLogger.player(player) + " gave the  " + StateLogger.chunk(chunk) + " to the " + to + ".");
 										break;
 									}
 									case PRIVATE:{
@@ -432,6 +447,7 @@ public class ChunkCmd extends CommandBase {
 										chunk.save();
 										Print.chat(sender, "&2Chunk set to &cPUBLIC&2!");
 										Print.chat(sender, "&2It is still yours, but anyone can edit blocks.");
+										StateLogger.log(StateLogger.LoggerType.CHUNK, StateLogger.player(player) + " set the type of " + StateLogger.chunk(chunk) + " to PUBLIC.");
 										break;
 									}
 									default:{
@@ -473,6 +489,7 @@ public class ChunkCmd extends CommandBase {
 					if(args[1].equals("reset")){
 						chunk.setLink(null, null);
 						Print.chat(sender, "&6Chunk unlinked.");
+						StateLogger.log(StateLogger.LoggerType.CHUNK, StateLogger.player(player) + " unliked the " + StateLogger.chunk(chunk) + ".");
 					}
 					else{
 						try{
@@ -480,7 +497,7 @@ public class ChunkCmd extends CommandBase {
 							int z = Integer.parseInt(args[2]);
 							chunk.setLink(x, z);
 							Print.chat(sender, "&6Chunk linked. ( " + x + " | " + z + " );");
-							
+							StateLogger.log(StateLogger.LoggerType.CHUNK, StateLogger.player(player) + " linked " + StateLogger.chunk(chunk) + " to (" + x + ", " + z + ").");
 						}
 						catch(Exception e){
 							Print.chat(sender, "&9Error: &c" + e.getMessage());
@@ -526,11 +543,13 @@ public class ChunkCmd extends CommandBase {
 									chunk.getPlayerWhitelist().add(gp.getId());
 									chunk.save();
 									Print.chat(sender, "&aPlayer added to whitelist.");
+									StateLogger.log(StateLogger.LoggerType.CHUNK, StateLogger.player(player) + " added " + StateLogger.player(gp) + " to the whitelist of " + StateLogger.chunk(chunk) + ".");
 								}
 								else if(args[1].equals("rem")){
 									chunk.getPlayerWhitelist().remove(gp.getId());
 									chunk.save();
 									Print.chat(sender, "&aPlayer removed from whitelist.");
+									StateLogger.log(StateLogger.LoggerType.CHUNK, StateLogger.player(player) + " removed " + StateLogger.player(gp) + " from the whitelist of " + StateLogger.chunk(chunk) + ".");
 								}
 								else{
 									Print.chat(sender, "&c&oHow could this happen?! Report this issue immediatelly.");
@@ -543,6 +562,7 @@ public class ChunkCmd extends CommandBase {
 							chunk.getCompanyWhitelist().clear();
 							chunk.save();
 							Print.chat(sender, "Whitelist cleared.");
+							StateLogger.log(StateLogger.LoggerType.CHUNK, StateLogger.player(player) + " cleared the whitelist of " + StateLogger.chunk(chunk) + ".");
 							return;
 						}
 						case "view":{

@@ -64,6 +64,7 @@ public class Config {
 		WEBHOOK_ICON = config.getString("discord_webhook_icon", DEFAULT_CAT, States.DEFAULT_ICON, "Icon for the Server Broadcaster, in discord.");
 		TRANSIT_ZONE_BOTTOM_LIMIT = config.getInt("temporary_district_bottom_limit", DEFAULT_CAT, 50, 0, 127, "Min Height value to which blocks in Temporary claimed Chunks can be accessed.");
 		TRANSIT_ZONE_TOP_LIMIT = config.getInt("temporary_district_top_limit", DEFAULT_CAT, 80, 127, 255, "Max Height value to which blocks in Temporary claimed Chunks can be accessed.");
+		ALLOW_TRANSIT_ZONES = config.getBoolean("allow_temporary_districts", DEFAULT_CAT, true, "If players should be able to claim chunks temporarily.");
 		updateWebHook();
 	}
 

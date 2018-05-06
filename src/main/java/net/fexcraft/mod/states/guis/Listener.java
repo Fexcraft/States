@@ -3,6 +3,7 @@ package net.fexcraft.mod.states.guis;
 import java.awt.Color;
 import java.awt.image.BufferedImage;
 
+import net.fexcraft.mod.fsmm.api.Account;
 import net.fexcraft.mod.fsmm.util.AccountManager;
 import net.fexcraft.mod.fsmm.util.Config;
 import net.fexcraft.mod.lib.api.network.IPacketListener;
@@ -211,7 +212,7 @@ public class Listener implements IPacketListener<PacketNBTTagCompound> {
 			compound.setString("result", "Chunk data not found.");
 			return compound;
 		}
-		if(!StatesPermissions.hasPermission(player, "chunk.claim", dis)){
+		if(dis.getId() != -2 && !StatesPermissions.hasPermission(player, "chunk.claim", dis)){
 			compound.setString("result", "No permission. (0)");
 			return compound;
 		}
@@ -219,25 +220,37 @@ public class Listener implements IPacketListener<PacketNBTTagCompound> {
 			compound.setString("result", "No permission. (1)");
 			return compound;
 		}
-		if(mode == 0 && dis.getMunicipality().getAccount().getBalance() < ck.getPrice()){
+		if(mode == 0 && dis.getId() != -2 && dis.getMunicipality().getAccount().getBalance() < ck.getPrice()){
 			Print.chat(player, "&7Municipality does not have enough money to claim this chunk.");
 			Print.chat(player, "&7Required: &9" + Config.getWorthAsString(ck.getPrice()) + " &8|| &7Available: &9" + Config.getWorthAsString(dis.getMunicipality().getAccount().getBalance()));
 			return null;
 		}
 		if(mode == 0){
 			if(ck.getDistrict().getId() < 0){
-				if(!nearbyChunkSame(ck, dis)){
+				if(dis.getId() != -2 && !nearbyChunkSame(ck, dis)){
 					compound.setString("result", "No nearby/connected chunks are of the selected district.");
 					return compound;
 				}
 				else{
-					if(ck.getPrice() > 0 && !AccountManager.INSTANCE.getBank(dis.getMunicipality().getAccount().getBankId()).processTransfer(player, dis.getMunicipality().getAccount(), ck.getPrice(), States.SERVERACCOUNT)){
-						return null;
+					if(ck.getPrice() > 0){
+						if(dis.getId() != -2){
+							if(!AccountManager.INSTANCE.getBank(dis.getMunicipality().getAccount().getBankId()).processTransfer(player, dis.getMunicipality().getAccount(), ck.getPrice(), States.SERVERACCOUNT)){
+								return null;
+							}
+						}
+						else{
+							Account playeracc = player.getCapability(StatesCapabilities.PLAYER, null).getAccount();
+							if(!AccountManager.INSTANCE.getBank(playeracc.getBankId()).processTransfer(player, playeracc, ck.getPrice() / 10, States.SERVERACCOUNT)){
+								return null;
+							}
+						}
 					}
 					ck.setDistrict(dis);
 					ck.setClaimer(player.getGameProfile().getId());
 					ck.setChanged(Time.getDate());
-					ck.setPrice(0);
+					if(dis.getId() != -2){
+						ck.setPrice(0);
+					}
 					ck.save();
 					ImageCache.update(world, ch);
 					compound.setString("result", "Chunk Claimed. (" + dis.getId() + ");");

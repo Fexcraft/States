@@ -17,6 +17,7 @@ import net.fexcraft.mod.states.impl.capabilities.PlayerCapabilityUtil;
 import net.fexcraft.mod.states.impl.capabilities.SignTileEntityCapabilityUtil;
 import net.fexcraft.mod.states.impl.capabilities.WorldCapabilityUtil;
 import net.fexcraft.mod.states.util.ImageCache;
+import net.fexcraft.mod.states.util.StateLogger;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.tileentity.TileEntitySign;
 import net.minecraft.util.ResourceLocation;
@@ -34,6 +35,7 @@ public class WorldEvents {
 		if(event.getWorld().provider.getDimension() != 0 || event.getWorld().isRemote){
 			return;
 		}
+		StateLogger.log("all", "Loading World...");
 		if(!States.STATES.containsKey(-1)){
 			if(!State.getStateFile(-1).exists()){
 				JsonObject object = new JsonObject();
@@ -93,6 +95,21 @@ public class WorldEvents {
 			}
 			States.MUNICIPALITIES.put(0, new GenericMunicipality(0));
 		}
+		if(!States.DISTRICTS.containsKey(-2)){
+			if(!District.getDistrictFile(-2).exists()){
+				JsonObject object = new JsonObject();
+				object.addProperty("id", -2);
+				object.addProperty("type", DistrictType.WILDERNESS.name());
+				object.addProperty("created", Time.getDate());
+				object.addProperty("creator", States.CONSOLE_UUID);
+				object.addProperty("changed", Time.getDate());
+				object.addProperty("name", "Transit Zone");
+				object.addProperty("municipality", -1);
+				object.addProperty("color", "#007F7F");
+				JsonUtil.write(District.getDistrictFile(-2), object);
+			}
+			States.DISTRICTS.put(-2, new GenericDistrict(-2));
+		}
 		if(!States.DISTRICTS.containsKey(-1)){
 			if(!District.getDistrictFile(-1).exists()){
 				JsonObject object = new JsonObject();
@@ -136,6 +153,7 @@ public class WorldEvents {
 		States.MUNICIPALITIES.values().forEach(elm -> { elm.save(); });
 		States.STATES.values().forEach(elm -> { elm.save(); });
 		ImageCache.saveQueue();
+		StateLogger.log("all", "Unloading World...");
 	}
 	
 	@SubscribeEvent

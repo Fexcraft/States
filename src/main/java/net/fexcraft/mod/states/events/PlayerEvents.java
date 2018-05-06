@@ -141,7 +141,14 @@ public class PlayerEvents {
 				return Config.ALLOW_WILDERNESS_ACCESS;
 			}
 			else if(chunk.getDistrict().getId() == -2){
-				return true;//TODO
+				if(chunk.getChanged() + Time.DAY_MS < Time.getDate()){
+					chunk.setDistrict(StateUtil.getDistrict(-1));
+					//TODO log
+					chunk.save();
+					Print.chat(player, "Updating chunk...");
+					return false;
+				}
+				return pos.getY() > Config.TRANSIT_ZONE_BOTTOM_LIMIT && pos.getY() < Config.TRANSIT_ZONE_TOP_LIMIT;
 			}
 			else{
 				Print.chat(player, "Unknown district type.");

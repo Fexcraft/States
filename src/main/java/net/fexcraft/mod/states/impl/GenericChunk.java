@@ -87,6 +87,9 @@ public class GenericChunk implements Chunk {
 			World world = Static.getServer().getWorld(0);
 			ImageCache.update(world, world.getChunkProvider().getLoadedChunk(x, z));
 		}
+		if(this.district.getId() == -2 && this.getChanged() + Time.DAY_MS < Time.getDate()){
+			this.setDistrict(StateUtil.getDistrict(-1));
+		}
 	}
 
 	public GenericChunk(int x, int z){

@@ -71,6 +71,12 @@ public class AreaView extends GuiContainer {
         bufferbuilder.pos((double)(x + 224), (double)(y +   0), (double)this.zLevel).tex((double)((float)(0 + 256) * 0.00390625F), (double)((float)(0 +   0) * 0.00390625F)).endVertex();
         bufferbuilder.pos((double)(x +   0), (double)(y +   0), (double)this.zLevel).tex((double)((float)(0 +   0) * 0.00390625F), (double)((float)(0 +   0) * 0.00390625F)).endVertex();
         tessellator.draw();
+        //
+		mc.fontRenderer.drawString("VM: " + Listener.MAP_VIEW_MODES[instance.mode], 7, 7, MapColor.SNOW.colorValue);
+		mc.fontRenderer.drawString("Terrain: " + (instance.terrain ? "shown" : "hidden"), 7, 16, MapColor.SNOW.colorValue);
+		mc.fontRenderer.drawString(instance.x + "x", 7, 25, MapColor.SNOW.colorValue);
+		mc.fontRenderer.drawString(instance.z + "z", 7, 34, MapColor.SNOW.colorValue);
+		mc.fontRenderer.drawString("SyncRQ: " + (instance.sent ? "true" : "false"), 7, 43, MapColor.SNOW.colorValue);
 	}
 	
 	@Override
@@ -173,7 +179,6 @@ public class AreaView extends GuiContainer {
 		@Override
 		public void drawButton(Minecraft mc, int mouseX, int mouseY, float f){
 			if(!this.visible){ return; }
-			GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
 			mc.getTextureManager().bindTexture(texture);
 			this.hovered = mouseX >= this.x && mouseY >= this.y && mouseX < this.x + this.width && mouseY < this.y + this.height;
 			if(this.hovered){ HOVERCLR.glColorApply(); }
@@ -203,6 +208,7 @@ public class AreaView extends GuiContainer {
 		public void drawButton(Minecraft mc, int mouseX, int mouseY, float partialTicks){
 			if(!visible){ return; }
 			mc.getTextureManager().bindTexture(instance.terrain ? map_texture : empty_tex);
+            GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
             this.hovered = mouseX >= this.x && mouseY >= this.y && mouseX < this.x + this.width && mouseY < this.y + this.height;
             xx = mouseX - x; yy = mouseY - this.y;
             if(xx >= 224){ xx = -1; } if(yy >= 224){ yy = -1; }
@@ -281,11 +287,6 @@ public class AreaView extends GuiContainer {
             	}
     		    instance.drawHoveringText(arr, mouseX, mouseY, mc.fontRenderer);
             }
-    		mc.fontRenderer.drawString("View Mode: " + Listener.MAP_VIEW_MODES[instance.mode], 7, 7, MapColor.SNOW.colorValue);
-    		mc.fontRenderer.drawString("Terrain: " + (instance.terrain ? "shown" : "hidden"), 7, 16, MapColor.SNOW.colorValue);
-    		mc.fontRenderer.drawString(instance.x + "x", 7, 25, MapColor.SNOW.colorValue);
-    		mc.fontRenderer.drawString(instance.z + "z", 7, 34, MapColor.SNOW.colorValue);
-    		mc.fontRenderer.drawString("SyncRQ: " + (instance.sent ? "true" : "false"), 7, 43, MapColor.SNOW.colorValue);
 	    }
 		
 	}

@@ -54,6 +54,7 @@ public class ChunkCmd extends CommandBase {
 		if(args.length == 0){
 			Print.chat(sender, "&7/ck claim <args>");
 			Print.chat(sender, "&7/ck reclaim <args>");
+			Print.chat(sender, "&7/ck tempclaim");
 			Print.chat(sender, "&7/ck info");
 			Print.chat(sender, "&7/ck map");
 			Print.chat(sender, "&7/ck buy");
@@ -81,6 +82,10 @@ public class ChunkCmd extends CommandBase {
 					return;
 				}
 				player.openGui(States.INSTANCE, 10, player.world, Integer.parseInt(args[1]), args[0].equals("claim") ? 0 : 1, 0);
+				return;
+			}
+			case "tempclaim":{
+				player.openGui(States.INSTANCE, 10, player.world, -2, 0, 0);
 				return;
 			}
 			case "map":{

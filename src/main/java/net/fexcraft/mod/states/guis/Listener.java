@@ -203,6 +203,10 @@ public class Listener implements IPacketListener<PacketNBTTagCompound> {
 			compound.setString("result", "District not found.");
 			return compound;
 		}
+		if(dis.getId() == -2 && !net.fexcraft.mod.states.util.Config.ALLOW_TRANSIT_ZONES){
+			compound.setString("result", "Transit Zones (-2) are disabled.");
+			return compound;
+		}
 		net.minecraft.world.chunk.Chunk ch = world.getChunkFromChunkCoords(nbt.getIntArray("data")[1], nbt.getIntArray("data")[2]);
 		if(ch == null){
 			compound.setString("result", "Chunk isn't loaded.");

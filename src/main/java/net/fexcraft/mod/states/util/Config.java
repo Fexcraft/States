@@ -19,7 +19,7 @@ public class Config {
 	public static File CONFIG_PATH;
 	public static long DEFAULT_CHUNK_PRICE, MUNICIPALITY_CREATION_PRICE, STATE_CREATION_PRICE;
 	public static int MAP_UPDATES_PER_TICK, BOT_PORT, TRANSIT_ZONE_BOTTOM_LIMIT, TRANSIT_ZONE_TOP_LIMIT;
-	public static boolean ALLOW_WILDERNESS_ACCESS;
+	public static boolean ALLOW_WILDERNESS_ACCESS, ALLOW_TRANSIT_ZONES;
 	public static String WEBHOOK, BOT_KEY, WEBHOOK_ICON;
 	//
 	public static final String DEFAULT_CAT = "Default Settings";

@@ -130,7 +130,7 @@ public class PlayerEvents {
 		return;
 	}
 	
-	private static boolean checkAccess(World world, BlockPos pos, IBlockState state, EntityPlayer player){
+	public static boolean checkAccess(World world, BlockPos pos, IBlockState state, EntityPlayer player){
 		PlayerCapability pl = player.getCapability(StatesCapabilities.PLAYER, null);
 		if(pl.getPermissions().hasPermission(States.ADMIN_PERM)){
 			return false;

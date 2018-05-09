@@ -149,6 +149,9 @@ public class StatesPermissions {
 		PERMISSIONS.put("state.set.icon", new Permission(PermissionGroup.STATE, PermissionLevel.STATE_COUNCIL, PermissionLevel.ADMIN));
 		PERMISSIONS.put("state.create", new Permission(PermissionGroup.SKIP, PermissionLevel.MUNICIPALITY_MAYOR, PermissionLevel.ADMIN));
 		PERMISSIONS.put("chunk.update", new Permission(PermissionGroup.SKIP, PermissionLevel.OWNER, PermissionLevel.DIS_MANAGER, PermissionLevel.MUNICIPALITY_MAYOR, PermissionLevel.STATE_LEADER, PermissionLevel.ADMIN));
+		PERMISSIONS.put("shop.create.municipality", new Permission(PermissionGroup.MUNICIPALITY, PermissionLevel.MUNICIPALITY_COUNCIL, PermissionLevel.ADMIN, PermissionLevel.OPERATOR));
+		PERMISSIONS.put("shop.create.state", new Permission(PermissionGroup.STATE, PermissionLevel.STATE_COUNCIL, PermissionLevel.ADMIN, PermissionLevel.OPERATOR));
+		PERMISSIONS.put("shop.create.server", new Permission(PermissionGroup.ADMIN, PermissionLevel.SKIP));
 		
 		
 	}

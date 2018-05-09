@@ -8,6 +8,7 @@ import com.google.common.collect.TreeBasedTable;
 
 import net.fexcraft.mod.fsmm.api.Account;
 import net.fexcraft.mod.fsmm.util.AccountManager;
+import net.fexcraft.mod.lib.capabilities.sign.SignCapabilityUtil;
 import net.fexcraft.mod.lib.network.PacketHandler;
 import net.fexcraft.mod.lib.network.handlers.NBTTagCompoundPacketHandler;
 import net.fexcraft.mod.lib.perms.PermManager;
@@ -24,6 +25,7 @@ import net.fexcraft.mod.states.api.capabilities.WorldCapability;
 import net.fexcraft.mod.states.guis.GuiHandler;
 import net.fexcraft.mod.states.guis.Listener;
 import net.fexcraft.mod.states.guis.Receiver;
+import net.fexcraft.mod.states.impl.SignShop;
 import net.fexcraft.mod.states.impl.capabilities.ChunkCapabilityUtil;
 import net.fexcraft.mod.states.impl.capabilities.PlayerCapabilityUtil;
 import net.fexcraft.mod.states.impl.capabilities.SignTileEntityCapabilityUtil;
@@ -93,6 +95,7 @@ public class States {
 		CapabilityManager.INSTANCE.register(PlayerCapability.class, new PlayerCapabilityUtil.Storage(), new PlayerCapabilityUtil.Callable());
 		//
 		StatesPermissions.init();
+		SignCapabilityUtil.addListener(SignShop.class);
 	}
 	
 	public static final File getWorldDirectory(){

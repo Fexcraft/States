@@ -59,4 +59,8 @@ public interface District extends ColorHolder, BuyableType, IconHolder {
 	
 	public void setForeignersSettle(boolean bool);
 	
+	public default State getState(){
+		return this.getMunicipality().getState();
+	}
+	
 }

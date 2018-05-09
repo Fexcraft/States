@@ -60,5 +60,13 @@ public interface Chunk extends BuyableType {
 	public List<UUID> getPlayerWhitelist();
 	
 	public List<Integer> getCompanyWhitelist();
+	
+	public default Municipality getMunicipality(){
+		return this.getDistrict().getMunicipality();
+	}
+	
+	public default State getState(){
+		return this.getDistrict().getMunicipality().getState();
+	}
 
 }

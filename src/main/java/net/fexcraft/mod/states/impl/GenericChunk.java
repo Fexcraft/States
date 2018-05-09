@@ -91,6 +91,7 @@ public class GenericChunk implements Chunk {
 		if(this.district.getId() == -2 && this.getChanged() + Time.DAY_MS < Time.getDate()){
 			StateLogger.log(StateLogger.LoggerType.CHUNK, StateLogger.district(-2) + " time of " + StateLogger.chunk(this) + " expired! Setting back to " + StateLogger.district(-1) + "!");
 			this.setDistrict(StateUtil.getDistrict(-1));
+			save();
 		}
 	}
 

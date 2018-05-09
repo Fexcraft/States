@@ -257,6 +257,8 @@ public class Listener implements IPacketListener<PacketNBTTagCompound> {
 						ck.setPrice(0);
 					}
 					ck.save();
+					updateNeighbors(ck);
+					//
 					StateLogger.log(StateLogger.LoggerType.CHUNK, StateLogger.player(player) + " claimed " + StateLogger.chunk(ck) + ", it is now part of " + StateLogger.district(dis) + ".");
 					ImageCache.update(world, ch);
 					compound.setString("result", "Chunk Claimed. (" + dis.getId() + ");");
@@ -317,20 +319,65 @@ public class Listener implements IPacketListener<PacketNBTTagCompound> {
 		}
 		return null;
 	}
+	
+	private static final int[][] coords = new int[4][2];
+	static {
+		coords[0] = new int[]{  1,  0 };
+		coords[1] = new int[]{ -1,  0 };
+		coords[2] = new int[]{  0,  1 };
+		coords[3] = new int[]{  0, -1 };
+	}
+
+	private void updateNeighbors(Chunk ck){
+		Chunk chunk = null;
+		for(int[] cor : coords){
+			chunk = StateUtil.getChunk(ck.xCoord() + cor[0], ck.zCoord() + cor[1]);
+			if(chunk != null && chunk.getDistrict().getId() >= 0 && chunk.getDistrict().getId() != ck.getDistrict().getId()){
+				if(!ck.getDistrict().getNeighbors().contains(chunk.getDistrict().getId())){
+					ck.getDistrict().getNeighbors().add(chunk.getDistrict().getId());
+					ck.getDistrict().save();
+					StateLogger.log(StateLogger.LoggerType.DISRICT, "Added " + StateLogger.district(chunk.getDistrict()) + " to NeighborList of " + StateLogger.district(ck.getDistrict()) + ".");
+				}
+				if(!chunk.getDistrict().getNeighbors().contains(ck.getDistrict().getId())){
+					chunk.getDistrict().getNeighbors().add(ck.getDistrict().getId());
+					chunk.getDistrict().save();
+					StateLogger.log(StateLogger.LoggerType.DISRICT, "Added " + StateLogger.district(ck.getDistrict()) + " to NeighborList of " + StateLogger.district(chunk.getDistrict()) + ".");
+				}
+				if(chunk.getMunicipality().getId() >= 0 && chunk.getMunicipality().getId() != ck.getMunicipality().getId()){
+					if(!ck.getMunicipality().getNeighbors().contains(chunk.getMunicipality().getId())){
+						ck.getMunicipality().getNeighbors().add(chunk.getMunicipality().getId());
+						ck.getMunicipality().save();
+						StateLogger.log(StateLogger.LoggerType.MUNICIPALITY, "Added " + StateLogger.municipality(chunk.getMunicipality()) + " to NeighborList of " + StateLogger.municipality(ck.getMunicipality()) + ".");
+					}
+					if(!chunk.getMunicipality().getNeighbors().contains(ck.getMunicipality().getId())){
+						chunk.getMunicipality().getNeighbors().add(ck.getMunicipality().getId());
+						chunk.getMunicipality().save();
+						StateLogger.log(StateLogger.LoggerType.MUNICIPALITY, "Added " + StateLogger.municipality(ck.getMunicipality()) + " to NeighborList of " + StateLogger.municipality(chunk.getMunicipality()) + ".");
+					}
+					if(chunk.getDistrict().getMunicipality().getState().getId() >= 0 && chunk.getDistrict().getMunicipality().getState().getId() != ck.getDistrict().getMunicipality().getState().getId()){
+						if(!ck.getState().getNeighbors().contains(chunk.getState().getId())){
+							ck.getState().getNeighbors().add(chunk.getState().getId());
+							ck.getState().save();
+							StateLogger.log(StateLogger.LoggerType.STATE, "Added " + StateLogger.state(chunk.getState()) + " to NeighborList of " + StateLogger.state(ck.getState()) + ".");
+						}
+						if(!chunk.getState().getNeighbors().contains(ck.getState().getId())){
+							chunk.getState().getNeighbors().add(ck.getState().getId());
+							chunk.getState().save();
+							StateLogger.log(StateLogger.LoggerType.STATE, "Added " + StateLogger.state(ck.getState()) + " to NeighborList of " + StateLogger.state(chunk.getState()) + ".");
+						}
+					}
+				}
+			}
+		}
+	}
 
 	private boolean nearbyChunkSame(Chunk ck, District dis){
 		Chunk chunk = null;
-		if((chunk = StateUtil.getChunk(ck.xCoord() + 1, ck.zCoord())) != null && chunk.getDistrict().getId() == dis.getId()){
-			return true;
-		}
-		if((chunk = StateUtil.getChunk(ck.xCoord() - 1, ck.zCoord())) != null && chunk.getDistrict().getId() == dis.getId()){
-			return true;
-		}
-		if((chunk = StateUtil.getChunk(ck.xCoord(), ck.zCoord() + 1)) != null && chunk.getDistrict().getId() == dis.getId()){
-			return true;
-		}
-		if((chunk = StateUtil.getChunk(ck.xCoord(), ck.zCoord() - 1)) != null && chunk.getDistrict().getId() == dis.getId()){
-			return true;
+		for(int[] cor : coords){
+			chunk = StateUtil.getChunk(ck.xCoord() + cor[0], ck.zCoord() + cor[1]);
+			if(chunk != null && chunk.getDistrict().getId() == dis.getId()){
+				return true;
+			}
 		}
 		return false;
 	}

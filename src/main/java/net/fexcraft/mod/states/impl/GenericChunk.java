@@ -195,7 +195,13 @@ public class GenericChunk implements Chunk {
 
 	@Override
 	public void setDistrict(District dis){
+		if(district.getId() != -1){
+			district.setClaimedChunks(district.getClaimedChunks() - 1);
+		}
 		district = dis;
+		if(district.getId() != -1){
+			district.setClaimedChunks(district.getClaimedChunks() + 1);
+		}
 	}
 
 	@Override

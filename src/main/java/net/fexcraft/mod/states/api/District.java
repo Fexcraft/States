@@ -62,5 +62,9 @@ public interface District extends ColorHolder, BuyableType, IconHolder {
 	public default State getState(){
 		return this.getMunicipality().getState();
 	}
+
+	public int getClaimedChunks();
+	
+	public void setClaimedChunks(int i);
 	
 }

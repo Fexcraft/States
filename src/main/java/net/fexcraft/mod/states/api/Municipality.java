@@ -72,4 +72,6 @@ public interface Municipality extends ColorHolder, BuyableType, IconHolder {
 
 	public List<Integer> getCompanyBlacklist();
 
+	public int getClaimedChunks();
+
 }

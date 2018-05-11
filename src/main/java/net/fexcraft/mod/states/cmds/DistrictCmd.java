@@ -71,6 +71,7 @@ public class DistrictCmd extends CommandBase {
 					District district = StateUtil.getDistrict(var);
 					Print.chat(sender, "&c-> &9" + district.getName() + " &7(" + district.getId() + ");");
 				});
+				Print.chat(sender, "&9Chunks: &7" + dis.getClaimedChunks());
 				Print.chat(sender, "&7Can Foreigners Settle: " + dis.canForeignersSettle());
 				Print.chat(sender, "&2Created by &7" + Static.getPlayerNameByUUID(dis.getCreator()) + "&2 at &8" + Time.getAsString(dis.getCreated()));
 				return;

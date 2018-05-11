@@ -15,6 +15,7 @@ import net.fexcraft.mod.lib.util.math.Time;
 import net.fexcraft.mod.states.States;
 import net.fexcraft.mod.states.api.Chunk;
 import net.fexcraft.mod.states.api.District;
+import net.fexcraft.mod.states.api.MunicipalityType;
 import net.fexcraft.mod.states.api.capabilities.StatesCapabilities;
 import net.fexcraft.mod.states.packets.ImagePacket;
 import net.fexcraft.mod.states.util.ImageCache;
@@ -205,6 +206,10 @@ public class Listener implements IPacketListener<PacketNBTTagCompound> {
 		}
 		if(dis.getId() == -2 && !net.fexcraft.mod.states.util.Config.ALLOW_TRANSIT_ZONES){
 			compound.setString("result", "Transit Zones (-2) are disabled.");
+			return compound;
+		}
+		if(dis.getMunicipality().getClaimedChunks() + 1 > MunicipalityType.getChunkLimitFor(dis.getMunicipality())){
+			compound.setString("result", "Municipality reached the Chunk Limit.");
 			return compound;
 		}
 		net.minecraft.world.chunk.Chunk ch = world.getChunkFromChunkCoords(nbt.getIntArray("data")[1], nbt.getIntArray("data")[2]);

@@ -19,7 +19,7 @@ import net.fexcraft.mod.states.util.StateUtil;
 
 public class GenericDistrict implements District {
 	
-	private int id;
+	private int id, chunks;
 	private DistrictType type;
 	private long created, changed, price;
 	private UUID creator, manager;
@@ -43,6 +43,7 @@ public class GenericDistrict implements District {
 		cfs = JsonUtil.getIfExists(obj, "can_foreigners_settle", false);
 		price = JsonUtil.getIfExists(obj, "price", 0).longValue();
 		icon = JsonUtil.getIfExists(obj, "icon", States.DEFAULT_ICON);
+		chunks = JsonUtil.getIfExists(obj, "chunks", 0).intValue();
 	}
 
 	@Override
@@ -61,6 +62,7 @@ public class GenericDistrict implements District {
 		obj.addProperty("can_foreigners_settle", cfs);
 		obj.addProperty("price", price);
 		if(icon != null){ obj.addProperty("icon", icon); }
+		obj.addProperty("chunks", chunks);
 		return obj;
 	}
 
@@ -195,6 +197,16 @@ public class GenericDistrict implements District {
 	@Override
 	public void setIcon(String url){
 		icon = url;
+	}
+
+	@Override
+	public int getClaimedChunks(){
+		return chunks;
+	}
+
+	@Override
+	public void setClaimedChunks(int i){
+		chunks = i; if(chunks < 0){ chunks = 0; }return;
 	}
 
 }

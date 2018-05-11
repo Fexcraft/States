@@ -13,6 +13,7 @@ import net.fexcraft.mod.lib.util.json.JsonUtil;
 import net.fexcraft.mod.lib.util.lang.ArrayList;
 import net.fexcraft.mod.lib.util.math.Time;
 import net.fexcraft.mod.states.States;
+import net.fexcraft.mod.states.api.District;
 import net.fexcraft.mod.states.api.Municipality;
 import net.fexcraft.mod.states.api.MunicipalityType;
 import net.fexcraft.mod.states.api.State;
@@ -237,6 +238,19 @@ public class GenericMunicipality implements Municipality {
 	@Override
 	public void setIcon(String url){
 		icon = url;
+	}
+
+	@Override
+	public int getClaimedChunks(){
+		int amount = 0;
+		District district = null;
+		for(int dis : districts){
+			district = StateUtil.getDistrict(dis, false);
+			if(district != null){
+				amount += district.getClaimedChunks();
+			}
+		}
+		return amount;
 	}
 
 }

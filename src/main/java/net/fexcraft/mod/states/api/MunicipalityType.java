@@ -4,20 +4,21 @@ import java.util.TreeSet;
 import com.google.gson.JsonObject;
 
 import net.fexcraft.mod.lib.util.json.JsonUtil;
+import net.fexcraft.mod.states.util.Config;
 
 public class MunicipalityType implements Comparable<MunicipalityType>{
 	
 	private static final TreeSet<MunicipalityType> TYPES = new TreeSet<MunicipalityType>();
 	public static final String[] DEFAULTS = new String[]{
-		"{'citizen': 0, 'districts': 3, 'title':'Hamlet'}",
-		"{'citizen': 8, 'districts': 4, 'title':'Village'}",
-		"{'citizen': 16, 'districts': 8, 'title':'Small Town'}",
-		"{'citizen': 24, 'districts': 12, 'title':'Town'}",
-		"{'citizen': 32, 'districts': 16, 'title':'Large Town'}",
-		"{'citizen': 40, 'districts': 20, 'title':'City'}",
-		"{'citizen': 60, 'districts': 28, 'title':'Large City'}",
-		"{'citizen': 120, 'districts': 36, 'title':'Metropolis'}",
-		"{'citizen': 160, 'districts': 50, 'title':'<name pending>'}",
+		"{'citizen': 0, 'districts': 1, 'title':'Hamlet'}",
+		"{'citizen': 8, 'districts': 2, 'title':'Village'}",
+		"{'citizen': 16, 'districts': 3, 'title':'Small Town'}",
+		"{'citizen': 24, 'districts': 4, 'title':'Town'}",
+		"{'citizen': 32, 'districts': 6, 'title':'Large Town'}",
+		"{'citizen': 40, 'districts': 8, 'title':'City'}",
+		"{'citizen': 60, 'districts': 10, 'title':'Large City'}",
+		"{'citizen': 120, 'districts': 12, 'title':'Metropolis'}",
+		"{'citizen': 160, 'districts': 16, 'title':'<name pending>'}",
 		
 	};
 	private int requred_citizen, district_limit;
@@ -90,6 +91,10 @@ public class MunicipalityType implements Comparable<MunicipalityType>{
 	@Override
 	public String toString(){
 		return "[citizen:" + requred_citizen + ",districts:" + district_limit + ", title:\"" + title + "\",obtainable:" + obtainable + "]";
+	}
+	
+	public static final int getChunkLimitFor(Municipality mun){
+		return Config.CHUNK_PER_CITIZEN * mun.getCitizen().size();
 	}
 	
 }

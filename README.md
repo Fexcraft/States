@@ -15,7 +15,7 @@ By default access the "wilderness" (unclaimed land) is disabled, so players cann
 Players can in such cases for example claim "temporarily" chunks, which are called "Transit Zones", such claims are valid for 1 day, and for example useful to build roads to Municipalities which aren't directly connected.
 <br>
 There are also other fancy additional features like "Sign Shops", which can be directly setup to pay/take money from the Municipality's or State's account, besides being able to use them as Private (Player) Shops.
-![SignShop](https://cdn.discordapp.com/attachments/424351061873131521/443900271362572288/2018-05-10_00-17-07.mp4)
+[SignShop](https://cdn.discordapp.com/attachments/424351061873131521/443900271362572288/2018-05-10_00-17-07.mp4) (VIDEO)
 
 ### Other mentionable things:
 - a GUI for Claiming Land
@@ -29,8 +29,8 @@ There are also other fancy additional features like "Sign Shops", which can be d
 - and some more things!
 <br>
 If you want to help out, be it in actual code, assets or in pure theorizing on best settings and new features, feel free to join our Discord server! (Depending on mood new Ideas might not be welcomed instantly :grin: )
-
-**This Mod does not contain a "war" mode, nor are there any plans to add one, ever.**<br>
+<br>
+<b>This Mod does not contain a "war" mode, nor are there any plans to add one, ever.</b>
 As some years of server management experience confirm, it's for one hard to have a realistic war in MC, and for other part, if allowing it to be "minecrafty", it will be a mere clicking around with swords, which I do not like.
 There are also many other reasons why I won't do it, available on request.
 

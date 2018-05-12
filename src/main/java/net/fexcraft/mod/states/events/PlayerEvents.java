@@ -15,6 +15,7 @@ import net.fexcraft.mod.states.api.capabilities.StatesCapabilities;
 import net.fexcraft.mod.states.util.Config;
 import net.fexcraft.mod.states.util.Sender;
 import net.fexcraft.mod.states.util.StateUtil;
+import net.fexcraft.mod.states.util.UpdateHandler;
 import net.minecraft.block.BlockButton;
 import net.minecraft.block.BlockChest;
 import net.minecraft.block.BlockDispenser;
@@ -69,6 +70,9 @@ public class PlayerEvents {
 		Print.chat(event.player, "&6You have &7" + (i <= 0 ? "no" : i) + "&6 new mail" + (i == 1 ? "" : "s") + ".");
 		Print.chat(event.player, "&e====-====-====-====-====-====&0[&2States&0]");
 		sendLocationUpdate(event.player, null, "&6Welcome back " + player.getFormattedNickname(event.player) + "&6!", "", "", 3);
+		if(UpdateHandler.STATE != null){
+			Print.chat(event.player, UpdateHandler.STATE);
+		}
 	}
 	
 	@SubscribeEvent

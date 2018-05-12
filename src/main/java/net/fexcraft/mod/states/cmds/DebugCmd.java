@@ -10,12 +10,14 @@ import net.fexcraft.mod.fsmm.util.Config;
 import net.fexcraft.mod.lib.api.common.fCommand;
 import net.fexcraft.mod.lib.util.common.Print;
 import net.fexcraft.mod.lib.util.json.JsonUtil;
+import net.fexcraft.mod.lib.util.math.Time;
 import net.fexcraft.mod.states.States;
 import net.fexcraft.mod.states.api.Chunk;
 import net.fexcraft.mod.states.api.capabilities.StatesCapabilities;
 import net.fexcraft.mod.states.util.StateUtil;
 import net.fexcraft.mod.states.util.StatesPermissions;
 import net.fexcraft.mod.states.util.StatesPermissions.Permission;
+import net.fexcraft.mod.states.util.UpdateHandler;
 import net.minecraft.command.CommandBase;
 import net.minecraft.command.CommandException;
 import net.minecraft.command.ICommandSender;
@@ -40,6 +42,8 @@ public class DebugCmd extends CommandBase {
     public List<String> getTabCompletions(MinecraftServer server, ICommandSender sender, String[] args, @Nullable BlockPos targetPos){
         return args.length == 1 ? Arrays.asList(new String[]{ "chunk", "chunks", "district", "districts", "municipality", "municipalities", "state", "states", "serveraccount", "permission", "permissions", "self"}) : Collections.<String>emptyList();
     }
+	
+	private long lastcheck;
 
 	@Override
 	public void execute(MinecraftServer server, ICommandSender sender, String[] args) throws CommandException {
@@ -56,6 +60,7 @@ public class DebugCmd extends CommandBase {
 			Print.chat(sender, "&7/st-debug permission <string>");
 			Print.chat(sender, "&7/st-debug permissions");
 			Print.chat(sender, "&7/st-debug self");
+			Print.chat(sender, "&7/st-debug check-for-updates");
 			return;
 		}
 		if(sender instanceof EntityPlayer == false){
@@ -138,6 +143,16 @@ public class DebugCmd extends CommandBase {
 			case "self":{
 				Print.chat(sender, sender.getCommandSenderEntity().getCapability(StatesCapabilities.PLAYER, null).toJsonObject());
 				return;
+			}
+			case "check-for-updates":{
+				if(lastcheck + (Time.MIN_MS + 15) < Time.getDate()){
+					Print.chat(sender, "Requesting update data...");
+					UpdateHandler.getDataFromServer();
+					lastcheck = Time.getDate();
+				}
+				else{
+					Print.chat(sender, "Please wait at least 15 minutes between requests.");
+				}
 			}
 		}
 	}

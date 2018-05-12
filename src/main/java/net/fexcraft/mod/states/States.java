@@ -35,6 +35,7 @@ import net.fexcraft.mod.states.packets.ImagePacketHandler;
 import net.fexcraft.mod.states.util.Config;
 import net.fexcraft.mod.states.util.Sender;
 import net.fexcraft.mod.states.util.StatesPermissions;
+import net.fexcraft.mod.states.util.UpdateHandler;
 import net.minecraftforge.common.capabilities.CapabilityManager;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.event.FMLInitializationEvent;
@@ -48,7 +49,7 @@ import net.minecraftforge.fml.relauncher.Side;
 @Mod(modid = States.MODID, name = "States", version = States.VERSION, dependencies = "required-after:fcl", /*serverSideOnly = true,*/ guiFactory = "net.fexcraft.mod.states.util.GuiFactory", acceptedMinecraftVersions = "*", acceptableRemoteVersions = "*")
 public class States {
 	
-	public static final String VERSION = "1.0";
+	public static final String VERSION = "1.0.0";
 	public static final String MODID = "states";
 	public static String ADMIN_PERM = "states.admin";
 	//
@@ -96,6 +97,8 @@ public class States {
 		//
 		StatesPermissions.init();
 		SignCapabilityUtil.addListener(SignShop.class);
+		//
+		UpdateHandler.initialize();
 	}
 	
 	public static final File getWorldDirectory(){

@@ -146,7 +146,7 @@ public class ClaimMap extends GuiContainer {
             		else{
             			new RGB(list.getCompoundTagAt(k).getInteger("color")).glColorApply();
             		}
-    				this.drawTexturedModalRect(this.x + (j * 10), this.y + (i * 10), 10, 10, 10, 10);
+    				this.drawTexturedModalRect(this.x + (j * 10), this.y + (i * 10), 10 + (j * 10), 10 + (i * 10), 10, 10);
     				RGB.glColorReset();
             		k++;
             	}

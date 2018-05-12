@@ -32,7 +32,7 @@ public class SignShop implements SignCapability.Listener {
 	
 	private static final ResourceLocation REGNAME = new ResourceLocation("states:shop");
 	private long price;
-	private boolean active;
+	private boolean active, server;
 	private ItemStack itemtype;
 	private ResourceLocation account;
 
@@ -88,6 +88,7 @@ public class SignShop implements SignCapability.Listener {
 							case "server":{
 								if(StatesPermissions.hasPermission(event.getEntityPlayer(), "shop.create.server", chunk)){
 									account = States.SERVERACCOUNT.getAsResourceLocation();
+									server = true;
 								}
 								else{
 									Print.chat(event.getEntityPlayer(), "&9No permission to Create Server Shops.");
@@ -188,6 +189,7 @@ public class SignShop implements SignCapability.Listener {
 	}
 
 	private void addStack(IItemHandler handler, ItemStack stack){
+		if(server){ return; }
 		for(int i = 0; i < handler.getSlots(); i++){
 			if((stack = handler.insertItem(i, stack, false)).isEmpty()){
 				return;
@@ -196,6 +198,7 @@ public class SignShop implements SignCapability.Listener {
 	}
 
 	private boolean hasSpace(EntityPlayer player, IItemHandler handler){
+		if(server){ return true; }
 		for(int i = 0; i < handler.getSlots(); i++){
 			if(handler.getStackInSlot(i).isEmpty() || isEqualOrValid(handler.getStackInSlot(i), true)){
 				return true;
@@ -206,6 +209,7 @@ public class SignShop implements SignCapability.Listener {
 	}
 
 	private boolean hasStack(EntityPlayer player, IItemHandler handler, boolean plinv){
+		if(server){ return true; }
 		for(int i = 0; i < handler.getSlots(); i++){
 			if(isEqualOrValid(handler.getStackInSlot(i), false)){
 				return true;
@@ -234,6 +238,9 @@ public class SignShop implements SignCapability.Listener {
 	}
 
 	private ItemStack getStackIfPossible(IItemHandler handler){
+		if(server){
+			return itemtype.copy();
+		}
 		for(int i = 0; i < handler.getSlots(); i++){
 			if(isEqualOrValid(handler.getStackInSlot(i), false)){
 				return handler.extractItem(i, itemtype.getCount(), false);
@@ -251,6 +258,9 @@ public class SignShop implements SignCapability.Listener {
 		compound.setLong("sign:price", price);
 		compound.setBoolean("sign:active", active);
 		compound.setString("sign:account", account.toString());
+		if(server){
+			compound.setBoolean("sign:server", server);
+		}
 		return compound;
 	}
 
@@ -266,6 +276,7 @@ public class SignShop implements SignCapability.Listener {
 			price = compound.getInteger("sign:price");
 			active = compound.getBoolean("sign:active");
 			account = new ResourceLocation(compound.getString("sign:account"));
+			server = compound.hasKey("sign:server") && compound.getBoolean("sign:server");
 		}
 		catch(Exception e){
 			e.printStackTrace();

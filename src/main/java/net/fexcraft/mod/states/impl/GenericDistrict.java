@@ -95,6 +95,10 @@ public class GenericDistrict implements District {
 		return created;
 	}
 
+	public void setCreated(long date){
+		created = date;
+	}
+
 	@Override
 	public UUID getCreator(){
 		return creator;

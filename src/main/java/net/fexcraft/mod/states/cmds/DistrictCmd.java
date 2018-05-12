@@ -4,15 +4,24 @@ import java.awt.Color;
 
 import com.mojang.authlib.GameProfile;
 
+import net.fexcraft.mod.fsmm.api.Bank;
+import net.fexcraft.mod.fsmm.util.AccountManager;
 import net.fexcraft.mod.fsmm.util.Config;
 import net.fexcraft.mod.lib.api.common.fCommand;
 import net.fexcraft.mod.lib.util.common.Print;
 import net.fexcraft.mod.lib.util.common.Static;
 import net.fexcraft.mod.lib.util.math.Time;
+import net.fexcraft.mod.states.States;
 import net.fexcraft.mod.states.api.Chunk;
 import net.fexcraft.mod.states.api.District;
 import net.fexcraft.mod.states.api.DistrictAttribute;
 import net.fexcraft.mod.states.api.DistrictType;
+import net.fexcraft.mod.states.api.Municipality;
+import net.fexcraft.mod.states.api.MunicipalityType;
+import net.fexcraft.mod.states.api.capabilities.PlayerCapability;
+import net.fexcraft.mod.states.api.capabilities.StatesCapabilities;
+import net.fexcraft.mod.states.guis.Listener;
+import net.fexcraft.mod.states.impl.GenericDistrict;
 import net.fexcraft.mod.states.util.StateLogger;
 import net.fexcraft.mod.states.util.StateUtil;
 import net.minecraft.command.CommandBase;
@@ -49,11 +58,17 @@ public class DistrictCmd extends CommandBase {
 		if(args.length == 0){
 			Print.chat(sender, "&7/dis info");
 			Print.chat(sender, "&7/dis types");
+			Print.chat(sender, "&7/dis create");
 			Print.chat(sender, "&7/dis attributes");
 			Print.chat(sender, "&7/dis set <option> <value>");
 			return;
 		}
 		EntityPlayer player = (EntityPlayer)sender.getCommandSenderEntity();
+		PlayerCapability ply = player.getCapability(StatesCapabilities.PLAYER, null);
+		if(ply == null){
+			Print.chat(sender, "&4Error loading Playerdata.");
+			return;
+		}
 		Chunk chunk = StateUtil.getChunk(player);
 		District dis = chunk.getDistrict();
 		switch(args[0]){
@@ -281,6 +296,87 @@ public class DistrictCmd extends CommandBase {
 				}
 				return;
 			}
+			case "create":{
+				if(hasPerm("district.create", player, ply.getMunicipality())){
+					if(ply.getMunicipality().getDistricts().size() + 1 > MunicipalityType.getType(ply.getMunicipality()).getDistrictLimit()){
+						Print.chat(sender, "&aYour Municipality reached the limit of possible Districts.");
+						return;
+					}
+					if(chunk.getDistrict().getId() >= 0){
+						Print.chat(sender, "&cThis chunk is already part of a District.");
+						return;
+					}
+					if(!nearbySameMunicipality(chunk, ply.getMunicipality())){
+						Print.chat(sender, "No nearby/connected chunks are of the same Municipality.");
+						return;
+					}
+					long price = net.fexcraft.mod.states.util.Config.DISTRICT_CREATION_PRICE;
+					if(price > ply.getMunicipality().getAccount().getBalance()){
+						Print.chat(sender, "&9Not enough money on Municipality Account.");
+						return;
+					}
+					Bank bank = AccountManager.INSTANCE.getBank(ply.getMunicipality().getAccount().getBankId());
+					if(bank == null){
+						Print.chat(sender, "&9Your bank couldn't be found.");
+						return;
+					}
+					if(args.length < 2){
+						Print.chat(sender, "&9No name for new District Specified.");
+						return;
+					}
+					String name = args[1];
+					if(args.length > 2){
+						for(int i = 2; i < args.length; i++){
+							name += " " + args[i];
+						}
+					}
+					try{
+						GenericDistrict newdis = new GenericDistrict(sender.getEntityWorld().getCapability(StatesCapabilities.WORLD, null).getNewDistrictId());
+						if(newdis.getDistrictFile().exists() || StateUtil.getDistrict(newdis.getId()).getId() >= 0){
+							throw new Exception("Tried to create new District with ID '" + newdis.getId() + "', but savefile already exists.");
+						}
+						else{
+							long halfprice = price / 2;
+							if(halfprice == 0 || bank.processTransfer(sender, ply.getMunicipality().getAccount(), halfprice, States.SERVERACCOUNT)){
+								bank.processTransfer(null, ply.getMunicipality().getAccount(), halfprice, States.SERVERACCOUNT);
+								newdis.setCreator(ply.getUUID());
+								newdis.setClaimedChunks(1);
+								newdis.setName(name);
+								newdis.setForeignersSettle(false);
+								newdis.setCreated(Time.getDate());
+								newdis.setChanged(Time.getDate());
+								newdis.setManager(ply.getUUID());
+								newdis.setMunicipality(ply.getMunicipality());
+								newdis.setPrice(0);
+								newdis.setType(DistrictType.WILDERNESS);
+								newdis.setIcon(States.DEFAULT_ICON);
+								newdis.setColor("#ffffff");
+								chunk.setDistrict(newdis);
+								newdis.getMunicipality().save();
+								newdis.save();
+								chunk.save();
+								States.DISTRICTS.put(newdis.getId(), newdis);
+								StateUtil.announce(server, "&9New District was created!");
+								StateUtil.announce(server, "&9Created by " + ply.getFormattedNickname(sender));
+								StateUtil.announce(server, "&9Name&0: &7" + newdis.getName());
+								StateLogger.log(StateLogger.LoggerType.DISRICT, StateLogger.player(player) + " created " + StateLogger.district(newdis) + " at " + StateLogger.chunk(chunk) + ".");
+								return;
+							}
+						}
+					}
+					catch(Exception e){
+						Print.chat(sender, "Error: " + e.getMessage());
+						Print.chat(sender, e);
+						Print.debug(e);
+						return;
+					}
+				}
+				else{
+					Print.chat(sender, "&cNo permission.");
+					return;
+				}
+				return;
+			}
 			default:{
 				Print.chat(sender, "&cInvalid Argument.");
 				return;
@@ -288,6 +384,17 @@ public class DistrictCmd extends CommandBase {
 		}
 	}
 	
+	private boolean nearbySameMunicipality(Chunk ck, Municipality mun){
+		Chunk chunk = null;
+		for(int[] cor : Listener.coords){
+			chunk = StateUtil.getChunk(ck.xCoord() + cor[0], ck.zCoord() + cor[1]);
+			if(chunk != null && chunk.getMunicipality().getId() == mun.getId()){
+				return true;
+			}
+		}
+		return false;
+	}
+
 	public static final boolean hasPerm(String perm, EntityPlayer player, Object obj){
 		return ChunkCmd.hasPerm(perm, player, obj);
 	}

@@ -325,7 +325,7 @@ public class Listener implements IPacketListener<PacketNBTTagCompound> {
 		return null;
 	}
 	
-	private static final int[][] coords = new int[4][2];
+	public static final int[][] coords = new int[4][2];
 	static {
 		coords[0] = new int[]{  1,  0 };
 		coords[1] = new int[]{ -1,  0 };

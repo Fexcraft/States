@@ -17,7 +17,7 @@ import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
 public class Config {
 	
 	public static File CONFIG_PATH;
-	public static long DEFAULT_CHUNK_PRICE, MUNICIPALITY_CREATION_PRICE, STATE_CREATION_PRICE;
+	public static long DEFAULT_CHUNK_PRICE, MUNICIPALITY_CREATION_PRICE, STATE_CREATION_PRICE, DISTRICT_CREATION_PRICE;
 	public static int MAP_UPDATES_PER_TICK, BOT_PORT, TRANSIT_ZONE_BOTTOM_LIMIT, TRANSIT_ZONE_TOP_LIMIT, CHUNK_PER_CITIZEN;
 	public static boolean ALLOW_WILDERNESS_ACCESS, ALLOW_TRANSIT_ZONES;
 	public static String WEBHOOK, BOT_KEY, WEBHOOK_ICON;
@@ -66,6 +66,7 @@ public class Config {
 		TRANSIT_ZONE_TOP_LIMIT = config.getInt("temporary_district_top_limit", DEFAULT_CAT, 80, 127, 255, "Max Height value to which blocks in Temporary claimed Chunks can be accessed.");
 		ALLOW_TRANSIT_ZONES = config.getBoolean("allow_temporary_districts", DEFAULT_CAT, true, "If players should be able to claim chunks temporarily.");
 		CHUNK_PER_CITIZEN = config.getInt("chunk_per_citizen", DEFAULT_CAT, 16, 1, 128, "How many chunks a Municipality can CLAIM per citizen inhabiting it.");
+		DISTRICT_CREATION_PRICE = config.getInt("district_creation_price", DEFAULT_CAT, 1200000, 0, Integer.MAX_VALUE, "Amount of Money Needded to create a district. (1000 == 1F$)");
 		updateWebHook();
 	}
 

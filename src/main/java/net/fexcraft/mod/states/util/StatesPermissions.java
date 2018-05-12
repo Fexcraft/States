@@ -76,11 +76,11 @@ public class StatesPermissions {
 	}
 	
 	private static Municipality municipality(Object obj){
-		return obj instanceof Chunk ? ((Chunk)obj).getDistrict().getMunicipality() : obj instanceof District ? ((District)obj).getMunicipality() :(Municipality)obj;
+		return obj instanceof Chunk ? ((Chunk)obj).getMunicipality() : obj instanceof District ? ((District)obj).getMunicipality() :(Municipality)obj;
 	}
 
 	private static State state(Object obj){
-		return obj instanceof Chunk ? ((Chunk)obj).getDistrict().getMunicipality().getState() : obj instanceof District ? ((District)obj).getMunicipality().getState() : obj instanceof Municipality ? ((Municipality)obj).getState() : (State)obj;
+		return obj instanceof Chunk ? ((Chunk)obj).getState() : obj instanceof District ? ((District)obj).getState() : obj instanceof Municipality ? ((Municipality)obj).getState() : (State)obj;
 	}
 
 	private static boolean isOperator(EntityPlayer entity){
@@ -152,6 +152,7 @@ public class StatesPermissions {
 		PERMISSIONS.put("shop.create.municipality", new Permission(PermissionGroup.MUNICIPALITY, PermissionLevel.MUNICIPALITY_COUNCIL, PermissionLevel.ADMIN, PermissionLevel.OPERATOR));
 		PERMISSIONS.put("shop.create.state", new Permission(PermissionGroup.STATE, PermissionLevel.STATE_COUNCIL, PermissionLevel.ADMIN, PermissionLevel.OPERATOR));
 		PERMISSIONS.put("shop.create.server", new Permission(PermissionGroup.ADMIN, PermissionLevel.SKIP));
+		PERMISSIONS.put("district.create", new Permission(PermissionGroup.ADMIN, PermissionLevel.MUNICIPALITY_MAYOR));
 		
 		
 	}

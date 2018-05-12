@@ -631,7 +631,7 @@ public class MunicipalityCmd extends CommandBase {
 						//
 						GenericDistrict newdis = new GenericDistrict(sender.getEntityWorld().getCapability(StatesCapabilities.WORLD, null).getNewDistrictId());
 						if(newdis.getDistrictFile().exists() || StateUtil.getDistrict(newdis.getId()).getId() >= 0){
-							throw new Exception("Tried to create new Municipality with ID '" + newmun.getId() + "', but savefile already exists.");
+							throw new Exception("Tried to create new District with ID '" + newmun.getId() + "', but savefile already exists.");
 						}
 						else{
 							newdis.setCreator(ply.getUUID());
@@ -658,8 +658,8 @@ public class MunicipalityCmd extends CommandBase {
 								StateUtil.announce(server, "&9New Municipality and District was created!");
 								StateUtil.announce(server, "&9Created by " + ply.getFormattedNickname(sender));
 								StateUtil.announce(server, "&9Name&0: &7" + newmun.getName());
-								StateLogger.log(StateLogger.LoggerType.MUNICIPALITY, StateLogger.player(player) + " created " + StateLogger.municipality(newmun) + ".");
-								StateLogger.log(StateLogger.LoggerType.DISRICT, StateLogger.player(player) + " created " + StateLogger.district(newdis) + ".");
+								StateLogger.log(StateLogger.LoggerType.MUNICIPALITY, StateLogger.player(player) + " created " + StateLogger.municipality(newmun) + " at " + StateLogger.chunk(chunk) + ".");
+								StateLogger.log(StateLogger.LoggerType.DISRICT, StateLogger.player(player) + " created " + StateLogger.district(newdis) + " at " + StateLogger.chunk(chunk) + ".");
 								StateLogger.log(StateLogger.LoggerType.DISRICT, StateLogger.player(player) + " created a Municipality at " + StateLogger.chunk(chunk) + ".");
 							}
 						}

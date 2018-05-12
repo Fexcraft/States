@@ -38,7 +38,7 @@ public class DebugCmd extends CommandBase {
 	
 	@Override
     public List<String> getTabCompletions(MinecraftServer server, ICommandSender sender, String[] args, @Nullable BlockPos targetPos){
-        return args.length == 0 ? Arrays.asList(new String[]{ "chunk", "chunks", "district", "districts", "municipality", "municipalities", "state", "states", "serveraccount", "permission", "permissions", "self"}) : Collections.<String>emptyList();
+        return args.length == 1 ? Arrays.asList(new String[]{ "chunk", "chunks", "district", "districts", "municipality", "municipalities", "state", "states", "serveraccount", "permission", "permissions", "self"}) : Collections.<String>emptyList();
     }
 
 	@Override

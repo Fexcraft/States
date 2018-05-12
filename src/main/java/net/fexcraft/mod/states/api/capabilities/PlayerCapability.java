@@ -78,4 +78,6 @@ public interface PlayerCapability {
 
 	public JsonObject toJsonObject();
 
+	public State getState();
+
 }

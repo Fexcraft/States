@@ -221,4 +221,9 @@ public class GenericPlayer implements PlayerCapability {
 		return entity;
 	}
 
+	@Override
+	public State getState(){
+		return municipality.getState();
+	}
+
 }

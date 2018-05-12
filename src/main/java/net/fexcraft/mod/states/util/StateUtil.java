@@ -21,6 +21,7 @@ import net.fexcraft.mod.states.api.capabilities.StatesCapabilities;
 import net.fexcraft.mod.states.api.root.AnnounceLevel;
 import net.fexcraft.mod.states.impl.GenericChunk;
 import net.fexcraft.mod.states.impl.GenericDistrict;
+import net.fexcraft.mod.states.impl.GenericMail;
 import net.fexcraft.mod.states.impl.GenericMunicipality;
 import net.fexcraft.mod.states.impl.GenericPlayer;
 import net.fexcraft.mod.states.impl.GenericState;
@@ -135,9 +136,21 @@ public class StateUtil {
 		mail.save();
 	}
 
-	public static List<Mail> gatherMailOf(String type, String string){
-		// TODO Auto-generated method stub
-		return null;
+	public static List<Mail> gatherMailOf(String type, String string, boolean read){
+		File folder = new File(States.getSaveDirectory(), "mails/" + type + "/" + string + "/");
+		ArrayList<Mail> list = new ArrayList<>();
+		if(!folder.exists()){ return list; }
+		for(File file : folder.listFiles()){
+			if(file.getName().endsWith(read ? ".read" : ".unread")){
+				try{
+					list.add(new GenericMail(file.getName().replace(read ? ".read" : ".unread", ""), type, string));
+				}
+				catch (Exception e){
+					e.printStackTrace();
+				}
+			}
+		}
+		return list;
 	}
 
 	public static int getUnreadMailsOf(String rectype, String string){

@@ -385,6 +385,7 @@ public class MunicipalityCmd extends CommandBase {
 						String invmsg = "You have been invited become a Municipality Countil Member " + mun.getName() + " (" + mun.getId() + ")!" + (msg == null ? "" : " MSG: " + msg);
 						JsonObject obj = new JsonObject();
 						obj.addProperty("type", "municipality_council");
+						obj.addProperty("id", mun.getId());
 						obj.addProperty("from", player.getGameProfile().getId().toString());
 						obj.addProperty("at", Time.getDate());
 						obj.addProperty("valid", Time.DAY_MS * 5);
@@ -575,6 +576,7 @@ public class MunicipalityCmd extends CommandBase {
 				String invmsg = "You have been invited to join the Municipality " + mun.getName() + " (" + mun.getId() + ")!" + (msg == null ? "" : " MSG: " + msg);
 				JsonObject obj = new JsonObject();
 				obj.addProperty("type", "municipality");
+				obj.addProperty("id", mun.getId());
 				obj.addProperty("from", player.getGameProfile().getId().toString());
 				obj.addProperty("at", Time.getDate());
 				obj.addProperty("valid", Time.DAY_MS * 2);

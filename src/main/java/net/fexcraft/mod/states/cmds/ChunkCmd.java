@@ -234,10 +234,11 @@ public class ChunkCmd extends CommandBase {
 					}
 					catch(Exception e){
 						Print.chat(sender, "&9Error: &7" + e.getMessage());
+						return;
 					}
 				}
 				if(chunk.getDistrict().getId() < 0){
-					Print.chat(sender, "Not claimed chunks can not be bought.");
+					Print.chat(sender, "Only claimed chunks can be bought.");
 					return;
 				}
 				if(chunk.getType() == ChunkType.PRIVATE && UUID.fromString(chunk.getOwner()).equals(player.getGameProfile().getId())){
@@ -252,10 +253,10 @@ public class ChunkCmd extends CommandBase {
 					Print.chat(sender, "&7You must be citizen of a Municipality to be able to buy chunks.");
 					return;
 				}
-				if(playerdata.getMunicipality().getState().getId() < 0){
+				/*if(playerdata.getMunicipality().getState().getId() < 0){
 					Print.chat(sender, "&7You must be citizen of a State to be able to buy chunks.");
 					return;
-				}
+				}*/
 				if(chunk.getDistrict().getMunicipality().getId() != playerdata.getMunicipality().getId() && !chunk.getDistrict().canForeignersSettle()){
 					Print.chat(sender, "&cYou are not part of this Municipality.");
 					Print.chat(sender, "&cChunks in this District can not be bought by Foreigners.");
@@ -339,7 +340,7 @@ public class ChunkCmd extends CommandBase {
 			case "setforsale":
 			case "sell":
 			case "sfs":{
-				if(!isPermitted(chunk, player)){
+				if(isPermitted(chunk, player)){
 					if(args.length < 2){
 						Print.chat(sender, "&9Missing argument.");
 						Print.chat(sender, "&7/ck set-for-sale <price>");
@@ -380,7 +381,7 @@ public class ChunkCmd extends CommandBase {
 								}
 							}
 							else{
-								Print.chat(sender, "&2Once a chunk is claimed, the district cannot be changed.");
+								Print.chat(sender, "&2Try &7/ck reclaim&2!");
 							}
 							break;
 						}
@@ -413,6 +414,7 @@ public class ChunkCmd extends CommandBase {
 									case MUNICIPAL:
 									case DISTRICT:
 									case NORMAL:{
+										String to = type == ChunkType.NORMAL || type == ChunkType.DISTRICT ? "District" : type == ChunkType.MUNICIPAL ? "Municipality" : type == ChunkType.STATEOWNED ? "State" : "ERROR";
 										chunk.setType(type);
 										chunk.setOwner(null);
 										chunk.setPrice(0);
@@ -424,9 +426,9 @@ public class ChunkCmd extends CommandBase {
 											ck.setPrice(0);
 											ck.setChanged(time);
 											ck.save();
+											StateLogger.log(StateLogger.LoggerType.CHUNK, StateLogger.player(player) + " gave the linked " + StateLogger.chunk(ck) + " to the " + to + ".");
 										});
 										chunk.save();
-										String to = type == ChunkType.NORMAL || type == ChunkType.DISTRICT ? "District" : type == ChunkType.MUNICIPAL ? "Municipality" : type == ChunkType.STATEOWNED ? "State" : "ERROR";
 										Print.chat(sender, "&9Chunk given to the &2" + to + "&9!");
 										StateLogger.log(StateLogger.LoggerType.CHUNK, StateLogger.player(player) + " gave the  " + StateLogger.chunk(chunk) + " to the " + to + ".");
 										break;
@@ -443,6 +445,7 @@ public class ChunkCmd extends CommandBase {
 											ck.setType(type);
 											ck.setChanged(time);
 											ck.save();
+											StateLogger.log(StateLogger.LoggerType.CHUNK, StateLogger.player(player) + " set the type of linked " + StateLogger.chunk(ck) + " to PUBLIC.");
 										});
 										chunk.save();
 										Print.chat(sender, "&2Chunk set to &cPUBLIC&2!");
@@ -495,6 +498,11 @@ public class ChunkCmd extends CommandBase {
 						try{
 							int x = Integer.parseInt(args[1]);
 							int z = Integer.parseInt(args[2]);
+							Chunk ck = StateUtil.getTempChunk(x, z);
+							if(!isOwner(ck, player)){
+								Print.chat(sender, "&cYou must be the owner of the Linked chunk aswel!");
+								return;
+							}
 							chunk.setLink(x, z);
 							Print.chat(sender, "&6Chunk linked. ( " + x + " | " + z + " );");
 							StateLogger.log(StateLogger.LoggerType.CHUNK, StateLogger.player(player) + " linked " + StateLogger.chunk(chunk) + " to (" + x + ", " + z + ").");

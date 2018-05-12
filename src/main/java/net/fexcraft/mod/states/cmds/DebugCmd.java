@@ -1,5 +1,11 @@
 package net.fexcraft.mod.states.cmds;
 
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
+
+import javax.annotation.Nullable;
+
 import net.fexcraft.mod.fsmm.util.Config;
 import net.fexcraft.mod.lib.api.common.fCommand;
 import net.fexcraft.mod.lib.util.common.Print;
@@ -15,6 +21,7 @@ import net.minecraft.command.CommandException;
 import net.minecraft.command.ICommandSender;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.server.MinecraftServer;
+import net.minecraft.util.math.BlockPos;
 
 @fCommand
 public class DebugCmd extends CommandBase {
@@ -28,6 +35,11 @@ public class DebugCmd extends CommandBase {
 	public String getUsage(ICommandSender sender){
 		return "/st-debug";
 	}
+	
+	@Override
+    public List<String> getTabCompletions(MinecraftServer server, ICommandSender sender, String[] args, @Nullable BlockPos targetPos){
+        return args.length == 0 ? Arrays.asList(new String[]{ "chunk", "chunks", "district", "districts", "municipality", "municipalities", "state", "states", "serveraccount", "permission", "permissions", "self"}) : Collections.<String>emptyList();
+    }
 
 	@Override
 	public void execute(MinecraftServer server, ICommandSender sender, String[] args) throws CommandException {
@@ -115,7 +127,6 @@ public class DebugCmd extends CommandBase {
 				Print.chat(sender, "&6Permission: &7" + args[1]);
 				Permission perm = StatesPermissions.PERMISSIONS.get(args[1]);
 				Print.chat(sender, perm == null ? "not found" : perm.toString());
-				//TODO group information print aswel?
 				return;
 			}
 			case "permissions":{

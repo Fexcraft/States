@@ -69,7 +69,7 @@ public interface PlayerCapability {
 	}
 
 	public static File getPlayerFile(UUID uuid){
-		return new File(States.getSaveDirectory(), "players/" + uuid.toString() + ".json");
+		return new File(States.getSaveDirectory(), "players/" + (uuid == null ? "null-uuid" : uuid.toString()) + ".json");
 	}
 	
 	public void save();

@@ -12,10 +12,8 @@ import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.client.event.RenderGameOverlayEvent;
 import net.minecraftforge.client.event.RenderGameOverlayEvent.ElementType;
-import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 
-@Mod.EventBusSubscriber
 public class LocationUpdate extends GuiScreen {
 	
 	public static long till = Time.getDate();
@@ -27,7 +25,7 @@ public class LocationUpdate extends GuiScreen {
 	private static final LocationUpdate THIS = new LocationUpdate();
 	
 	@SubscribeEvent
-	public static void displayLocationUpdate(RenderGameOverlayEvent event){
+	public void displayLocationUpdate(RenderGameOverlayEvent event){
 		if(event.getType() == ElementType.HOTBAR && till >= Time.getDate()){
 			if(client == null){ client = Minecraft.getMinecraft(); }
 			Model.bindTexture(texture);

@@ -57,7 +57,7 @@ public class GenericPlayer implements PlayerCapability {
 			obj.addProperty("nick", nick);
 		}
 		obj.addProperty("color", color);
-		obj.addProperty("municipality", municipality.getId());
+		obj.addProperty("municipality", municipality == null ? -1 : municipality.getId());
 		return obj;
 	}
 
@@ -153,7 +153,7 @@ public class GenericPlayer implements PlayerCapability {
 
 	@Override
 	public String getUUIDAsString(){
-		return uuid.toString();
+		return uuid == null ? "null-uuid" : uuid.toString();
 	}
 
 	@Override

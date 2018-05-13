@@ -36,6 +36,7 @@ import net.fexcraft.mod.states.util.Config;
 import net.fexcraft.mod.states.util.Sender;
 import net.fexcraft.mod.states.util.StatesPermissions;
 import net.fexcraft.mod.states.util.UpdateHandler;
+import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.common.capabilities.CapabilityManager;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.event.FMLInitializationEvent;
@@ -75,6 +76,9 @@ public class States {
 	@Mod.EventHandler
 	public void properInit(FMLInitializationEvent event){
 		NetworkRegistry.INSTANCE.registerGuiHandler(INSTANCE, new GuiHandler());
+		if(event.getSide().isClient()){
+			MinecraftForge.EVENT_BUS.register(new net.fexcraft.mod.states.guis.LocationUpdate());
+		}
 	}
 	
 	@Mod.EventHandler

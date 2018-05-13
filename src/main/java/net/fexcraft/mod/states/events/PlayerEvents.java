@@ -73,11 +73,14 @@ public class PlayerEvents {
 		if(UpdateHandler.STATE != null){
 			Print.chat(event.player, UpdateHandler.STATE);
 		}
+		//
+		Sender.sendToWebhook(null, event.player.getGameProfile().getName() + " joined.");
 	}
 	
 	@SubscribeEvent
 	public static void onLogout(PlayerLoggedOutEvent event){
 		States.PLAYERS.remove(event.player.getGameProfile().getId());
+		Sender.sendToWebhook(null, event.player.getGameProfile().getName() + " left.");
 	}
 	
 	@SubscribeEvent

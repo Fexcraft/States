@@ -1,9 +1,9 @@
 package net.fexcraft.mod.states.util;
 
 import java.io.BufferedReader;
-import java.io.DataOutputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.io.OutputStreamWriter;
 import java.net.HttpURLConnection;
 import java.net.ServerSocket;
 import java.net.Socket;
@@ -11,6 +11,7 @@ import java.net.URL;
 
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
+import com.google.gson.stream.JsonWriter;
 
 import net.fexcraft.mod.lib.perms.PermManager;
 import net.fexcraft.mod.lib.util.common.Formatter;
@@ -59,7 +60,7 @@ public class Sender {
 	}
 
 	public static void sendToWebhook(EntityPlayer sender, String message){
-		if(Config.WEBHOOK == null){ return; }
+		if(RECEIVER == null){ return; }
 		try{
 			URL url = new URL(Config.WEBHOOK);
 			HttpURLConnection connection = (HttpURLConnection) url.openConnection();
@@ -79,21 +80,32 @@ public class Sender {
 				obj.addProperty("avatar_url", Config.WEBHOOK_ICON);
 			}
 			//
-			DataOutputStream wr = new DataOutputStream(connection.getOutputStream());
-			wr.writeBytes(obj.toString()); wr.flush(); wr.close();
+			//OutputStreamWriter wr = new OutputStreamWriter(connection.getOutputStream(), "utf-8");
+			//wr.write(obj.toString()); wr.flush(); wr.close();
+			JsonWriter writer = JsonUtil.getGson().newJsonWriter(new OutputStreamWriter(connection.getOutputStream(), "utf-8"));
+			writer.jsonValue(obj.toString());
+			writer.flush(); writer.close();
 			//
-			if(Static.dev()){
+			if(true){//Static.dev()){
 				BufferedReader in = new BufferedReader(new InputStreamReader(connection.getInputStream()));
 				String input; StringBuffer response = new StringBuffer();
 				while((input = in.readLine()) != null){ response.append(input); }
 				in.close(); input = response.toString();
-				if(!input.equals("")){ Print.chat(sender, input); }
+				if(!input.equals("")){
+					if(sender == null){
+						Print.log("[States-Webhook]: " + input);
+					}
+					else{
+						Print.chat(sender, input);
+					}
+				}
 			}
 			//
 			connection.disconnect();
 			return;
 		}
 		catch(Exception e){
+			Print.log(e.getMessage());
 			e.printStackTrace();
 		}
 	}
@@ -104,7 +116,7 @@ public class Sender {
 		
 		@Override
 		public void run(){
-			Print.log("[States] Starting Message Listener on port " + Config.BOT_PORT);
+			Print.log("[States-Webhook] Starting Message Listener on port " + Config.BOT_PORT);
 			sendToWebhook(null, "Starting Server Message Receiver...");
 			try{
 				ServerSocket socket = new ServerSocket(Config.BOT_PORT);
@@ -137,7 +149,7 @@ public class Sender {
 			catch(IOException e){
 				e.printStackTrace();
 			}
-			Print.log("[States] Stopping Message Listener on port " + Config.BOT_PORT);
+			Print.log("[States-Webhook] Stopping Message Listener on port " + Config.BOT_PORT);
 			sendToWebhook(null, "Server Message Receiver stopped.");
 		}
 

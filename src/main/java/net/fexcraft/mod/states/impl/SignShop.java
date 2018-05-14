@@ -209,7 +209,7 @@ public class SignShop implements SignCapability.Listener {
 	}
 
 	private boolean hasStack(EntityPlayer player, IItemHandler handler, boolean plinv){
-		if(server){ return true; }
+		if(server && !plinv){ return true; }
 		for(int i = 0; i < handler.getSlots(); i++){
 			if(isEqualOrValid(handler.getStackInSlot(i), false)){
 				return true;

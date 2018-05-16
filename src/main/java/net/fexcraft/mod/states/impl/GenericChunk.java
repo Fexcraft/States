@@ -184,8 +184,8 @@ public class GenericChunk implements Chunk {
 
 	@Override
 	public void setChanged(long new_change){
-		changed = new_change;
-		SignTileEntityCapabilityUtil.processChunkChange(this, "chunk");
+            changed = new_change;
+            SignTileEntityCapabilityUtil.processChunkChange(StateUtil.getChunk(this), "chunk");
 	}
 
 	@Override

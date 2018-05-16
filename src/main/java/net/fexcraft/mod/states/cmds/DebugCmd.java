@@ -9,6 +9,7 @@ import javax.annotation.Nullable;
 import net.fexcraft.mod.fsmm.util.Config;
 import net.fexcraft.mod.lib.api.common.fCommand;
 import net.fexcraft.mod.lib.util.common.Print;
+import net.fexcraft.mod.lib.util.common.Static;
 import net.fexcraft.mod.lib.util.json.JsonUtil;
 import net.fexcraft.mod.lib.util.math.Time;
 import net.fexcraft.mod.states.States;
@@ -23,6 +24,7 @@ import net.minecraft.command.CommandException;
 import net.minecraft.command.ICommandSender;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.server.MinecraftServer;
+import net.minecraft.util.EnumFacing;
 import net.minecraft.util.math.BlockPos;
 
 @fCommand
@@ -70,10 +72,13 @@ public class DebugCmd extends CommandBase {
 		Chunk chunk = StateUtil.getChunk((EntityPlayer)sender);
 		switch(args[0]){
 			case "chunks":{
-				States.CHUNKS.cellSet().forEach((elm) -> {
-					Print.log(elm.getValue().toJsonObject().toString());
-				});
-				Print.chat(sender, "&7Chunks loaded: &a" + States.CHUNKS.size());
+                                Static.getServer().worlds[0].getChunkProvider().getLoadedChunks().forEach(ck -> {
+                                    Chunk chk = ck.getCapability(StatesCapabilities.CHUNK, null).getStatesChunk(true);
+                                    if(chk != null){
+                                        Print.log(chk.toJsonObject().toString());
+                                    }
+                                });
+				Print.chat(sender, "&7Chunks loaded: &a" + Static.getServer().worlds[0].getChunkProvider().getLoadedChunkCount());
 				Print.chat(sender, "Chunk JSON's printed into console.");
 				return;
 			}

@@ -6,6 +6,7 @@ import java.util.UUID;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
+import net.fexcraft.mod.lib.util.common.Static;
 
 import net.fexcraft.mod.lib.util.json.JsonUtil;
 import net.fexcraft.mod.lib.util.lang.ArrayList;
@@ -14,8 +15,10 @@ import net.fexcraft.mod.states.States;
 import net.fexcraft.mod.states.api.District;
 import net.fexcraft.mod.states.api.DistrictType;
 import net.fexcraft.mod.states.api.Municipality;
+import net.fexcraft.mod.states.api.capabilities.StatesCapabilities;
 import net.fexcraft.mod.states.impl.capabilities.SignTileEntityCapabilityUtil;
 import net.fexcraft.mod.states.util.StateUtil;
+import net.minecraft.util.EnumFacing;
 
 public class GenericDistrict implements District {
 	
@@ -120,10 +123,10 @@ public class GenericDistrict implements District {
 
 	@Override
 	public void setChanged(long new_change){
-		changed = new_change;
-		States.CHUNKS.cellSet().forEach(cell -> {
-			SignTileEntityCapabilityUtil.processChunkChange(cell.getValue(), "district");
-		});
+            changed = new_change;
+            Static.getServer().worlds[0].getChunkProvider().getLoadedChunks().forEach(chunk -> {
+                SignTileEntityCapabilityUtil.processChunkChange(chunk, "district");
+            });
 	}
 
 	@Override

@@ -48,12 +48,12 @@ public class SignTileEntityCapabilityUtil implements ICapabilitySerializable<NBT
 		StatesCapabilities.SIGN_TE.getStorage().readNBT(StatesCapabilities.SIGN_TE, instance, null, nbt);
 	}
 
-	public static void processChunkChange(Chunk chunk, String string){
-		net.minecraft.world.chunk.Chunk ck = Static.getServer().worlds[0].getChunkFromChunkCoords(chunk.xCoord(), chunk.zCoord());
-		ck.getTileEntityMap().values().forEach(te -> {
+	public static void processChunkChange(net.minecraft.world.chunk.Chunk chunk, String string){
+            if(chunk == null){ return; }
+		chunk.getTileEntityMap().values().forEach(te -> {
 			if(te instanceof TileEntitySign){
 				SignTileEntityCapability cap = te.getCapability(StatesCapabilities.SIGN_TE, null);
-				cap.update(chunk, string, true);
+				cap.update(chunk.getCapability(StatesCapabilities.CHUNK, null).getStatesChunk(), string, true);
 			}
 		});
 	}

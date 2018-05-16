@@ -244,11 +244,12 @@ public class StateCmd extends CommandBase {
 				return;
 			}
 			case "council":{
-				if(args.length < 2){
-					Print.chat(sender, "&7/st council vote <playername> (for leader)");
-					Print.chat(sender, "&7/st council kick <playername>");
-					Print.chat(sender, "&7/st council invite <playername>");
-					Print.chat(sender, "&7/st council leave");
+				if(args.length == 1){
+                                    Print.chat(sender, "&7/st council vote <playername> (for leader)");
+                                    Print.chat(sender, "&7/st council kick <playername>");
+                                    Print.chat(sender, "&7/st council invite <playername>");
+                                    Print.chat(sender, "&7/st council leave");
+                                    return;
 				}
 				switch(args[1]){
 					case "vote":{
@@ -341,10 +342,11 @@ public class StateCmd extends CommandBase {
 				return;
 			}
 			case "mun": case "municipality":{
-				if(args.length < 2){
-					Print.chat(sender, "&7/st mun list");
-					Print.chat(sender, "&7/st mun invite <municipality id>");
-					Print.chat(sender, "&7/st mun kick/remove");
+				if(args.length == 1){
+                                    Print.chat(sender, "&7/st mun list");
+                                    Print.chat(sender, "&7/st mun invite <municipality id>");
+                                    Print.chat(sender, "&7/st mun kick/remove");
+                                    return;
 				}
 				switch(args[1]){
 					case "list":{

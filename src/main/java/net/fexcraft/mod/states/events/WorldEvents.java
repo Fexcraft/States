@@ -189,7 +189,8 @@ public class WorldEvents {
 	
 	@SubscribeEvent
 	public static void onAttachEventChunk(AttachCapabilitiesEvent<net.minecraft.world.chunk.Chunk> event){
-		event.addCapability(ChunkCapabilityUtil.REGISTRY_NAME, new ChunkCapabilityUtil(event.getObject()));
+            if(event.getObject().getWorld().provider.getDimension() != 0){ return; }
+            event.addCapability(ChunkCapabilityUtil.REGISTRY_NAME, new ChunkCapabilityUtil(event.getObject()));
 	}
 	
 }

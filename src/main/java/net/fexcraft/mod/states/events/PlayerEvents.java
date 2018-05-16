@@ -6,6 +6,7 @@ import java.util.List;
 import net.fexcraft.mod.lib.network.PacketHandler;
 import net.fexcraft.mod.lib.network.packet.PacketNBTTagCompound;
 import net.fexcraft.mod.lib.util.common.Print;
+import net.fexcraft.mod.lib.util.common.Static;
 import net.fexcraft.mod.lib.util.math.Time;
 import net.fexcraft.mod.states.States;
 import net.fexcraft.mod.states.api.Chunk;
@@ -140,9 +141,9 @@ public class PlayerEvents {
 	public static boolean checkAccess(World world, BlockPos pos, IBlockState state, EntityPlayer player){
             if(world.provider.getDimension() != 0){ return true; }
             PlayerCapability pl = player.getCapability(StatesCapabilities.PLAYER, null);
-            if(pl.getPermissions().hasPermission(States.ADMIN_PERM)){
+            /*if(pl.getPermissions().hasPermission(States.ADMIN_PERM)){
 		return true;
-            }
+            }*/
             Chunk chunk = world.getChunkFromBlockCoords(pos).getCapability(StatesCapabilities.CHUNK, null).getStatesChunk();
             if(chunk.getDistrict().getId() < 0){
                 if(chunk.getDistrict().getId() == -1){
@@ -191,7 +192,9 @@ public class PlayerEvents {
 	@SubscribeEvent
 	public static void onMessage(ServerChatEvent event){
             event.setCanceled(true);
-            Sender.sendAs(event.getPlayer(), event.getMessage());
+            Static.getServer().addScheduledTask(() -> {
+                Sender.sendAs(event.getPlayer(), event.getMessage());
+            });
 	}
 	
 	@SubscribeEvent

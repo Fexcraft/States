@@ -29,15 +29,25 @@ import net.minecraft.util.ResourceLocation;
 @fCommand
 public class MailCmd extends CommandBase {
 
-	@Override
-	public String getName(){
-		return "mail";
-	}
+    @Override
+    public String getName(){
+        return "mail";
+    }
 
+    @Override
+    public String getUsage(ICommandSender sender){
+	return "/mail";
+    }
+    
+    @Override
+    public boolean checkPermission(MinecraftServer server, ICommandSender sender){
+        return sender != null;
+    }
+	
 	@Override
-	public String getUsage(ICommandSender sender){
-		return "/mail";
-	}
+    public int getRequiredPermissionLevel(){
+        return 0;
+    }
 
 	@Override
 	public void execute(MinecraftServer server, ICommandSender sender, String[] args) throws CommandException {

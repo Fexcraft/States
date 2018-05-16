@@ -29,6 +29,7 @@ import net.minecraft.command.ICommandSender;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.server.MinecraftServer;
+import net.minecraft.util.EnumFacing;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3d;
@@ -37,19 +38,25 @@ import net.minecraft.world.World;
 import net.minecraftforge.fml.common.FMLCommonHandler;
 
 public class StateUtil {
-
-	public static Chunk getChunk(EntityPlayer player){
-		net.minecraft.world.chunk.Chunk chunk = player.world.getChunkFromBlockCoords(player.getPosition());
-		return States.CHUNKS.get(chunk.x, chunk.z);
-	}
-
-	public static Chunk getChunk(int x, int z){
-		return  States.CHUNKS.get(x, z);
-	}
-
-	public static Chunk getChunk(World world, BlockPos pos){
-		return States.CHUNKS.get(pos.getX() >> 4, pos.getZ() >> 4);
-	}
+    
+    public static @Nullable Chunk getChunk(int x, int z){
+        return getChunk(Static.getServer().worlds[0].getChunkProvider().getLoadedChunk(x, z));
+    }
+    
+    public static @Nullable Chunk getChunk(@Nullable World world, BlockPos pos){
+        return getChunk((world == null ? Static.getServer().worlds[0] : world).getChunkProvider().getLoadedChunk(pos.getX() >> 4, pos.getZ() >> 4));
+    }
+    
+    public static @Nullable Chunk getChunk(EntityPlayer player){
+        return getChunk(player.world, player.getPosition());
+    }
+    
+    public static @Nullable Chunk getChunk(net.minecraft.world.chunk.Chunk chunk){
+        if(chunk != null){
+            return chunk.getCapability(StatesCapabilities.CHUNK, null).getStatesChunk();
+        }
+        return null;
+    }
 	
 	public static District getDistrict(int value){
 		return getDistrict(value, true);
@@ -247,5 +254,9 @@ public class StateUtil {
         }
 		return list;
 	}
+
+    public static @Nullable net.minecraft.world.chunk.Chunk getChunk(Chunk chunk){
+        return Static.getServer().worlds[0].getChunkProvider().getLoadedChunk(chunk.xCoord(), chunk.zCoord());
+    }
 
 }

@@ -138,59 +138,60 @@ public class PlayerEvents {
 	}
 	
 	public static boolean checkAccess(World world, BlockPos pos, IBlockState state, EntityPlayer player){
-		PlayerCapability pl = player.getCapability(StatesCapabilities.PLAYER, null);
-		if(pl.getPermissions().hasPermission(States.ADMIN_PERM)){
-			return false;
-		}
-		Chunk chunk = world.getChunkFromBlockCoords(pos).getCapability(StatesCapabilities.CHUNK, null).getStatesChunk();
-		if(chunk.getDistrict().getId() < 0){
-			if(chunk.getDistrict().getId() == -1){
-				return Config.ALLOW_WILDERNESS_ACCESS;
-			}
-			else if(chunk.getDistrict().getId() == -2){
-				if(chunk.getChanged() + Time.DAY_MS < Time.getDate()){
-					chunk.setDistrict(StateUtil.getDistrict(-1));
-					//TODO log
-					chunk.save();
-					Print.chat(player, "Updating chunk...");
-					return false;
-				}
-				return pos.getY() > Config.TRANSIT_ZONE_BOTTOM_LIMIT && pos.getY() < Config.TRANSIT_ZONE_TOP_LIMIT;
-			}
-			else{
-				Print.chat(player, "Unknown district type.");
-				return false;
-			}
-		}
-		//TODO company check
-		switch(chunk.getType()){
-			case PRIVATE:{
-				return chunk.getOwner().equals(pl.getUUIDAsString()) || chunk.getPlayerWhitelist().contains(pl.getUUID()) || pl.isMayorOf(chunk.getDistrict().getMunicipality()) || pl.isStateLeaderOf(chunk.getDistrict().getMunicipality().getState());
-			}
-			case NORMAL:{
-				return pl.getMunicipality().getId() == chunk.getDistrict().getMunicipality().getId();
-			}
-			case DISTRICT:{
-				return pl.isDistrictManagerOf(chunk.getDistrict()) || pl.isMayorOf(chunk.getDistrict().getMunicipality()) || pl.isStateLeaderOf(chunk.getDistrict().getMunicipality().getState());
-			}
-			case MUNICIPAL:{
-				return pl.isMayorOf(chunk.getDistrict().getMunicipality()) || pl.isStateLeaderOf(chunk.getDistrict().getMunicipality().getState());
-			}
-			case STATEOWNED:{
-				return pl.isStateLeaderOf(chunk.getDistrict().getMunicipality().getState());
-			}
-			case COMPANY: return false;//TODO
-			case PUBLIC: return true;
-			default:{
-				return false;
-			}
-		}
+            if(world.provider.getDimension() != 0){ return true; }
+            PlayerCapability pl = player.getCapability(StatesCapabilities.PLAYER, null);
+            if(pl.getPermissions().hasPermission(States.ADMIN_PERM)){
+		return true;
+            }
+            Chunk chunk = world.getChunkFromBlockCoords(pos).getCapability(StatesCapabilities.CHUNK, null).getStatesChunk();
+            if(chunk.getDistrict().getId() < 0){
+                if(chunk.getDistrict().getId() == -1){
+                    return Config.ALLOW_WILDERNESS_ACCESS;
+                }
+                else if(chunk.getDistrict().getId() == -2){
+                    if(chunk.getChanged() + Time.DAY_MS < Time.getDate()){
+                        chunk.setDistrict(StateUtil.getDistrict(-1));
+                        //TODO log
+                        chunk.save();
+                        Print.chat(player, "Updating chunk...");
+                            return false;
+                        }
+                        return pos.getY() > Config.TRANSIT_ZONE_BOTTOM_LIMIT && pos.getY() < Config.TRANSIT_ZONE_TOP_LIMIT;
+                }
+                else{
+                    Print.chat(player, "Unknown district type.");
+                    return false;
+                }
+            }
+            //TODO company check
+            switch(chunk.getType()){
+                case PRIVATE:{
+                    return chunk.getOwner().equals(pl.getUUIDAsString()) || chunk.getPlayerWhitelist().contains(pl.getUUID()) || pl.isMayorOf(chunk.getDistrict().getMunicipality()) || pl.isStateLeaderOf(chunk.getDistrict().getMunicipality().getState());
+                }
+                case NORMAL:{
+                    return pl.getMunicipality().getId() == chunk.getDistrict().getMunicipality().getId();
+                }
+                case DISTRICT:{
+                    return pl.isDistrictManagerOf(chunk.getDistrict()) || pl.isMayorOf(chunk.getDistrict().getMunicipality()) || pl.isStateLeaderOf(chunk.getDistrict().getMunicipality().getState());
+                }
+                case MUNICIPAL:{
+                    return pl.isMayorOf(chunk.getDistrict().getMunicipality()) || pl.isStateLeaderOf(chunk.getDistrict().getMunicipality().getState());
+                }
+                case STATEOWNED:{
+                    return pl.isStateLeaderOf(chunk.getDistrict().getMunicipality().getState());
+                }
+                case COMPANY: return false;//TODO
+                case PUBLIC: return true;
+                default:{
+                    return false;
+                }
+            }
 	}
 	
 	@SubscribeEvent
 	public static void onMessage(ServerChatEvent event){
-		event.setCanceled(true);
-		Sender.sendAs(event.getPlayer(), event.getMessage());
+            event.setCanceled(true);
+            Sender.sendAs(event.getPlayer(), event.getMessage());
 	}
 	
 	@SubscribeEvent

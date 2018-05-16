@@ -197,7 +197,7 @@ public class WorldCapabilityUtil implements ICapabilitySerializable<NBTBase>{
 						throw new Exception("Found file in Districts Directory which shouldn't be there.");
 					}
 				}
-				districts = i - 2;//recompensate for wilderness & "spawn"
+				districts = i - 3;//recompensate for wilderness, "spawn" & transit zone
 			}
 		}
 

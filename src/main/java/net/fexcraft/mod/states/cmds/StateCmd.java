@@ -462,7 +462,7 @@ public class StateCmd extends CommandBase {
 						//Now let's save stuff.
 						long halfprice = price / 2;
 						if(halfprice == 0 || bank.processTransfer(sender, ply.getMunicipality().getAccount(), halfprice, States.SERVERACCOUNT)){
-							bank.processTransfer(null, ply.getAccount(), halfprice, newstate.getAccount());
+							bank.processTransfer(null, ply.getMunicipality().getAccount(), halfprice, newstate.getAccount());
 							newstate.save(); States.STATES.put(newstate.getId(), newstate);
 							ply.getMunicipality().setState(newstate);
 							ply.getMunicipality().setChanged(Time.getDate());

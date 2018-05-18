@@ -61,7 +61,7 @@ public class SignShop implements SignCapability.Listener {
 				if(te != null && te.hasCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, facing) && PlayerEvents.checkAccess(te.getWorld(), te.getPos(), te.getWorld().getBlockState(te.getPos()), event.getEntityPlayer())){
 					itemtype = te.getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, facing).getStackInSlot(0).copy();
 					if(!tileentity.signText[1].getUnformattedText().equals("")){
-						Chunk chunk = StateUtil.getChunk(te.getWorld(), te.getPos());
+						Chunk chunk = StateUtil.getChunk(te.getPos());
 						switch(tileentity.signText[1].getUnformattedText().toLowerCase()){
 							case "district":
 							case "municipality":{

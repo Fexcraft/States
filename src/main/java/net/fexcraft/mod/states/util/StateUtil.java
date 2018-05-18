@@ -40,15 +40,15 @@ import net.minecraftforge.fml.common.FMLCommonHandler;
 public class StateUtil {
     
     public static @Nullable Chunk getChunk(int x, int z){
-        return getChunk(Static.getServer().worlds[0].getChunkProvider().getLoadedChunk(x, z));
-    }
-    
-    public static @Nullable Chunk getChunk(@Nullable World world, BlockPos pos){
-        return getChunk((world == null ? Static.getServer().worlds[0] : world).getChunkProvider().getLoadedChunk(pos.getX() >> 4, pos.getZ() >> 4));
+        return States.CHUNKS.get(x, z);
     }
     
     public static @Nullable Chunk getChunk(EntityPlayer player){
-        return getChunk(player.world, player.getPosition());
+        return getChunk(player.getPosition());
+    }
+    
+    public static @Nullable Chunk getChunk(BlockPos pos){
+        return getChunk(pos.getX() >> 4, pos.getZ() >> 4);
     }
     
     public static @Nullable Chunk getChunk(net.minecraft.world.chunk.Chunk chunk){
@@ -56,6 +56,17 @@ public class StateUtil {
             return chunk.getCapability(StatesCapabilities.CHUNK, null).getStatesChunk();
         }
         return null;
+    }
+    
+    public static Chunk getTempChunk(int x, int z){
+        Chunk chunk = getChunk(x, z);
+        return chunk == null ? new GenericChunk(x, z, false) : chunk;
+    }
+    
+    public static Chunk getTempChunk(ResourceLocation ckpos){
+        int x = Integer.parseInt(ckpos.getResourceDomain());
+        int z = Integer.parseInt(ckpos.getResourcePath());
+        return getTempChunk(x, z);
     }
 	
 	public static District getDistrict(int value){
@@ -104,17 +115,6 @@ public class StateUtil {
 			return state;
 		}
 		else return bool ? States.STATES.get(-1) : null;
-	}
-
-	public static Chunk getTempChunk(int x, int z){
-		Chunk chunk = getChunk(x, z);
-		return chunk == null ? new GenericChunk(x, z, false) : chunk;
-	}
-
-	public static Chunk getTempChunk(ResourceLocation ckpos){
-		int x = Integer.parseInt(ckpos.getResourceDomain());
-		int z = Integer.parseInt(ckpos.getResourcePath());
-		return getTempChunk(x, z);
 	}
 
 	public static boolean isUUID(String owner){

@@ -1,5 +1,6 @@
 package net.fexcraft.mod.states.impl.capabilities;
 
+import net.fexcraft.mod.states.States;
 import net.fexcraft.mod.states.api.capabilities.ChunkCapability;
 import net.fexcraft.mod.states.api.capabilities.StatesCapabilities;
 import net.fexcraft.mod.states.impl.GenericChunk;
@@ -89,7 +90,7 @@ public class ChunkCapabilityUtil implements ICapabilitySerializable<NBTBase>{
         public net.fexcraft.mod.states.api.Chunk getStatesChunk(boolean allownull){
             if(allownull){ return statechunk; }
             if(statechunk == null){
-                statechunk = new GenericChunk(chunk.x, chunk.z);
+                statechunk = States.CHUNKS.get(chunk.x, chunk.z);
             }
             return statechunk;
         }

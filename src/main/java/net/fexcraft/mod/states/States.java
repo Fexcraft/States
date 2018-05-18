@@ -1,5 +1,6 @@
 package net.fexcraft.mod.states;
 
+import com.google.common.collect.TreeBasedTable;
 import java.io.File;
 import java.util.TreeMap;
 import java.util.UUID;
@@ -12,6 +13,7 @@ import net.fexcraft.mod.lib.network.handlers.NBTTagCompoundPacketHandler;
 import net.fexcraft.mod.lib.perms.PermManager;
 import net.fexcraft.mod.lib.perms.PermissionNode;
 import net.fexcraft.mod.lib.util.common.Static;
+import net.fexcraft.mod.states.api.Chunk;
 import net.fexcraft.mod.states.api.District;
 import net.fexcraft.mod.states.api.Municipality;
 import net.fexcraft.mod.states.api.State;
@@ -47,11 +49,11 @@ import net.minecraftforge.fml.relauncher.Side;
 @Mod(modid = States.MODID, name = "States", version = States.VERSION, dependencies = "required-after:fcl", /*serverSideOnly = true,*/ guiFactory = "net.fexcraft.mod.states.util.GuiFactory", acceptedMinecraftVersions = "*", acceptableRemoteVersions = "*")
 public class States {
 	
-	public static final String VERSION = "1.0";
+	public static final String VERSION = "1.1";
 	public static final String MODID = "states";
 	public static String ADMIN_PERM = "states.admin";
 	//
-	//public static final TreeBasedTable<Integer, Integer, Chunk> CHUNKS = TreeBasedTable.create();
+	public static final TreeBasedTable<Integer, Integer, Chunk> CHUNKS = TreeBasedTable.create();
 	public static final TreeMap<Integer, District> DISTRICTS = new TreeMap<Integer, District>();
 	public static final TreeMap<Integer, Municipality> MUNICIPALITIES = new TreeMap<Integer, Municipality>();
 	public static final TreeMap<Integer, State> STATES = new TreeMap<Integer, State>();

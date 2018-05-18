@@ -44,7 +44,10 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.gameevent.PlayerEvent.PlayerLoggedInEvent;
 import net.minecraftforge.fml.common.gameevent.PlayerEvent.PlayerLoggedOutEvent;
 import net.minecraftforge.fml.common.gameevent.TickEvent;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
 
+@SideOnly(Side.SERVER)
 @Mod.EventBusSubscriber
 public class PlayerEvents {
 	
@@ -85,8 +88,8 @@ public class PlayerEvents {
 	}
 	
 	@SubscribeEvent
-	public static void onInteract(PlayerInteractEvent event){
-		if(event.getWorld().isRemote || event.getEntityPlayer().getActiveHand() == EnumHand.OFF_HAND){
+	public static void onRickClickBlock(PlayerInteractEvent.RightClickBlock event){
+		if(event.getWorld().isRemote || event.getEntityPlayer().dimension != 0 || event.getEntityPlayer().getActiveHand() == EnumHand.OFF_HAND){
 			return;
 		}
 		IBlockState state = event.getWorld().getBlockState(event.getPos());
@@ -96,7 +99,7 @@ public class PlayerEvents {
 			if(te_sign == null || te_sign.signText == null || te_sign.signText[0] == null){
 				return;
 			}
-			Chunk chunk = StateUtil.getChunk(event.getWorld(), event.getPos());
+			Chunk chunk = StateUtil.getChunk(event.getPos());
 			SignTileEntityCapability cap = te_sign.getCapability(StatesCapabilities.SIGN_TE, null);
 			if(te_sign.signText[0].getUnformattedText().equalsIgnoreCase("[States]")){
 				if(cap != null){ cap.setup(chunk); }
@@ -122,6 +125,7 @@ public class PlayerEvents {
 	
 	@SubscribeEvent
 	public static void onBlockBreak(BlockEvent.BreakEvent event){
+                if(event.getPlayer().dimension != 0){ return; }
 		if(!checkAccess(event.getWorld(), event.getPos(), event.getState(), event.getPlayer())){
 			Print.bar(event.getPlayer(), "No permission to break blocks here.");
 			event.setCanceled(true);
@@ -131,6 +135,7 @@ public class PlayerEvents {
 
 	@SubscribeEvent
 	public static void onBlockPlace(BlockEvent.PlaceEvent event){
+                if(event.getPlayer().dimension != 0){ return; }
 		if(!checkAccess(event.getWorld(), event.getPos(), event.getState(), event.getPlayer())){
 			Print.bar(event.getPlayer(), "No permission to place blocks here.");
 			event.setCanceled(true);
@@ -139,12 +144,8 @@ public class PlayerEvents {
 	}
 	
 	public static boolean checkAccess(World world, BlockPos pos, IBlockState state, EntityPlayer player){
-            if(world.provider.getDimension() != 0){ return true; }
-            PlayerCapability pl = player.getCapability(StatesCapabilities.PLAYER, null);
-            /*if(pl.getPermissions().hasPermission(States.ADMIN_PERM)){
-		return true;
-            }*/
-            Chunk chunk = world.getChunkFromBlockCoords(pos).getCapability(StatesCapabilities.CHUNK, null).getStatesChunk();
+            /*if(pl.getPermissions().hasPermission(States.ADMIN_PERM)){ return true; }*/
+            Chunk chunk = StateUtil.getChunk(pos);
             if(chunk.getDistrict().getId() < 0){
                 if(chunk.getDistrict().getId() == -1){
                     return Config.ALLOW_WILDERNESS_ACCESS;
@@ -164,7 +165,7 @@ public class PlayerEvents {
                     return false;
                 }
             }
-            //TODO company check
+            PlayerCapability pl = player.getCapability(StatesCapabilities.PLAYER, null);
             switch(chunk.getType()){
                 case PRIVATE:{
                     return chunk.getOwner().equals(pl.getUUIDAsString()) || chunk.getPlayerWhitelist().contains(pl.getUUID()) || pl.isMayorOf(chunk.getDistrict().getMunicipality()) || pl.isStateLeaderOf(chunk.getDistrict().getMunicipality().getState());
@@ -199,7 +200,7 @@ public class PlayerEvents {
 	
 	@SubscribeEvent
 	public static void onTick(TickEvent.PlayerTickEvent event){
-		if(event.player.world.isRemote){ return; }
+		if(event.player.world.isRemote || event.player.dimension != 0){ return; }
 		PlayerCapability player = event.player.getCapability(StatesCapabilities.PLAYER, null);
 		if(player != null && Time.getDate() > player.getLastPositionUpdate()){
 			player.setPositionUpdate(Time.getDate());

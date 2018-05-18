@@ -72,14 +72,17 @@ public class DebugCmd extends CommandBase {
 		Chunk chunk = StateUtil.getChunk((EntityPlayer)sender);
 		switch(args[0]){
 			case "chunks":{
-                                Static.getServer().worlds[0].getChunkProvider().getLoadedChunks().forEach(ck -> {
-                                    Chunk chk = ck.getCapability(StatesCapabilities.CHUNK, null).getStatesChunk(true);
-                                    if(chk != null){
-                                        Print.log(chk.toJsonObject().toString());
-                                    }
-                                });
-				Print.chat(sender, "&7Chunks loaded: &a" + Static.getServer().worlds[0].getChunkProvider().getLoadedChunkCount());
-				Print.chat(sender, "Chunk JSON's printed into console.");
+                                if(Static.dev()){
+                                    Static.getServer().worlds[0].getChunkProvider().getLoadedChunks().forEach(ck -> {
+                                        Chunk chk = ck.getCapability(StatesCapabilities.CHUNK, null).getStatesChunk(true);
+                                        if(chk != null){
+                                            Print.log(chk.toJsonObject().toString());
+                                        }
+                                        });
+                                    Print.chat(sender, "Chunk JSON's printed into console.");
+                                }
+				Print.chat(sender, "&7Chunks (World0) loaded: &a" + Static.getServer().worlds[0].getChunkProvider().getLoadedChunkCount());
+				Print.chat(sender, "&7Chunks (States) loaded: &a" + States.CHUNKS.size());
 				return;
 			}
 			case "ck": case "chunk":{
@@ -91,12 +94,14 @@ public class DebugCmd extends CommandBase {
 				return;
 			}
 			case "districts":{
-				States.DISTRICTS.values().forEach((elm) -> {
-					Print.log(JsonUtil.setPrettyPrinting(elm.toJsonObject()));
-				});
+                                if(Static.dev()){
+                                    States.DISTRICTS.values().forEach((elm) -> {
+                                            Print.log(JsonUtil.setPrettyPrinting(elm.toJsonObject()));
+                                    });
+                                    Print.chat(sender, "Districts JSON's printed into console.");
+                                }
 				Print.chat(sender, "&9Districts loaded: &a" + States.DISTRICTS.size());
 				Print.chat(sender, "&9Districts indata: &a" + States.DISTRICTS.firstEntry().getValue().getDistrictFile().getParentFile().listFiles().length);
-				Print.chat(sender, "Districts JSON's printed into console.");
 				return;
 			}
 			case "municipality":{
@@ -104,9 +109,12 @@ public class DebugCmd extends CommandBase {
 				return;
 			}
 			case "municipalities":{
-				States.MUNICIPALITIES.values().forEach((elm) -> {
+				if(Static.dev()){
+                                    States.MUNICIPALITIES.values().forEach((elm) -> {
 					Print.log(JsonUtil.setPrettyPrinting(elm.toJsonObject()));
-				});
+                                    });
+                                    Print.chat(sender, "Municipality JSON's printed into console.");
+                                }
 				Print.chat(sender, "&9Municipalities loaded: &a" + States.MUNICIPALITIES.size());
 				Print.chat(sender, "&9Municipalities indata: &a" + States.MUNICIPALITIES.firstEntry().getValue().getMunicipalityFile().getParentFile().listFiles().length);
 				Print.chat(sender, "Municipality JSON's printed into console.");
@@ -117,12 +125,14 @@ public class DebugCmd extends CommandBase {
 				return;
 			}
 			case "states":{
-				States.STATES.values().forEach((elm) -> {
-					Print.log(JsonUtil.setPrettyPrinting(elm.toJsonObject()));
-				});
+				if(Static.dev()){
+                                    States.STATES.values().forEach((elm) -> {
+                                        Print.log(JsonUtil.setPrettyPrinting(elm.toJsonObject()));
+                                    });
+                                    Print.chat(sender, "State JSON's printed into console.");
+                                }
 				Print.chat(sender, "&9States loaded: &a" + States.STATES.size());
 				Print.chat(sender, "&9States indata: &a" + States.STATES.firstEntry().getValue().getStateFile().getParentFile().listFiles().length);
-				Print.chat(sender, "State JSON's printed into console.");
 				return;
 			}
 			case "serveraccount":{

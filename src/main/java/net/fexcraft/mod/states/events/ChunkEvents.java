@@ -17,7 +17,7 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 @Mod.EventBusSubscriber
 public class ChunkEvents {
     
-    /*@SubscribeEvent
+    @SubscribeEvent
     public static void onLoad(ChunkEvent.Load event){
         if(event.getWorld().isRemote || event.getWorld().provider.getDimension() != 0){
             return;
@@ -26,14 +26,15 @@ public class ChunkEvents {
         if(!States.CHUNKS.contains(x, z)){
             States.CHUNKS.put(x, z, new GenericChunk(x, z));
         }
-    }*/
+    }
     
     @SubscribeEvent
     public static void onUnload(ChunkEvent.Unload event){
         if(event.getWorld().isRemote || event.getWorld().provider.getDimension() != 0){
             return;
         }
-        Chunk chunk = event.getChunk().getCapability(StatesCapabilities.CHUNK, null).getStatesChunk(true);
+        Chunk chunk = States.CHUNKS.remove(event.getChunk().x, event.getChunk().z);
+        //Chunk chunk = event.getChunk().getCapability(StatesCapabilities.CHUNK, null).getStatesChunk(true);
         if(!(chunk == null)){
             File file = chunk.getChunkFile();
             boolean matches = file.exists() && JsonUtil.get(file).get("changed").getAsLong() == chunk.getChanged();

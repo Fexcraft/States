@@ -230,12 +230,16 @@ public class ChunkCmd extends CommandBase {
 				//TODO add check for companies, based on their type
 				if(args.length >= 3 && args[1].equals("via-sign")){
 					try{
-						chunk = StateUtil.getChunk(player.world, BlockPos.fromLong(Long.parseLong(args[2])));
+						chunk = StateUtil.getChunk(BlockPos.fromLong(Long.parseLong(args[2])));
 					}
 					catch(Exception e){
 						Print.chat(sender, "&9Error: &7" + e.getMessage());
 						return;
 					}
+                                        if(chunk == null){
+                                                Print.chat(sender, "Chunk couldn't be found, maybe it isn't loaded?");
+                                                return;
+                                        }
 				}
 				if(chunk.getDistrict().getId() < 0){
 					Print.chat(sender, "Only claimed chunks can be bought.");

@@ -5,6 +5,7 @@ import java.util.List;
 
 import net.fexcraft.mod.lib.network.PacketHandler;
 import net.fexcraft.mod.lib.network.packet.PacketNBTTagCompound;
+import net.fexcraft.mod.lib.perms.PermManager;
 import net.fexcraft.mod.lib.util.common.Print;
 import net.fexcraft.mod.lib.util.common.Static;
 import net.fexcraft.mod.lib.util.math.Time;
@@ -143,7 +144,7 @@ public class PlayerEvents {
 	}
 	
 	public static boolean checkAccess(World world, BlockPos pos, IBlockState state, EntityPlayer player){
-            /*if(pl.getPermissions().hasPermission(States.ADMIN_PERM)){ return true; }*/
+            if(PermManager.getPlayerPerms(player).hasPermission(States.ADMIN_PERM)){ return true; }
             Chunk chunk = StateUtil.getChunk(pos);
             if(chunk.getDistrict().getId() < 0){
                 if(chunk.getDistrict().getId() == -1){

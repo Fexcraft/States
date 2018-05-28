@@ -147,7 +147,7 @@ public class SignShop implements SignCapability.Listener {
 					if(tileentity.signText[3].getUnformattedText().toLowerCase().startsWith("buy")){
 						if(hasStack(event.getEntityPlayer(), te_handler, false)){
 							if(AccountManager.INSTANCE.getBank(playeracc.getBankId()).processTransfer(event.getEntityPlayer(), playeracc, price, shop)){
-								event.getEntityPlayer().addItemStackToInventory(getStackIfPossible(te_handler));
+								event.getEntityPlayer().addItemStackToInventory(getStackIfPossible(te_handler, false));
 								Print.bar(event.getEntityPlayer(), "Items bought.");
 							}
 						}
@@ -155,7 +155,7 @@ public class SignShop implements SignCapability.Listener {
 					else if(tileentity.signText[3].getUnformattedText().toLowerCase().startsWith("sell")){
 						if(hasStack(event.getEntityPlayer(), pl_handler, true) && hasSpace(event.getEntityPlayer(), te_handler)){
 							if(AccountManager.INSTANCE.getBank(shop.getBankId()).processTransfer(event.getEntityPlayer(), shop, price, playeracc)){
-								addStack(te_handler, getStackIfPossible(pl_handler));
+								addStack(te_handler, getStackIfPossible(pl_handler, true));
 								Print.bar(event.getEntityPlayer(), "Items sold.");
 							}
 						}
@@ -237,8 +237,8 @@ public class SignShop implements SignCapability.Listener {
         }
 	}
 
-	private ItemStack getStackIfPossible(IItemHandler handler){
-		if(server){
+	private ItemStack getStackIfPossible(IItemHandler handler, boolean player){
+		if(server && !player){
 			return itemtype.copy();
 		}
 		for(int i = 0; i < handler.getSlots(); i++){

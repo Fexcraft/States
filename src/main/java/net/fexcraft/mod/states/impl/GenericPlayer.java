@@ -54,7 +54,7 @@ public class GenericPlayer implements PlayerCapability {
 		JsonObject obj = new JsonObject();
 		obj.addProperty("uuid", this.getUUIDAsString());
 		if(nick != null){
-			obj.addProperty("nick", nick);
+			obj.addProperty("nickname", nick);
 		}
 		obj.addProperty("color", color);
 		obj.addProperty("municipality", municipality == null ? -1 : municipality.getId());

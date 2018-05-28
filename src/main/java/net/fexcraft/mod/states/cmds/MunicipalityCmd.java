@@ -630,6 +630,7 @@ public class MunicipalityCmd extends CommandBase {
 						newmun.setPrice(0);
 						newmun.getCitizen().add(ply.getUUID());
 						newmun.setChanged(Time.getDate());
+                                                newmun.getCouncil().add(ply.getUUID());
 						//
 						GenericDistrict newdis = new GenericDistrict(sender.getEntityWorld().getCapability(StatesCapabilities.WORLD, null).getNewDistrictId());
 						if(newdis.getDistrictFile().exists() || StateUtil.getDistrict(newdis.getId()).getId() >= 0){

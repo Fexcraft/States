@@ -41,7 +41,7 @@ public class Sender {
     
     public static void sendAs(EntityPlayer sender, String message, boolean webhook){
         if(sender == null){ Print.log("SENDER NULL || " + message); }
-        String name = "&" + (PermManager.getPlayerPerms(sender).hasPermission(States.ADMIN_PERM) ? "4" : "6" + "#&8] " + sender.getCapability(StatesCapabilities.PLAYER, null).getFormattedNickname(sender));
+        String name = "&" + (PermManager.getPlayerPerms(sender).hasPermission(States.ADMIN_PERM) ? "4" : "6") + "#&8] " + sender.getCapability(StatesCapabilities.PLAYER, null).getFormattedNickname(sender);
         Static.getServer().getPlayerList().sendMessage(new TextComponentString(Formatter.format(name + "&0: &7" + message)));
         if(webhook){ sendToWebhook(sender, message);}
     }

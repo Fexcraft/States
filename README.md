@@ -67,7 +67,7 @@ _**Ask**, as I have partial memory loss, and already forgot some of things I wan
 - [FCL](https://github.com/Fexcraft/FCL) - Fexcraft Common Library<br>
 Utils & other Common stuff States is  making use of.
 - [FSMM](https://github.com/Fexcraft/FSMM) - Fex's Small Money Mod<br>
-Account & Money(Currentcy) Management mod, which is in it's latest versions pretty well customisable.
+Account & Money(Currency) Management mod, which is in it's latest versions pretty well customisable.
 
 ### License
 http://fexcraft.net/license?id=mods

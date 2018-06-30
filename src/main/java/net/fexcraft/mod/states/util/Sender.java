@@ -19,6 +19,7 @@ import net.fexcraft.mod.lib.util.common.Print;
 import net.fexcraft.mod.lib.util.common.Static;
 import net.fexcraft.mod.lib.util.json.JsonUtil;
 import net.fexcraft.mod.states.States;
+import net.fexcraft.mod.states.api.capabilities.PlayerCapability;
 import net.fexcraft.mod.states.api.capabilities.StatesCapabilities;
 import net.minecraft.command.ICommandSender;
 import net.minecraft.entity.player.EntityPlayer;
@@ -41,9 +42,10 @@ public class Sender {
     
     public static void sendAs(EntityPlayer sender, String message, boolean webhook){
         if(sender == null){ Print.log("SENDER NULL || " + message); }
-        String name = "&" + (PermManager.getPlayerPerms(sender).hasPermission(States.ADMIN_PERM) ? "4" : "6") + "#&8] " + sender.getCapability(StatesCapabilities.PLAYER, null).getFormattedNickname(sender);
+        PlayerCapability cap = sender.getCapability(StatesCapabilities.PLAYER, null);
+        String name = "&" + (PermManager.getPlayerPerms(sender).hasPermission(States.ADMIN_PERM) ? "4" : "6") + "#&8] " + cap.getFormattedNickname();
         Static.getServer().getPlayerList().sendMessage(new TextComponentString(Formatter.format(name + "&0: &7" + message)));
-        if(webhook){ sendToWebhook(sender, message);}
+        if(webhook){ sendToWebhook(cap, message);}
     }
     
     public static void sendFromDiscord(JsonObject obj){
@@ -59,7 +61,7 @@ public class Sender {
         Static.getServer().getPlayerList().sendMessage(text);
     }
     
-    public static void sendToWebhook(EntityPlayer sender, String message){
+    public static void sendToWebhook(PlayerCapability sender, String message){
         if(RECEIVER == null){ return; }
         try{
             URL url = new URL(Config.WEBHOOK);
@@ -71,10 +73,10 @@ public class Sender {
             connection.setDoOutput(true);
             //
             JsonObject obj = new JsonObject();
-            obj.addProperty("username", sender == null ? "States Broadcaster" : sender.getName());
+            obj.addProperty("username", sender == null ? Config.WEBHOOK_BROADCASTER_NAME : sender.getWebhookNickname());
             obj.addProperty("content", Formatter.clear(message));
             if(sender != null){
-                obj.addProperty("avatar_url", "https://crafatar.com/avatars/" + sender.getGameProfile().getId().toString());
+                obj.addProperty("avatar_url", "https://crafatar.com/avatars/" + sender.getEntityPlayer().getGameProfile().getId().toString());
             }
             else{
                 obj.addProperty("avatar_url", Config.WEBHOOK_ICON);
@@ -96,7 +98,7 @@ public class Sender {
                         Print.log("[States-Webhook]: " + input);
                     }
                     else{
-                        Print.chat(sender, input);
+                        Print.chat(sender.getEntityPlayer(), input);
                     }
                 }
             }

@@ -1,6 +1,6 @@
 package net.fexcraft.mod.states.guis;
 
-import net.fexcraft.mod.lib.tmt.Model;
+import net.fexcraft.mod.lib.tmt.ModelBase;
 import net.fexcraft.mod.lib.util.common.Formatter;
 import net.fexcraft.mod.lib.util.math.Time;
 import net.minecraft.block.material.MapColor;
@@ -28,7 +28,7 @@ public class LocationUpdate extends GuiScreen {
 	public void displayLocationUpdate(RenderGameOverlayEvent event){
 		if(event.getType() == ElementType.HOTBAR && till >= Time.getDate()){
 			if(client == null){ client = Minecraft.getMinecraft(); }
-			Model.bindTexture(texture);
+			ModelBase.bindTexture(texture);
 			THIS.drawTexturedModalRect(0, 0, 0, 0, 256, 38);
 			Tessellator tessellator = Tessellator.getInstance();
 	        BufferBuilder bufferbuilder = tessellator.getBuffer();

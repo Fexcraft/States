@@ -357,7 +357,7 @@ public class DistrictCmd extends CommandBase {
 								chunk.save();
 								States.DISTRICTS.put(newdis.getId(), newdis);
 								StateUtil.announce(server, "&9New District was created!");
-								StateUtil.announce(server, "&9Created by " + ply.getFormattedNickname(sender));
+								StateUtil.announce(server, "&9Created by " + ply.getFormattedNickname());
 								StateUtil.announce(server, "&9Name&0: &7" + newdis.getName());
 								StateLogger.log(StateLogger.LoggerType.DISRICT, StateLogger.player(player) + " created " + StateLogger.district(newdis) + " at " + StateLogger.chunk(chunk) + ".");
 								return;

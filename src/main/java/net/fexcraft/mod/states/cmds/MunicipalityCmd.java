@@ -352,7 +352,7 @@ public class MunicipalityCmd extends CommandBase {
 						}
 						mun.getCouncil().remove(ply.getUUID());
 						mun.save();
-						StateUtil.announce(server, AnnounceLevel.MUNICIPALITY, ply.getFormattedNickname(sender) + " &9left the Municipality Council!", mun.getId());
+						StateUtil.announce(server, AnnounceLevel.MUNICIPALITY, ply.getFormattedNickname() + " &9left the Municipality Council!", mun.getId());
 						StateLogger.log(StateLogger.LoggerType.MUNICIPALITY, StateLogger.player(player) + " left of the council of " + StateLogger.municipality(mun) + ".");
 					}
 					case "invite":{
@@ -520,13 +520,13 @@ public class MunicipalityCmd extends CommandBase {
 				if(!ply.canLeave(sender)){
 					return;
 				}
-				StateUtil.announce(server, AnnounceLevel.MUNICIPALITY, "&o" + ply.getFormattedNickname(sender) + " &e&oleft the Municipality!", ply.getMunicipality().getId());
+				StateUtil.announce(server, AnnounceLevel.MUNICIPALITY, "&o" + ply.getFormattedNickname() + " &e&oleft the Municipality!", ply.getMunicipality().getId());
 				StateLogger.log(StateLogger.LoggerType.MUNICIPALITY, StateLogger.player(player) + " left " + StateLogger.municipality(ply.getMunicipality()) + ".");
 				ply.setMunicipality(mun);
 				if(mun.getMayor() != null){
 					StateUtil.sendMail(new GenericMail("player", States.CONSOLE_UUID, mun.getMayor().toString(), player.getGameProfile().getName() + " joined the Municipality. At " + Time.getAsString(-1), MailType.SYSTEM, null));
 				}
-				StateUtil.announce(server, AnnounceLevel.MUNICIPALITY, "&o" + ply.getFormattedNickname(sender) + " &2&ojoined the Municipality!", ply.getMunicipality().getId());
+				StateUtil.announce(server, AnnounceLevel.MUNICIPALITY, "&o" + ply.getFormattedNickname() + " &2&ojoined the Municipality!", ply.getMunicipality().getId());
 				StateLogger.log(StateLogger.LoggerType.MUNICIPALITY, StateLogger.player(player) + " joined " + StateLogger.municipality(ply.getMunicipality()) + ".");
 				return;
 			}
@@ -541,7 +541,7 @@ public class MunicipalityCmd extends CommandBase {
 				if(ply.getMunicipality().getMayor() != null){
 					StateUtil.sendMail(new GenericMail("player", States.CONSOLE_UUID, ply.getMunicipality().getMayor().toString(), player.getGameProfile().getName() + " left the Municipality. At " + Time.getAsString(-1), MailType.SYSTEM, null));
 				}
-				StateUtil.announce(server, AnnounceLevel.MUNICIPALITY, "&o" + ply.getFormattedNickname(sender) + " &e&oleft the Municipality!", ply.getMunicipality().getId());
+				StateUtil.announce(server, AnnounceLevel.MUNICIPALITY, "&o" + ply.getFormattedNickname() + " &e&oleft the Municipality!", ply.getMunicipality().getId());
 				StateLogger.log(StateLogger.LoggerType.MUNICIPALITY, StateLogger.player(player) + " left " + StateLogger.municipality(mun) + ".");
 				ply.setMunicipality(StateUtil.getMunicipality(-1));
 				return;
@@ -659,7 +659,7 @@ public class MunicipalityCmd extends CommandBase {
 								chunk.setClaimer(ply.getUUID());
 								ply.setMunicipality(newmun);
 								StateUtil.announce(server, "&9New Municipality and District was created!");
-								StateUtil.announce(server, "&9Created by " + ply.getFormattedNickname(sender));
+								StateUtil.announce(server, "&9Created by " + ply.getFormattedNickname());
 								StateUtil.announce(server, "&9Name&0: &7" + newmun.getName());
 								StateLogger.log(StateLogger.LoggerType.MUNICIPALITY, StateLogger.player(player) + " created " + StateLogger.municipality(newmun) + " at " + StateLogger.chunk(chunk) + ".");
 								StateLogger.log(StateLogger.LoggerType.DISRICT, StateLogger.player(player) + " created " + StateLogger.district(newdis) + " at " + StateLogger.chunk(chunk) + ".");

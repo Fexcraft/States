@@ -291,7 +291,7 @@ public class StateCmd extends CommandBase {
 						}
 						state.getCouncil().remove(ply.getUUID());
 						state.save();
-						StateUtil.announce(server, AnnounceLevel.MUNICIPALITY, ply.getFormattedNickname(sender) + " &9left the State Council!", state.getId());
+						StateUtil.announce(server, AnnounceLevel.MUNICIPALITY, ply.getFormattedNickname() + " &9left the State Council!", state.getId());
 						StateLogger.log(StateLogger.LoggerType.STATE, StateLogger.player(player) + " left the council of " + StateLogger.state(state) + ".");
 					}
 					case "invite":{
@@ -470,7 +470,7 @@ public class StateCmd extends CommandBase {
 							ply.getMunicipality().setChanged(Time.getDate());
 							ply.getMunicipality().save();
 							StateUtil.announce(server, "&9New State was created!");
-							StateUtil.announce(server, "&9Created by " + ply.getFormattedNickname(sender));
+							StateUtil.announce(server, "&9Created by " + ply.getFormattedNickname());
 							StateUtil.announce(server, "&9Name&0: &7" + newstate.getName());
 							StateLogger.log(StateLogger.LoggerType.STATE, StateLogger.player(player) + " created " + StateLogger.state(newstate) + ".");
 						}

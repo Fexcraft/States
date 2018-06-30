@@ -3,8 +3,6 @@ package net.fexcraft.mod.states.impl.capabilities;
 import net.fexcraft.mod.states.States;
 import net.fexcraft.mod.states.api.capabilities.ChunkCapability;
 import net.fexcraft.mod.states.api.capabilities.StatesCapabilities;
-import net.fexcraft.mod.states.impl.GenericChunk;
-import net.fexcraft.mod.states.util.StateUtil;
 import net.minecraft.nbt.NBTBase;
 import net.minecraft.nbt.NBTTagString;
 import net.minecraft.util.EnumFacing;
@@ -31,7 +29,7 @@ public class ChunkCapabilityUtil implements ICapabilitySerializable<NBTBase>{
     
     @Override
     public <T> T getCapability(Capability<T> capability, EnumFacing facing){
-        return capability == StatesCapabilities.CHUNK ? StatesCapabilities.CHUNK.<T>cast(this.instance) : null;
+        return capability == StatesCapabilities.CHUNK ? StatesCapabilities.CHUNK.cast(this.instance) : null;
     }
     
     @Override

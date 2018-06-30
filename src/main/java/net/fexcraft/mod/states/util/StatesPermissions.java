@@ -153,6 +153,8 @@ public class StatesPermissions {
 		PERMISSIONS.put("shop.create.state", new Permission(PermissionGroup.STATE, PermissionLevel.STATE_COUNCIL, PermissionLevel.ADMIN, PermissionLevel.OPERATOR));
 		PERMISSIONS.put("shop.create.server", new Permission(PermissionGroup.ADMIN, PermissionLevel.SKIP));
 		PERMISSIONS.put("district.create", new Permission(PermissionGroup.ADMIN, PermissionLevel.MUNICIPALITY_MAYOR));
+		PERMISSIONS.put("nickname.change.self", new Permission(PermissionGroup.SKIP, PermissionLevel.NONE));
+		PERMISSIONS.put("nickname.change.others", new Permission(PermissionGroup.ADMIN, PermissionLevel.SKIP));
 		
 		
 	}

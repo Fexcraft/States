@@ -16,8 +16,10 @@ import net.fexcraft.mod.states.api.Municipality;
 import net.fexcraft.mod.states.api.State;
 import net.minecraft.command.ICommandSender;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.server.MinecraftServer;
+import net.minecraft.world.World;
 
-public interface PlayerCapability {
+public interface PlayerCapability extends ICommandSender {
 	
 	public Municipality getMunicipality();
 	
@@ -26,13 +28,19 @@ public interface PlayerCapability {
 	public boolean isOnlinePlayer();
 	
 	public long getLastSave();
+
+	public void setRawNickname(String name);
 	
 	@Nullable
 	public String getRawNickname();
 	
 	public int getNicknameColor();
+
+	public void setNicknameColor(int color);
 	
-	public String getFormattedNickname(ICommandSender player);
+	public String getFormattedNickname();
+
+	public String getWebhookNickname();
 	
 	public PlayerPerms getPermissions();
 	
@@ -79,5 +87,27 @@ public interface PlayerCapability {
 	public JsonObject toJsonObject();
 
 	public State getState();
+	
+	/// ---- ///
+
+	@Override
+	public default String getName(){
+		return this.getEntityPlayer().getName();
+	}
+
+	@Override
+	public default boolean canUseCommand(int permLevel, String commandName){
+		return this.getEntityPlayer().canUseCommand(permLevel, commandName);
+	}
+
+	@Override
+	public default World getEntityWorld(){
+		return this.getEntityPlayer().getEntityWorld();
+	}
+
+	@Override
+	public default MinecraftServer getServer(){
+		return this.getEntityPlayer().getServer();
+	}
 
 }

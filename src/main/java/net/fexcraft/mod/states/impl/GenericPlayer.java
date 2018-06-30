@@ -46,7 +46,7 @@ public class GenericPlayer implements PlayerCapability {
 	public void save(){
 		JsonObject obj = this.toJsonObject();
 		obj.addProperty("lastsave", lastsave = Time.getDate());
-		JsonUtil.write(this.getPlayerFile(), obj);
+		JsonUtil.write(this.getPlayerFile(), obj, true);
 	}
 
 	@Override
@@ -132,8 +132,8 @@ public class GenericPlayer implements PlayerCapability {
 	}
 
 	@Override
-	public String getFormattedNickname(ICommandSender player){
-		return Formatter.format(Formatter.fromInt(color) + (nick == null ? player.getName() : nick));
+	public String getFormattedNickname(){
+		return Formatter.format(Formatter.fromInt(color) + (nick == null ? entity.getName() : nick));
 	}
 
 	@Override
@@ -224,6 +224,21 @@ public class GenericPlayer implements PlayerCapability {
 	@Override
 	public State getState(){
 		return municipality.getState();
+	}
+
+	@Override
+	public String getWebhookNickname(){
+		return nick == null ? entity.getName() : nick + " (" + entity.getName() + ")";
+	}
+
+	@Override
+	public void setRawNickname(String name){
+		this.nick = name;
+	}
+
+	@Override
+	public void setNicknameColor(int color){
+		this.color = color;
 	}
 
 }

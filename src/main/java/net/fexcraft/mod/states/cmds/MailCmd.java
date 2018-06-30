@@ -166,11 +166,11 @@ public class MailCmd extends CommandBase {
 									Print.chat(sender, "&cYou are blacklisted in this Municipality.");
 									return;
 								}
-								StateUtil.announce(server, AnnounceLevel.MUNICIPALITY, "&o" + cap.getFormattedNickname(sender) + " &e&oleft the Municipality!", cap.getMunicipality().getId());
+								StateUtil.announce(server, AnnounceLevel.MUNICIPALITY, "&o" + cap.getFormattedNickname() + " &e&oleft the Municipality!", cap.getMunicipality().getId());
 								StateLogger.log(StateLogger.LoggerType.MUNICIPALITY, StateLogger.player(player) + " left " + StateLogger.municipality(cap.getMunicipality()) + ".");
 								cap.setMunicipality(mun);
 								cap.save(); mun.save();
-								StateUtil.announce(server, AnnounceLevel.MUNICIPALITY, "&o" + cap.getFormattedNickname(sender) + " &2&ojoined the Municipality!", cap.getMunicipality().getId());
+								StateUtil.announce(server, AnnounceLevel.MUNICIPALITY, "&o" + cap.getFormattedNickname() + " &2&ojoined the Municipality!", cap.getMunicipality().getId());
 								StateLogger.log(StateLogger.LoggerType.MUNICIPALITY, StateLogger.player(player) + " joined " + StateLogger.municipality(cap.getMunicipality()) + ".");
 								break;
 							}
@@ -186,7 +186,7 @@ public class MailCmd extends CommandBase {
 								}
 								mun.getCouncil().add(cap.getUUID());
 								mun.save();
-								StateUtil.announce(server, AnnounceLevel.MUNICIPALITY, cap.getFormattedNickname(player) + " joined the Coucil of our Municipality!", mun.getId());
+								StateUtil.announce(server, AnnounceLevel.MUNICIPALITY, cap.getFormattedNickname() + " joined the Coucil of our Municipality!", mun.getId());
 								StateLogger.log(StateLogger.LoggerType.MUNICIPALITY, StateLogger.player(player) + " joined to the council of " + StateLogger.municipality(mun) + ".");
 								break;
 							}
@@ -202,7 +202,7 @@ public class MailCmd extends CommandBase {
 								}
 								state.getCouncil().add(cap.getUUID());
 								state.save();
-								StateUtil.announce(server, AnnounceLevel.STATE, cap.getFormattedNickname(player) + " joined the Coucil of our State!", state.getId());
+								StateUtil.announce(server, AnnounceLevel.STATE, cap.getFormattedNickname() + " joined the Coucil of our State!", state.getId());
 								StateLogger.log(StateLogger.LoggerType.STATE, StateLogger.player(player) + " joined to the council of " + StateLogger.state(state) + ".");
 								break;
 							}

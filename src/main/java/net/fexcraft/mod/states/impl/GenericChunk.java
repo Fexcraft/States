@@ -111,7 +111,7 @@ public class GenericChunk implements Chunk {
 
 	@Override
 	public long getPrice(){
-		return price;
+		return this.district.getId() == -1 ? Config.DEFAULT_CHUNK_PRICE : price;
 	}
 
 	@Override

@@ -6,8 +6,6 @@ import com.google.gson.JsonObject;
 
 import net.fexcraft.mod.fsmm.api.Account;
 import net.fexcraft.mod.fsmm.util.AccountManager;
-import net.fexcraft.mod.lib.perms.PermManager;
-import net.fexcraft.mod.lib.perms.player.PlayerPerms;
 import net.fexcraft.mod.lib.util.common.Formatter;
 import net.fexcraft.mod.lib.util.common.Print;
 import net.fexcraft.mod.lib.util.json.JsonUtil;
@@ -134,11 +132,6 @@ public class GenericPlayer implements PlayerCapability {
 	@Override
 	public String getFormattedNickname(){
 		return Formatter.format(Formatter.fromInt(color) + (nick == null ? entity.getName() : nick));
-	}
-
-	@Override
-	public PlayerPerms getPermissions(){
-		return PermManager.getPlayerPerms(entity);
 	}
 
 	@Override

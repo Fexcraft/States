@@ -8,7 +8,6 @@ import javax.annotation.Nullable;
 import com.google.gson.JsonObject;
 
 import net.fexcraft.mod.fsmm.api.Account;
-import net.fexcraft.mod.lib.perms.player.PlayerPerms;
 import net.fexcraft.mod.states.States;
 import net.fexcraft.mod.states.api.Chunk;
 import net.fexcraft.mod.states.api.District;
@@ -41,8 +40,6 @@ public interface PlayerCapability extends ICommandSender {
 	public String getFormattedNickname();
 
 	public String getWebhookNickname();
-	
-	public PlayerPerms getPermissions();
 	
 	public UUID getUUID();
 

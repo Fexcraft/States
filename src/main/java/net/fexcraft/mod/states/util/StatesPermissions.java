@@ -2,10 +2,8 @@ package net.fexcraft.mod.states.util;
 
 import java.util.TreeMap;
 
-import net.fexcraft.mod.lib.perms.PermManager;
 import net.fexcraft.mod.lib.util.common.Print;
 import net.fexcraft.mod.lib.util.common.Static;
-import net.fexcraft.mod.states.States;
 import net.fexcraft.mod.states.api.Chunk;
 import net.fexcraft.mod.states.api.District;
 import net.fexcraft.mod.states.api.Municipality;
@@ -29,7 +27,7 @@ public class StatesPermissions {
 		boolean group = false;
 		if(perm.group != null && perm.group != PermissionGroup.SKIP){
 			switch(perm.group){
-				case ADMIN: group = isAdmin(entity) || isOperator(entity); break;
+				case ADMIN: group = StateUtil.isAdmin(entity) || isOperator(entity); break;
 				case DISTRICT: group = player.isDistrictManagerOf(district(obj)) || player.isMayorOf(district(obj).getMunicipality()); break;
 				case MUNICIPALITY: group = player.isMayorOf(municipality(obj)) || player.isStateLeaderOf(municipality(obj).getState()); break;
 				case NONE: group = true; break;
@@ -45,7 +43,7 @@ public class StatesPermissions {
 			for(PermissionLevel level : perm.levels){
 				if(exit){ break; }
 				switch(level){
-					case ADMIN: exit = isAdmin(entity); break;
+					case ADMIN: exit = StateUtil.isAdmin(entity); break;
 					case DIS_MANAGER: exit = player.isDistrictManagerOf(district(obj)); break;
 					case MUNICIPALITY_COUNCIL: exit = municipality(obj).getCouncil().contains(player.getUUID()); break;
 					case MUNICIPALITY_MAYOR: exit = player.isMayorOf(municipality(obj)); break;
@@ -85,10 +83,6 @@ public class StatesPermissions {
 
 	private static boolean isOperator(EntityPlayer entity){
 		return Static.getServer().getPlayerList().getOppedPlayers().getPermissionLevel(entity.getGameProfile()) > 0;
-	}
-
-	private static boolean isAdmin(EntityPlayer entity){
-		return PermManager.getPlayerPerms(entity).hasPermission(States.ADMIN_PERM);
 	}
 
 	public static class Permission {

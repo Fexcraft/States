@@ -10,8 +10,6 @@ import net.fexcraft.mod.fsmm.util.AccountManager;
 import net.fexcraft.mod.lib.capabilities.sign.SignCapabilityUtil;
 import net.fexcraft.mod.lib.network.PacketHandler;
 import net.fexcraft.mod.lib.network.handlers.NBTTagCompoundPacketHandler;
-import net.fexcraft.mod.lib.perms.PermManager;
-import net.fexcraft.mod.lib.perms.PermissionNode;
 import net.fexcraft.mod.lib.util.common.Static;
 import net.fexcraft.mod.states.api.Chunk;
 import net.fexcraft.mod.states.api.District;
@@ -45,13 +43,15 @@ import net.minecraftforge.fml.common.event.FMLServerStartingEvent;
 import net.minecraftforge.fml.common.event.FMLServerStoppingEvent;
 import net.minecraftforge.fml.common.network.NetworkRegistry;
 import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.server.permission.DefaultPermissionLevel;
+import net.minecraftforge.server.permission.PermissionAPI;
 
 @Mod(modid = States.MODID, name = "States", version = States.VERSION, dependencies = "required-after:fcl", /*serverSideOnly = true,*/ guiFactory = "net.fexcraft.mod.states.util.GuiFactory", acceptedMinecraftVersions = "*", acceptableRemoteVersions = "*")
 public class States {
 	
 	public static final String VERSION = "1.1";
 	public static final String MODID = "states";
-	public static String ADMIN_PERM = "states.admin";
+	public static String ADMIN_PERM = "states.external.admin";
 	//
 	public static final TreeBasedTable<Integer, Integer, Chunk> CHUNKS = TreeBasedTable.create();
 	public static final TreeMap<Integer, District> DISTRICTS = new TreeMap<Integer, District>();
@@ -88,9 +88,7 @@ public class States {
 		PacketHandler.getInstance().registerMessage(ImagePacketHandler.Client.class, ImagePacket.class, 29910, Side.CLIENT);
 		PacketHandler.getInstance().registerMessage(ImagePacketHandler.Server.class, ImagePacket.class, 29911, Side.SERVER);
 		//
-		PermManager.setEnabled(MODID);
-		PermManager.add(ADMIN_PERM, PermissionNode.Type.BOOLEAN, false, true);
-		//PlayerPerms.addAdditionalData(GenericPlayer.class);
+		PermissionAPI.registerNode(ADMIN_PERM, DefaultPermissionLevel.OP, "States Admin Permission");
 		//
 		SERVERACCOUNT = AccountManager.INSTANCE.getAccount("server", "states", true);
 		CapabilityManager.INSTANCE.register(SignTileEntityCapability.class, new SignTileEntityCapabilityUtil.Storage(), new SignTileEntityCapabilityUtil.Callable());

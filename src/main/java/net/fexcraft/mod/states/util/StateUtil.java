@@ -29,13 +29,12 @@ import net.minecraft.command.ICommandSender;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.server.MinecraftServer;
-import net.minecraft.util.EnumFacing;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.util.text.TextComponentString;
-import net.minecraft.world.World;
 import net.minecraftforge.fml.common.FMLCommonHandler;
+import net.minecraftforge.server.permission.PermissionAPI;
 
 public class StateUtil {
     
@@ -258,5 +257,9 @@ public class StateUtil {
     public static @Nullable net.minecraft.world.chunk.Chunk getChunk(Chunk chunk){
         return Static.getServer().worlds[0].getChunkProvider().getLoadedChunk(chunk.xCoord(), chunk.zCoord());
     }
+
+	public static boolean isAdmin(EntityPlayer sender){
+		return PermissionAPI.hasPermission(sender, States.ADMIN_PERM);
+	}
 
 }

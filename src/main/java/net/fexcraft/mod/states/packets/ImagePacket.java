@@ -5,6 +5,7 @@ import java.nio.charset.StandardCharsets;
 
 import io.netty.buffer.ByteBuf;
 import net.fexcraft.mod.lib.api.network.IPacket;
+import net.fexcraft.mod.states.util.ImageCache;
 import net.minecraftforge.fml.common.network.simpleimpl.IMessage;
 
 public class ImagePacket implements IPacket, IMessage{
@@ -21,6 +22,7 @@ public class ImagePacket implements IPacket, IMessage{
 
 	@Override
 	public void toBytes(ByteBuf buf){
+		if(image == null){ image = ImageCache.emptyImage(); }
 		int x = image.getWidth(), y = image.getHeight();
 		buf.writeInt(x); buf.writeInt(y);
 		buf.writeInt(target.length());

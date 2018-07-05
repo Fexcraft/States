@@ -235,6 +235,7 @@ public class AreaView extends GuiContainer {
                 		else{
                 			rgb = new RGB(instance.list.getCompoundTagAt(i).getInteger("color"));
                 		}
+            			rgb.alpha = 0.8f;
             			rgb.glColorApply();
             			int x = this.x + (xx * 7), y = this.y + (yy * 7);
             			int tx = xx * 8, ty = yy * 8;

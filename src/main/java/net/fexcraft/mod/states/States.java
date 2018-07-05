@@ -49,7 +49,7 @@ import net.minecraftforge.server.permission.PermissionAPI;
 @Mod(modid = States.MODID, name = "States", version = States.VERSION, dependencies = "required-after:fcl", /*serverSideOnly = true,*/ guiFactory = "net.fexcraft.mod.states.util.GuiFactory", acceptedMinecraftVersions = "*", acceptableRemoteVersions = "*")
 public class States {
 	
-	public static final String VERSION = "1.1";
+	public static final String VERSION = "1.1.1";
 	public static final String MODID = "states";
 	public static String ADMIN_PERM = "states.external.admin";
 	//

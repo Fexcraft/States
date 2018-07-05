@@ -3,9 +3,11 @@ package net.fexcraft.mod.states.util;
 import java.awt.Color;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
+import java.util.TreeMap;
 
 import javax.annotation.Nullable;
 
+import net.fexcraft.mod.lib.util.math.Time;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.texture.SimpleTexture;
@@ -17,12 +19,15 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 
 public class ImageUtil {
+	
+	public static TreeMap<Long, ResourceLocation> TEMP_IMAGES = new TreeMap<>();
 
 	public static ResourceLocation getTempChunkImage(World world, int i, int j){
 		ResourceLocation rs = new ResourceLocation("states:temp/geo_chunk_" + i + "_" + j);
 		if(Minecraft.getMinecraft().renderEngine.getTexture(rs) == null){
         	Minecraft.getMinecraft().renderEngine.loadTexture(rs, new TempChunkTexture(world, rs, i, j));
 		}
+		TEMP_IMAGES.put(Time.getDate(), rs);
 		return rs;
 	}
 

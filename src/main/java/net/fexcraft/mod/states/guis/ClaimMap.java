@@ -9,10 +9,14 @@ import net.fexcraft.mod.lib.network.packet.PacketNBTTagCompound;
 import net.fexcraft.mod.lib.util.common.Formatter;
 import net.fexcraft.mod.lib.util.common.Print;
 import net.fexcraft.mod.lib.util.render.RGB;
+import net.fexcraft.mod.states.util.ImageUtil;
 import net.minecraft.block.material.MapColor;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiButton;
 import net.minecraft.client.gui.inventory.GuiContainer;
+import net.minecraft.client.renderer.BufferBuilder;
+import net.minecraft.client.renderer.Tessellator;
+import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
@@ -30,6 +34,8 @@ public class ClaimMap extends GuiContainer {
 	private MapButton map;
 	private static String result = "";
 	private static ClaimMap instance;
+	private static World world;
+	private static int cx, cz;
 	
 	public ClaimMap(EntityPlayer player, World world, int x, int y, int z){
 		super(new PlaceholderContainer());
@@ -40,6 +46,7 @@ public class ClaimMap extends GuiContainer {
 		list = null;
 		requestData();
 		instance = this;
+		ClaimMap.world = world;
 	}
 
 	@Override
@@ -118,10 +125,12 @@ public class ClaimMap extends GuiContainer {
 			super(buttonId, x, y, 110, 110, "");
 		}
 		
+		private RGB temprgb;
+		
 		@Override
 		public void drawButton(Minecraft mc, int mouseX, int mouseY, float partialTicks){
 			if(!visible){ return; }
-			mc.getTextureManager().bindTexture(texture);
+			//mc.getTextureManager().bindTexture(texture);
             this.hovered = mouseX >= this.x && mouseY >= this.y && mouseX < this.x + this.width && mouseY < this.y + this.height;
             xx = mouseX - x; yy = mouseY - this.y;
             if(xx >= 110){ xx = -1; } if(yy >= 110){ yy = -1; }
@@ -135,18 +144,30 @@ public class ClaimMap extends GuiContainer {
     			l += j > 0 ? 1 : 0;
     			m = l + (k * 11);
             }
-            //
             int k = 0;
+            cx = (mc.player.getPosition().getX() >> 4) - 5;
+            cz = (mc.player.getPosition().getZ() >> 4) - 5;
             for(int j = 0; j < 11; j++){
             	for(int i = 0; i < 11; i++){
             		if(m == k){
             			Color color = new Color(list.getCompoundTagAt(k).getInteger("color"));
-            			new RGB(color.getRed() + 255 / 2, color.getGreen() + 255 / 2, + color.getBlue() + 255 / 2).glColorApply();
+            			temprgb = new RGB(color.getRed() + 255 / 2, color.getGreen() + 255 / 2, + color.getBlue() + 255 / 2);
+            			temprgb.alpha = 0.8f; temprgb.glColorApply();
             		}
             		else{
-            			new RGB(list.getCompoundTagAt(k).getInteger("color")).glColorApply();
+            			temprgb = new RGB(list.getCompoundTagAt(k).getInteger("color"));
+            			temprgb.alpha = 0.8f; temprgb.glColorApply();
             		}
-    				this.drawTexturedModalRect(this.x + (j * 10), this.y + (i * 10), 10 + (j * 10), 10 + (i * 10), 10, 10);
+            		mc.getTextureManager().bindTexture(ImageUtil.getTempChunkImage(world, j + cx, i + cz));
+    				//this.drawTexturedModalRect(this.x + (j * 10), this.y + (i * 10), 10 + (j * 10), 10 + (i * 10), 10, 10);
+                    Tessellator tessellator = Tessellator.getInstance();
+                    BufferBuilder bufferbuilder = tessellator.getBuffer();
+                    bufferbuilder.begin(7, DefaultVertexFormats.POSITION_TEX);
+                    bufferbuilder.pos(this.x + (j * 10),      this.y + (i * 10) + 10, this.zLevel).tex(0, 1).endVertex();
+                    bufferbuilder.pos(this.x + (j * 10) + 10, this.y + (i * 10) + 10, this.zLevel).tex(1, 1).endVertex();
+                    bufferbuilder.pos(this.x + (j * 10) + 10, this.y + (i * 10) + 0,  this.zLevel).tex(1, 0).endVertex();
+                    bufferbuilder.pos(this.x + (j * 10),      this.y + (i * 10) + 0,  this.zLevel).tex(0, 0).endVertex();
+                    tessellator.draw();
     				RGB.glColorReset();
             		k++;
             	}

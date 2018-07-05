@@ -1,15 +1,20 @@
 package net.fexcraft.mod.states.util;
 
 import java.io.File;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
 import javax.annotation.Nullable;
 
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
+
 import net.fexcraft.mod.lib.util.common.Formatter;
 import net.fexcraft.mod.lib.util.common.Print;
 import net.fexcraft.mod.lib.util.common.Static;
+import net.fexcraft.mod.lib.util.json.JsonUtil;
 import net.fexcraft.mod.states.States;
 import net.fexcraft.mod.states.api.Chunk;
 import net.fexcraft.mod.states.api.District;
@@ -260,6 +265,35 @@ public class StateUtil {
 
 	public static boolean isAdmin(EntityPlayer sender){
 		return PermissionAPI.hasPermission(sender, States.ADMIN_PERM);
+	}
+	
+	// --- /// --- //
+	
+	public static JsonObject getStateJson(int value){
+		JsonElement elm = JsonUtil.read(State.getStateFile(value), false);
+		if(elm == null){
+			InputStream in = StateUtil.class.getClassLoader().getResourceAsStream("/assets/states/defaults/states/" + value + ".json");
+			 return in == null ? new JsonObject() : JsonUtil.getObjectFromInputStream(in);
+		}
+		else return elm.getAsJsonObject();
+	}
+	
+	public static JsonObject getMunicipalityJson(int value){
+		JsonElement elm = JsonUtil.read(Municipality.getMunicipalityFile(value), false);
+		if(elm == null){
+			InputStream in = StateUtil.class.getClassLoader().getResourceAsStream("/assets/states/defaults/municipalities/" + value + ".json");
+			 return in == null ? new JsonObject() : JsonUtil.getObjectFromInputStream(in);
+		}
+		else return elm.getAsJsonObject();
+	}
+	
+	public static JsonObject getDistrictJson(int value){
+		JsonElement elm = JsonUtil.read(District.getDistrictFile(value), false);
+		if(elm == null){
+			InputStream in = StateUtil.class.getClassLoader().getResourceAsStream("/assets/states/defaults/districts/" + value + ".json");
+			 return in == null ? new JsonObject() : JsonUtil.getObjectFromInputStream(in);
+		}
+		else return elm.getAsJsonObject();
 	}
 
 }

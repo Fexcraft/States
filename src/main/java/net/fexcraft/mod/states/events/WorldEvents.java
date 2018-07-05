@@ -1,14 +1,6 @@
 package net.fexcraft.mod.states.events;
 
-import com.google.gson.JsonObject;
-
-import net.fexcraft.mod.lib.util.json.JsonUtil;
-import net.fexcraft.mod.lib.util.math.Time;
 import net.fexcraft.mod.states.States;
-import net.fexcraft.mod.states.api.District;
-import net.fexcraft.mod.states.api.DistrictType;
-import net.fexcraft.mod.states.api.Municipality;
-import net.fexcraft.mod.states.api.State;
 import net.fexcraft.mod.states.impl.GenericDistrict;
 import net.fexcraft.mod.states.impl.GenericMunicipality;
 import net.fexcraft.mod.states.impl.GenericState;
@@ -30,115 +22,30 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 @Mod.EventBusSubscriber
 public class WorldEvents {
 	
+	private static int[] def_st = new int[]{ -1, 0 };
+	private static int[] def_mun = new int[]{ -1, 0 };
+	private static int[] def_dis = new int[]{ -2, -1, 0 };
+	
 	@SubscribeEvent
 	public static void onWorldLoad(WorldEvent.Load event){
 		if(event.getWorld().provider.getDimension() != 0 || event.getWorld().isRemote){
 			return;
 		}
 		StateLogger.log("all", "Loading World...");
-		if(!States.STATES.containsKey(-1)){
-			if(!State.getStateFile(-1).exists()){
-				JsonObject object = new JsonObject();
-				object.addProperty("id", -1);
-				object.addProperty("created", Time.getDate());
-				object.addProperty("creator", States.CONSOLE_UUID);
-				object.addProperty("changed", Time.getDate());
-				object.addProperty("name", "Neutral Territory");
-				object.addProperty("leader", States.CONSOLE_UUID);
-				object.addProperty("capital", -1);
-				object.addProperty("color", "#003500");
-				JsonUtil.write(State.getStateFile(-1), object);
+		for(int i : def_st){
+			if(!States.STATES.containsKey(i)){
+				States.STATES.put(i, new GenericState(i));
 			}
-			States.STATES.put(-1, new GenericState(-1));
 		}
-		if(!States.STATES.containsKey(0)){
-			if(!State.getStateFile(0).exists()){
-				JsonObject object = new JsonObject();
-				object.addProperty("id", 0);
-				object.addProperty("created", Time.getDate());
-				object.addProperty("creator", States.DEF_UUID);
-				object.addProperty("changed", Time.getDate());
-				object.addProperty("name", "Testaria");
-				object.addProperty("leader", States.DEF_UUID);
-				object.addProperty("capital", 0);
-				object.addProperty("color", "#FF6600");
-				JsonUtil.write(State.getStateFile(0), object);
+		for(int i : def_mun){
+			if(!States.MUNICIPALITIES.containsKey(i)){
+				States.MUNICIPALITIES.put(i, new GenericMunicipality(i));
 			}
-			States.STATES.put(0, new GenericState(0));
 		}
-		if(!States.MUNICIPALITIES.containsKey(-1)){
-			if(!Municipality.getMunicipalityFile(-1).exists()){
-				JsonObject object = new JsonObject();
-				object.addProperty("id", -1);
-				object.addProperty("created", Time.getDate());
-				object.addProperty("creator", States.CONSOLE_UUID);
-				object.addProperty("changed", Time.getDate());
-				object.addProperty("name", "Wilderness");
-				object.addProperty("state", -1);
-				object.addProperty("color", "#003500");
-				JsonUtil.write(Municipality.getMunicipalityFile(-1), object);
+		for(int i : def_dis){
+			if(!States.DISTRICTS.containsKey(i)){
+				States.DISTRICTS.put(i, new GenericDistrict(i));
 			}
-			States.MUNICIPALITIES.put(-1, new GenericMunicipality(-1));
-		}
-		if(!States.MUNICIPALITIES.containsKey(0)){
-			if(!Municipality.getMunicipalityFile(0).exists()){
-				JsonObject object = new JsonObject();
-				object.addProperty("id", 0);
-				object.addProperty("created", Time.getDate());
-				object.addProperty("creator", States.DEF_UUID);
-				object.addProperty("changed", Time.getDate());
-				object.addProperty("mayor", States.DEF_UUID);
-				object.addProperty("name", "Spawn");
-				object.addProperty("state", 0);
-				object.addProperty("color", "#FF6600");
-				JsonUtil.write(Municipality.getMunicipalityFile(0), object);
-			}
-			States.MUNICIPALITIES.put(0, new GenericMunicipality(0));
-		}
-		if(!States.DISTRICTS.containsKey(-2)){
-			if(!District.getDistrictFile(-2).exists()){
-				JsonObject object = new JsonObject();
-				object.addProperty("id", -2);
-				object.addProperty("type", DistrictType.WILDERNESS.name());
-				object.addProperty("created", Time.getDate());
-				object.addProperty("creator", States.CONSOLE_UUID);
-				object.addProperty("changed", Time.getDate());
-				object.addProperty("name", "Transit Zone");
-				object.addProperty("municipality", -1);
-				object.addProperty("color", "#007F7F");
-				JsonUtil.write(District.getDistrictFile(-2), object);
-			}
-			States.DISTRICTS.put(-2, new GenericDistrict(-2));
-		}
-		if(!States.DISTRICTS.containsKey(-1)){
-			if(!District.getDistrictFile(-1).exists()){
-				JsonObject object = new JsonObject();
-				object.addProperty("id", -1);
-				object.addProperty("type", DistrictType.WILDERNESS.name());
-				object.addProperty("created", Time.getDate());
-				object.addProperty("creator", States.CONSOLE_UUID);
-				object.addProperty("changed", Time.getDate());
-				object.addProperty("name", "Wilderness");
-				object.addProperty("municipality", -1);
-				object.addProperty("color", "#003500");
-				JsonUtil.write(District.getDistrictFile(-1), object);
-			}
-			States.DISTRICTS.put(-1, new GenericDistrict(-1));
-		}
-		if(!States.DISTRICTS.containsKey(0)){
-			if(!District.getDistrictFile(0).exists()){
-				JsonObject object = new JsonObject();
-				object.addProperty("id", 0);
-				object.addProperty("type", DistrictType.MUNICIPIAL.name());
-				object.addProperty("created", Time.getDate());
-				object.addProperty("creator", States.DEF_UUID);
-				object.addProperty("changed", Time.getDate());
-				object.addProperty("name", "Safezone");
-				object.addProperty("municipality", 0);
-				object.addProperty("color", "#FF6600");
-				JsonUtil.write(District.getDistrictFile(0), object);
-			}
-			States.DISTRICTS.put(0, new GenericDistrict(0));
 		}
 		ImageCache.loadQueue();
 		//event.getWorld().addEventListener(new TestListener());

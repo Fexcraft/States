@@ -134,7 +134,7 @@ public class GenericChunk implements Chunk {
 		obj.addProperty("x", x);
 		obj.addProperty("z", z);
 		obj.addProperty("price", price);
-		obj.addProperty("district", district.getId());
+		obj.addProperty("district", district == null ? -1 : district.getId());
 		obj.addProperty("created", created);
 		obj.addProperty("creator", creator.toString());
 		obj.addProperty("changed", changed);

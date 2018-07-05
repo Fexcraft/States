@@ -15,10 +15,8 @@ import net.fexcraft.mod.states.States;
 import net.fexcraft.mod.states.api.District;
 import net.fexcraft.mod.states.api.DistrictType;
 import net.fexcraft.mod.states.api.Municipality;
-import net.fexcraft.mod.states.api.capabilities.StatesCapabilities;
 import net.fexcraft.mod.states.impl.capabilities.SignTileEntityCapabilityUtil;
 import net.fexcraft.mod.states.util.StateUtil;
-import net.minecraft.util.EnumFacing;
 
 public class GenericDistrict implements District {
 	
@@ -33,7 +31,7 @@ public class GenericDistrict implements District {
 	
 	public GenericDistrict(int id){
 		this.id = id;
-		JsonObject obj = JsonUtil.get(this.getDistrictFile());
+		JsonObject obj = StateUtil.getDistrictJson(id);
 		type = DistrictType.valueOf(JsonUtil.getIfExists(obj, "type", DistrictType.WILDERNESS.name()));
 		created = JsonUtil.getIfExists(obj, "created", Time.getDate()).longValue();
 		creator = UUID.fromString(obj.has("creator") ? obj.get("creator").getAsString() : States.CONSOLE_UUID);

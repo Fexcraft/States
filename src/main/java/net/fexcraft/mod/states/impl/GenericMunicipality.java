@@ -34,7 +34,7 @@ public class GenericMunicipality implements Municipality {
 	
 	public GenericMunicipality(int id){
 		this.id = id;
-		JsonObject obj = JsonUtil.get(this.getMunicipalityFile());
+		JsonObject obj = StateUtil.getMunicipalityJson(id);
 		name = JsonUtil.getIfExists(obj, "name", "Unnamed Place");
 		created = JsonUtil.getIfExists(obj, "created", Time.getDate()).longValue();
 		creator = UUID.fromString(obj.has("creator") ? obj.get("creator").getAsString() : States.CONSOLE_UUID);

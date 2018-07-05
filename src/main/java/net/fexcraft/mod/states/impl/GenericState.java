@@ -14,6 +14,7 @@ import net.fexcraft.mod.lib.util.lang.ArrayList;
 import net.fexcraft.mod.lib.util.math.Time;
 import net.fexcraft.mod.states.States;
 import net.fexcraft.mod.states.api.State;
+import net.fexcraft.mod.states.util.StateUtil;
 
 public class GenericState implements State {
 	
@@ -27,7 +28,7 @@ public class GenericState implements State {
 
 	public GenericState(int value){
 		id = value;
-		JsonObject obj = JsonUtil.get(this.getStateFile());
+		JsonObject obj = StateUtil.getStateJson(value).getAsJsonObject();
 		name = JsonUtil.getIfExists(obj, "name", "Unnamed State");
 		created = JsonUtil.getIfExists(obj, "created", Time.getDate()).longValue();
 		changed = JsonUtil.getIfExists(obj, "changed", Time.getDate()).longValue();

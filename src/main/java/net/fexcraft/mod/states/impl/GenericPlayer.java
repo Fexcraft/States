@@ -30,10 +30,9 @@ public class GenericPlayer implements PlayerCapability {
 	private Chunk last_chunk, current_chunk;
 	//
 	private Municipality municipality;
+	private boolean loaded;
 	
-	public GenericPlayer(){
-		//
-	}
+	public GenericPlayer(){}
 
 	public GenericPlayer(UUID uuid){
 		this.uuid = uuid;
@@ -78,6 +77,7 @@ public class GenericPlayer implements PlayerCapability {
 			}
 		}
 		this.account = AccountManager.INSTANCE.getAccount("player", uuid.toString(), true);
+		loaded = true;
 	}
 
 	@Override
@@ -232,6 +232,11 @@ public class GenericPlayer implements PlayerCapability {
 	@Override
 	public void setNicknameColor(int color){
 		this.color = color;
+	}
+
+	@Override
+	public boolean isLoaded(){
+		return loaded;
 	}
 
 }

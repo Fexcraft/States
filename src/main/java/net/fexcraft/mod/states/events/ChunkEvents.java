@@ -22,6 +22,7 @@ public class ChunkEvents {
         }
         if(!WorldEvents.LOADED){
         	WorldEvents.onWorldLoad(null);
+        	WorldEvents.LOADED = true;
         }
         int x = event.getChunk().x, z = event.getChunk().z;
         if(!States.CHUNKS.contains(x, z)){

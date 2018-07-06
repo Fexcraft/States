@@ -32,24 +32,27 @@ public class WorldEvents {
 		if(event != null && (event.getWorld().provider.getDimension() != 0 || event.getWorld().isRemote)){
 			return;
 		}
-		if(LOADED){ return; }
-		StateLogger.log("all", "Loading World...");
-		for(int i : def_st){
-			if(!States.STATES.containsKey(i)){
-				States.STATES.put(i, new GenericState(i));
+		if(!LOADED){
+			StateLogger.log("all", "Loading World...");
+			for(int i : def_st){
+				if(!States.STATES.containsKey(i)){
+					States.STATES.put(i, new GenericState(i));
+				}
+			}
+			for(int i : def_mun){
+				if(!States.MUNICIPALITIES.containsKey(i)){
+					States.MUNICIPALITIES.put(i, new GenericMunicipality(i));
+				}
+			}
+			for(int i : def_dis){
+				if(!States.DISTRICTS.containsKey(i)){
+					States.DISTRICTS.put(i, new GenericDistrict(i));
+				}
 			}
 		}
-		for(int i : def_mun){
-			if(!States.MUNICIPALITIES.containsKey(i)){
-				States.MUNICIPALITIES.put(i, new GenericMunicipality(i));
-			}
+		if(event != null){
+			ImageCache.loadQueue();
 		}
-		for(int i : def_dis){
-			if(!States.DISTRICTS.containsKey(i)){
-				States.DISTRICTS.put(i, new GenericDistrict(i));
-			}
-		}
-		ImageCache.loadQueue();
 		LOADED = true;
 		//event.getWorld().addEventListener(new TestListener());
 	}
@@ -88,7 +91,7 @@ public class WorldEvents {
 	
 	@SubscribeEvent
 	public static void onAttachEventEntityPlayer(AttachCapabilitiesEvent<net.minecraft.entity.Entity> event){
-		if(event.getObject() instanceof EntityPlayer){
+		if(event.getObject() instanceof EntityPlayer && !event.getObject().world.isRemote){
 			event.addCapability(PlayerCapabilityUtil.REGISTRY_NAME, new PlayerCapabilityUtil((EntityPlayer)event.getObject()));
 		}
 	}

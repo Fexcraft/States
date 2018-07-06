@@ -107,4 +107,6 @@ public interface PlayerCapability extends ICommandSender {
 		return this.getEntityPlayer().getServer();
 	}
 
+	public boolean isLoaded();
+
 }

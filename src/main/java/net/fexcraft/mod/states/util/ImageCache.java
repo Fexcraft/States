@@ -40,35 +40,40 @@ public class ImageCache {
 	public static class TickHandler {
 		
 		@SubscribeEvent
-		public static void onTick(TickEvent.ServerTickEvent event) throws Exception {
-			if(event.phase == Phase.START){
-				if(QUEUE.size() == 0){ return; }
-				for(int i = 0; i < Config.MAP_UPDATES_PER_TICK; i++){
-					QueueObj obj = QUEUE.poll();
-					if(obj != null){
-						updateImage(obj.world, obj.chunk);
+		public static void onTick(TickEvent.ServerTickEvent event){
+			try{
+				if(event.phase == Phase.START){
+					if(QUEUE.size() == 0){ return; }
+					for(int i = 0; i < Config.MAP_UPDATES_PER_TICK; i++){
+						QueueObj obj = QUEUE.poll();
+						if(obj != null){
+							updateImage(obj.world, obj.chunk);
+						}
 					}
 				}
-			}
-			else{
-				if(LOADED_CACHE.size() == 0){ return; }
-				for(int i = 0; i < Config.MAP_UPDATES_PER_TICK; i++){
-					Entry<String, TempImg> entry = LOADED_CACHE.firstEntry();
-					if(entry != null){
-						if(entry.getValue().last_access + (Time.MIN_MS) >= Time.getDate()){
-							saveImage(entry.getValue().image, entry.getKey());
-							LOADED_CACHE.remove(entry.getKey());
+				else{
+					if(LOADED_CACHE.size() == 0){ return; }
+					for(int i = 0; i < Config.MAP_UPDATES_PER_TICK; i++){
+						Entry<String, TempImg> entry = LOADED_CACHE.firstEntry();
+						if(entry != null){
+							if(entry.getValue().last_access + (Time.MIN_MS) >= Time.getDate()){
+								saveImage(entry.getValue().image, entry.getKey());
+								LOADED_CACHE.remove(entry.getKey());
+							}
+						}
+					}
+				}
+				if(++check >= 2000){
+					check = 0; long time = Time.getDate();
+					for(long key : ImageUtil.TEMP_IMAGES.keySet()){
+						if((key + Time.MIN_MS) < time){
+							ImageUtil.TEMP_IMAGES.remove(key);
 						}
 					}
 				}
 			}
-			if(++check >= 2000){
-				check = 0; long time = Time.getDate();
-				for(long key : ImageUtil.TEMP_IMAGES.keySet()){
-					if((key + Time.MIN_MS) < time){
-						ImageUtil.TEMP_IMAGES.remove(key);
-					}
-				}
+			catch(Exception e){
+				e.printStackTrace();
 			}
 		}
 		

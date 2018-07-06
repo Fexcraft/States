@@ -55,6 +55,7 @@ public class PlayerEvents {
 			Print.chat(event.player, "Player data couldn't be loaded.");
 			return;
 		}
+		if(!player.isLoaded()){ player.load(); }
 		States.PLAYERS.put(event.player.getGameProfile().getId(), player);
 		Print.chat(event.player, "&e====-====-====-====-====-====&0[&2States&0]");
 		Print.chat(event.player, "&6Welcome back " + player.getFormattedNickname() + "&6!");//TODO replace with nick

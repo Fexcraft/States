@@ -25,12 +25,14 @@ public class WorldEvents {
 	private static int[] def_st = new int[]{ -1, 0 };
 	private static int[] def_mun = new int[]{ -1, 0 };
 	private static int[] def_dis = new int[]{ -2, -1, 0 };
+	public static boolean LOADED = false;
 	
 	@SubscribeEvent
 	public static void onWorldLoad(WorldEvent.Load event){
-		if(event.getWorld().provider.getDimension() != 0 || event.getWorld().isRemote){
+		if(event != null && (event.getWorld().provider.getDimension() != 0 || event.getWorld().isRemote)){
 			return;
 		}
+		if(LOADED){ return; }
 		StateLogger.log("all", "Loading World...");
 		for(int i : def_st){
 			if(!States.STATES.containsKey(i)){
@@ -48,6 +50,7 @@ public class WorldEvents {
 			}
 		}
 		ImageCache.loadQueue();
+		LOADED = true;
 		//event.getWorld().addEventListener(new TestListener());
 	}
 	
@@ -61,6 +64,7 @@ public class WorldEvents {
 		States.STATES.values().forEach(elm -> { elm.save(); });
 		ImageCache.saveQueue();
 		StateLogger.log("all", "Unloading World...");
+		LOADED = false;
 	}
 	
 	@SubscribeEvent

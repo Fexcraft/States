@@ -1,6 +1,7 @@
 package net.fexcraft.mod.states.util;
 
 import java.io.File;
+import java.io.FileReader;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
@@ -81,14 +82,14 @@ public class StateUtil {
 		if(States.DISTRICTS.containsKey(value)){
 			return States.DISTRICTS.get(value);
 		}
-		if(District.getDistrictFile(value).exists()){
+		if(District.getDistrictFile(value).exists() || isDefaultAvailable("districts", value)){
 			District district = new GenericDistrict(value);
 			States.DISTRICTS.put(value, district);
 			return district;
 		}
 		else return wilderness ? States.DISTRICTS.get(-1) : null;
 	}
-	
+
 	public static Municipality getMunicipality(int value){
 		return getMunicipality(value, true);
 	}
@@ -97,7 +98,7 @@ public class StateUtil {
 		if(States.MUNICIPALITIES.containsKey(value)){
 			return States.MUNICIPALITIES.get(value);
 		}
-		if(Municipality.getMunicipalityFile(value).exists()){
+		if(Municipality.getMunicipalityFile(value).exists() || isDefaultAvailable("municipalities", value)){
 			Municipality municipality = new GenericMunicipality(value);
 			States.MUNICIPALITIES.put(value, municipality);
 			return municipality;
@@ -113,7 +114,7 @@ public class StateUtil {
 		if(States.STATES.containsKey(value)){
 			return States.STATES.get(value);
 		}
-		if(State.getStateFile(value).exists()){
+		if(State.getStateFile(value).exists() || isDefaultAvailable("states", value)){
 			State state = new GenericState(value);
 			States.STATES.put(value, state);
 			return state;
@@ -270,30 +271,54 @@ public class StateUtil {
 	// --- /// --- //
 	
 	public static JsonObject getStateJson(int value){
-		JsonElement elm = JsonUtil.read(State.getStateFile(value), false);
+		JsonElement elm = read(State.getStateFile(value));
 		if(elm == null){
-			InputStream in = StateUtil.class.getClassLoader().getResourceAsStream("/assets/states/defaults/states/" + value + ".json");
-			 return in == null ? new JsonObject() : JsonUtil.getObjectFromInputStream(in);
+			InputStream in = StateUtil.class.getClassLoader().getResourceAsStream("assets/states/defaults/states/" + value + ".json");
+			return in == null ? new JsonObject() : JsonUtil.getObjectFromInputStream(in);
 		}
 		else return elm.getAsJsonObject();
 	}
 	
 	public static JsonObject getMunicipalityJson(int value){
-		JsonElement elm = JsonUtil.read(Municipality.getMunicipalityFile(value), false);
+		JsonElement elm = read(Municipality.getMunicipalityFile(value));
 		if(elm == null){
-			InputStream in = StateUtil.class.getClassLoader().getResourceAsStream("/assets/states/defaults/municipalities/" + value + ".json");
-			 return in == null ? new JsonObject() : JsonUtil.getObjectFromInputStream(in);
+			InputStream in = StateUtil.class.getClassLoader().getResourceAsStream("assets/states/defaults/municipalities/" + value + ".json");
+			return in == null ? new JsonObject() : JsonUtil.getObjectFromInputStream(in);
 		}
 		else return elm.getAsJsonObject();
 	}
 	
 	public static JsonObject getDistrictJson(int value){
-		JsonElement elm = JsonUtil.read(District.getDistrictFile(value), false);
+		JsonElement elm = read(District.getDistrictFile(value));
 		if(elm == null){
-			InputStream in = StateUtil.class.getClassLoader().getResourceAsStream("/assets/states/defaults/districts/" + value + ".json");
-			 return in == null ? new JsonObject() : JsonUtil.getObjectFromInputStream(in);
+			InputStream in = StateUtil.class.getClassLoader().getResourceAsStream("assets/states/defaults/districts/" + value + ".json");
+			return in == null ? new JsonObject() : JsonUtil.getObjectFromInputStream(in);
 		}
 		else return elm.getAsJsonObject();
+	}
+	
+	private static boolean isDefaultAvailable(String type, int value){
+		return StateUtil.class.getClassLoader().getResourceAsStream("assets/states/defaults/" + type + "/" + value + ".json") != null;
+	}
+	
+	/** Copy from JsonUtil, adjusted to don't print too much into console. */
+	public static final JsonElement read(File file, boolean bool){
+		try{
+			if(!file.getParentFile().exists()){ file.getParentFile().mkdirs(); }
+			FileReader fr = new FileReader(file);
+			JsonElement obj = JsonUtil.getParser().parse(fr); fr.close();
+			return obj;
+		}
+		catch (Exception e) {
+			if(bool){
+				e.printStackTrace();
+			}
+			return null;
+		}
+	}
+	
+	public static final JsonElement read(File file){
+		return read(file, false);
 	}
 
 }

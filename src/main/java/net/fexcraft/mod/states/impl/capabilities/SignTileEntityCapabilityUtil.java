@@ -2,8 +2,6 @@ package net.fexcraft.mod.states.impl.capabilities;
 
 import java.util.TreeMap;
 
-import net.fexcraft.mod.lib.util.common.Static;
-import net.fexcraft.mod.states.api.Chunk;
 import net.fexcraft.mod.states.api.capabilities.StatesCapabilities;
 import net.fexcraft.mod.states.api.capabilities.SignTileEntityCapability;
 import net.minecraft.nbt.NBTBase;

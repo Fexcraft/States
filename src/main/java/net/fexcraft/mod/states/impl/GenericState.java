@@ -32,7 +32,7 @@ public class GenericState implements State {
 		name = JsonUtil.getIfExists(obj, "name", "Unnamed State");
 		created = JsonUtil.getIfExists(obj, "created", Time.getDate()).longValue();
 		changed = JsonUtil.getIfExists(obj, "changed", Time.getDate()).longValue();
-		creator = obj.has("creator") ? UUID.fromString(obj.get("creator").getAsString()) : null;
+		creator = obj.has("creator") ? UUID.fromString(obj.get("creator").getAsString()) : UUID.fromString(States.CONSOLE_UUID);
 		leader = obj.has("leader") ? UUID.fromString(obj.get("leader").getAsString()) : null;
 		account = AccountManager.INSTANCE.getAccount("state", id + "", true);
 		capital = JsonUtil.getIfExists(obj, "capital", -1).intValue();

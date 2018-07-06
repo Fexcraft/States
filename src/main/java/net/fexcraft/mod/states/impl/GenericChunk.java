@@ -40,7 +40,8 @@ public class GenericChunk implements Chunk {
 	
 	public GenericChunk(int x, int z, boolean create){
 		this.x = x; this.z = z;
-		JsonObject obj = JsonUtil.get(getChunkFile());
+		JsonElement jsn = StateUtil.read(getChunkFile());
+		JsonObject obj = jsn == null ? new JsonObject() : jsn.getAsJsonObject();
 		price = JsonUtil.getIfExists(obj, "price", Config.DEFAULT_CHUNK_PRICE).longValue();
 		district = StateUtil.getDistrict(JsonUtil.getIfExists(obj, "district", -1).intValue());
 		created = JsonUtil.getIfExists(obj, "created", Time.getDate()).longValue();
@@ -88,7 +89,7 @@ public class GenericChunk implements Chunk {
 			World world = Static.getServer().getWorld(0);
 			ImageCache.update(world, world.getChunkProvider().getLoadedChunk(x, z));
 		}
-		if(this.district.getId() == -2 && this.getChanged() + Time.DAY_MS < Time.getDate()){
+		if(district != null && this.district.getId() == -2 && this.getChanged() + Time.DAY_MS < Time.getDate()){
 			StateLogger.log(StateLogger.LoggerType.CHUNK, StateLogger.district(-2) + " time of " + StateLogger.chunk(this) + " expired! Setting back to " + StateLogger.district(-1) + "!");
 			this.setDistrict(StateUtil.getDistrict(-1));
 			save();

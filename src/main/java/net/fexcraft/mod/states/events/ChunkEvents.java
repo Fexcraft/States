@@ -5,11 +5,9 @@ import java.io.File;
 import net.fexcraft.mod.lib.util.json.JsonUtil;
 import net.fexcraft.mod.states.States;
 import net.fexcraft.mod.states.api.Chunk;
-import net.fexcraft.mod.states.api.capabilities.StatesCapabilities;
 import net.fexcraft.mod.states.impl.GenericChunk;
 import net.fexcraft.mod.states.impl.capabilities.SignTileEntityCapabilityUtil;
 import net.fexcraft.mod.states.util.ImageCache;
-import net.minecraft.util.EnumFacing;
 import net.minecraftforge.event.world.ChunkEvent;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
@@ -21,6 +19,9 @@ public class ChunkEvents {
     public static void onLoad(ChunkEvent.Load event){
         if(event.getWorld().isRemote || event.getWorld().provider.getDimension() != 0){
             return;
+        }
+        if(!WorldEvents.LOADED){
+        	WorldEvents.onWorldLoad(null);
         }
         int x = event.getChunk().x, z = event.getChunk().z;
         if(!States.CHUNKS.contains(x, z)){

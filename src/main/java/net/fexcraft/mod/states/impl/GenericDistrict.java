@@ -6,6 +6,7 @@ import java.util.UUID;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
+
 import net.fexcraft.mod.lib.util.common.Static;
 
 import net.fexcraft.mod.lib.util.json.JsonUtil;
@@ -40,7 +41,7 @@ public class GenericDistrict implements District {
 		name = JsonUtil.getIfExists(obj, "name", "Unnamed District");
 		municipality = StateUtil.getMunicipality(JsonUtil.getIfExists(obj, "municipality", -1).intValue());
 		manager = obj.has("manager") ? UUID.fromString(obj.get("manager").getAsString()) : null;
-		color = JsonUtil.getIfExists(obj, "color", "#ffffff");
+		color = obj.has("color") ? obj.get("color").getAsString() : "#ffffff";
 		cfs = JsonUtil.getIfExists(obj, "can_foreigners_settle", false);
 		price = JsonUtil.getIfExists(obj, "price", 0).longValue();
 		icon = JsonUtil.getIfExists(obj, "icon", States.DEFAULT_ICON);

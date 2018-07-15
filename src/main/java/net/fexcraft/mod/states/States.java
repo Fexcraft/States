@@ -49,7 +49,7 @@ import net.minecraftforge.server.permission.PermissionAPI;
 @Mod(modid = States.MODID, name = "States", version = States.VERSION, dependencies = "required-after:fcl", /*serverSideOnly = true,*/ guiFactory = "net.fexcraft.mod.states.util.GuiFactory", acceptedMinecraftVersions = "*", acceptableRemoteVersions = "*")
 public class States {
 	
-	public static final String VERSION = "1.1.2";
+	public static final String VERSION = "1.1.4";
 	public static final String MODID = "states";
 	public static String ADMIN_PERM = "states.external.admin";
 	//
@@ -70,6 +70,12 @@ public class States {
 	@Mod.EventHandler
 	public void preInit(FMLPreInitializationEvent event){
 		Config.initialize(event);
+		StatesPermissions.init();
+		SignCapabilityUtil.addListener(SignShop.class);
+		CapabilityManager.INSTANCE.register(SignTileEntityCapability.class, new SignTileEntityCapabilityUtil.Storage(), new SignTileEntityCapabilityUtil.Callable());
+		CapabilityManager.INSTANCE.register(ChunkCapability.class, new ChunkCapabilityUtil.Storage(), new ChunkCapabilityUtil.Callable());
+		CapabilityManager.INSTANCE.register(WorldCapability.class, new WorldCapabilityUtil.Storage(), new WorldCapabilityUtil.Callable());
+		CapabilityManager.INSTANCE.register(PlayerCapability.class, new PlayerCapabilityUtil.Storage(), new PlayerCapabilityUtil.Callable());
 	}
 	
 	@Mod.EventHandler
@@ -85,20 +91,11 @@ public class States {
 		NBTTagCompoundPacketHandler.addListener(Side.SERVER, new Listener());
 		NBTTagCompoundPacketHandler.addListener(Side.CLIENT, new Receiver());
 		//
+		PermissionAPI.registerNode(ADMIN_PERM, DefaultPermissionLevel.OP, "States Admin Permission");
+		SERVERACCOUNT = AccountManager.INSTANCE.getAccount("server", "states", true);
+		//
 		PacketHandler.getInstance().registerMessage(ImagePacketHandler.Client.class, ImagePacket.class, 29910, Side.CLIENT);
 		PacketHandler.getInstance().registerMessage(ImagePacketHandler.Server.class, ImagePacket.class, 29911, Side.SERVER);
-		//
-		PermissionAPI.registerNode(ADMIN_PERM, DefaultPermissionLevel.OP, "States Admin Permission");
-		//
-		SERVERACCOUNT = AccountManager.INSTANCE.getAccount("server", "states", true);
-		CapabilityManager.INSTANCE.register(SignTileEntityCapability.class, new SignTileEntityCapabilityUtil.Storage(), new SignTileEntityCapabilityUtil.Callable());
-		CapabilityManager.INSTANCE.register(ChunkCapability.class, new ChunkCapabilityUtil.Storage(), new ChunkCapabilityUtil.Callable());
-		CapabilityManager.INSTANCE.register(WorldCapability.class, new WorldCapabilityUtil.Storage(), new WorldCapabilityUtil.Callable());
-		CapabilityManager.INSTANCE.register(PlayerCapability.class, new PlayerCapabilityUtil.Storage(), new PlayerCapabilityUtil.Callable());
-		//
-		StatesPermissions.init();
-		SignCapabilityUtil.addListener(SignShop.class);
-		//
 		UpdateHandler.initialize();
 	}
 	

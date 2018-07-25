@@ -1,6 +1,7 @@
 package net.fexcraft.mod.states.impl;
 
 import java.io.File;
+import java.util.Collection;
 import java.util.List;
 import java.util.UUID;
 
@@ -14,6 +15,7 @@ import net.fexcraft.mod.lib.util.lang.ArrayList;
 import net.fexcraft.mod.lib.util.math.Time;
 import net.fexcraft.mod.states.States;
 import net.fexcraft.mod.states.api.Chunk;
+import net.fexcraft.mod.states.api.ChunkPos;
 import net.fexcraft.mod.states.api.ChunkType;
 import net.fexcraft.mod.states.api.District;
 import net.fexcraft.mod.states.impl.capabilities.SignTileEntityCapabilityUtil;
@@ -37,9 +39,10 @@ public class GenericChunk implements Chunk {
 	private String owner;
 	private List<UUID> wl_players = new ArrayList<>();
 	private List<Integer> wl_companies = new ArrayList<>();
+	private ChunkPos pos;
 	
 	public GenericChunk(int x, int z, boolean create){
-		this.x = x; this.z = z;
+		this.x = x; this.z = z; pos = new ChunkPos(x, z);
 		JsonElement jsn = StateUtil.read(getChunkFile());
 		JsonObject obj = jsn == null ? new JsonObject() : jsn.getAsJsonObject();
 		price = JsonUtil.getIfExists(obj, "price", Config.DEFAULT_CHUNK_PRICE).longValue();
@@ -262,6 +265,17 @@ public class GenericChunk implements Chunk {
 	@Override
 	public String toString(){
 		return x + "_" + z;
+	}
+
+	@Override
+	public boolean isForceLoaded(){
+		Collection<ChunkPos> pos = this.district.getMunicipality().getForceLoadedChunks();
+		return pos == null ? false : pos.contains(getChunkPos());
+	}
+
+	@Override
+	public ChunkPos getChunkPos(){
+		return pos;
 	}
 
 }

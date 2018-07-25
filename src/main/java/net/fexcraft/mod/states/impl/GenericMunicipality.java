@@ -1,6 +1,7 @@
 package net.fexcraft.mod.states.impl;
 
 import java.io.File;
+import java.util.Collection;
 import java.util.List;
 import java.util.UUID;
 
@@ -9,15 +10,20 @@ import com.google.gson.JsonObject;
 
 import net.fexcraft.mod.fsmm.api.Account;
 import net.fexcraft.mod.fsmm.util.AccountManager;
+import net.fexcraft.mod.lib.util.common.Print;
 import net.fexcraft.mod.lib.util.json.JsonUtil;
 import net.fexcraft.mod.lib.util.lang.ArrayList;
 import net.fexcraft.mod.lib.util.math.Time;
 import net.fexcraft.mod.states.States;
+import net.fexcraft.mod.states.api.ChunkPos;
 import net.fexcraft.mod.states.api.District;
 import net.fexcraft.mod.states.api.Municipality;
 import net.fexcraft.mod.states.api.MunicipalityType;
 import net.fexcraft.mod.states.api.State;
+import net.fexcraft.mod.states.util.Config;
+import net.fexcraft.mod.states.util.ForcedChunksManager;
 import net.fexcraft.mod.states.util.StateUtil;
+import net.minecraft.command.ICommandSender;
 
 public class GenericMunicipality implements Municipality {
 	
@@ -251,6 +257,46 @@ public class GenericMunicipality implements Municipality {
 			}
 		}
 		return amount;
+	}
+
+	@Override
+	public Collection<ChunkPos> getForceLoadedChunks(){
+		return States.LOADED_CHUNKS.containsKey(id) ? States.LOADED_CHUNKS.get(id) : null;
+	}
+
+	@Override
+	public boolean modifyForceloadedChunk(ICommandSender sender, ChunkPos pos, boolean add_rem){
+		if(add_rem){
+			if(this.getForceLoadedChunks() != null && this.getForceLoadedChunks().size() + 1 > Config.LOADED_CHUNKS_PER_MUNICIPALITY){
+				Print.chat(sender, "&9Municipality reached the Server's Limit for Forced-Chunks-per-Municipality.");
+				return false;
+			}
+			if(this.getForceLoadedChunks() == null){
+				States.LOADED_CHUNKS.put(id, new ArrayList<>());
+			}
+			if(this.getForceLoadedChunks().contains(pos)){
+				Print.chat(sender, "&cChunk already force-loaded.");
+				return false;
+			}
+			this.getForceLoadedChunks().add(pos);
+			ForcedChunksManager.check();
+			Print.chat(sender, "&aChunk added.");
+			return true;
+		}
+		else{
+			if(this.getForceLoadedChunks() == null){
+				Print.chat(sender, "&cMunicipality has no loaded chunk list.");
+				return false;
+			}
+			if(!this.getForceLoadedChunks().contains(pos)){
+				Print.chat(sender, "&cChunk is not force loaded.");
+				return false;
+			}
+			this.getForceLoadedChunks().remove(pos);
+			ForcedChunksManager.check();
+			Print.chat(sender, "&aChunk removed.");
+			return true;
+		}
 	}
 
 }

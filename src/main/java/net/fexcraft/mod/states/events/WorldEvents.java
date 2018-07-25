@@ -8,6 +8,7 @@ import net.fexcraft.mod.states.impl.capabilities.ChunkCapabilityUtil;
 import net.fexcraft.mod.states.impl.capabilities.PlayerCapabilityUtil;
 import net.fexcraft.mod.states.impl.capabilities.SignTileEntityCapabilityUtil;
 import net.fexcraft.mod.states.impl.capabilities.WorldCapabilityUtil;
+import net.fexcraft.mod.states.util.ForcedChunksManager;
 import net.fexcraft.mod.states.util.ImageCache;
 import net.fexcraft.mod.states.util.StateLogger;
 import net.minecraft.entity.player.EntityPlayer;
@@ -53,6 +54,7 @@ public class WorldEvents {
 		if(event != null){
 			ImageCache.loadQueue();
 		}
+		ForcedChunksManager.load();
 		LOADED = true;
 		//event.getWorld().addEventListener(new TestListener());
 	}
@@ -67,6 +69,7 @@ public class WorldEvents {
 		States.STATES.values().forEach(elm -> { elm.save(); });
 		ImageCache.saveQueue();
 		StateLogger.log("all", "Unloading World...");
+		ForcedChunksManager.unload();
 		LOADED = false;
 	}
 	

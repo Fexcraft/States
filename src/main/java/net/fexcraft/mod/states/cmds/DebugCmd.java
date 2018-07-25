@@ -1,6 +1,7 @@
 package net.fexcraft.mod.states.cmds;
 
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 
@@ -15,6 +16,7 @@ import net.fexcraft.mod.lib.util.math.Time;
 import net.fexcraft.mod.states.States;
 import net.fexcraft.mod.states.api.Chunk;
 import net.fexcraft.mod.states.api.capabilities.StatesCapabilities;
+import net.fexcraft.mod.states.util.ForcedChunksManager;
 import net.fexcraft.mod.states.util.StateUtil;
 import net.fexcraft.mod.states.util.StatesPermissions;
 import net.fexcraft.mod.states.util.StatesPermissions.Permission;
@@ -24,7 +26,6 @@ import net.minecraft.command.CommandException;
 import net.minecraft.command.ICommandSender;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.server.MinecraftServer;
-import net.minecraft.util.EnumFacing;
 import net.minecraft.util.math.BlockPos;
 
 @fCommand
@@ -64,6 +65,7 @@ public class DebugCmd extends CommandBase {
             Print.chat(sender, "&7/st-debug self");
             Print.chat(sender, "&7/st-debug totals");
             Print.chat(sender, "&7/st-debug check-for-updates");
+            Print.chat(sender, "&7/st-debug loadedchunks");
             return;
         }
         if(sender instanceof EntityPlayer == false){
@@ -179,6 +181,19 @@ public class DebugCmd extends CommandBase {
                 Print.chat(sender, "&7Chunks: &a" + Static.getServer().worlds[0].getChunkProvider().getLoadedChunkCount() + "&8/&3" + States.CHUNKS.size());
                 Print.chat(sender, "&6RAM: &5" + MB(Runtime.getRuntime().totalMemory() - Runtime.getRuntime().freeMemory())+ "&8/&7" + MB(Runtime.getRuntime().totalMemory()));
                 return;
+            }
+            case "loadedchunks":{
+            	long l = 0; for(Collection<?> coll : States.LOADED_CHUNKS.values()){ l += coll.size(); }
+            	long loaded = ForcedChunksManager.getLoadedChunksInTickets();
+            	long tickets = ForcedChunksManager.getTickets().size();
+                Print.chat(sender, "&7Chunks (World0) force-loaded: &a" + (tickets == 0 ? "no tickets loaded" : loaded));
+                Print.chat(sender, "&7Chunks (States) force-loaded: &a" + l);
+                Print.chat(sender, "&7Chunks (Forge) per ticket: &a" + ForcedChunksManager.chunksPerTicket());
+                Print.chat(sender, "&7Tickets in use: &a" + tickets + " &7| &9ratio: &5" + Static.divide(loaded, tickets));
+                if(ForcedChunksManager.getTickets().isEmpty() && l > 0){
+                	Print.chat(sender, "&cThere seems to be an error, chunks are registered as loaded, but there are no (forge-chunk-loader) tickets!");
+                }
+            	return;
             }
         }
     }

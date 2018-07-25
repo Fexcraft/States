@@ -1,6 +1,7 @@
 package net.fexcraft.mod.states.cmds;
 
 import java.awt.Color;
+import java.util.Collection;
 
 import com.google.gson.JsonObject;
 import com.mojang.authlib.GameProfile;
@@ -108,6 +109,9 @@ public class MunicipalityCmd extends CommandBase {
 				Print.chat(sender, "&3Open to join: " + mun.isOpen());
 				Print.chat(sender, "&6Chunks: &7" + mun.getClaimedChunks() + "&8/&9" + MunicipalityType.getChunkLimitFor(mun));
 				Print.chat(sender, "&2Created by &7" + Static.getPlayerNameByUUID(mun.getCreator()) + "&2 at &8" + Time.getAsString(mun.getCreated()));
+				Collection<?> coll = mun.getForceLoadedChunks();
+				if(coll != null && coll.size() > 0);
+				Print.chat(sender, "&4Force-Loaded Chunks: " + coll.size());
 				return;
 			}
 			case "types":{

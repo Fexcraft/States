@@ -68,6 +68,7 @@ public class ChunkCmd extends CommandBase {
 			Print.chat(sender, "&7/ck update <option:range> [admin-only]");
 			Print.chat(sender, "&7/ck queue");
 			Print.chat(sender, "&7/ck types");
+			Print.chat(sender, "&7/ck force-load <true/false>");
 			return;
 		}
 		if(sender.getCommandSenderEntity() instanceof EntityPlayer == false){
@@ -140,6 +141,9 @@ public class ChunkCmd extends CommandBase {
 				Print.chat(sender, "&2Claimed by &7" + Static.getPlayerNameByUUID(chunk.getClaimer()) + "&2 at &8" + Time.getAsString(chunk.getCreated()));
 				if(chunk.getDistrict().getId() == -2){
 					Print.chat(sender, "&9Transit Zone till: &7" + Time.getAsString(chunk.getChanged() + Time.DAY_MS));
+				}
+				if(chunk.isForceLoaded()){
+					Print.chat(sender, "&4&oThis is a force-loaded chunk.");
 				}
 				return;
 			}
@@ -606,6 +610,20 @@ public class ChunkCmd extends CommandBase {
 				Print.chat(sender, "&9Existing chunk types:");
 				for(ChunkType type : ChunkType.values()){
 					Print.chat(sender, "&2-> &3" + type.name().toLowerCase());
+				}
+				return;
+			}
+			case "force-load":{
+				if(args.length < 2){
+					Print.chat(sender, "&9Missing argument.");
+					Print.chat(sender, "&7/ck force-load true");
+					Print.chat(sender, "&7/ck force-load false");
+					return;
+				}
+				if(hasPerm("chunk.forceload", player, chunk)){
+					boolean bool = Boolean.parseBoolean(args[1]);
+					chunk.getMunicipality().modifyForceloadedChunk(player, chunk.getChunkPos(), bool);
+					return;
 				}
 				return;
 			}

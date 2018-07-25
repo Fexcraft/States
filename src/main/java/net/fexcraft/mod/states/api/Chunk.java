@@ -68,5 +68,9 @@ public interface Chunk extends BuyableType {
 	public default State getState(){
 		return this.getDistrict().getMunicipality().getState();
 	}
+	
+	public boolean isForceLoaded();
+
+	public ChunkPos getChunkPos();
 
 }

@@ -1,8 +1,11 @@
 package net.fexcraft.mod.states.api;
 
 import java.io.File;
+import java.util.Collection;
 import java.util.List;
 import java.util.UUID;
+
+import javax.annotation.Nullable;
 
 import com.google.gson.JsonObject;
 
@@ -11,6 +14,7 @@ import net.fexcraft.mod.states.States;
 import net.fexcraft.mod.states.api.root.BuyableType;
 import net.fexcraft.mod.states.api.root.ColorHolder;
 import net.fexcraft.mod.states.api.root.IconHolder;
+import net.minecraft.command.ICommandSender;
 
 public interface Municipality extends ColorHolder, BuyableType, IconHolder {
 	
@@ -73,5 +77,9 @@ public interface Municipality extends ColorHolder, BuyableType, IconHolder {
 	public List<Integer> getCompanyBlacklist();
 
 	public int getClaimedChunks();
+	
+	public @Nullable Collection<ChunkPos> getForceLoadedChunks();
+	
+	public @Nullable boolean modifyForceloadedChunk(ICommandSender sender, ChunkPos pos, boolean add_rem);
 
 }

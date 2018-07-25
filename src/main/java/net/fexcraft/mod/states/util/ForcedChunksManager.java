@@ -49,6 +49,11 @@ public class ForcedChunksManager implements LoadingCallback {
 				}
 			}
 		}
+		for(Ticket ticket : tickets){
+			if(ticket.getChunkList().size() == 0){
+				ForgeChunkManager.releaseTicket(ticket);
+			}
+		}
 	}
 
 	public static boolean isChunkLoaded(ChunkPos pos){
@@ -137,6 +142,10 @@ public class ForcedChunksManager implements LoadingCallback {
 	}
 	
 	public static int chunksPerTicket(){
+		return ForgeChunkManager.getMaxChunkDepthFor(States.MODID);
+	}
+	
+	public static int maxTickets(){
 		return ForgeChunkManager.getMaxTicketLengthFor(States.MODID);
 	}
 	

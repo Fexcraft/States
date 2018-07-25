@@ -43,7 +43,7 @@ public class DebugCmd extends CommandBase {
     
     @Override
     public List<String> getTabCompletions(MinecraftServer server, ICommandSender sender, String[] args, @Nullable BlockPos targetPos){
-        return args.length == 1 ? Arrays.asList(new String[]{ "chunk", "chunks", "district", "districts", "municipality", "municipalities", "state", "states", "serveraccount", "permission", "permissions", "self"}) : Collections.<String>emptyList();
+        return args.length == 1 ? Arrays.asList(new String[]{ "chunk", "chunks", "district", "districts", "municipality", "municipalities", "state", "states", "serveraccount", "permission", "permissions", "self", "totals", "check-for-updates", "loadedchunks"}) : Collections.<String>emptyList();
     }
     
     private long lastcheck;
@@ -189,7 +189,8 @@ public class DebugCmd extends CommandBase {
                 Print.chat(sender, "&7Chunks (World0) force-loaded: &a" + (tickets == 0 ? "no tickets loaded" : loaded));
                 Print.chat(sender, "&7Chunks (States) force-loaded: &a" + l);
                 Print.chat(sender, "&7Chunks (Forge) per ticket: &a" + ForcedChunksManager.chunksPerTicket());
-                Print.chat(sender, "&7Tickets in use: &a" + tickets + " &7| &9ratio: &5" + Static.divide(loaded, tickets));
+                Print.chat(sender, "&7Tickets (Forge) available: &a" + ForcedChunksManager.maxTickets());
+                Print.chat(sender, "&7Tickets in use: &a" + tickets + " &7| &9ratio: &3" + Static.divide(loaded, tickets) + "&7 per ticket");
                 if(ForcedChunksManager.getTickets().isEmpty() && l > 0){
                 	Print.chat(sender, "&cThere seems to be an error, chunks are registered as loaded, but there are no (forge-chunk-loader) tickets!");
                 }

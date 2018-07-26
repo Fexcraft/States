@@ -18,6 +18,7 @@ import net.fexcraft.mod.lib.util.common.Static;
 import net.fexcraft.mod.lib.util.json.JsonUtil;
 import net.fexcraft.mod.states.States;
 import net.fexcraft.mod.states.api.Chunk;
+import net.fexcraft.mod.states.api.ChunkPos;
 import net.fexcraft.mod.states.api.District;
 import net.fexcraft.mod.states.api.Mail;
 import net.fexcraft.mod.states.api.Municipality;
@@ -45,7 +46,7 @@ import net.minecraftforge.server.permission.PermissionAPI;
 public class StateUtil {
     
     public static @Nullable Chunk getChunk(int x, int z){
-        return States.CHUNKS.get(x, z);
+        return States.CHUNKS.values().stream().filter(pre -> pre.xCoord() == x && pre.zCoord() == z).findFirst().get();
     }
     
     public static @Nullable Chunk getChunk(EntityPlayer player){
@@ -54,6 +55,10 @@ public class StateUtil {
     
     public static @Nullable Chunk getChunk(BlockPos pos){
         return getChunk(pos.getX() >> 4, pos.getZ() >> 4);
+    }
+    
+    public static @Nullable Chunk getChunk(ChunkPos pos){
+        return States.CHUNKS.get(pos);
     }
     
     public static @Nullable Chunk getChunk(net.minecraft.world.chunk.Chunk chunk){
@@ -65,7 +70,12 @@ public class StateUtil {
     
     public static Chunk getTempChunk(int x, int z){
         Chunk chunk = getChunk(x, z);
-        return chunk == null ? new GenericChunk(x, z, false) : chunk;
+        return chunk == null ? new GenericChunk(new ChunkPos(x, z), false) : chunk;
+    }
+    
+    public static Chunk getTempChunk(ChunkPos pos){
+        Chunk chunk = getChunk(pos);
+        return chunk == null ? new GenericChunk(pos, false) : chunk;
     }
     
     public static Chunk getTempChunk(ResourceLocation ckpos){

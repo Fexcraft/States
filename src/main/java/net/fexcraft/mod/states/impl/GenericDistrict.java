@@ -23,12 +23,12 @@ public class GenericDistrict implements District {
 	
 	private int id, chunks;
 	private DistrictType type;
-	private long created, changed, price;
+	private long created, changed, price, chunktax;
 	private UUID creator, manager;
 	private ArrayList<Integer> neighbors;
 	private String name, color, icon;
 	private Municipality municipality;
-	private boolean cfs;
+	private boolean cfs, onbankrupt;
 	
 	public GenericDistrict(int id){
 		this.id = id;
@@ -46,6 +46,8 @@ public class GenericDistrict implements District {
 		price = JsonUtil.getIfExists(obj, "price", 0).longValue();
 		icon = JsonUtil.getIfExists(obj, "icon", States.DEFAULT_ICON);
 		chunks = JsonUtil.getIfExists(obj, "chunks", 0).intValue();
+		chunktax = JsonUtil.getIfExists(obj, "chunktax", 0).longValue();
+		onbankrupt = JsonUtil.getIfExists(obj, "unclaim_chunks_if_bankrupt", false);
 	}
 
 	@Override
@@ -65,6 +67,8 @@ public class GenericDistrict implements District {
 		obj.addProperty("price", price);
 		if(icon != null){ obj.addProperty("icon", icon); }
 		obj.addProperty("chunks", chunks);
+		if(chunktax > 0){ obj.addProperty("chunktax", chunktax); }
+		obj.addProperty("unclaim_chunks_if_bankrupt", onbankrupt);
 		return obj;
 	}
 
@@ -213,6 +217,26 @@ public class GenericDistrict implements District {
 	@Override
 	public void setClaimedChunks(int i){
 		chunks = i; if(chunks < 0){ chunks = 0; }return;
+	}
+
+	@Override
+	public long getChunkTax(){
+		return chunktax;
+	}
+
+	@Override
+	public void setChunkTax(long tax){
+		chunktax = tax;
+	}
+
+	@Override
+	public boolean unclaimIfBankrupt(){
+		return onbankrupt;
+	}
+
+	@Override
+	public void setUnclaimIfBankrupt(boolean newvalue){
+		onbankrupt = newvalue;
 	}
 
 }

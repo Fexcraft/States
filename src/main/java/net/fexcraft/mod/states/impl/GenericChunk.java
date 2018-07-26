@@ -31,7 +31,7 @@ public class GenericChunk implements Chunk {
 	private District district;
 	private long price;
 	private int x, z;
-	private Integer lx, lz;
+	private ChunkPos link;
 	private long created, changed;
 	private UUID creator;
 	private ArrayList<ResourceLocation> linked;
@@ -40,9 +40,10 @@ public class GenericChunk implements Chunk {
 	private List<UUID> wl_players = new ArrayList<>();
 	private List<Integer> wl_companies = new ArrayList<>();
 	private ChunkPos pos;
+	private long lasttaxcheck, ctax;
 	
-	public GenericChunk(int x, int z, boolean create){
-		this.x = x; this.z = z; pos = new ChunkPos(x, z);
+	public GenericChunk(ChunkPos pos, boolean create){
+		this.x = pos.x; this.z = pos.z; this.pos = pos;
 		JsonElement jsn = StateUtil.read(getChunkFile());
 		JsonObject obj = jsn == null ? new JsonObject() : jsn.getAsJsonObject();
 		price = JsonUtil.getIfExists(obj, "price", Config.DEFAULT_CHUNK_PRICE).longValue();
@@ -53,12 +54,15 @@ public class GenericChunk implements Chunk {
 		linked = JsonUtil.jsonArrayToResourceLocationArray(JsonUtil.getIfExists(obj, "linked", new JsonArray()).getAsJsonArray());
 		type = ChunkType.valueOf(JsonUtil.getIfExists(obj, "type", ChunkType.NORMAL.name()).toUpperCase());
 		owner = JsonUtil.getIfExists(obj, "owner", "null");
+		lasttaxcheck = JsonUtil.getIfExists(obj, "last_tax_collection", 0).longValue();
+		ctax = JsonUtil.getIfExists(obj, "custom_tax", 0).longValue();
 		//
-		String lk = JsonUtil.getIfExists(obj, "link", "");
-		if(lk.length() > 0){
-			String[] link = lk.split(":");
-			lx = Integer.parseInt(link[0]);
-			lz = Integer.parseInt(link[1]);
+		try{
+			String str = JsonUtil.getIfExists(obj, "link", "");
+			if(str.length() > 0){ link = new ChunkPos(str.split(":")); }
+		}
+		catch(Exception e){
+			e.printStackTrace();
 		}
 		//
 		if(obj.has("whitelist")){
@@ -99,8 +103,8 @@ public class GenericChunk implements Chunk {
 		}
 	}
 
-	public GenericChunk(int x, int z){
-		this(x, z, true);
+	public GenericChunk(ChunkPos pos){
+		this(pos, true);
 	}
 
 	@Override
@@ -144,8 +148,8 @@ public class GenericChunk implements Chunk {
 		obj.addProperty("changed", changed);
 		obj.addProperty("type", type.toString());
 		obj.addProperty("owner", owner == null ? "null" : owner);
-		if((Integer)lx != null && (Integer)lz != null){
-			obj.addProperty("link", lx + ":" + lz);
+		if(link != null){
+			obj.addProperty("link", link.x + ":" + link.z);
 		}
 		if(!linked.isEmpty()){
 			JsonArray array = new JsonArray();
@@ -158,6 +162,8 @@ public class GenericChunk implements Chunk {
 			wl_companies.forEach(entry -> array.add(entry));
 			obj.add("whitelist", array);
 		}
+		obj.addProperty("last_tax_collection", lastTaxCollection());
+		if(ctax > 0){ obj.addProperty("custom_tax", ctax); }
 		return obj;
 	}
 
@@ -238,18 +244,13 @@ public class GenericChunk implements Chunk {
 	}
 
 	@Override
-	public int[] getLink(){
-		return lx == null || lz == null ? null : new int[]{lx, lz};
+	public ChunkPos getLink(){
+		return link;
 	}
 
 	@Override
-	public void setLink(Integer x, Integer z){
-		if(x == null || z == null){
-			lx = null; lz = null;
-		}
-		else{
-			lx = x; lz = z;
-		}
+	public void setLink(ChunkPos pos){
+		link = pos;
 	}
 
 	@Override
@@ -276,6 +277,27 @@ public class GenericChunk implements Chunk {
 	@Override
 	public ChunkPos getChunkPos(){
 		return pos;
+	}
+
+	@Override
+	public long lastTaxCollection(){
+		return lasttaxcheck;
+	}
+
+	@Override
+	public void onTaxCollected(long time){
+		lasttaxcheck = time;
+		this.save(); //TODO more checks?
+	}
+
+	@Override
+	public long getCustomTax(){
+		return ctax;
+	}
+
+	@Override
+	public void setCustomTax(long newtax){
+		this.ctax = newtax;
 	}
 
 }

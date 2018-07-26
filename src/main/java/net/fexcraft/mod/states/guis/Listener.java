@@ -108,7 +108,7 @@ public class Listener implements IPacketListener<PacketNBTTagCompound> {
 								compound.setInteger("z", chunk.zCoord());
 								compound.setBoolean("linked", chunk.getLink() != null);
 								if(compound.getBoolean("linked")){
-									compound.setIntArray("link", chunk.getLink());
+									compound.setIntArray("link", new int[]{ chunk.getLink().x, chunk.getLink().z });
 								}
 								compound.setBoolean("owned", chunk.getOwner() != null && !chunk.getOwner().equals("null"));
 								if(compound.getBoolean("owned")){
@@ -161,7 +161,7 @@ public class Listener implements IPacketListener<PacketNBTTagCompound> {
 									compound.setInteger("z", ck.zCoord());
 									compound.setBoolean("linked", ck.getLink() != null);
 									if(compound.getBoolean("linked")){
-										compound.setIntArray("link", ck.getLink());
+										compound.setIntArray("link", new int[]{ chunk.getLink().x, chunk.getLink().z });
 									}
 									compound.setBoolean("owned", ck.getOwner() != null && !ck.getOwner().equals("null"));
 									if(compound.getBoolean("owned")){

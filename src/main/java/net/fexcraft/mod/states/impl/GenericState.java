@@ -25,6 +25,7 @@ public class GenericState implements State {
 	private Account account;
 	private ArrayList<Integer> neighbors, municipalities, blacklist;
 	private ArrayList<UUID> council;
+	private byte chunktaxpercent;
 
 	public GenericState(int value){
 		id = value;
@@ -43,6 +44,7 @@ public class GenericState implements State {
 		blacklist = JsonUtil.jsonArrayToIntegerArray(JsonUtil.getIfExists(obj, "blacklist", new JsonArray()).getAsJsonArray());
 		price = JsonUtil.getIfExists(obj, "price", 0).longValue();
 		icon = JsonUtil.getIfExists(obj, "icon", States.DEFAULT_ICON);
+		chunktaxpercent = JsonUtil.getIfExists(obj, "chunk_tax_percent", 0).byteValue();
 	}
 
 	@Override
@@ -63,6 +65,9 @@ public class GenericState implements State {
 		obj.add("blacklist", JsonUtil.getArrayFromIntegerList(blacklist));
 		obj.addProperty("price", price);
 		if(icon != null){ obj.addProperty("icon", icon); }
+		if(chunktaxpercent > 0){
+			obj.addProperty("chunk_tax_percent", chunktaxpercent);
+		}
 		return obj;
 	}
 
@@ -194,6 +199,16 @@ public class GenericState implements State {
 	@Override
 	public void setIcon(String url){
 		icon = url;
+	}
+
+	@Override
+	public byte getChunkTaxPercentage(){
+		return chunktaxpercent;
+	}
+
+	@Override
+	public void setChunkTaxPercentage(byte newtax){
+		chunktaxpercent = newtax;
 	}
 	
 }

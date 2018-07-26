@@ -39,9 +39,14 @@ public class Sender {
     }
     
     public static void sendAs(EntityPlayer sender, String message, boolean webhook){
-        if(sender == null){ Print.log("SENDER NULL || " + message); }
-        PlayerCapability cap = sender.getCapability(StatesCapabilities.PLAYER, null);
-        String name = "&" + (StateUtil.isAdmin(sender) ? "4" : "6") + "#&8] " + cap.getFormattedNickname();
+    	String name; PlayerCapability cap = null;
+        if(sender == null){
+        	name = "&9#&8] &2" + Config.WEBHOOK_BROADCASTER_NAME;
+        }
+        else{
+            cap = sender.getCapability(StatesCapabilities.PLAYER, null);
+            name = "&" + (StateUtil.isAdmin(sender) ? "4" : "6") + "#&8] " + cap.getFormattedNickname();
+        }
         Static.getServer().getPlayerList().sendMessage(new TextComponentString(Formatter.format(name + "&0: &7" + message)));
         if(webhook){ sendToWebhook(cap, message);}
     }

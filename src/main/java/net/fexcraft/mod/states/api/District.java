@@ -66,5 +66,13 @@ public interface District extends ColorHolder, BuyableType, IconHolder {
 	public int getClaimedChunks();
 	
 	public void setClaimedChunks(int i);
+
+	public long getChunkTax();
+	
+	public void setChunkTax(long tax);
+
+	public boolean unclaimIfBankrupt();
+	
+	public void setUnclaimIfBankrupt(boolean newvalue);
 	
 }

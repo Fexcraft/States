@@ -8,6 +8,8 @@ public class ChunkPos extends net.minecraft.util.math.ChunkPos implements Compar
 	
 	public ChunkPos(int x, int z){ super(x, z); }
 	
+	public ChunkPos(String[] arr){ super(Integer.parseInt(arr[0]), Integer.parseInt(arr[1])); }
+	
 	@Override
 	public int compareTo(net.minecraft.util.math.ChunkPos o){
 		if(this.equals(o)){ return 0; }

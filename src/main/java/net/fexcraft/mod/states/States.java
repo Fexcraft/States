@@ -1,8 +1,9 @@
 package net.fexcraft.mod.states;
 
-import com.google.common.collect.TreeBasedTable;
 import java.io.File;
+import java.util.Calendar;
 import java.util.Collection;
+import java.util.Timer;
 import java.util.TreeMap;
 import java.util.UUID;
 
@@ -35,6 +36,7 @@ import net.fexcraft.mod.states.util.Config;
 import net.fexcraft.mod.states.util.ForcedChunksManager;
 import net.fexcraft.mod.states.util.Sender;
 import net.fexcraft.mod.states.util.StatesPermissions;
+import net.fexcraft.mod.states.util.TaxSystem;
 import net.fexcraft.mod.states.util.UpdateHandler;
 import net.minecraftforge.common.ForgeChunkManager;
 import net.minecraftforge.common.MinecraftForge;
@@ -56,9 +58,10 @@ public class States {
 	
 	public static final String VERSION = "1.1.5";
 	public static final String MODID = "states";
-	public static String ADMIN_PERM = "states.external.admin";
+	public static final String ADMIN_PERM = "states.external.admin";
+	public static final String PREFIX = "&0[&2States&0]";
 	//
-	public static final TreeBasedTable<Integer, Integer, Chunk> CHUNKS = TreeBasedTable.create();
+	public static final TreeMap<ChunkPos, Chunk> CHUNKS = new TreeMap<>();
 	public static final TreeMap<Integer, District> DISTRICTS = new TreeMap<Integer, District>();
 	public static final TreeMap<Integer, Municipality> MUNICIPALITIES = new TreeMap<Integer, Municipality>();
 	public static final TreeMap<Integer, State> STATES = new TreeMap<Integer, State>();
@@ -72,6 +75,7 @@ public class States {
 	//
 	@Mod.Instance(MODID)
 	public static States INSTANCE;
+	public static Timer TAX_TIMER;
 	
 	@Mod.EventHandler
 	public void preInit(FMLPreInitializationEvent event){
@@ -122,8 +126,13 @@ public class States {
 	}
 	
 	@Mod.EventHandler
-	public void serverStarting(FMLServerStartedEvent event){
+	public void serverStarted(FMLServerStartedEvent event){
 		ForcedChunksManager.check();
+		if(TAX_TIMER == null){
+			TAX_TIMER = new Timer(); Calendar calendar = Calendar.getInstance();
+	        calendar.set(Calendar.HOUR_OF_DAY, 12); calendar.set(Calendar.MINUTE, 0); calendar.set(Calendar.SECOND, 0); calendar.set(Calendar.MILLISECOND, 0);
+			TAX_TIMER.schedule(new TaxSystem(), calendar.getTime(), Config.TAX_INTERVAL);
+		}
 	}
 	
 	@Mod.EventHandler

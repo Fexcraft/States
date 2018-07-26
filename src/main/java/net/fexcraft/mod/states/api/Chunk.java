@@ -8,9 +8,10 @@ import com.google.gson.JsonObject;
 
 import net.fexcraft.mod.states.States;
 import net.fexcraft.mod.states.api.root.BuyableType;
+import net.fexcraft.mod.states.api.root.Taxable;
 import net.minecraft.util.ResourceLocation;
 
-public interface Chunk extends BuyableType {
+public interface Chunk extends BuyableType, Taxable {
 	
 	public int xCoord();
 	
@@ -52,10 +53,10 @@ public interface Chunk extends BuyableType {
 	
 	public void setOwner(String str);
 	
-	public int[] getLink();
+	public ChunkPos getLink();
 	
-	/** Set either to null to reset. */
-	public void setLink(Integer x, Integer z);
+	/** Set to null to reset. */
+	public void setLink(ChunkPos pos);
 	
 	public List<UUID> getPlayerWhitelist();
 	

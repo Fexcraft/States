@@ -61,4 +61,8 @@ public interface State extends ColorHolder, BuyableType, IconHolder {
 
 	public List<Integer> getBlacklist();
 
+	public byte getChunkTaxPercentage();
+	
+	public void setChunkTaxPercentage(byte newtax);
+
 }

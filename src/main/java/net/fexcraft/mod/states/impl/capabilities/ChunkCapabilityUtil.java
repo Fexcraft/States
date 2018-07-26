@@ -1,8 +1,8 @@
 package net.fexcraft.mod.states.impl.capabilities;
 
-import net.fexcraft.mod.states.States;
 import net.fexcraft.mod.states.api.capabilities.ChunkCapability;
 import net.fexcraft.mod.states.api.capabilities.StatesCapabilities;
+import net.fexcraft.mod.states.util.StateUtil;
 import net.minecraft.nbt.NBTBase;
 import net.minecraft.nbt.NBTTagString;
 import net.minecraft.util.EnumFacing;
@@ -88,7 +88,7 @@ public class ChunkCapabilityUtil implements ICapabilitySerializable<NBTBase>{
         public net.fexcraft.mod.states.api.Chunk getStatesChunk(boolean allownull){
             if(allownull){ return statechunk; }
             if(statechunk == null){
-                statechunk = States.CHUNKS.get(chunk.x, chunk.z);
+                statechunk = StateUtil.getChunk(chunk.x, chunk.z);
             }
             return statechunk;
         }

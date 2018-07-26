@@ -7,6 +7,7 @@ import java.util.UUID;
 
 import net.fexcraft.mod.lib.util.common.Static;
 import net.fexcraft.mod.lib.util.json.JsonUtil;
+import net.fexcraft.mod.lib.util.math.Time;
 import net.fexcraft.mod.states.States;
 import net.fexcraft.mod.states.api.MunicipalityType;
 import net.minecraftforge.common.config.ConfigElement;
@@ -17,7 +18,7 @@ import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
 public class Config {
 	
 	public static File CONFIG_PATH;
-	public static long DEFAULT_CHUNK_PRICE, MUNICIPALITY_CREATION_PRICE, STATE_CREATION_PRICE, DISTRICT_CREATION_PRICE;
+	public static long DEFAULT_CHUNK_PRICE, MUNICIPALITY_CREATION_PRICE, STATE_CREATION_PRICE, DISTRICT_CREATION_PRICE, TAX_INTERVAL;
 	public static int MAP_UPDATES_PER_TICK, BOT_PORT, TRANSIT_ZONE_BOTTOM_LIMIT, TRANSIT_ZONE_TOP_LIMIT, CHUNK_PER_CITIZEN, NICKNAME_LENGTH, LOADED_CHUNKS_PER_MUNICIPALITY;
 	public static boolean ALLOW_WILDERNESS_ACCESS, ALLOW_TRANSIT_ZONES;
 	public static String WEBHOOK, BOT_KEY, WEBHOOK_ICON, WEBHOOK_BROADCASTER_NAME;
@@ -70,6 +71,7 @@ public class Config {
 		NICKNAME_LENGTH = config.getInt("nickname_length", DEFAULT_CAT, 40, 3, 128, "Max length of Player Nicknames (/nick).");
 		WEBHOOK_BROADCASTER_NAME = config.getString("discord_webhook_broadcaster_name", DEFAULT_CAT, "States Broadcaster", "The \"Server's\" name when sending messages to the webhook which aren't from a player, e.g. on server start/stop.");
 		LOADED_CHUNKS_PER_MUNICIPALITY = config.getInt("loaded_chunks_per_municipality", DEFAULT_CAT, 0, 0, 128, "Amount of max (force) loaded chunks a Municipality can have.");
+		TAX_INTERVAL = config.getInt("tax_interval", DEFAULT_CAT, (int)Time.DAY_MS, 1000, Integer.MAX_VALUE, "Intervals between tax collection cycles, 1000 = 1 second.");
 		updateWebHook();
 	}
 

@@ -57,7 +57,7 @@ public class PlayerEvents {
 		}
 		if(!player.isLoaded()){ player.load(); }
 		States.PLAYERS.put(event.player.getGameProfile().getId(), player);
-		Print.chat(event.player, "&e====-====-====-====-====-====&0[&2States&0]");
+		Print.chat(event.player, "&e====-====-====-====-====-====" + States.PREFIX);
 		Print.chat(event.player, "&6Welcome back " + player.getFormattedNickname() + "&6!");//TODO replace with nick
 		if(event.player.dimension != 0){
 			Print.chat(event.player, "&2You are currently in &7DIM($0)&0.".replace("$0", event.player.dimension + ""));
@@ -70,7 +70,7 @@ public class PlayerEvents {
 		}
 		int i = StateUtil.getUnreadMailsOf("player", event.player.getGameProfile().getId().toString());
 		Print.chat(event.player, "&6You have &7" + (i <= 0 ? "no" : i) + "&6 new mail" + (i == 1 ? "" : "s") + ".");
-		Print.chat(event.player, "&e====-====-====-====-====-====&0[&2States&0]");
+		Print.chat(event.player, "&e====-====-====-====-====-====" + States.PREFIX);
 		sendLocationUpdate(event.player, null, "&6Welcome back " + player.getFormattedNickname() + "&6!", "", "", 3);
 		if(UpdateHandler.STATE != null){
 			Print.chat(event.player, UpdateHandler.STATE);

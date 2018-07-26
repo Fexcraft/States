@@ -13,6 +13,7 @@ import net.fexcraft.mod.lib.util.common.Static;
 import net.fexcraft.mod.lib.util.math.Time;
 import net.fexcraft.mod.states.States;
 import net.fexcraft.mod.states.api.Chunk;
+import net.fexcraft.mod.states.api.ChunkPos;
 import net.fexcraft.mod.states.api.ChunkType;
 import net.fexcraft.mod.states.api.capabilities.PlayerCapability;
 import net.fexcraft.mod.states.api.capabilities.StatesCapabilities;
@@ -137,7 +138,7 @@ public class ChunkCmd extends CommandBase {
 						Print.chat(sender, "&c-> &9" + chunk.getLinkedChunks().get(i));
 					}
 				}
-				Print.chat(sender, "&9Linked: &7" + (chunk.getLink() == null ? "false" : chunk.getLink()[0] + "x, " + chunk.getLink()[1] + "z"));
+				Print.chat(sender, "&9Linked: &7" + (chunk.getLink() == null ? "false" : chunk.getLink().x + "x, " + chunk.getLink().z + "z"));
 				Print.chat(sender, "&2Claimed by &7" + Static.getPlayerNameByUUID(chunk.getClaimer()) + "&2 at &8" + Time.getAsString(chunk.getCreated()));
 				if(chunk.getDistrict().getId() == -2){
 					Print.chat(sender, "&9Transit Zone till: &7" + Time.getAsString(chunk.getChanged() + Time.DAY_MS));
@@ -498,7 +499,7 @@ public class ChunkCmd extends CommandBase {
 						return;
 					}
 					if(args[1].equals("reset")){
-						chunk.setLink(null, null);
+						chunk.setLink(null);
 						Print.chat(sender, "&6Chunk unlinked.");
 						StateLogger.log(StateLogger.LoggerType.CHUNK, StateLogger.player(player) + " unliked the " + StateLogger.chunk(chunk) + ".");
 					}
@@ -511,7 +512,7 @@ public class ChunkCmd extends CommandBase {
 								Print.chat(sender, "&cYou must be the owner of the Linked chunk aswel!");
 								return;
 							}
-							chunk.setLink(x, z);
+							chunk.setLink(new ChunkPos(x, z));
 							Print.chat(sender, "&6Chunk linked. ( " + x + " | " + z + " );");
 							StateLogger.log(StateLogger.LoggerType.CHUNK, StateLogger.player(player) + " linked " + StateLogger.chunk(chunk) + " to (" + x + ", " + z + ").");
 						}
@@ -623,6 +624,7 @@ public class ChunkCmd extends CommandBase {
 				if(hasPerm("chunk.forceload", player, chunk)){
 					boolean bool = Boolean.parseBoolean(args[1]);
 					chunk.getMunicipality().modifyForceloadedChunk(player, chunk.getChunkPos(), bool);
+					StateLogger.log(StateLogger.LoggerType.MUNICIPALITY, StateLogger.player(player) + " " + (bool ? "enabled" : "disabled") + " chunk force-loading at " + StateLogger.chunk(chunk) + ", in the District of " + StateLogger.district(chunk.getDistrict()) + ", which is in " + StateLogger.municipality(chunk.getMunicipality()) + ".");
 					return;
 				}
 				return;
@@ -636,8 +638,8 @@ public class ChunkCmd extends CommandBase {
 
 	private boolean isPermitted(Chunk chunk, EntityPlayer player){
 		if(chunk.getLink() != null){
-			int[] link = chunk.getLink();
-			Print.chat(player, "&7Chunk is linked to a chunk at &2" + link[0] + "x&7, &2" + link[1] + "z&7.");
+			ChunkPos link = chunk.getLink();
+			Print.chat(player, "&7Chunk is linked to a chunk at &2" + link.x + "x&7, &2" + link.z + "z&7.");
 			Print.chat(player, "&7Please make changes to that chunk, they will be copied to this one.");
 			Print.chat(player, "&7Alternatively unlink this chunk.");
 			return false;
@@ -672,8 +674,8 @@ public class ChunkCmd extends CommandBase {
 	
 	private boolean isOwner(Chunk chunk, EntityPlayer player){
 		if(chunk.getLink() != null){
-			int[] link = chunk.getLink();
-			Print.chat(player, "&7Chunk is linked to a chunk at &2" + link[0] + "x&7, &2" + link[1] + "z&7.");
+			ChunkPos link = chunk.getLink();
+			Print.chat(player, "&7Chunk is linked to a chunk at &2" + link.x + "x&7, &2" + link.z + "z&7.");
 			Print.chat(player, "&7Please make changes to that chunk, they will be copied to this one.");
 			Print.chat(player, "&7Alternatively unlink this chunk.");
 			return false;

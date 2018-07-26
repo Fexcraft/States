@@ -29,14 +29,14 @@ public class GenericMunicipality implements Municipality/*, Taxable*/ {
 	
 	private int id;
 	private String name, color, icon;
-	private long created, changed, price;
+	private long created, changed, price, citizentax;
 	private UUID creator, mayor;
 	private Account account;
 	private ArrayList<Integer> neighbors, districts, com_blacklist;
 	private ArrayList<UUID> citizen, council, pl_blacklist;
 	private MunicipalityType type;
 	private State state;
-	private boolean open;
+	private boolean open, kib;
 	
 	public GenericMunicipality(int id){
 		this.id = id;
@@ -59,6 +59,8 @@ public class GenericMunicipality implements Municipality/*, Taxable*/ {
 		pl_blacklist = JsonUtil.jsonArrayToUUIDArray(JsonUtil.getIfExists(obj, "player_blacklist", new JsonArray()).getAsJsonArray());
 		price = JsonUtil.getIfExists(obj, "price", 0).longValue();
 		icon = JsonUtil.getIfExists(obj, "icon", States.DEFAULT_ICON);
+		kib = JsonUtil.getIfExists(obj, "kick_if_bankrupt", false);
+		citizentax = JsonUtil.getIfExists(obj, "citizen_tax", 0).longValue();
 	}
 
 	@Override
@@ -80,6 +82,8 @@ public class GenericMunicipality implements Municipality/*, Taxable*/ {
 		obj.addProperty("open", false);
 		obj.addProperty("price", price);
 		if(icon != null){ obj.addProperty("icon", icon); }
+		obj.addProperty("kick_if_bankrupt", kib);
+		obj.addProperty("citizen_tax", citizentax);
 		return obj;
 	}
 
@@ -297,6 +301,26 @@ public class GenericMunicipality implements Municipality/*, Taxable*/ {
 			Print.chat(sender, "&aChunk removed.");
 			return true;
 		}
+	}
+
+	@Override
+	public long getCitizenTax(){
+		return citizentax;
+	}
+
+	@Override
+	public void setCitizenTax(long newtax){
+		citizentax = newtax;
+	}
+
+	@Override
+	public boolean kickIfBankrupt(){
+		return kib;
+	}
+
+	@Override
+	public void setKickIfBankrupt(boolean newvalue){
+		kib = newvalue;
 	}
 
 }

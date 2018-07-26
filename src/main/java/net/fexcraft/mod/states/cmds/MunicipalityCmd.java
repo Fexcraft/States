@@ -3,6 +3,8 @@ package net.fexcraft.mod.states.cmds;
 import java.awt.Color;
 import java.util.Collection;
 
+import org.apache.commons.lang3.math.NumberUtils;
+
 import com.google.gson.JsonObject;
 import com.mojang.authlib.GameProfile;
 
@@ -95,6 +97,7 @@ public class MunicipalityCmd extends CommandBase {
 				Print.chat(sender, "&6Color: &7" + mun.getColor());
 				Print.chat(sender, "&8Citizen: &7" + mun.getCitizen().size());
 				Print.chat(sender, "&9Balance: &7" + Config.getWorthAsString(mun.getAccount().getBalance()));
+				Print.chat(sender, "&9Citizen Tax: &7" + (mun.getCitizenTax() > 0 ? ggas(mun.getCitizenTax()) : "none"));
 				Print.chat(sender, "&9Last change: &7" + Time.getAsString(mun.getChanged()));
 				Print.chat(sender, "&9Council Members: &7" + mun.getCouncil().size());
 				mun.getCouncil().forEach(uuid -> {
@@ -107,6 +110,7 @@ public class MunicipalityCmd extends CommandBase {
 					Print.chat(sender, "&c-> &9" + municipality.getName() + " &7(" + municipality.getId() + ");");
 				});
 				Print.chat(sender, "&3Open to join: " + mun.isOpen());
+				Print.chat(sender, "&8Kick if Bankrupt: " + mun.kickIfBankrupt());
 				Print.chat(sender, "&6Chunks: &7" + mun.getClaimedChunks() + "&8/&9" + MunicipalityType.getChunkLimitFor(mun));
 				Print.chat(sender, "&2Created by &7" + Static.getPlayerNameByUUID(mun.getCreator()) + "&2 at &8" + Time.getAsString(mun.getCreated()));
 				Collection<?> coll = mun.getForceLoadedChunks();
@@ -178,6 +182,8 @@ public class MunicipalityCmd extends CommandBase {
 					Print.chat(sender, "&7/mun set price <price/0>");
 					Print.chat(sender, "&7/mun set color <hex>");
 					Print.chat(sender, "&7/mun set icon <url>");
+					Print.chat(sender, "&7/mun set citizen-tax <amount/reset>");
+					Print.chat(sender, "&7/dis set kick-if-brankrupt <true/false>");
 					return;
 				}
 				switch(args[1]){
@@ -298,6 +304,32 @@ public class MunicipalityCmd extends CommandBase {
 						}
 						else{
 							Print.chat(sender, "&cNo permission.");
+						}
+						break;
+					}
+					case "citizen-tax":{
+						if(hasPerm("municipality.set.citizentax", player, mun)){
+							if(args[2].equals("reset") || args[2].equals("disable")){
+								mun.setCitizenTax(0); mun.save();
+								Print.chat(sender, "&9Municipality's Citizen Tax was reset!");
+							}
+							else if(NumberUtils.isCreatable(args[2])){
+								mun.setCitizenTax(Long.parseLong(args[2])); mun.save();
+								Print.chat(sender, "&9Municipality's Citizen Tax was set! (" + ggas(mun.getCitizenTax()) + ")");
+							}
+							else{
+								Print.chat(sender, "Not a (valid) number.");
+							}
+						}
+						break;
+					}
+					case "kick-if-brankrupt":{
+						if(hasPerm("municipality.set.kick-if-brankrupt", player, mun)){
+							if(args.length < 3){ Print.chat(sender, "&9Missing Argument!"); break; }
+							mun.setKickIfBankrupt(Boolean.parseBoolean(args[2]));
+							mun.setChanged(Time.getDate()); mun.save();
+							Print.chat(sender, "&2KIB: &7" + mun.kickIfBankrupt());
+							StateLogger.log(StateLogger.LoggerType.DISRICT, StateLogger.player(player) + " changed 'kick-if-brankrupt' of " + StateLogger.municipality(mun) + " to " + mun.kickIfBankrupt() + ".");
 						}
 						break;
 					}
@@ -684,6 +716,10 @@ public class MunicipalityCmd extends CommandBase {
 				return;
 			}
 		}
+	}
+
+	private String ggas(long citizenTax){
+		return ChunkCmd.ggas(citizenTax);
 	}
 
 	public static final boolean hasPerm(String perm, EntityPlayer player, Object obj){

@@ -10,6 +10,7 @@ import net.fexcraft.mod.states.api.Chunk;
 import net.fexcraft.mod.states.api.District;
 import net.fexcraft.mod.states.api.Municipality;
 import net.fexcraft.mod.states.api.State;
+import net.fexcraft.mod.states.api.capabilities.PlayerCapability;
 import net.minecraft.entity.player.EntityPlayer;
 
 public class StateLogger {
@@ -73,6 +74,10 @@ public class StateLogger {
 
 	public static String player(GameProfile gp){
 		return gp.getId().toString() + "(" + gp.getName() + ")";
+	}
+
+	public static String player(PlayerCapability cap){
+		return player(cap.getEntityPlayer());
 	}
 
 	public static String chunk(Chunk chunk){

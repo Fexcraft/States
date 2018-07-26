@@ -16,6 +16,7 @@ import net.fexcraft.mod.states.api.Municipality;
 import net.fexcraft.mod.states.api.State;
 import net.fexcraft.mod.states.api.capabilities.PlayerCapability;
 import net.fexcraft.mod.states.util.StateUtil;
+import net.fexcraft.mod.states.util.TaxSystem;
 import net.minecraft.command.ICommandSender;
 import net.minecraft.entity.player.EntityPlayer;
 
@@ -25,7 +26,7 @@ public class GenericPlayer implements PlayerCapability {
 	private String nick;
 	private UUID uuid;
 	private int color = 2;
-	private long lastsave, lastpos;
+	private long lastsave, lastpos, lasttaxcoll, customtax;
 	private Account account;
 	private Chunk last_chunk, current_chunk;
 	//
@@ -55,6 +56,8 @@ public class GenericPlayer implements PlayerCapability {
 		}
 		obj.addProperty("color", color);
 		obj.addProperty("municipality", municipality == null ? -1 : municipality.getId());
+		obj.addProperty("last_tax_collection", lasttaxcoll);
+		if(customtax > 0){ obj.addProperty("custom_tax", customtax); }
 		return obj;
 	}
 
@@ -77,7 +80,10 @@ public class GenericPlayer implements PlayerCapability {
 			}
 		}
 		this.account = AccountManager.INSTANCE.getAccount("player", uuid.toString(), true);
+		this.lasttaxcoll = JsonUtil.getIfExists(obj, "last_tax_collection", 0).longValue();
+		this.customtax = JsonUtil.getIfExists(obj, "custom_tax", 0).longValue();
 		loaded = true;
+		TaxSystem.processPlayerTax(TaxSystem.getProbableSchedule(), this);
 	}
 
 	@Override
@@ -237,6 +243,27 @@ public class GenericPlayer implements PlayerCapability {
 	@Override
 	public boolean isLoaded(){
 		return loaded;
+	}
+
+	@Override
+	public long lastTaxCollection(){
+		return lasttaxcoll;
+	}
+
+	@Override
+	public void onTaxCollected(long time){
+		this.lasttaxcoll = time;
+		this.save();
+	}
+
+	@Override
+	public long getCustomTax(){
+		return customtax;
+	}
+
+	@Override
+	public void setCustomTax(long newtax){
+		this.customtax = newtax;
 	}
 
 }

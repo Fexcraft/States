@@ -82,4 +82,12 @@ public interface Municipality extends ColorHolder, BuyableType, IconHolder {
 	
 	public @Nullable boolean modifyForceloadedChunk(ICommandSender sender, ChunkPos pos, boolean add_rem);
 
+	public long getCitizenTax();
+	
+	public void setCitizenTax(long tax);
+
+	public boolean kickIfBankrupt();
+	
+	public void setKickIfBankrupt(boolean newvalue);
+
 }

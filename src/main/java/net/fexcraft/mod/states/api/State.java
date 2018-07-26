@@ -65,4 +65,8 @@ public interface State extends ColorHolder, BuyableType, IconHolder {
 	
 	public void setChunkTaxPercentage(byte newtax);
 
+	public byte getCitizenTaxPercentage();
+	
+	public void setCitizenTaxPercentage(byte newtax);
+
 }

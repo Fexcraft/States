@@ -91,6 +91,7 @@ public class StateCmd extends CommandBase {
 				Print.chat(sender, "&9Balance: &7" + Config.getWorthAsString(state.getAccount().getBalance()));
 				Print.chat(sender, "&9Last change: &7" + Time.getAsString(state.getChanged()));
 				Print.chat(sender, "&9ChunkTax%: &7" + state.getChunkTaxPercentage() + "%");
+				Print.chat(sender, "&9CitizenTax%: &7" + state.getCitizenTaxPercentage() + "%");
 				Print.chat(sender, "&9Council Members: &7" + state.getCouncil().size());
 				state.getCouncil().forEach(uuid -> {
 					Print.chat(sender, "&c-> &9" + Static.getPlayerNameByUUID(uuid));
@@ -116,6 +117,7 @@ public class StateCmd extends CommandBase {
 					Print.chat(sender, "&7/st set capital <municipality id>");
 					Print.chat(sender, "&7/st set icon <url>");
 					Print.chat(sender, "&7/st set chunk-tax-percentage <0-100/reset>");
+					Print.chat(sender, "&7/st set citizen-tax-percentage <0-100/reset>");
 					return;
 				}
 				switch(args[1]){
@@ -255,6 +257,24 @@ public class StateCmd extends CommandBase {
 								if(byt > 100){ byt = 100; } if(byt < 0){ byt = 0; }
 								state.setChunkTaxPercentage(byt); state.save();
 								Print.chat(sender, "&9State's Chunk Tax Percentage was set! (" + state.getChunkTaxPercentage() + "%)");
+							}
+							else{
+								Print.chat(sender, "Not a (valid) number.");
+							}
+						}
+						break;
+					}
+					case "citizen-tax-percentage":{
+						if(hasPerm("state.set.citizen-tax-percentage", player, state)){
+							if(args[2].equals("reset") || args[2].equals("disable")){
+								state.setCitizenTaxPercentage((byte)0); state.save();
+								Print.chat(sender, "&State's Citizen Tax Percentage was reset!");
+							}
+							else if(NumberUtils.isCreatable(args[2])){
+								byte byt = Byte.parseByte(args[2]);
+								if(byt > 100){ byt = 100; } if(byt < 0){ byt = 0; }
+								state.setCitizenTaxPercentage(byt); state.save();
+								Print.chat(sender, "&9State's Citizen Tax Percentage was set! (" + state.getCitizenTaxPercentage() + "%)");
 							}
 							else{
 								Print.chat(sender, "Not a (valid) number.");

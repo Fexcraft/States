@@ -91,6 +91,7 @@ public class DistrictCmd extends CommandBase {
 				});
 				Print.chat(sender, "&9Chunks: &7" + dis.getClaimedChunks());
 				Print.chat(sender, "&7Can Foreigners Settle: " + dis.canForeignersSettle());
+				Print.chat(sender, "&8Unclaim if Bankrupt: " + dis.unclaimIfBankrupt());
 				Print.chat(sender, "&2Created by &7" + Static.getPlayerNameByUUID(dis.getCreator()) + "&2 at &8" + Time.getAsString(dis.getCreated()));
 				return;
 			}
@@ -121,6 +122,7 @@ public class DistrictCmd extends CommandBase {
 					Print.chat(sender, "&7/dis set can-foreigners-settle <true/false>");
 					Print.chat(sender, "&7/dis set icon <url>");
 					Print.chat(sender, "&7/dis set chunk-tax <amount/reset>");
+					Print.chat(sender, "&7/dis set unclaim-if-brankrupt <true/false>");
 					return;
 				}
 				switch(args[1]){
@@ -310,6 +312,16 @@ public class DistrictCmd extends CommandBase {
 							else{
 								Print.chat(sender, "Not a (valid) number.");
 							}
+						}
+						break;
+					}
+					case "unclaim-if-brankrupt":{
+						if(hasPerm("district.set.unclaim-if-brankrupt", player, dis)){
+							if(args.length < 3){ Print.chat(sender, "&9Missing Argument!"); break; }
+							dis.setUnclaimIfBankrupt(Boolean.parseBoolean(args[2]));
+							dis.setChanged(Time.getDate()); dis.save();
+							Print.chat(sender, "&2UIB: &7" + dis.unclaimIfBankrupt());
+							StateLogger.log(StateLogger.LoggerType.DISRICT, StateLogger.player(player) + " changed 'unclaim-if-brankrupt' of " + StateLogger.district(dis) + " to " + dis.unclaimIfBankrupt() + ".");
 						}
 						break;
 					}

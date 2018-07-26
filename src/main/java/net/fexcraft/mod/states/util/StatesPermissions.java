@@ -153,6 +153,10 @@ public class StatesPermissions {
 		PERMISSIONS.put("chunk.set.customtax", new Permission(PermissionGroup.MUNICIPALITY, PermissionLevel.DIS_MANAGER, PermissionLevel.ADMIN));
 		PERMISSIONS.put("district.set.chunktax", new Permission(PermissionGroup.MUNICIPALITY, PermissionLevel.DIS_MANAGER, PermissionLevel.MUNICIPALITY_COUNCIL, PermissionLevel.STATE_COUNCIL, PermissionLevel.ADMIN));
 		PERMISSIONS.put("state.set.chunk-tax-percentage", new Permission(PermissionGroup.STATE, PermissionLevel.ADMIN));
+		PERMISSIONS.put("district.set.unclaim-if-brankrupt", new Permission(PermissionGroup.DISTRICT, PermissionLevel.MUNICIPALITY_COUNCIL, PermissionLevel.ADMIN));
+		PERMISSIONS.put("municipality.set.citizentax", new Permission(PermissionGroup.MUNICIPALITY, PermissionLevel.MUNICIPALITY_COUNCIL, PermissionLevel.STATE_COUNCIL, PermissionLevel.ADMIN));
+		PERMISSIONS.put("municipality.set.kick-if-brankrupt", new Permission(PermissionGroup.SKIP, PermissionLevel.MUNICIPALITY_MAYOR, PermissionLevel.MUNICIPALITY_COUNCIL, PermissionLevel.ADMIN));
+		PERMISSIONS.put("state.set.citizen-tax-percentage", new Permission(PermissionGroup.STATE, PermissionLevel.ADMIN));
 		
 	}
 

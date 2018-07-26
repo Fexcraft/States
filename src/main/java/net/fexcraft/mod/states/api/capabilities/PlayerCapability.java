@@ -13,12 +13,13 @@ import net.fexcraft.mod.states.api.Chunk;
 import net.fexcraft.mod.states.api.District;
 import net.fexcraft.mod.states.api.Municipality;
 import net.fexcraft.mod.states.api.State;
+import net.fexcraft.mod.states.api.root.Taxable;
 import net.minecraft.command.ICommandSender;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.world.World;
 
-public interface PlayerCapability extends ICommandSender {
+public interface PlayerCapability extends ICommandSender, Taxable {
 	
 	public Municipality getMunicipality();
 	

@@ -149,7 +149,10 @@ public class StatesPermissions {
 		PERMISSIONS.put("district.create", new Permission(PermissionGroup.ADMIN, PermissionLevel.MUNICIPALITY_MAYOR));
 		PERMISSIONS.put("nickname.change.self", new Permission(PermissionGroup.SKIP, PermissionLevel.NONE));
 		PERMISSIONS.put("nickname.change.others", new Permission(PermissionGroup.ADMIN, PermissionLevel.SKIP));
-		PERMISSIONS.put("chunk.forceload", new Permission(PermissionGroup.MUNICIPALITY, PermissionLevel.STATE_COUNCIL, PermissionLevel.ADMIN));
+		PERMISSIONS.put("chunk.set.forceloaded", new Permission(PermissionGroup.MUNICIPALITY, PermissionLevel.STATE_COUNCIL, PermissionLevel.ADMIN));
+		PERMISSIONS.put("chunk.set.customtax", new Permission(PermissionGroup.MUNICIPALITY, PermissionLevel.DIS_MANAGER, PermissionLevel.ADMIN));
+		PERMISSIONS.put("district.set.chunktax", new Permission(PermissionGroup.MUNICIPALITY, PermissionLevel.DIS_MANAGER, PermissionLevel.MUNICIPALITY_COUNCIL, PermissionLevel.STATE_COUNCIL, PermissionLevel.ADMIN));
+		PERMISSIONS.put("state.set.chunk-tax-percentage", new Permission(PermissionGroup.STATE, PermissionLevel.ADMIN));
 		
 	}
 

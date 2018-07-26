@@ -23,6 +23,7 @@ import net.fexcraft.mod.states.util.Config;
 import net.fexcraft.mod.states.util.ImageCache;
 import net.fexcraft.mod.states.util.StateLogger;
 import net.fexcraft.mod.states.util.StateUtil;
+import net.fexcraft.mod.states.util.TaxSystem;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.world.World;
 
@@ -101,6 +102,7 @@ public class GenericChunk implements Chunk {
 			this.setDistrict(StateUtil.getDistrict(-1));
 			save();
 		}
+		TaxSystem.processChunkTax(TaxSystem.getProbableSchedule(), this);
 	}
 
 	public GenericChunk(ChunkPos pos){

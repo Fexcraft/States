@@ -2,6 +2,8 @@ package net.fexcraft.mod.states.cmds;
 
 import java.awt.Color;
 
+import org.apache.commons.lang3.math.NumberUtils;
+
 import com.mojang.authlib.GameProfile;
 
 import net.fexcraft.mod.fsmm.api.Bank;
@@ -80,6 +82,7 @@ public class DistrictCmd extends CommandBase {
 				Print.chat(sender, "&9Price: &7" + (dis.getPrice() > 0 ? Config.getWorthAsString(dis.getPrice()) : "not for sale"));
 				Print.chat(sender, "&9Type: &7" + dis.getType().name().toLowerCase());
 				Print.chat(sender, "&9Color: &7" + dis.getColor());
+				Print.chat(sender, "&9Chunk Tax: &7" + (dis.getChunkTax() > 0 ? ggas(dis.getChunkTax()) : "none"));
 				Print.chat(sender, "&9Last change: &7" + Time.getAsString(dis.getChanged()));
 				Print.chat(sender, "&9Neighbors: &7" + dis.getNeighbors().size());
 				dis.getNeighbors().forEach(var -> {
@@ -117,6 +120,7 @@ public class DistrictCmd extends CommandBase {
 					Print.chat(sender, "&7/dis set color <hex>");
 					Print.chat(sender, "&7/dis set can-foreigners-settle <true/false>");
 					Print.chat(sender, "&7/dis set icon <url>");
+					Print.chat(sender, "&7/dis set chunk-tax <amount/reset>");
 					return;
 				}
 				switch(args[1]){
@@ -293,6 +297,22 @@ public class DistrictCmd extends CommandBase {
 						}
 						break;
 					}
+					case "chunk-tax":{
+						if(hasPerm("district.set.chunktax", player, dis)){
+							if(args[2].equals("reset") || args[2].equals("disable")){
+								dis.setChunkTax(0); dis.save();
+								Print.chat(sender, "&9District's Chunk Tax was reset!");
+							}
+							else if(NumberUtils.isCreatable(args[2])){
+								dis.setChunkTax(Long.parseLong(args[2])); dis.save();
+								Print.chat(sender, "&9District's Chunk Tax was set! (" + ggas(dis.getChunkTax()) + ")");
+							}
+							else{
+								Print.chat(sender, "Not a (valid) number.");
+							}
+						}
+						break;
+					}
 				}
 				return;
 			}
@@ -384,6 +404,10 @@ public class DistrictCmd extends CommandBase {
 		}
 	}
 	
+	private String ggas(long tax){
+		return ChunkCmd.ggas(tax);
+	}
+
 	private boolean nearbySameMunicipality(Chunk ck, Municipality mun){
 		Chunk chunk = null;
 		for(int[] cor : Listener.coords){

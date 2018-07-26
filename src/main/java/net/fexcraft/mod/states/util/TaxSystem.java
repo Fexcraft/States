@@ -1,6 +1,7 @@
 package net.fexcraft.mod.states.util;
 
 import java.io.File;
+import java.util.Calendar;
 import java.util.Collection;
 import java.util.Map.Entry;
 import java.util.TimerTask;
@@ -17,6 +18,7 @@ import net.fexcraft.mod.lib.util.math.Time;
 import net.fexcraft.mod.states.States;
 import net.fexcraft.mod.states.api.Chunk;
 import net.fexcraft.mod.states.api.ChunkPos;
+import net.fexcraft.mod.states.api.ChunkType;
 import net.fexcraft.mod.states.api.Mail;
 import net.fexcraft.mod.states.api.MailType;
 import net.fexcraft.mod.states.api.Municipality;
@@ -24,7 +26,8 @@ import net.fexcraft.mod.states.impl.GenericMail;
 
 public class TaxSystem extends TimerTask {
 	
-	private long last_interval;
+	private static long last_interval;
+	private static boolean loaded;
 
 	@Override
 	public void run(){
@@ -40,17 +43,17 @@ public class TaxSystem extends TimerTask {
 			StateLogger.log(StateLogger.LoggerType.CHUNK, "Collecting tax from loaded chunks...");
 			ImmutableMap<ChunkPos, Chunk> map = ImmutableMap.copyOf(States.CHUNKS);
 			for(Chunk chunk  : map.values()){
-				this.processChunkTax(date, chunk);
+				TaxSystem.processChunkTax(date, chunk);
 			}
 			StateLogger.log(StateLogger.LoggerType.MUNICIPALITY, "Collecting tax from loaded municipalities...");
 			ImmutableMap<Integer, Municipality> mapm = ImmutableMap.copyOf(States.MUNICIPALITIES);
 			for(Municipality mun : mapm.values()){
-				this.processMunicipalityTax(date, mun);
+				TaxSystem.processMunicipalityTax(date, mun);
 			}
 			StateLogger.log(StateLogger.LoggerType.MUNICIPALITY, "Collecting tax from force-loaded chunks...");
 			ImmutableMap<Integer, Collection<ChunkPos>> maplc = ImmutableMap.copyOf(States.LOADED_CHUNKS);
 			for(Entry<Integer, Collection<ChunkPos>> entry : maplc.entrySet()){
-				this.processLoadedChunkTax(date, entry.getKey(), entry.getValue());
+				TaxSystem.processLoadedChunkTax(date, entry.getKey(), entry.getValue());
 			}
 			Sender.sendAs(null, "Finished collecting tax.");
 			last_interval = date; save();
@@ -63,30 +66,27 @@ public class TaxSystem extends TimerTask {
 		}
 	}
 
-	private void processLoadedChunkTax(long date, Integer key, Collection<ChunkPos> value){
+	public static void processLoadedChunkTax(long date, Integer key, Collection<ChunkPos> value){
+		if(!loaded){ return; }
 		//if(value.lastTaxCollection() + Config.TAX_INTERVAL > date){ return; }
 	}
 
-	private void processMunicipalityTax(long date, Municipality value){
+	public static void processMunicipalityTax(long date, Municipality value){
+		if(!loaded){ return; }
 		//if(value.lastTaxCollection() + Config.TAX_INTERVAL > date){ return; }
 	}
 
-	private void processChunkTax(long date, Chunk value){
+	public static void processChunkTax(long date, Chunk value){
+		if(!loaded){ return; }
 		if(value.lastTaxCollection() + Config.TAX_INTERVAL > date){ return; }
 		if(value.getLink() != null){
 			Chunk chunk = StateUtil.getChunk(value.getLink());
-			if(chunk != null){
-				//Chunk exists, it it will either be polled for tax or has been already.
-				return;
-			}
-			else{
-				chunk = StateUtil.getTempChunk(value.getLink());
-				if(chunk == null){ return; }//In case anything is broken.
+			if(chunk == null ? (chunk = StateUtil.getTempChunk(value.getLink())) != null : true){
 				processChunkTax(date, chunk);
 			}
 			return;
 		}
-		if(value.getDistrict().getId() <= -1){ return; }
+		if(value.getDistrict().getId() <= -1 && !Static.dev()){ return; }
 		long tax = 0;
 		if(value.getCustomTax() > 0){
 			tax = value.getCustomTax();
@@ -130,6 +130,7 @@ public class TaxSystem extends TimerTask {
 						"Owner of the Property at " + StateLogger.chunk(value) + " did not have enough money to pay the tax, following the District's settings, the property was taken from that player/company.", MailType.SYSTEM, null);
 					mail.save();
 					value.setOwner(null);
+					value.setType(ChunkType.DISTRICT);
 					value.onTaxCollected(date);
 					return;
 				}
@@ -179,13 +180,13 @@ public class TaxSystem extends TimerTask {
 		value.onTaxCollected(date);
 	}
 
-	private long getPercentage(long tax, byte percent){
+	public static long getPercentage(long tax, byte percent){
 		return percent > 0 ? (tax / 100) * percent : 0;
 	}
 
 	private void load(){
 		JsonObject obj = JsonUtil.get(new File(States.getSaveDirectory(), "tax_interval.json"));
-		last_interval = JsonUtil.getIfExists(obj, "last_interval", 0).longValue();
+		last_interval = JsonUtil.getIfExists(obj, "last_interval", 0).longValue(); loaded = true;
 	}
 	
 	private void save(){
@@ -193,6 +194,23 @@ public class TaxSystem extends TimerTask {
 		obj.addProperty("last_interval", last_interval);
 		//
 		JsonUtil.write(new File(States.getSaveDirectory(), "tax_interval.json"), obj, true);
+	}
+
+	public static long getProbableSchedule(){
+		return last_interval;
+	}
+	
+	private static Calendar calendar;
+	
+	public static Calendar getCalendar(){
+		if(calendar == null){
+			calendar = Calendar.getInstance();
+	        calendar.set(Calendar.HOUR_OF_DAY, 12);
+	        calendar.set(Calendar.MINUTE, 0);
+	        calendar.set(Calendar.SECOND, 0);
+	        calendar.set(Calendar.MILLISECOND, 0);
+		}
+		return calendar;
 	}
 	
 }

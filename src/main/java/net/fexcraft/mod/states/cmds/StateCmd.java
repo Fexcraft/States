@@ -4,6 +4,8 @@ import java.awt.Color;
 import java.util.ArrayList;
 import java.util.UUID;
 
+import org.apache.commons.lang3.math.NumberUtils;
+
 import com.google.gson.JsonObject;
 import com.mojang.authlib.GameProfile;
 
@@ -83,11 +85,12 @@ public class StateCmd extends CommandBase {
 				Print.chat(sender, "&6Info of State &7" + state.getName() + " (" + state.getId() + ")&2:");
 				Print.chat(sender, "&9Capital: &7" + StateUtil.getMunicipality(state.getCapitalId()).getName() + " (" + state.getCapitalId() + ")");
 				Print.chat(sender, "&9Leader: &7" + (state.getLeader() == null ? "no one" : Static.getPlayerNameByUUID(state.getLeader())));
-				Print.chat(sender, "&9Price: &7" + (state.getPrice() > 0 ? Config.getWorthAsString(state.getPrice()) : "not for sale"));
+				Print.chat(sender, "&9Price: &7" + (state.getPrice() > 0 ? ggas(state.getPrice()) : "not for sale"));
 				Print.chat(sender, "&6Color: &7" + state.getColor());
 				Print.chat(sender, "&8Citizen: &7" + getCitizens(state).size());
 				Print.chat(sender, "&9Balance: &7" + Config.getWorthAsString(state.getAccount().getBalance()));
 				Print.chat(sender, "&9Last change: &7" + Time.getAsString(state.getChanged()));
+				Print.chat(sender, "&9ChunkTax%: &7" + state.getChunkTaxPercentage() + "%");
 				Print.chat(sender, "&9Council Members: &7" + state.getCouncil().size());
 				state.getCouncil().forEach(uuid -> {
 					Print.chat(sender, "&c-> &9" + Static.getPlayerNameByUUID(uuid));
@@ -112,6 +115,7 @@ public class StateCmd extends CommandBase {
 					Print.chat(sender, "&7/st set color <hex>");
 					Print.chat(sender, "&7/st set capital <municipality id>");
 					Print.chat(sender, "&7/st set icon <url>");
+					Print.chat(sender, "&7/st set chunk-tax-percentage <0-100/reset>");
 					return;
 				}
 				switch(args[1]){
@@ -240,15 +244,33 @@ public class StateCmd extends CommandBase {
 						}
 						break;
 					}
+					case "chunk-tax-percentage":{
+						if(hasPerm("state.set.chunk-tax-percentage", player, state)){
+							if(args[2].equals("reset") || args[2].equals("disable")){
+								state.setChunkTaxPercentage((byte)0); state.save();
+								Print.chat(sender, "&State's Chunk Tax Percentage was reset!");
+							}
+							else if(NumberUtils.isCreatable(args[2])){
+								byte byt = Byte.parseByte(args[2]);
+								if(byt > 100){ byt = 100; } if(byt < 0){ byt = 0; }
+								state.setChunkTaxPercentage(byt); state.save();
+								Print.chat(sender, "&9State's Chunk Tax Percentage was set! (" + state.getChunkTaxPercentage() + "%)");
+							}
+							else{
+								Print.chat(sender, "Not a (valid) number.");
+							}
+						}
+						break;
+					}
 				}
 				return;
 			}
 			case "council":{
 				if(args.length == 1){
-                                    Print.chat(sender, "&7/st council vote <playername> (for leader)");
-                                    Print.chat(sender, "&7/st council kick <playername>");
-                                    Print.chat(sender, "&7/st council invite <playername>");
-                                    Print.chat(sender, "&7/st council leave");
+					Print.chat(sender, "&7/st council vote <playername> (for leader)");
+					Print.chat(sender, "&7/st council kick <playername>");
+					Print.chat(sender, "&7/st council invite <playername>");
+					Print.chat(sender, "&7/st council leave");
                                     return;
 				}
 				switch(args[1]){
@@ -503,6 +525,10 @@ public class StateCmd extends CommandBase {
 		}
 	}
 	
+	private String ggas(long leng){
+		return ChunkCmd.ggas(leng);
+	}
+
 	private ArrayList<UUID> getCitizens(State state){
 		ArrayList<UUID> list = new ArrayList<UUID>();
 		for(int id : state.getMunicipalities()){

@@ -2,6 +2,8 @@ package net.fexcraft.mod.states.cmds;
 
 import java.util.UUID;
 
+import org.apache.commons.lang3.math.NumberUtils;
+
 import com.mojang.authlib.GameProfile;
 
 import net.fexcraft.mod.fsmm.api.Account;
@@ -51,6 +53,10 @@ public class ChunkCmd extends CommandBase {
     public int getRequiredPermissionLevel(){
         return 0;
     }
+	
+	public static String ggas(long value){
+		return Config.getWorthAsString(value);
+	}
 
 	@Override
 	public void execute(MinecraftServer server, ICommandSender sender, String[] args) throws CommandException {
@@ -130,8 +136,10 @@ public class ChunkCmd extends CommandBase {
 				Print.chat(sender, "&9District: &7" + chunk.getDistrict().getName() + " (" + chunk.getDistrict().getId() + ")");
 				Print.chat(sender, "&9Owner: &7" + (chunk.getType() == ChunkType.PRIVATE ? Static.getPlayerNameByUUID(UUID.fromString(chunk.getOwner())) : chunk.getOwner()));
 				Print.chat(sender, "&9Price: &7" + (chunk.getPrice() > 0 ? Config.getWorthAsString(chunk.getPrice()) : "not for sale"));
+				Print.chat(sender, "&9Tax: &7" + (chunk.getCustomTax() > 0 ? ggas(chunk.getCustomTax()) + " &c&m" : "") + ggas(chunk.getDistrict().getChunkTax()));
 				Print.chat(sender, "&9Type: &7" + chunk.getType().name().toLowerCase());
 				Print.chat(sender, "&9Last change: &7" + Time.getAsString(chunk.getChanged()));
+				Print.chat(sender, "&9Last TaxColl.: &7" + Time.getAsString(chunk.lastTaxCollection()));
 				Print.chat(sender, "&9Linked chunks: &7" + chunk.getLinkedChunks().size());
 				if(chunk.getLinkedChunks().size() > 0){
 					for(int i = 0; i < chunk.getLinkedChunks().size(); i++){
@@ -480,10 +488,48 @@ public class ChunkCmd extends CommandBase {
 							Print.chat(sender, "&2Please use the &7/ck whitelist &2command instead!");
 							break;
 						}
+						case "force-loaded":{
+							if(args.length < 3){
+								Print.chat(sender, "&9Missing argument.");
+								Print.chat(sender, "&7/ck set force-loaded true");
+								Print.chat(sender, "&7/ck set force-loaded false");
+								return;
+							}
+							if(hasPerm("chunk.set.forceloaded", player, chunk)){
+								boolean bool = Boolean.parseBoolean(args[2]);
+								chunk.getMunicipality().modifyForceloadedChunk(player, chunk.getChunkPos(), bool);
+								StateLogger.log(StateLogger.LoggerType.MUNICIPALITY, StateLogger.player(player) + " " + (bool ? "enabled" : "disabled") + " chunk force-loading at " + StateLogger.chunk(chunk) + ", in the District of " + StateLogger.district(chunk.getDistrict()) + ", which is in " + StateLogger.municipality(chunk.getMunicipality()) + ".");
+								return;
+							}
+							break;
+						}
+						case "custom-tax":{
+							if(args.length < 3){
+								Print.chat(sender, "&9Missing argument!");
+								Print.chat(sender, "&7/ck set custom-tax <amount>");
+								Print.chat(sender, "&7/ck set custom-tax reset/disable");
+								return;
+							}
+							if(hasPerm("chunk.set.customtax", player, chunk)){
+								if(args[2].equals("reset") || args[2].equals("disable")){
+									chunk.setCustomTax(0); chunk.save();
+									Print.chat(sender, "&9Chunk's Custom Tax was reset!");
+								}
+								else if(NumberUtils.isCreatable(args[2])){
+									chunk.setCustomTax(Long.parseLong(args[2])); chunk.save();
+									Print.chat(sender, "&9Chunk's Custom Tax was set! (" + ggas(chunk.getCustomTax()) + ")");
+								}
+								else{
+									Print.chat(sender, "Not a (valid) number.");
+								}
+							}
+							break;
+						}
 						case "help":
 						default:{
 							Print.chat(sender, "&9Available options:");
 							Print.chat(sender, "&7district, price, link, type, owner, whitelist");
+							Print.chat(sender, "&7force-loaded, custom-tax");
 							break;
 						}
 					}
@@ -611,21 +657,6 @@ public class ChunkCmd extends CommandBase {
 				Print.chat(sender, "&9Existing chunk types:");
 				for(ChunkType type : ChunkType.values()){
 					Print.chat(sender, "&2-> &3" + type.name().toLowerCase());
-				}
-				return;
-			}
-			case "force-load":{
-				if(args.length < 2){
-					Print.chat(sender, "&9Missing argument.");
-					Print.chat(sender, "&7/ck force-load true");
-					Print.chat(sender, "&7/ck force-load false");
-					return;
-				}
-				if(hasPerm("chunk.forceload", player, chunk)){
-					boolean bool = Boolean.parseBoolean(args[1]);
-					chunk.getMunicipality().modifyForceloadedChunk(player, chunk.getChunkPos(), bool);
-					StateLogger.log(StateLogger.LoggerType.MUNICIPALITY, StateLogger.player(player) + " " + (bool ? "enabled" : "disabled") + " chunk force-loading at " + StateLogger.chunk(chunk) + ", in the District of " + StateLogger.district(chunk.getDistrict()) + ", which is in " + StateLogger.municipality(chunk.getMunicipality()) + ".");
-					return;
 				}
 				return;
 			}

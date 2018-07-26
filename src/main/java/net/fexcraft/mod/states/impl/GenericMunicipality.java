@@ -25,7 +25,7 @@ import net.fexcraft.mod.states.util.ForcedChunksManager;
 import net.fexcraft.mod.states.util.StateUtil;
 import net.minecraft.command.ICommandSender;
 
-public class GenericMunicipality implements Municipality {
+public class GenericMunicipality implements Municipality/*, Taxable*/ {
 	
 	private int id;
 	private String name, color, icon;

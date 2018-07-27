@@ -7,6 +7,7 @@ import com.mojang.authlib.GameProfile;
 
 import net.fexcraft.mod.lib.util.common.Print;
 import net.fexcraft.mod.states.api.Chunk;
+import net.fexcraft.mod.states.api.ChunkPos;
 import net.fexcraft.mod.states.api.District;
 import net.fexcraft.mod.states.api.Municipality;
 import net.fexcraft.mod.states.api.State;
@@ -82,6 +83,10 @@ public class StateLogger {
 
 	public static String chunk(Chunk chunk){
 		return "Chunk(" + chunk.xCoord() + ", " + chunk.zCoord() + ")";
+	}
+
+	public static String chunk(ChunkPos pos){
+		return "Chunk(" + pos.x + ", " + pos.z + ")";
 	}
 
 	public static String district(int i){

@@ -24,10 +24,10 @@ public class StatesPermissions {
 			Print.log("Permission with ID '" + permission + "' doesn't exists.");
 			return false;
 		}
-		boolean group = false;
+		boolean group = false, admin = false;
 		if(perm.group != null && perm.group != PermissionGroup.SKIP){
 			switch(perm.group){
-				case ADMIN: group = StateUtil.isAdmin(entity) || isOperator(entity); break;
+				case ADMIN: group = StateUtil.isAdmin(entity) || isOperator(entity); admin = true; break;
 				case DISTRICT: group = player.isDistrictManagerOf(district(obj)) || player.isMayorOf(district(obj).getMunicipality()); break;
 				case MUNICIPALITY: group = player.isMayorOf(municipality(obj)) || player.isStateLeaderOf(municipality(obj).getState()); break;
 				case NONE: group = true; break;
@@ -62,6 +62,7 @@ public class StatesPermissions {
 		}
 		Print.debug(entity.getName() + " | " + permission + " | PS: " + group);
 		Print.debug("Perm Check End;");
+		if(admin){ Print.chat(player, "&7&oAdmin mode."); }
 		return group;
 	}
 	

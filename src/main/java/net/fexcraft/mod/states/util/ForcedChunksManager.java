@@ -90,7 +90,7 @@ public class ForcedChunksManager implements LoadingCallback {
 		if(Config.LOADED_CHUNKS_PER_MUNICIPALITY <= 0){ return; }
 		//if(States.LOADED_CHUNKS.size() <= 0){ return; }
 		JsonObject obj = new JsonObject();
-		for(Entry<Integer, Collection<ChunkPos>> entry : States.LOADED_CHUNKS.entrySet()){
+		for(Entry<Integer, List<ChunkPos>> entry : States.LOADED_CHUNKS.entrySet()){
 			JsonArray array = new JsonArray();
 			for(ChunkPos pos : entry.getValue()){
 				JsonObject jsn = new JsonObject(); jsn.addProperty("x", pos.x); jsn.addProperty("z", pos.z); array.add(jsn);
@@ -147,6 +147,13 @@ public class ForcedChunksManager implements LoadingCallback {
 	
 	public static int maxTickets(){
 		return ForgeChunkManager.getMaxTicketLengthFor(States.MODID);
+	}
+
+	/** Warning! Does not remove from the "States" loaded-chunk list as of now!*/
+	public static void requestUnload(ChunkPos pos){
+		Ticket ticket = getTicketForChunk(pos);
+		if(ticket != null){ ForgeChunkManager.unforceChunk(ticket, pos); }
+		return;
 	}
 	
 }

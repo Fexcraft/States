@@ -2,7 +2,7 @@ package net.fexcraft.mod.states.util;
 
 import java.io.File;
 import java.util.Calendar;
-import java.util.Collection;
+import java.util.List;
 import java.util.Map.Entry;
 import java.util.TimerTask;
 
@@ -32,10 +32,11 @@ import net.minecraft.entity.player.EntityPlayerMP;
 public class TaxSystem extends TimerTask {
 	
 	private static long last_interval;
-	private static boolean loaded;
+	private static boolean loaded, firstrun = true;
 
 	@Override
 	public void run(){
+		if(firstrun){ firstrun = false; return; }
 		try{
 			load();
 			long date = Time.getDate();
@@ -61,8 +62,8 @@ public class TaxSystem extends TimerTask {
 				TaxSystem.processPlayerTax(date, player.getCapability(StatesCapabilities.PLAYER, null));
 			}
 			StateLogger.log(StateLogger.LoggerType.MUNICIPALITY, "Collecting tax from force-loaded chunks...");
-			ImmutableMap<Integer, Collection<ChunkPos>> maplc = ImmutableMap.copyOf(States.LOADED_CHUNKS);
-			for(Entry<Integer, Collection<ChunkPos>> entry : maplc.entrySet()){
+			ImmutableMap<Integer, List<ChunkPos>> maplc = ImmutableMap.copyOf(States.LOADED_CHUNKS);
+			for(Entry<Integer, List<ChunkPos>> entry : maplc.entrySet()){
 				TaxSystem.processLoadedChunkTax(date, entry.getKey(), entry.getValue());
 			}
 			Sender.sendAs(null, "Finished collecting tax.");
@@ -77,9 +78,33 @@ public class TaxSystem extends TimerTask {
 		}
 	}
 
-	public static void processLoadedChunkTax(long date, Integer key, Collection<ChunkPos> value){
+	public static void processLoadedChunkTax(long date, Integer key, List<ChunkPos> value){
 		if(!loaded){ return; }
 		//if(value.lastTaxCollection() + Config.TAX_INTERVAL > date){ return; }
+		long conf = Config.LOADED_CHUNKS_TAX;
+		if(conf > 0){
+			Municipality mun = StateUtil.getMunicipality(key, false);
+			if(mun == null){ return; }//TODO maybe remove the collection?
+			for(int i = 0; i < value.size(); i++){
+				if(mun.getAccount().getBalance() < conf){
+					ChunkPos pos = States.LOADED_CHUNKS.get(key).remove(i);
+					Mail mail = new GenericMail("player", getMayor(mun), "TaxCollector",
+						"Municipality didn't have enough money to pay the tax for force-loading the " + StateLogger.chunk(pos) + "! As such, force-loading got disabled.", MailType.SYSTEM, null);
+					mail.save();
+					StateLogger.log(StateLogger.LoggerType.MUNICIPALITY,
+						"Municipality didn't have enough money to pay the tax for force-loading the " + StateLogger.chunk(pos) + "! As such, force-loading got disabled.");
+					ForcedChunksManager.requestUnload(pos);
+				}
+				else{
+					Bank bank = AccountManager.INSTANCE.getBank(mun.getAccount().getBankId());
+					boolean wl = !(bank == null);
+					if(bank == null || !wl){ bank = AccountManager.INSTANCE.getBank(mun.getAccount().getBankId(), true); }
+					if(bank == null){ return; }//TODO error message
+					bank.processTransfer(Static.getServer(), mun.getAccount(), conf, States.SERVERACCOUNT);
+					if(!wl){ AccountManager.INSTANCE.unloadBank(bank); }
+				}
+			}
+		}
 	}
 
 	public static void processPlayerTax(long date, PlayerCapability cap){

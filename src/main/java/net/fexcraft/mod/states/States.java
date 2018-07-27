@@ -2,7 +2,7 @@ package net.fexcraft.mod.states;
 
 import java.io.File;
 import java.util.Calendar;
-import java.util.Collection;
+import java.util.List;
 import java.util.Timer;
 import java.util.TreeMap;
 import java.util.UUID;
@@ -66,7 +66,7 @@ public class States {
 	public static final TreeMap<Integer, Municipality> MUNICIPALITIES = new TreeMap<Integer, Municipality>();
 	public static final TreeMap<Integer, State> STATES = new TreeMap<Integer, State>();
 	public static final TreeMap<UUID, PlayerCapability> PLAYERS = new TreeMap<UUID, PlayerCapability>();
-	public static final TreeMap<Integer, Collection<ChunkPos>> LOADED_CHUNKS = new TreeMap<>();
+	public static final TreeMap<Integer, List<ChunkPos>> LOADED_CHUNKS = new TreeMap<>();
 	//
 	public static final String DEF_UUID = "66e70cb7-1d96-487c-8255-5c2d7a2b6a0e";
 	public static final String CONSOLE_UUID = "f78a4d8d-d51b-4b39-98a3-230f2de0c670";
@@ -130,7 +130,7 @@ public class States {
 		ForcedChunksManager.check();
 		if(TAX_TIMER == null){
 			TAX_TIMER = new Timer(); Calendar calendar = Calendar.getInstance();
-	        calendar.set(Calendar.HOUR_OF_DAY, 12); calendar.set(Calendar.MINUTE, 0); calendar.set(Calendar.SECOND, 0); calendar.set(Calendar.MILLISECOND, 0);
+	        calendar.set(Calendar.HOUR_OF_DAY, 0); calendar.set(Calendar.MINUTE, 0); calendar.set(Calendar.SECOND, 0); calendar.set(Calendar.MILLISECOND, 0);
 			TAX_TIMER.schedule(new TaxSystem(), calendar.getTime(), Config.TAX_INTERVAL);
 		}
 	}

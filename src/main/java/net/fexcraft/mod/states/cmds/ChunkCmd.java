@@ -7,6 +7,7 @@ import org.apache.commons.lang3.math.NumberUtils;
 import com.mojang.authlib.GameProfile;
 
 import net.fexcraft.mod.fsmm.api.Account;
+import net.fexcraft.mod.fsmm.api.Bank;
 import net.fexcraft.mod.fsmm.util.AccountManager;
 import net.fexcraft.mod.fsmm.util.Config;
 import net.fexcraft.mod.lib.api.common.fCommand;
@@ -496,9 +497,20 @@ public class ChunkCmd extends CommandBase {
 								return;
 							}
 							if(hasPerm("chunk.set.forceloaded", player, chunk)){
+								if(chunk.getMunicipality().getAccount().getBalance() < net.fexcraft.mod.states.util.Config.LOADED_CHUNKS_TAX){
+									Print.chat(sender, "Not enough money to pay the tax.");
+									return;
+								}
 								boolean bool = Boolean.parseBoolean(args[2]);
 								chunk.getMunicipality().modifyForceloadedChunk(player, chunk.getChunkPos(), bool);
 								StateLogger.log(StateLogger.LoggerType.MUNICIPALITY, StateLogger.player(player) + " " + (bool ? "enabled" : "disabled") + " chunk force-loading at " + StateLogger.chunk(chunk) + ", in the District of " + StateLogger.district(chunk.getDistrict()) + ", which is in " + StateLogger.municipality(chunk.getMunicipality()) + ".");
+								//
+								Bank bank = AccountManager.INSTANCE.getBank(chunk.getMunicipality().getAccount().getBankId());
+								boolean wl = !(bank == null);
+								if(bank == null || !wl){ bank = AccountManager.INSTANCE.getBank(chunk.getMunicipality().getAccount().getBankId(), true); }
+								if(bank == null){ return; }//TODO error message
+								bank.processTransfer(Static.getServer(), chunk.getMunicipality().getAccount(), net.fexcraft.mod.states.util.Config.LOADED_CHUNKS_TAX, States.SERVERACCOUNT);
+								if(!wl){ AccountManager.INSTANCE.unloadBank(bank); }
 								return;
 							}
 							break;

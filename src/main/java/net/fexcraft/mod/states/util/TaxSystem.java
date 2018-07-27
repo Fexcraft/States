@@ -66,6 +66,8 @@ public class TaxSystem extends TimerTask {
 			for(Entry<Integer, List<ChunkPos>> entry : maplc.entrySet()){
 				TaxSystem.processLoadedChunkTax(date, entry.getKey(), entry.getValue());
 			}
+			StateLogger.log(StateLogger.LoggerType.PLAYER, "Collecting tax from offline players...");
+			TaxSystem.processOfflinePlayerTax(date);
 			Sender.sendAs(null, "Finished collecting tax.");
 			last_interval = date; save();
 		}
@@ -76,6 +78,10 @@ public class TaxSystem extends TimerTask {
 			StateLogger.log("player", "An error occured while collecting tax, further collection is halted for this interval.");
 			e.printStackTrace();
 		}
+	}
+
+	private static void processOfflinePlayerTax(long date){
+		//TODO
 	}
 
 	public static void processLoadedChunkTax(long date, Integer key, List<ChunkPos> value){

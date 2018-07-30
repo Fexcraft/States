@@ -20,7 +20,7 @@ public class Config {
 	public static File CONFIG_PATH;
 	public static long DEFAULT_CHUNK_PRICE, MUNICIPALITY_CREATION_PRICE, STATE_CREATION_PRICE, DISTRICT_CREATION_PRICE, TAX_INTERVAL, LOADED_CHUNKS_TAX;
 	public static int MAP_UPDATES_PER_TICK, BOT_PORT, TRANSIT_ZONE_BOTTOM_LIMIT, TRANSIT_ZONE_TOP_LIMIT, CHUNK_PER_CITIZEN, NICKNAME_LENGTH, LOADED_CHUNKS_PER_MUNICIPALITY;
-	public static boolean ALLOW_WILDERNESS_ACCESS, ALLOW_TRANSIT_ZONES;
+	public static boolean ALLOW_WILDERNESS_ACCESS, ALLOW_TRANSIT_ZONES, TAX_OFFLINE_PLAYERS;
 	public static String WEBHOOK, BOT_KEY, WEBHOOK_ICON, WEBHOOK_BROADCASTER_NAME;
 	//
 	public static final String DEFAULT_CAT = "Default Settings";
@@ -73,6 +73,7 @@ public class Config {
 		LOADED_CHUNKS_PER_MUNICIPALITY = config.getInt("loaded_chunks_per_municipality", DEFAULT_CAT, 0, 0, 128, "Amount of max (force) loaded chunks a Municipality can have.");
 		TAX_INTERVAL = config.getInt("tax_interval", DEFAULT_CAT, (int)Time.DAY_MS, 1000, Integer.MAX_VALUE, "Intervals between tax collection cycles, 1000 = 1 second.");
 		LOADED_CHUNKS_TAX = config.getInt("loaded_chunks_tax", DEFAULT_CAT, 25000, 0, Integer.MAX_VALUE, "Tax a Municipality has to pay the Server for having force-loaded chunks.");
+		TAX_OFFLINE_PLAYERS = config.getBoolean("tax_offline_players", DEFAULT_CAT, false, "If offline (inactive since more than one interval) players should be taxed as well.");
 		updateWebHook();
 	}
 

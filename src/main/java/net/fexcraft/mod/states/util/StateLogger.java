@@ -78,7 +78,7 @@ public class StateLogger {
 	}
 
 	public static String player(PlayerCapability cap){
-		return player(cap.getEntityPlayer());
+		return cap.getUUIDAsString() + "(" + (cap.getEntityPlayer() == null ? "off-line" : cap.getName()) + ")";
 	}
 
 	public static String chunk(Chunk chunk){

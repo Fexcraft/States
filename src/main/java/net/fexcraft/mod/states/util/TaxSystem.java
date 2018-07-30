@@ -5,6 +5,7 @@ import java.util.Calendar;
 import java.util.List;
 import java.util.Map.Entry;
 import java.util.TimerTask;
+import java.util.UUID;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
@@ -27,6 +28,7 @@ import net.fexcraft.mod.states.api.Municipality;
 import net.fexcraft.mod.states.api.capabilities.PlayerCapability;
 import net.fexcraft.mod.states.api.capabilities.StatesCapabilities;
 import net.fexcraft.mod.states.impl.GenericMail;
+import net.fexcraft.mod.states.impl.GenericPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
 
 public class TaxSystem extends TimerTask {
@@ -51,23 +53,21 @@ public class TaxSystem extends TimerTask {
 			for(Chunk chunk  : map.values()){
 				TaxSystem.processChunkTax(date, chunk);
 			}
-			/*StateLogger.log(StateLogger.LoggerType.MUNICIPALITY, "Collecting tax from loaded municipalities...");
-			ImmutableMap<Integer, Municipality> mapm = ImmutableMap.copyOf(States.MUNICIPALITIES);
-			for(Municipality mun : mapm.values()){
-				TaxSystem.processMunicipalityTax(date, mun);
-			}*/
 			StateLogger.log(StateLogger.LoggerType.PLAYER, "Collecting tax from online players...");
 			ImmutableList<EntityPlayerMP> players = ImmutableList.copyOf(Static.getServer().getPlayerList().getPlayers());
 			for(EntityPlayerMP player : players){
 				TaxSystem.processPlayerTax(date, player.getCapability(StatesCapabilities.PLAYER, null));
 			}
+			if(Config.TAX_OFFLINE_PLAYERS){
+				StateLogger.log(StateLogger.LoggerType.PLAYER, "Collecting tax from offline players...");
+				TaxSystem.processOfflinePlayerTax(date);
+			}
+			//
 			StateLogger.log(StateLogger.LoggerType.MUNICIPALITY, "Collecting tax from force-loaded chunks...");
 			ImmutableMap<Integer, List<ChunkPos>> maplc = ImmutableMap.copyOf(States.LOADED_CHUNKS);
 			for(Entry<Integer, List<ChunkPos>> entry : maplc.entrySet()){
 				TaxSystem.processLoadedChunkTax(date, entry.getKey(), entry.getValue());
 			}
-			StateLogger.log(StateLogger.LoggerType.PLAYER, "Collecting tax from offline players...");
-			TaxSystem.processOfflinePlayerTax(date);
 			Sender.sendAs(null, "Finished collecting tax.");
 			last_interval = date; save();
 		}
@@ -78,10 +78,6 @@ public class TaxSystem extends TimerTask {
 			StateLogger.log("player", "An error occured while collecting tax, further collection is halted for this interval.");
 			e.printStackTrace();
 		}
-	}
-
-	private static void processOfflinePlayerTax(long date){
-		//TODO
 	}
 
 	public static void processLoadedChunkTax(long date, Integer key, List<ChunkPos> value){
@@ -113,6 +109,32 @@ public class TaxSystem extends TimerTask {
 		}
 	}
 
+	private static void processOfflinePlayerTax(long date){
+		File folder = new File(States.getSaveDirectory(), "players/");
+		if(folder == null || !folder.exists()){ return; }
+		for(File file : folder.listFiles()){
+			try{
+				UUID uuid = UUID.fromString(file.getName().replace(".json", ""));
+				if(isOnline(uuid)){ continue; }
+				GenericPlayer player = new GenericPlayer(uuid);
+				processPlayerTax(date, player); player.save();
+				AccountManager.INSTANCE.unloadAccount(player.getAccount());
+			}
+			catch(Exception e){
+				e.printStackTrace();
+			}
+		}
+	}
+
+	private static boolean isOnline(UUID uuid){
+		for(EntityPlayerMP player : Static.getServer().getPlayerList().getPlayers()){
+			if(player.getGameProfile().getId().equals(uuid)){
+				return true;
+			}
+		}
+		return false;
+	}
+
 	public static void processPlayerTax(long date, PlayerCapability cap){
 		if(!loaded || cap == null){ return; }
 		if(cap.lastTaxCollection() + Config.TAX_INTERVAL > date){ return; }
@@ -141,7 +163,7 @@ public class TaxSystem extends TimerTask {
 					return;
 				}
 				else if(account.getBalance() > 0 && bank != null && cap.getMunicipality().kickIfBankrupt()){
-					bank.processTransfer(Static.getServer(), account, tax, cap.getMunicipality().getAccount());
+					bank.processTransfer(Static.getServer(), account, account.getBalance(), cap.getMunicipality().getAccount());
 					Mail mail = new GenericMail("player", cap.getUUIDAsString(), "TaxCollector",
 						"WARNING! You didn't have enough money to pay your tax, next tax collection cycle you may get kicked!", MailType.SYSTEM, null);
 					mail.save();
@@ -153,7 +175,7 @@ public class TaxSystem extends TimerTask {
 					return;
 				}
 				else if(account.getBalance() > 0 && bank != null && !cap.getMunicipality().kickIfBankrupt()){
-					bank.processTransfer(Static.getServer(), account, tax, cap.getMunicipality().getAccount());
+					bank.processTransfer(Static.getServer(), account, account.getBalance(), cap.getMunicipality().getAccount());
 					if(!bankloaded){ AccountManager.INSTANCE.unloadBank(bank); }
 					Mail mail = new GenericMail("player", cap.getUUIDAsString(), "TaxCollector",
 						"WARNING! You didn't have enough money to pay your tax!", MailType.SYSTEM, null);
@@ -244,7 +266,7 @@ public class TaxSystem extends TimerTask {
 					return;
 				}
 				else if(account.getBalance() > 0 && bank != null && value.getDistrict().unclaimIfBankrupt()){
-					bank.processTransfer(Static.getServer(), account, tax, value.getMunicipality().getAccount());
+					bank.processTransfer(Static.getServer(), account, account.getBalance(), value.getMunicipality().getAccount());
 					Mail mail = new GenericMail("player", value.getOwner(), "TaxCollector",
 						"WARNING! You didn't have enough money to pay for your Property at " + StateLogger.chunk(value) + ", next tax collection cycle it will be unclaimed!", MailType.SYSTEM, null);
 					mail.save();
@@ -257,7 +279,7 @@ public class TaxSystem extends TimerTask {
 					return;
 				}
 				else if(account.getBalance() > 0 && bank != null && !value.getDistrict().unclaimIfBankrupt()){
-					bank.processTransfer(Static.getServer(), account, tax, value.getMunicipality().getAccount());
+					bank.processTransfer(Static.getServer(), account, account.getBalance(), value.getMunicipality().getAccount());
 					if(!bankloaded){ AccountManager.INSTANCE.unloadBank(bank); }
 					if(!wasloaded){ AccountManager.INSTANCE.unloadAccount(account); }
 					Mail mail = new GenericMail("player", value.getOwner(), "TaxCollector",

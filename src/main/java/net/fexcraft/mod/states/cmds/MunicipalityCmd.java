@@ -184,7 +184,7 @@ public class MunicipalityCmd extends CommandBase {
 					Print.chat(sender, "&7/mun set color <hex>");
 					Print.chat(sender, "&7/mun set icon <url>");
 					Print.chat(sender, "&7/mun set citizen-tax <amount/reset>");
-					Print.chat(sender, "&7/dis set kick-if-brankrupt <true/false>");
+					Print.chat(sender, "&7/mun set kick-if-bankrupt <true/false>");
 					return;
 				}
 				switch(args[1]){
@@ -324,8 +324,8 @@ public class MunicipalityCmd extends CommandBase {
 						}
 						break;
 					}
-					case "kick-if-brankrupt":{
-						if(hasPerm("municipality.set.kick-if-brankrupt", player, mun)){
+					case "kick-if-bankrupt":{
+						if(hasPerm("municipality.set.kick-if-bankrupt", player, mun)){
 							if(args.length < 3){ Print.chat(sender, "&9Missing Argument!"); break; }
 							mun.setKickIfBankrupt(Boolean.parseBoolean(args[2]));
 							mun.setChanged(Time.getDate()); mun.save();

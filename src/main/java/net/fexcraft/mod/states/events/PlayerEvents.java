@@ -16,6 +16,7 @@ import net.fexcraft.mod.states.api.capabilities.StatesCapabilities;
 import net.fexcraft.mod.states.util.Config;
 import net.fexcraft.mod.states.util.Sender;
 import net.fexcraft.mod.states.util.StateUtil;
+import net.fexcraft.mod.states.util.TaxSystem;
 import net.fexcraft.mod.states.util.UpdateHandler;
 import net.minecraft.block.BlockButton;
 import net.minecraft.block.BlockChest;
@@ -77,6 +78,7 @@ public class PlayerEvents {
 		}
 		//
 		Sender.sendToWebhook(null, event.player.getGameProfile().getName() + " joined.");
+		TaxSystem.processPlayerTax(TaxSystem.getProbableSchedule(), player);
 	}
 	
 	@SubscribeEvent

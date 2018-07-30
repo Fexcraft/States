@@ -122,7 +122,7 @@ public class DistrictCmd extends CommandBase {
 					Print.chat(sender, "&7/dis set can-foreigners-settle <true/false>");
 					Print.chat(sender, "&7/dis set icon <url>");
 					Print.chat(sender, "&7/dis set chunk-tax <amount/reset>");
-					Print.chat(sender, "&7/dis set unclaim-if-brankrupt <true/false>");
+					Print.chat(sender, "&7/dis set unclaim-if-bankrupt <true/false>");
 					return;
 				}
 				switch(args[1]){
@@ -316,7 +316,7 @@ public class DistrictCmd extends CommandBase {
 						break;
 					}
 					case "unclaim-if-brankrupt":{
-						if(hasPerm("district.set.unclaim-if-brankrupt", player, dis)){
+						if(hasPerm("district.set.unclaim-if-bankrupt", player, dis)){
 							if(args.length < 3){ Print.chat(sender, "&9Missing Argument!"); break; }
 							dis.setUnclaimIfBankrupt(Boolean.parseBoolean(args[2]));
 							dis.setChanged(Time.getDate()); dis.save();

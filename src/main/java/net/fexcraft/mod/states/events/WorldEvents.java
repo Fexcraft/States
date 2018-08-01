@@ -11,6 +11,7 @@ import net.fexcraft.mod.states.impl.capabilities.WorldCapabilityUtil;
 import net.fexcraft.mod.states.util.ForcedChunksManager;
 import net.fexcraft.mod.states.util.ImageCache;
 import net.fexcraft.mod.states.util.StateLogger;
+import net.fexcraft.mod.states.util.StateUtil;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.tileentity.TileEntitySign;
 import net.minecraft.util.ResourceLocation;
@@ -64,9 +65,7 @@ public class WorldEvents {
 		if(event.getWorld().provider.getDimension() != 0 || event.getWorld().isRemote){
 			return;
 		}
-		States.DISTRICTS.values().forEach(elm -> { elm.save(); });
-		States.MUNICIPALITIES.values().forEach(elm -> { elm.save(); });
-		States.STATES.values().forEach(elm -> { elm.save(); });
+		StateUtil.unloadAll();
 		ImageCache.saveQueue();
 		StateLogger.log("all", "Unloading World...");
 		ForcedChunksManager.unload();

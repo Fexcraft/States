@@ -151,7 +151,6 @@ public class States {
 		if(Sender.RECEIVER != null){
 			Sender.RECEIVER.halt();
 		}
-		StateUtil.unloadAll();
 	}
 
 }

@@ -10,6 +10,7 @@ import java.util.UUID;
 
 import javax.annotation.Nullable;
 
+import com.google.common.collect.ImmutableList;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 
@@ -47,7 +48,7 @@ import net.minecraftforge.server.permission.PermissionAPI;
 public class StateUtil extends TimerTask {
     
     public static @Nullable Chunk getChunk(int x, int z){
-        return States.CHUNKS.values().stream().filter(pre -> pre.xCoord() == x && pre.zCoord() == z).findFirst().get();
+        return States.CHUNKS.get(new ChunkPos(x, z));
     }
     
     public static @Nullable Chunk getChunk(EntityPlayer player){
@@ -335,7 +336,30 @@ public class StateUtil extends TimerTask {
 	@Override
 	public void run(){
 		try{
-			//TODO
+			Print.debug("Scheduled check for inactive districts.");
+			ImmutableList<District> collD = ImmutableList.copyOf(States.DISTRICTS.values());
+			for(District dis : collD){
+				if(States.CHUNKS.values().stream().filter(pre -> pre.getDistrict().getId() == dis.getId()).count() <= 0){
+					States.DISTRICTS.remove(dis.getId());
+					dis.save();
+				}
+			}
+			Print.debug("Scheduled check for inactive municipalities.");
+			ImmutableList<Municipality> collM = ImmutableList.copyOf(States.MUNICIPALITIES.values());
+			for(Municipality mun : collM){
+				if(States.DISTRICTS.values().stream().filter(pre -> pre.getMunicipality().getId() == mun.getId()).count() <= 0){
+					States.MUNICIPALITIES.remove(mun.getId());
+					mun.save(); mun.unload();
+				}
+			}
+			Print.debug("Scheduled check for inactive states.");
+			ImmutableList<State> collS = ImmutableList.copyOf(States.STATES.values());
+			for(State state : collS){
+				if(States.MUNICIPALITIES.values().stream().filter(pre -> pre.getState().getId() == state.getId()).count() <= 0){
+					States.STATES.remove(state.getId());
+					state.save(); state.unload();
+				}
+			}
 		}
 		catch(Exception e){
 			Sender.sendAs(null, "SCHEDULED DATA UNLOAD ERRORED");

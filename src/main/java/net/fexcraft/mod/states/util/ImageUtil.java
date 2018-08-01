@@ -17,11 +17,8 @@ import net.minecraft.init.Blocks;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
-import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.gameevent.TickEvent;
-import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
 
 public class ImageUtil {
 	
@@ -39,15 +36,12 @@ public class ImageUtil {
 	public static void load(ResourceLocation texture, BufferedImage image) {
 		Minecraft.getMinecraft().renderEngine.loadTexture(texture, new TempTexture(texture, image));
 	}
-	
-	@SideOnly(Side.CLIENT)
-	@Mod.EventBusSubscriber
 	public static class TickHandler {
 		
 		private static int check;
 		
 		@SubscribeEvent
-		public static void onTick(TickEvent.ServerTickEvent event){
+		public void onTick(TickEvent.ServerTickEvent event){
 			try{
 				if(++check >= 2000){
 					check = 0; long time = Time.getDate();

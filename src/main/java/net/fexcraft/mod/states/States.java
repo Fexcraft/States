@@ -39,6 +39,7 @@ import net.fexcraft.mod.states.packets.ImagePacket;
 import net.fexcraft.mod.states.packets.ImagePacketHandler;
 import net.fexcraft.mod.states.util.Config;
 import net.fexcraft.mod.states.util.ForcedChunksManager;
+import net.fexcraft.mod.states.util.ImageUtil;
 import net.fexcraft.mod.states.util.Sender;
 import net.fexcraft.mod.states.util.StateUtil;
 import net.fexcraft.mod.states.util.StatesPermissions;
@@ -62,7 +63,7 @@ import net.minecraftforge.server.permission.PermissionAPI;
 @Mod(modid = States.MODID, name = "States", version = States.VERSION, dependencies = "required-after:fcl", /*serverSideOnly = true,*/ guiFactory = "net.fexcraft.mod.states.util.GuiFactory", acceptedMinecraftVersions = "*", acceptableRemoteVersions = "*")
 public class States {
 	
-	public static final String VERSION = "1.1.5";
+	public static final String VERSION = "1.2.1";
 	public static final String MODID = "states";
 	public static final String ADMIN_PERM = "states.external.admin";
 	public static final String PREFIX = "&0[&2States&0]";
@@ -114,6 +115,9 @@ public class States {
 		PacketHandler.getInstance().registerMessage(ImagePacketHandler.Client.class, ImagePacket.class, 29910, Side.CLIENT);
 		PacketHandler.getInstance().registerMessage(ImagePacketHandler.Server.class, ImagePacket.class, 29911, Side.SERVER);
 		UpdateHandler.initialize();
+		if(event.getSide().isClient()){
+			MinecraftForge.EVENT_BUS.register(new ImageUtil.TickHandler());
+		}
 	}
 	
 	public static final File getWorldDirectory(){
@@ -142,7 +146,7 @@ public class States {
 			(TAX_TIMER = new Timer()).schedule(new TaxSystem(), new Date(mid), Config.TAX_INTERVAL);
 		}
 		if(DATA_MANAGER == null){
-			(DATA_MANAGER = new Timer()).schedule(new StateUtil(), new Date(mid), Time.MIN_MS * 15);
+			(DATA_MANAGER = new Timer()).schedule(new StateUtil(), new Date(mid), Static.dev() ? 30000 : Time.MIN_MS * 15);
 		}
 	}
 	

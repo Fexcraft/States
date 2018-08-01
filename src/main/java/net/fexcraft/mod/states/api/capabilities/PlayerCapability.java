@@ -7,19 +7,19 @@ import javax.annotation.Nullable;
 
 import com.google.gson.JsonObject;
 
-import net.fexcraft.mod.fsmm.api.Account;
 import net.fexcraft.mod.states.States;
 import net.fexcraft.mod.states.api.Chunk;
 import net.fexcraft.mod.states.api.District;
 import net.fexcraft.mod.states.api.Municipality;
 import net.fexcraft.mod.states.api.State;
+import net.fexcraft.mod.states.api.root.AccountHolder;
 import net.fexcraft.mod.states.api.root.Taxable;
 import net.minecraft.command.ICommandSender;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.world.World;
 
-public interface PlayerCapability extends ICommandSender, Taxable {
+public interface PlayerCapability extends ICommandSender, Taxable, AccountHolder {
 	
 	public Municipality getMunicipality();
 	
@@ -45,8 +45,6 @@ public interface PlayerCapability extends ICommandSender, Taxable {
 	public UUID getUUID();
 
 	public String getUUIDAsString();
-
-	public Account getAccount();
 
 	public boolean isMayorOf(Municipality municipality);
 

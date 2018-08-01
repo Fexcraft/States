@@ -4,7 +4,7 @@ import java.awt.Color;
 import java.awt.image.BufferedImage;
 
 import net.fexcraft.mod.fsmm.api.Account;
-import net.fexcraft.mod.fsmm.util.AccountManager;
+import net.fexcraft.mod.fsmm.api.Bank;
 import net.fexcraft.mod.fsmm.util.Config;
 import net.fexcraft.mod.lib.api.network.IPacketListener;
 import net.fexcraft.mod.lib.network.PacketHandler;
@@ -244,13 +244,14 @@ public class Listener implements IPacketListener<PacketNBTTagCompound> {
 				else{
 					if(ck.getPrice() > 0){
 						if(dis.getId() != -2){
-							if(!AccountManager.INSTANCE.getBank(dis.getMunicipality().getAccount().getBankId()).processTransfer(player, dis.getMunicipality().getAccount(), ck.getPrice(), States.SERVERACCOUNT)){
+							if(!dis.getMunicipality().getBank().processAction(Bank.Action.TRANSFER, player, dis.getMunicipality().getAccount(), ck.getPrice(), States.SERVERACCOUNT)){
 								return null;
 							}
 						}
 						else{
 							Account playeracc = player.getCapability(StatesCapabilities.PLAYER, null).getAccount();
-							if(!AccountManager.INSTANCE.getBank(playeracc.getBankId()).processTransfer(player, playeracc, ck.getPrice() / 10, States.SERVERACCOUNT)){
+							Bank playerbank = player.getCapability(StatesCapabilities.PLAYER, null).getBank();
+							if(!playerbank.processAction(Bank.Action.TRANSFER, player, playeracc, ck.getPrice() / 10, States.SERVERACCOUNT)){
 								return null;
 							}
 						}

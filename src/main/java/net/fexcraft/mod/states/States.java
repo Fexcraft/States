@@ -1,18 +1,23 @@
 package net.fexcraft.mod.states;
 
 import java.io.File;
-import java.util.Calendar;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
+import java.time.ZoneOffset;
+import java.util.Date;
 import java.util.List;
 import java.util.Timer;
 import java.util.TreeMap;
 import java.util.UUID;
 
 import net.fexcraft.mod.fsmm.api.Account;
-import net.fexcraft.mod.fsmm.util.AccountManager;
+import net.fexcraft.mod.fsmm.util.DataManager;
 import net.fexcraft.mod.lib.capabilities.sign.SignCapabilityUtil;
 import net.fexcraft.mod.lib.network.PacketHandler;
 import net.fexcraft.mod.lib.network.handlers.NBTTagCompoundPacketHandler;
 import net.fexcraft.mod.lib.util.common.Static;
+import net.fexcraft.mod.lib.util.math.Time;
 import net.fexcraft.mod.states.api.Chunk;
 import net.fexcraft.mod.states.api.ChunkPos;
 import net.fexcraft.mod.states.api.District;
@@ -35,6 +40,7 @@ import net.fexcraft.mod.states.packets.ImagePacketHandler;
 import net.fexcraft.mod.states.util.Config;
 import net.fexcraft.mod.states.util.ForcedChunksManager;
 import net.fexcraft.mod.states.util.Sender;
+import net.fexcraft.mod.states.util.StateUtil;
 import net.fexcraft.mod.states.util.StatesPermissions;
 import net.fexcraft.mod.states.util.TaxSystem;
 import net.fexcraft.mod.states.util.UpdateHandler;
@@ -75,7 +81,7 @@ public class States {
 	//
 	@Mod.Instance(MODID)
 	public static States INSTANCE;
-	public static Timer TAX_TIMER;
+	public static Timer TAX_TIMER, DATA_MANAGER;
 	
 	@Mod.EventHandler
 	public void preInit(FMLPreInitializationEvent event){
@@ -103,7 +109,7 @@ public class States {
 		NBTTagCompoundPacketHandler.addListener(Side.CLIENT, new Receiver());
 		//
 		PermissionAPI.registerNode(ADMIN_PERM, DefaultPermissionLevel.OP, "States Admin Permission");
-		SERVERACCOUNT = AccountManager.INSTANCE.getAccount("server", "states", true);
+		SERVERACCOUNT = DataManager.getAccount("server:states", false, true);
 		//
 		PacketHandler.getInstance().registerMessage(ImagePacketHandler.Client.class, ImagePacket.class, 29910, Side.CLIENT);
 		PacketHandler.getInstance().registerMessage(ImagePacketHandler.Server.class, ImagePacket.class, 29911, Side.SERVER);
@@ -128,10 +134,15 @@ public class States {
 	@Mod.EventHandler
 	public void serverStarted(FMLServerStartedEvent event){
 		ForcedChunksManager.check();
+		//
+		LocalDateTime midnight = LocalDateTime.of(LocalDate.now(ZoneOffset.systemDefault()), LocalTime.MIDNIGHT);
+		long mid = midnight.toInstant(ZoneOffset.UTC).toEpochMilli(); long date = Time.getDate();
+		while((mid += Config.TAX_INTERVAL) < date);
 		if(TAX_TIMER == null){
-			TAX_TIMER = new Timer(); Calendar calendar = Calendar.getInstance();
-	        calendar.set(Calendar.HOUR_OF_DAY, 0); calendar.set(Calendar.MINUTE, 0); calendar.set(Calendar.SECOND, 0); calendar.set(Calendar.MILLISECOND, 0);
-			TAX_TIMER.schedule(new TaxSystem(), calendar.getTime(), Config.TAX_INTERVAL);
+			(TAX_TIMER = new Timer()).schedule(new TaxSystem(), new Date(mid), Config.TAX_INTERVAL);
+		}
+		if(DATA_MANAGER == null){
+			(DATA_MANAGER = new Timer()).schedule(new StateUtil(), new Date(mid), Time.MIN_MS * 15);
 		}
 	}
 	
@@ -140,6 +151,7 @@ public class States {
 		if(Sender.RECEIVER != null){
 			Sender.RECEIVER.halt();
 		}
+		StateUtil.unloadAll();
 	}
 
 }

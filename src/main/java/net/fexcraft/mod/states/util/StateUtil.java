@@ -5,6 +5,7 @@ import java.io.FileReader;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.TimerTask;
 import java.util.UUID;
 
 import javax.annotation.Nullable;
@@ -43,7 +44,7 @@ import net.minecraft.util.text.TextComponentString;
 import net.minecraftforge.fml.common.FMLCommonHandler;
 import net.minecraftforge.server.permission.PermissionAPI;
 
-public class StateUtil {
+public class StateUtil extends TimerTask {
     
     public static @Nullable Chunk getChunk(int x, int z){
         return States.CHUNKS.values().stream().filter(pre -> pre.xCoord() == x && pre.zCoord() == z).findFirst().get();
@@ -329,6 +330,23 @@ public class StateUtil {
 	
 	public static final JsonElement read(File file){
 		return read(file, false);
+	}
+
+	@Override
+	public void run(){
+		try{
+			//TODO
+		}
+		catch(Exception e){
+			Sender.sendAs(null, "SCHEDULED DATA UNLOAD ERRORED");
+			e.printStackTrace();
+		}
+	}
+
+	public static final void unloadAll(){
+		for(District dis : States.DISTRICTS.values()){ dis.save(); }
+		for(Municipality mun : States.MUNICIPALITIES.values()){ mun.save(); mun.unload(); }
+		for(State state : States.STATES.values()){ state.save(); state.unload(); }
 	}
 
 }

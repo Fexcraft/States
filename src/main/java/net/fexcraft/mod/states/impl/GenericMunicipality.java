@@ -9,7 +9,8 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 
 import net.fexcraft.mod.fsmm.api.Account;
-import net.fexcraft.mod.fsmm.util.AccountManager;
+import net.fexcraft.mod.fsmm.api.Bank;
+import net.fexcraft.mod.fsmm.util.DataManager;
 import net.fexcraft.mod.lib.util.common.Print;
 import net.fexcraft.mod.lib.util.json.JsonUtil;
 import net.fexcraft.mod.lib.util.lang.ArrayList;
@@ -45,7 +46,7 @@ public class GenericMunicipality implements Municipality/*, Taxable*/ {
 		created = JsonUtil.getIfExists(obj, "created", Time.getDate()).longValue();
 		creator = UUID.fromString(obj.has("creator") ? obj.get("creator").getAsString() : States.CONSOLE_UUID);
 		changed = JsonUtil.getIfExists(obj, "changed", Time.getDate()).longValue();
-		account = AccountManager.INSTANCE.getAccount("municipality", id + "", true);
+		account = DataManager.getAccount("municipality:" + id, false, true);
 		mayor = obj.has("mayor") ? UUID.fromString(obj.get("mayor").getAsString()) : null;
 		neighbors = JsonUtil.jsonArrayToIntegerArray(JsonUtil.getIfExists(obj, "neighbors", new JsonArray()).getAsJsonArray());
 		districts = JsonUtil.jsonArrayToIntegerArray(JsonUtil.getIfExists(obj, "districts", new JsonArray()).getAsJsonArray());
@@ -94,8 +95,6 @@ public class GenericMunicipality implements Municipality/*, Taxable*/ {
 		File file = getMunicipalityFile();
 		if(!file.getParentFile().exists()){ file.getParentFile().mkdirs(); }
 		JsonUtil.write(file, obj);
-		//
-		AccountManager.INSTANCE.saveAccount(account);
 	}
 
 	@Override
@@ -321,6 +320,19 @@ public class GenericMunicipality implements Municipality/*, Taxable*/ {
 	@Override
 	public void setKickIfBankrupt(boolean newvalue){
 		kib = newvalue;
+	}
+
+	@Override
+	public void unload(){
+		DataManager.unloadAccount(account);
+	}
+	
+	@Override
+	public void finalize(){ unload(); }
+
+	@Override
+	public Bank getBank(){
+		return DataManager.getBank(account.getBankId(), true, true);
 	}
 
 }

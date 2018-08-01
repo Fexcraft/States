@@ -1,8 +1,9 @@
 package net.fexcraft.mod.states.impl;
 
 import net.fexcraft.mod.fsmm.api.Account;
-import net.fexcraft.mod.fsmm.util.AccountManager;
+import net.fexcraft.mod.fsmm.api.Bank;
 import net.fexcraft.mod.fsmm.util.Config;
+import net.fexcraft.mod.fsmm.util.DataManager;
 import net.fexcraft.mod.lib.capabilities.sign.SignCapability;
 import net.fexcraft.mod.lib.util.common.Formatter;
 import net.fexcraft.mod.lib.util.common.Print;
@@ -131,22 +132,18 @@ public class SignShop implements SignCapability.Listener {
 			EnumFacing facing = state.getBlock() instanceof BlockWallSign ? EnumFacing.getFront(tileentity.getBlockMetadata()) : null;
 			if(te != null && te.hasCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, facing)){
 				if(event.getEntityPlayer().getHeldItemMainhand().isEmpty()){
-					boolean loaded = false;
-					Account shop = AccountManager.INSTANCE.getAccount(account.getResourceDomain(), account.getResourcePath());
-					if(shop == null){
-						shop = AccountManager.INSTANCE.getAccount(account.getResourceDomain(), account.getResourcePath(), true);
-						loaded = true;
-					}
+					Account shop = DataManager.getAccount(account.toString(), true, false);
 					if(shop == null){
 						Print.chat(event.getEntityPlayer(), "Shop Account couldn't be loaded.");
 						return true;
 					}
 					Account playeracc = event.getEntityPlayer().getCapability(StatesCapabilities.PLAYER, null).getAccount();
+					Bank playerbank = event.getEntityPlayer().getCapability(StatesCapabilities.PLAYER, null).getBank();
 					IItemHandler te_handler = te.getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, facing);
 					IItemHandler pl_handler = event.getEntityPlayer().getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, null);
 					if(tileentity.signText[3].getUnformattedText().toLowerCase().startsWith("buy")){
 						if(hasStack(event.getEntityPlayer(), te_handler, false)){
-							if(AccountManager.INSTANCE.getBank(playeracc.getBankId()).processTransfer(event.getEntityPlayer(), playeracc, price, shop)){
+							if(playerbank.processAction(Bank.Action.TRANSFER, event.getEntityPlayer(), playeracc, price, shop)){
 								event.getEntityPlayer().addItemStackToInventory(getStackIfPossible(te_handler, false));
 								Print.bar(event.getEntityPlayer(), "Items bought.");
 							}
@@ -154,7 +151,7 @@ public class SignShop implements SignCapability.Listener {
 					}
 					else if(tileentity.signText[3].getUnformattedText().toLowerCase().startsWith("sell")){
 						if(hasStack(event.getEntityPlayer(), pl_handler, true) && hasSpace(event.getEntityPlayer(), te_handler)){
-							if(AccountManager.INSTANCE.getBank(shop.getBankId()).processTransfer(event.getEntityPlayer(), shop, price, playeracc)){
+							if(DataManager.getBank(shop.getBankId(), true, false).processAction(Bank.Action.TRANSFER, event.getEntityPlayer(), shop, price, playeracc)){
 								addStack(te_handler, getStackIfPossible(pl_handler, true));
 								Print.bar(event.getEntityPlayer(), "Items sold.");
 							}
@@ -162,9 +159,6 @@ public class SignShop implements SignCapability.Listener {
 					}
 					else{
 						Print.chat(event.getEntityPlayer(), "Invalid Mode at line 4.");
-					}
-					if(loaded){
-						AccountManager.INSTANCE.unloadAccount(shop);
 					}
 				}
 				else{

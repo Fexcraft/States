@@ -7,7 +7,6 @@ import org.apache.commons.lang3.math.NumberUtils;
 import com.mojang.authlib.GameProfile;
 
 import net.fexcraft.mod.fsmm.api.Bank;
-import net.fexcraft.mod.fsmm.util.AccountManager;
 import net.fexcraft.mod.fsmm.util.Config;
 import net.fexcraft.mod.lib.api.common.fCommand;
 import net.fexcraft.mod.lib.util.common.Print;
@@ -347,8 +346,8 @@ public class DistrictCmd extends CommandBase {
 						Print.chat(sender, "&9Not enough money on Municipality Account.");
 						return;
 					}
-					Bank bank = AccountManager.INSTANCE.getBank(ply.getMunicipality().getAccount().getBankId());
-					if(bank == null){
+					Bank bank = ply.getMunicipality().getBank();
+					if(bank.isNull()){
 						Print.chat(sender, "&9Your bank couldn't be found.");
 						return;
 					}
@@ -369,8 +368,8 @@ public class DistrictCmd extends CommandBase {
 						}
 						else{
 							long halfprice = price / 2;
-							if(halfprice == 0 || bank.processTransfer(sender, ply.getMunicipality().getAccount(), halfprice, States.SERVERACCOUNT)){
-								bank.processTransfer(null, ply.getMunicipality().getAccount(), halfprice, States.SERVERACCOUNT);
+							if(halfprice == 0 || bank.processAction(Bank.Action.TRANSFER, sender, ply.getMunicipality().getAccount(), halfprice, States.SERVERACCOUNT)){
+								bank.processAction(Bank.Action.TRANSFER, null, ply.getMunicipality().getAccount(), halfprice, States.SERVERACCOUNT);
 								newdis.setCreator(ply.getUUID());
 								newdis.setClaimedChunks(1);
 								newdis.setName(name);

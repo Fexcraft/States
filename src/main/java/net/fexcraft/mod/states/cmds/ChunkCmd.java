@@ -8,7 +8,7 @@ import com.mojang.authlib.GameProfile;
 
 import net.fexcraft.mod.fsmm.api.Account;
 import net.fexcraft.mod.fsmm.api.Bank;
-import net.fexcraft.mod.fsmm.util.AccountManager;
+import net.fexcraft.mod.fsmm.api.FSMMCapabilities;
 import net.fexcraft.mod.fsmm.util.Config;
 import net.fexcraft.mod.lib.api.common.fCommand;
 import net.fexcraft.mod.lib.util.common.Print;
@@ -293,7 +293,6 @@ public class ChunkCmd extends CommandBase {
 				}
 				else{
 					Account receiver = null;
-					boolean wasloadedin = true;
 					switch(chunk.getType()){
 						case COMPANY:{
 							Print.chat(sender, "&cNot available yet.");//TODO companies.
@@ -306,11 +305,7 @@ public class ChunkCmd extends CommandBase {
 							break;
 						}
 						case PRIVATE:{
-							receiver = AccountManager.INSTANCE.getAccount("player", chunk.getOwner());
-							if(receiver == null){
-								wasloadedin = false;
-								receiver = AccountManager.INSTANCE.getAccount("player", chunk.getOwner(), true);
-							}
+							receiver = player.world.getCapability(FSMMCapabilities.WORLD, null).getAccount("player:" + chunk.getOwner(), true, true);
 							break;
 						}
 						case PUBLIC:
@@ -324,7 +319,7 @@ public class ChunkCmd extends CommandBase {
 						}
 					}
 					Account ac_sender = playerdata.getAccount();
-					if(!AccountManager.INSTANCE.getBank(ac_sender.getBankId()).processTransfer(sender, ac_sender, chunk.getPrice(), receiver)){
+					if(!playerdata.getBank().processAction(Bank.Action.TRANSFER, sender, ac_sender, chunk.getPrice(), receiver)){
 						return;
 					}
 					long time = Time.getDate();
@@ -346,9 +341,6 @@ public class ChunkCmd extends CommandBase {
 							StateLogger.log(StateLogger.LoggerType.CHUNK, StateLogger.player(player) + " received the " + StateLogger.chunk(ck) + " which was linked to " + StateLogger.chunk(chunk) + "!");
 						}
 						Print.chat(sender, "&7" + chunk.getLinkedChunks().size() + "&a linked chunks bought!");
-					}
-					if(!wasloadedin){
-						AccountManager.INSTANCE.unloadAccount(receiver);
 					}
 				}
 				return;
@@ -505,12 +497,8 @@ public class ChunkCmd extends CommandBase {
 								chunk.getMunicipality().modifyForceloadedChunk(player, chunk.getChunkPos(), bool);
 								StateLogger.log(StateLogger.LoggerType.MUNICIPALITY, StateLogger.player(player) + " " + (bool ? "enabled" : "disabled") + " chunk force-loading at " + StateLogger.chunk(chunk) + ", in the District of " + StateLogger.district(chunk.getDistrict()) + ", which is in " + StateLogger.municipality(chunk.getMunicipality()) + ".");
 								//
-								Bank bank = AccountManager.INSTANCE.getBank(chunk.getMunicipality().getAccount().getBankId());
-								boolean wl = !(bank == null);
-								if(bank == null || !wl){ bank = AccountManager.INSTANCE.getBank(chunk.getMunicipality().getAccount().getBankId(), true); }
-								if(bank == null){ return; }//TODO error message
-								bank.processTransfer(Static.getServer(), chunk.getMunicipality().getAccount(), net.fexcraft.mod.states.util.Config.LOADED_CHUNKS_TAX, States.SERVERACCOUNT);
-								if(!wl){ AccountManager.INSTANCE.unloadBank(bank); }
+								Bank bank = chunk.getMunicipality().getBank();
+								bank.processAction(Bank.Action.TRANSFER, Static.getServer(), chunk.getMunicipality().getAccount(), net.fexcraft.mod.states.util.Config.LOADED_CHUNKS_TAX, States.SERVERACCOUNT);
 								return;
 							}
 							break;

@@ -8,7 +8,8 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 
 import net.fexcraft.mod.fsmm.api.Account;
-import net.fexcraft.mod.fsmm.util.AccountManager;
+import net.fexcraft.mod.fsmm.api.Bank;
+import net.fexcraft.mod.fsmm.util.DataManager;
 import net.fexcraft.mod.lib.util.json.JsonUtil;
 import net.fexcraft.mod.lib.util.lang.ArrayList;
 import net.fexcraft.mod.lib.util.math.Time;
@@ -35,7 +36,7 @@ public class GenericState implements State {
 		changed = JsonUtil.getIfExists(obj, "changed", Time.getDate()).longValue();
 		creator = obj.has("creator") ? UUID.fromString(obj.get("creator").getAsString()) : UUID.fromString(States.CONSOLE_UUID);
 		leader = obj.has("leader") ? UUID.fromString(obj.get("leader").getAsString()) : null;
-		account = AccountManager.INSTANCE.getAccount("state", id + "", true);
+		account = DataManager.getAccount("state:" + id, false, true);
 		capital = JsonUtil.getIfExists(obj, "capital", -1).intValue();
 		neighbors = JsonUtil.jsonArrayToIntegerArray(JsonUtil.getIfExists(obj, "neighbors", new JsonArray()).getAsJsonArray());
 		municipalities = JsonUtil.jsonArrayToIntegerArray(JsonUtil.getIfExists(obj, "municipalities", new JsonArray()).getAsJsonArray());
@@ -82,8 +83,6 @@ public class GenericState implements State {
 		File file = getStateFile();
 		if(!file.getParentFile().exists()){ file.getParentFile().mkdirs(); }
 		JsonUtil.write(file, obj);
-		//
-		AccountManager.INSTANCE.saveAccount(account);
 	}
 
 	@Override
@@ -223,6 +222,19 @@ public class GenericState implements State {
 	@Override
 	public void setCitizenTaxPercentage(byte newtax){
 		citizentaxpercent = newtax;
+	}
+
+	@Override
+	public void unload(){
+		DataManager.unloadAccount(account);
+	}
+	
+	@Override
+	public void finalize(){ unload(); }
+
+	@Override
+	public Bank getBank(){
+		return DataManager.getBank(account.getBankId(), true, true);
 	}
 	
 }

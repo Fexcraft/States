@@ -10,7 +10,6 @@ import com.google.gson.JsonObject;
 import com.mojang.authlib.GameProfile;
 
 import net.fexcraft.mod.fsmm.api.Bank;
-import net.fexcraft.mod.fsmm.util.AccountManager;
 import net.fexcraft.mod.fsmm.util.Config;
 import net.fexcraft.mod.lib.api.common.fCommand;
 import net.fexcraft.mod.lib.util.common.Print;
@@ -477,7 +476,7 @@ public class StateCmd extends CommandBase {
 					Print.chat(sender, "&9No name for new State Specified.");
 					return;
 				}
-				Bank bank = AccountManager.INSTANCE.getBank(ply.getMunicipality().getAccount().getBankId());
+				Bank bank = ply.getMunicipality().getBank();
 				if(bank == null){
 					Print.chat(sender, "&9Your Municipality Bank couldn't be found.");
 					return;
@@ -505,8 +504,8 @@ public class StateCmd extends CommandBase {
 						//
 						//Now let's save stuff.
 						long halfprice = price / 2;
-						if(halfprice == 0 || bank.processTransfer(sender, ply.getMunicipality().getAccount(), halfprice, States.SERVERACCOUNT)){
-							bank.processTransfer(null, ply.getMunicipality().getAccount(), halfprice, newstate.getAccount());
+						if(halfprice == 0 || bank.processAction(Bank.Action.TRANSFER, sender, ply.getMunicipality().getAccount(), halfprice, States.SERVERACCOUNT)){
+							bank.processAction(Bank.Action.TRANSFER, null, ply.getMunicipality().getAccount(), halfprice, newstate.getAccount());
 							newstate.save(); States.STATES.put(newstate.getId(), newstate);
 							ply.getMunicipality().setState(newstate);
 							ply.getMunicipality().setChanged(Time.getDate());

@@ -6,13 +6,13 @@ import java.util.UUID;
 
 import com.google.gson.JsonObject;
 
-import net.fexcraft.mod.fsmm.api.Account;
 import net.fexcraft.mod.states.States;
+import net.fexcraft.mod.states.api.root.AccountHolder;
 import net.fexcraft.mod.states.api.root.BuyableType;
 import net.fexcraft.mod.states.api.root.ColorHolder;
 import net.fexcraft.mod.states.api.root.IconHolder;
 
-public interface State extends ColorHolder, BuyableType, IconHolder {
+public interface State extends ColorHolder, BuyableType, IconHolder, AccountHolder {
 	
 	public int getId();
 	
@@ -45,8 +45,6 @@ public interface State extends ColorHolder, BuyableType, IconHolder {
 	public JsonObject toJsonObject();
 
 	public void save();
-	
-	public Account getAccount();
 	
 	public UUID getLeader();
 	

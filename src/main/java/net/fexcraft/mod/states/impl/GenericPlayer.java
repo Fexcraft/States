@@ -5,7 +5,9 @@ import java.util.UUID;
 import com.google.gson.JsonObject;
 
 import net.fexcraft.mod.fsmm.api.Account;
-import net.fexcraft.mod.fsmm.util.AccountManager;
+import net.fexcraft.mod.fsmm.api.Bank;
+import net.fexcraft.mod.fsmm.api.FSMMCapabilities;
+import net.fexcraft.mod.fsmm.util.DataManager;
 import net.fexcraft.mod.lib.util.common.Formatter;
 import net.fexcraft.mod.lib.util.common.Print;
 import net.fexcraft.mod.lib.util.json.JsonUtil;
@@ -51,9 +53,7 @@ public class GenericPlayer implements PlayerCapability {
 	public JsonObject toJsonObject(){
 		JsonObject obj = new JsonObject();
 		obj.addProperty("uuid", this.getUUIDAsString());
-		if(nick != null){
-			obj.addProperty("nickname", nick);
-		}
+		if(nick != null){ obj.addProperty("nickname", nick); }
 		obj.addProperty("color", color);
 		obj.addProperty("municipality", municipality == null ? -1 : municipality.getId());
 		obj.addProperty("last_tax_collection", lasttaxcoll);
@@ -79,7 +79,7 @@ public class GenericPlayer implements PlayerCapability {
 				this.municipality.getCitizen().add(uuid);
 			}
 		}
-		this.account = AccountManager.INSTANCE.getAccount("player", uuid.toString(), true);
+		this.account = this.isOnlinePlayer() ? entity.getCapability(FSMMCapabilities.PLAYER, null).getAccount() : DataManager.getAccount("player:" + uuid.toString(), true, true);
 		this.lasttaxcoll = JsonUtil.getIfExists(obj, "last_tax_collection", 0).longValue();
 		this.customtax = JsonUtil.getIfExists(obj, "custom_tax", 0).longValue();
 		loaded = true;
@@ -264,6 +264,23 @@ public class GenericPlayer implements PlayerCapability {
 	@Override
 	public void setCustomTax(long newtax){
 		this.customtax = newtax;
+	}
+
+	@Override
+	public void unload(){
+		DataManager.unloadAccount(account);
+	}
+	
+	@Override
+	public void finalize(){
+		if(entity == null && account != null){
+			DataManager.save(account);
+		}
+	}
+
+	@Override
+	public Bank getBank(){
+		return this.isOnlinePlayer() ? entity.getCapability(FSMMCapabilities.PLAYER, null).getBank() : DataManager.getBank(account.getBankId(), true, true);
 	}
 
 }

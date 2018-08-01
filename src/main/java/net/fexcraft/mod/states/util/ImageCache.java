@@ -34,7 +34,6 @@ public class ImageCache {
 	//private static BufferedImage NOIMG;
 	private static final Queue<QueueObj> QUEUE = new LinkedList<>();
 	private static final TreeMap<String, TempImg> LOADED_CACHE = new TreeMap<>();
-	private static int check;
 	
 	@Mod.EventBusSubscriber
 	public static class TickHandler {
@@ -60,14 +59,6 @@ public class ImageCache {
 								saveImage(entry.getValue().image, entry.getKey());
 								LOADED_CACHE.remove(entry.getKey());
 							}
-						}
-					}
-				}
-				if(++check >= 2000){
-					check = 0; long time = Time.getDate();
-					for(long key : ImageUtil.TEMP_IMAGES.keySet()){
-						if((key + Time.MIN_MS) < time){
-							ImageUtil.TEMP_IMAGES.remove(key);
 						}
 					}
 				}

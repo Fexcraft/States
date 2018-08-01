@@ -13,7 +13,7 @@ import com.google.gson.JsonObject;
 
 import net.fexcraft.mod.fsmm.api.Account;
 import net.fexcraft.mod.fsmm.api.Bank;
-import net.fexcraft.mod.fsmm.util.AccountManager;
+import net.fexcraft.mod.fsmm.util.DataManager;
 import net.fexcraft.mod.lib.util.common.Print;
 import net.fexcraft.mod.lib.util.common.Static;
 import net.fexcraft.mod.lib.util.json.JsonUtil;
@@ -34,11 +34,10 @@ import net.minecraft.entity.player.EntityPlayerMP;
 public class TaxSystem extends TimerTask {
 	
 	private static long last_interval;
-	private static boolean loaded, firstrun = true;
+	private static boolean loaded;
 
 	@Override
 	public void run(){
-		if(firstrun){ firstrun = false; return; }
 		try{
 			load();
 			long date = Time.getDate();
@@ -98,12 +97,7 @@ public class TaxSystem extends TimerTask {
 					ForcedChunksManager.requestUnload(pos);
 				}
 				else{
-					Bank bank = AccountManager.INSTANCE.getBank(mun.getAccount().getBankId());
-					boolean wl = !(bank == null);
-					if(bank == null || !wl){ bank = AccountManager.INSTANCE.getBank(mun.getAccount().getBankId(), true); }
-					if(bank == null){ return; }//TODO error message
-					bank.processTransfer(Static.getServer(), mun.getAccount(), conf, States.SERVERACCOUNT);
-					if(!wl){ AccountManager.INSTANCE.unloadBank(bank); }
+					mun.getBank().processAction(Bank.Action.TRANSFER, Static.getServer(), mun.getAccount(), conf, States.SERVERACCOUNT);
 				}
 			}
 		}
@@ -118,7 +112,7 @@ public class TaxSystem extends TimerTask {
 				if(isOnline(uuid)){ continue; }
 				GenericPlayer player = new GenericPlayer(uuid);
 				processPlayerTax(date, player); player.save();
-				AccountManager.INSTANCE.unloadAccount(player.getAccount());
+				player.unload();
 			}
 			catch(Exception e){
 				e.printStackTrace();
@@ -144,14 +138,9 @@ public class TaxSystem extends TimerTask {
 			Account account = cap.getAccount();
 			Account receiver = cap.getMunicipality().getAccount();
 			Account state = cap.getState().getAccount();
-			boolean bankloaded = true;
-			Bank bank = AccountManager.INSTANCE.getBank(account.getBankId());
-			if(bank == null){
-				bank = AccountManager.INSTANCE.getBank(account.getBankId(), true);
-				bankloaded = false;
-			}
+			Bank bank = cap.getBank();
 			if(account.getBalance() < tax){
-				if((account.getBalance() <= 0 || bank == null) && cap.getMunicipality().kickIfBankrupt()){
+				if((account.getBalance() <= 0 || bank.isNull()) && cap.getMunicipality().kickIfBankrupt()){
 					Mail mail = new GenericMail("player", cap.getUUIDAsString(), "TaxCollector",
 						"You didn't have enough money to pay your citizen tax, as such, you got kicked.", MailType.SYSTEM, null);
 					mail.save();
@@ -163,7 +152,7 @@ public class TaxSystem extends TimerTask {
 					return;
 				}
 				else if(account.getBalance() > 0 && bank != null && cap.getMunicipality().kickIfBankrupt()){
-					bank.processTransfer(Static.getServer(), account, account.getBalance(), cap.getMunicipality().getAccount());
+					bank.processAction(Bank.Action.TRANSFER, Static.getServer(), account, account.getBalance(), cap.getMunicipality().getAccount());
 					Mail mail = new GenericMail("player", cap.getUUIDAsString(), "TaxCollector",
 						"WARNING! You didn't have enough money to pay your tax, next tax collection cycle you may get kicked!", MailType.SYSTEM, null);
 					mail.save();
@@ -171,12 +160,10 @@ public class TaxSystem extends TimerTask {
 						StateLogger.player(cap) + " did not have enough money to pay the full tax.", MailType.SYSTEM, null);
 					mail.save();
 					cap.onTaxCollected(date);
-					if(!bankloaded){ AccountManager.INSTANCE.unloadBank(bank); }
 					return;
 				}
 				else if(account.getBalance() > 0 && bank != null && !cap.getMunicipality().kickIfBankrupt()){
-					bank.processTransfer(Static.getServer(), account, account.getBalance(), cap.getMunicipality().getAccount());
-					if(!bankloaded){ AccountManager.INSTANCE.unloadBank(bank); }
+					bank.processAction(Bank.Action.TRANSFER, Static.getServer(), account, account.getBalance(), cap.getMunicipality().getAccount());
 					Mail mail = new GenericMail("player", cap.getUUIDAsString(), "TaxCollector",
 						"WARNING! You didn't have enough money to pay your tax!", MailType.SYSTEM, null);
 					mail.save();
@@ -185,20 +172,19 @@ public class TaxSystem extends TimerTask {
 					mail.save();
 					cap.onTaxCollected(date);
 				}
-				if(bank == null){
+				if(bank.isNull()){
 					StateLogger.log(StateLogger.LoggerType.CHUNK, "Tax collection for " + StateLogger.player(cap) + " could not be completed as the player's bank is NULL, additionally, the player didn't have enough money to pay the tax.");
 				}
 			}
-			if(bank == null){
+			if(bank.isNull()){
 				StateLogger.log(StateLogger.LoggerType.PLAYER, "Tax collection for " + StateLogger.player(cap.getEntityPlayer()) + " could not be completed as the player's bank is NULL.");
 			}
 			long statetax = tax > 1000 ? getPercentage(tax, cap.getState().getCitizenTaxPercentage()) : 0;
 			long muntax = tax > 1000 ? tax - statetax : tax;
-			bank.processTransfer(Static.getServer(), account, muntax, receiver);
+			bank.processAction(Bank.Action.TRANSFER, Static.getServer(), account, muntax, receiver);
 			if(state != null && statetax > 0){
-				bank.processTransfer(Static.getServer(), account, statetax, state);
+				bank.processAction(Bank.Action.TRANSFER, Static.getServer(), account, statetax, state);
 			}
-			if(!bankloaded){ AccountManager.INSTANCE.unloadBank(bank); }
 		}
 		cap.onTaxCollected(date);
 	}
@@ -229,31 +215,21 @@ public class TaxSystem extends TimerTask {
 			}
 		}
 		if(tax > 0){
-			boolean wasloaded = true;
 			Account account = null;
 			Account receiver = value.getMunicipality().getAccount();
 			Account state = value.getState().getAccount();
 			switch(value.getType()){
 				case PRIVATE:{
-					account = AccountManager.INSTANCE.getAccount("player", value.getOwner());
-					if(account == null){
-						wasloaded = false;
-						account = AccountManager.INSTANCE.getAccount("player", value.getOwner(), true);
-					}
+					account = DataManager.getAccount("player:" + value.getOwner(), true, false);
 					break;
 				}
 				case COMPANY: //TODO
 				default: return;
 			}
 			if(account == null || receiver == null){ return; }
-			boolean bankloaded = true;
-			Bank bank = AccountManager.INSTANCE.getBank(account.getBankId());
-			if(bank == null){
-				bank = AccountManager.INSTANCE.getBank(account.getBankId(), true);
-				bankloaded = false;
-			}
+			Bank bank = DataManager.getBank(account.getBankId(), true, false);
 			if(account.getBalance() < tax){
-				if((account.getBalance() <= 0 || bank == null) && value.getDistrict().unclaimIfBankrupt()){
+				if((account.getBalance() <= 0 || bank.isNull()) && value.getDistrict().unclaimIfBankrupt()){
 					Mail mail = new GenericMail("player", value.getOwner(), "TaxCollector",
 						"You didn't have enough money to pay for your Property at " + StateLogger.chunk(value) + ", as such, it was unclaimed.", MailType.SYSTEM, null);
 					mail.save();
@@ -266,7 +242,7 @@ public class TaxSystem extends TimerTask {
 					return;
 				}
 				else if(account.getBalance() > 0 && bank != null && value.getDistrict().unclaimIfBankrupt()){
-					bank.processTransfer(Static.getServer(), account, account.getBalance(), value.getMunicipality().getAccount());
+					bank.processAction(Bank.Action.TRANSFER, Static.getServer(), account, account.getBalance(), value.getMunicipality().getAccount());
 					Mail mail = new GenericMail("player", value.getOwner(), "TaxCollector",
 						"WARNING! You didn't have enough money to pay for your Property at " + StateLogger.chunk(value) + ", next tax collection cycle it will be unclaimed!", MailType.SYSTEM, null);
 					mail.save();
@@ -274,14 +250,10 @@ public class TaxSystem extends TimerTask {
 						"Owner of the Property at " + StateLogger.chunk(value) + " did not have enough money to pay the full tax.", MailType.SYSTEM, null);
 					mail.save();
 					value.onTaxCollected(date);
-					if(!bankloaded){ AccountManager.INSTANCE.unloadBank(bank); }
-					if(!wasloaded){ AccountManager.INSTANCE.unloadAccount(account); }
 					return;
 				}
 				else if(account.getBalance() > 0 && bank != null && !value.getDistrict().unclaimIfBankrupt()){
-					bank.processTransfer(Static.getServer(), account, account.getBalance(), value.getMunicipality().getAccount());
-					if(!bankloaded){ AccountManager.INSTANCE.unloadBank(bank); }
-					if(!wasloaded){ AccountManager.INSTANCE.unloadAccount(account); }
+					bank.processAction(Bank.Action.TRANSFER, Static.getServer(), account, account.getBalance(), value.getMunicipality().getAccount());
 					Mail mail = new GenericMail("player", value.getOwner(), "TaxCollector",
 						"WARNING! You didn't have enough money to pay for your Property at " + StateLogger.chunk(value) + "!", MailType.SYSTEM, null);
 					mail.save();
@@ -290,23 +262,21 @@ public class TaxSystem extends TimerTask {
 					mail.save();
 					value.onTaxCollected(date);
 				}
-				if(bank == null){
+				if(bank.isNull()){
 					StateLogger.log(StateLogger.LoggerType.CHUNK, "Tax collection for " + StateLogger.chunk(value) + " could not be completed as the owner's bank is NULL, additionally, the owner didn't have enough money to pay the tax.");
 				}
 				return;
 			}
-			if(bank == null){
+			if(bank.isNull()){
 				StateLogger.log(StateLogger.LoggerType.CHUNK, "Tax collection for " + StateLogger.chunk(value) + " could not be completed as the owner's bank is NULL.");
 				return;
 			}
 			long statetax = tax > 1000 ? getPercentage(tax, value.getState().getChunkTaxPercentage()) : 0;
 			long muntax = tax > 1000 ? tax - statetax : tax;
-			bank.processTransfer(Static.getServer(), account, muntax, receiver);
+			bank.processAction(Bank.Action.TRANSFER, Static.getServer(), account, muntax, receiver);
 			if(state != null && statetax > 0){
-				bank.processTransfer(Static.getServer(), account, statetax, state);
+				bank.processAction(Bank.Action.TRANSFER, Static.getServer(), account, statetax, state);
 			}
-			if(!wasloaded){ AccountManager.INSTANCE.unloadAccount(account); }
-			if(!bankloaded){ AccountManager.INSTANCE.unloadBank(bank); }
 		}
 		value.onTaxCollected(date);
 	}

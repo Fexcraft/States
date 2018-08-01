@@ -9,7 +9,6 @@ import com.google.gson.JsonObject;
 import com.mojang.authlib.GameProfile;
 
 import net.fexcraft.mod.fsmm.api.Bank;
-import net.fexcraft.mod.fsmm.util.AccountManager;
 import net.fexcraft.mod.fsmm.util.Config;
 import net.fexcraft.mod.lib.api.common.fCommand;
 import net.fexcraft.mod.lib.util.common.Print;
@@ -143,12 +142,12 @@ public class MunicipalityCmd extends CommandBase {
 					}
 					//
 					State playerstate = ply.getMunicipality().getState();
-					Bank bank = AccountManager.INSTANCE.getBank(playerstate.getAccount().getBankId());
-					if(bank == null){
+					Bank bank = playerstate.getBank();
+					if(bank.isNull()){
 						Print.chat(sender, "&cState's Bank not found.");
 						return;
 					}
-					if(bank.processTransfer(sender, playerstate.getAccount(), mun.getPrice(), mun.getState().getAccount())){
+					if(bank.processAction(Bank.Action.TRANSFER, sender, playerstate.getAccount(), mun.getPrice(), mun.getState().getAccount())){
 						if(mun.isCapital()){
 							if(mun.getState().getMunicipalities().size() > 0){
 								mun.getState().setCapitalId(-1);
@@ -642,8 +641,8 @@ public class MunicipalityCmd extends CommandBase {
 					Print.chat(sender, "&9No name for new Municipality Specified.");
 					return;
 				}
-				Bank bank = AccountManager.INSTANCE.getBank(ply.getAccount().getBankId());
-				if(bank == null){
+				Bank bank = ply.getBank();
+				if(bank.isNull()){
 					Print.chat(sender, "&9Your bank couldn't be found.");
 					return;
 				}
@@ -685,8 +684,8 @@ public class MunicipalityCmd extends CommandBase {
 							//
 							//Now let's save stuff.
 							long halfprice = price / 2;
-							if(halfprice == 0 || bank.processTransfer(sender, ply.getAccount(), halfprice, States.SERVERACCOUNT)){
-								bank.processTransfer(null, ply.getAccount(), halfprice, newmun.getAccount());
+							if(halfprice == 0 || bank.processAction(Bank.Action.TRANSFER, sender, ply.getAccount(), halfprice, States.SERVERACCOUNT)){
+								bank.processAction(Bank.Action.TRANSFER, null, ply.getAccount(), halfprice, newmun.getAccount());
 								newmun.save(); States.MUNICIPALITIES.put(newmun.getId(), newmun);
 								newdis.save(); States.DISTRICTS.put(newdis.getId(), newdis);
 								chunk.setDistrict(newdis); chunk.save();

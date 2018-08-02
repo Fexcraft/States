@@ -1,5 +1,6 @@
 # States
-Hopefully less issueful successor of the "Nations" Series.
+Hopefully less issueful successor of the "Nations" Series.<br>
+(Wiki: https://github.com/Fexcraft/States/wiki)
 
 ### So... what is "States"?
 Similarly to "Nations" (an old FSU module), it has a multi-layer protection system.

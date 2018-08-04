@@ -73,6 +73,6 @@ Account & Money(Currency) Management mod, which is in it's latest versions prett
 ### License
 http://fexcraft.net/license?id=mods
 ### Discord
-https://discord.gg/rMXcrsv
+https://discord.gg/AkMAzaA
 ### Wiki
 https://github.com/Fexcraft/States/wiki (we may need help filling that one...)

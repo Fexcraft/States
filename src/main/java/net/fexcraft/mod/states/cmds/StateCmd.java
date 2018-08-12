@@ -113,6 +113,7 @@ public class StateCmd extends CommandBase {
 					Print.chat(sender, "&7/st set name <new name>");
 					Print.chat(sender, "&7/st set price <price/0>");
 					Print.chat(sender, "&7/st set color <hex>");
+					Print.chat(sender, "&7/st set leader <playername>");
 					Print.chat(sender, "&7/st set capital <municipality id>");
 					Print.chat(sender, "&7/st set icon <url>");
 					Print.chat(sender, "&7/st set chunk-tax-percentage <0-100/reset>");
@@ -120,6 +121,28 @@ public class StateCmd extends CommandBase {
 					return;
 				}
 				switch(args[1]){
+					case "leader":{
+						if(hasPerm("state.set.leader", player, state)){
+							if(args.length < 3){
+								Print.chat(sender, "&9Missing Argument!");
+								break;
+							}
+							GameProfile gp = Static.getServer().getPlayerProfileCache().getGameProfileForUsername(args[2]);
+							if(gp == null || gp.getId() == null){
+								Print.chat(sender, "&cPlayer not found in Cache.");
+								break;
+							}
+							state.setLeader(gp.getId());
+							state.setChanged(Time.getDate());
+							state.save();
+							Print.chat(sender, "&2Set &7" + gp.getName() + "&2 to new State Leader!");
+							StateLogger.log(StateLogger.LoggerType.DISRICT, StateLogger.player(player) + " changed leader of " + StateLogger.state(state) + " to " + StateLogger.player(gp) + ".");
+						}
+						else{
+							Print.chat(sender, "&cNo permission.");
+						}
+						break;
+					}
 					case "name":{
 						if(hasPerm("state.set.name", player, state)){
 							if(args.length < 3){

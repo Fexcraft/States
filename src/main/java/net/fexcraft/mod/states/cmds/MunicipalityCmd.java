@@ -180,6 +180,7 @@ public class MunicipalityCmd extends CommandBase {
 					Print.chat(sender, "&7/mun set open <true/false>");
 					Print.chat(sender, "&7/mun set name <new name>");
 					Print.chat(sender, "&7/mun set price <price/0>");
+					Print.chat(sender, "&7/mun set mayor <playername>");
 					Print.chat(sender, "&7/mun set color <hex>");
 					Print.chat(sender, "&7/mun set icon <url>");
 					Print.chat(sender, "&7/mun set citizen-tax <amount/reset>");
@@ -187,6 +188,28 @@ public class MunicipalityCmd extends CommandBase {
 					return;
 				}
 				switch(args[1]){
+					case "mayor":{
+						if(hasPerm("municipality.set.mayor", player, mun)){
+							if(args.length < 3){
+								Print.chat(sender, "&9Missing Argument!");
+								break;
+							}
+							GameProfile gp = Static.getServer().getPlayerProfileCache().getGameProfileForUsername(args[2]);
+							if(gp == null || gp.getId() == null){
+								Print.chat(sender, "&cPlayer not found in Cache.");
+								break;
+							}
+							mun.setMayor(gp.getId());
+							mun.setChanged(Time.getDate());
+							mun.save();
+							Print.chat(sender, "&2Set &7" + gp.getName() + "&2 to new Municipality Mayor!");
+							StateLogger.log(StateLogger.LoggerType.DISRICT, StateLogger.player(player) + " changed mayor of " + StateLogger.municipality(mun) + " to " + StateLogger.player(gp) + ".");
+						}
+						else{
+							Print.chat(sender, "&cNo permission.");
+						}
+						break;
+					}
 					case "name":{
 						if(hasPerm("municipality.set.name", player, mun)){
 							if(args.length < 3){

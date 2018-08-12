@@ -196,8 +196,8 @@ public class GenericChunk implements Chunk {
 
 	@Override
 	public void setChanged(long new_change){
-            changed = new_change;
-            SignTileEntityCapabilityUtil.processChunkChange(StateUtil.getChunk(this), "chunk");
+		changed = new_change;
+		SignTileEntityCapabilityUtil.processChunkChange(StateUtil.getChunk(this), "chunk");
 	}
 
 	@Override
@@ -242,7 +242,7 @@ public class GenericChunk implements Chunk {
 
 	@Override
 	public void setOwner(String str){
-		owner = str == null ? "null" : owner;
+		owner = str == null ? "null" : str;
 	}
 
 	@Override

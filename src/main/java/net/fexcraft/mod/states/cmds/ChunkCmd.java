@@ -135,7 +135,7 @@ public class ChunkCmd extends CommandBase {
 				Print.chat(sender, "&e====-====-====-====-====-====&0[&2States&0]");
 				Print.chat(sender, "&6Info of chunk &7" + chunk.xCoord() + "x&2, &7" + chunk.zCoord() + "z&2:");
 				Print.chat(sender, "&9District: &7" + chunk.getDistrict().getName() + " (" + chunk.getDistrict().getId() + ")");
-				Print.chat(sender, "&9Owner: &7" + (chunk.getType() == ChunkType.PRIVATE ? Static.getPlayerNameByUUID(UUID.fromString(chunk.getOwner())) : chunk.getOwner()));
+				Print.chat(sender, "&9Owner: &7" + (chunk.getType() == ChunkType.PRIVATE ? Static.getPlayerNameByUUID(chunk.getOwner()) : chunk.getOwner()));
 				Print.chat(sender, "&9Price: &7" + (chunk.getPrice() > 0 ? Config.getWorthAsString(chunk.getPrice()) : "not for sale"));
 				Print.chat(sender, "&9Tax: &7" + (chunk.getCustomTax() > 0 ? ggas(chunk.getCustomTax()) + " &c&m" : "") + ggas(chunk.getDistrict().getChunkTax()));
 				Print.chat(sender, "&9Type: &7" + chunk.getType().name().toLowerCase());
@@ -250,10 +250,10 @@ public class ChunkCmd extends CommandBase {
 						Print.chat(sender, "&9Error: &7" + e.getMessage());
 						return;
 					}
-                                        if(chunk == null){
-                                                Print.chat(sender, "Chunk couldn't be found, maybe it isn't loaded?");
-                                                return;
-                                        }
+					if(chunk == null){
+						Print.chat(sender, "Chunk couldn't be found, maybe it isn't loaded?");
+						return;
+					}
 				}
 				if(chunk.getDistrict().getId() < 0){
 					Print.chat(sender, "Only claimed chunks can be bought.");

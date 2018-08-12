@@ -158,6 +158,8 @@ public class StatesPermissions {
 		PERMISSIONS.put("municipality.set.citizentax", new Permission(PermissionGroup.MUNICIPALITY, PermissionLevel.MUNICIPALITY_COUNCIL, PermissionLevel.STATE_COUNCIL, PermissionLevel.ADMIN));
 		PERMISSIONS.put("municipality.set.kick-if-bankrupt", new Permission(PermissionGroup.SKIP, PermissionLevel.MUNICIPALITY_MAYOR, PermissionLevel.MUNICIPALITY_COUNCIL, PermissionLevel.ADMIN));
 		PERMISSIONS.put("state.set.citizen-tax-percentage", new Permission(PermissionGroup.STATE, PermissionLevel.ADMIN));
+		PERMISSIONS.put("municipality.set.mayor", new Permission(PermissionGroup.SKIP, PermissionLevel.MUNICIPALITY_MAYOR, PermissionLevel.ADMIN));
+		PERMISSIONS.put("state.set.leader", new Permission(PermissionGroup.SKIP, PermissionLevel.STATE_LEADER, PermissionLevel.ADMIN));
 		
 	}
 

@@ -6,6 +6,7 @@ import java.io.File;
 import java.util.LinkedList;
 import java.util.Map.Entry;
 import java.util.Queue;
+import java.util.TimerTask;
 import java.util.TreeMap;
 
 import javax.imageio.ImageIO;
@@ -23,55 +24,42 @@ import net.minecraft.init.Blocks;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import net.minecraft.world.chunk.Chunk;
-import net.minecraftforge.fml.common.Mod;
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
-import net.minecraftforge.fml.common.gameevent.TickEvent;
-import net.minecraftforge.fml.common.gameevent.TickEvent.Phase;
 
-public class ImageCache {
+public class ImageCache extends TimerTask {
 	
 	private static final int IMGSIZE = 512;
 	//private static BufferedImage NOIMG;
 	private static final Queue<QueueObj> QUEUE = new LinkedList<>();
 	private static final TreeMap<String, TempImg> LOADED_CACHE = new TreeMap<>();
 	
-	@Mod.EventBusSubscriber
-	public static class TickHandler {
-		
-		@SubscribeEvent
-		public static void onTick(TickEvent.ServerTickEvent event){
-			try{
-				if(event.phase == Phase.START){
-					if(QUEUE.size() == 0){ return; }
-					for(int i = 0; i < Config.MAP_UPDATES_PER_TICK; i++){
-						QueueObj obj = QUEUE.poll();
-						if(obj != null){
-							updateImage(obj.world, obj.chunk);
-						}
-					}
-				}
-				else{
-					if(LOADED_CACHE.size() == 0){ return; }
-					for(int i = 0; i < Config.MAP_UPDATES_PER_TICK; i++){
-						Entry<String, TempImg> entry = LOADED_CACHE.firstEntry();
-						if(entry != null){
-							if(entry.getValue().last_access + (Time.MIN_MS) >= Time.getDate()){
-								saveImage(entry.getValue().image, entry.getKey());
-								LOADED_CACHE.remove(entry.getKey());
-							}
-						}
-					}
+	@Override
+	public void run(){
+		try{
+			if(QUEUE.size() == 0){ return; }
+			for(int i = 0; i < Config.MAP_UPDATES_PER_SECOND; i++){
+				QueueObj obj = QUEUE.poll();
+				if(obj != null){
+					updateImage(obj.world, obj.chunk);
 				}
 			}
-			catch(Exception e){
-				e.printStackTrace();
+			if(LOADED_CACHE.size() == 0){ return; }
+			for(int i = 0; i < Config.MAP_UPDATES_PER_SECOND; i++){
+				Entry<String, TempImg> entry = LOADED_CACHE.firstEntry();
+				if(entry != null){
+					if(entry.getValue().last_access + (Time.MIN_MS) >= Time.getDate()){
+						saveImage(entry.getValue().image, entry.getKey());
+						LOADED_CACHE.remove(entry.getKey());
+					}
+				}
 			}
 		}
-		
+		catch(Exception e){
+			e.printStackTrace();
+		}
 	}
 	
 	public static void update(World world, Chunk chunk){
-		if(Config.MAP_UPDATES_PER_TICK == 0 || chunk == null){
+		if(Config.MAP_UPDATES_PER_SECOND == 0 || chunk == null){
 			return;
 		}
 		QUEUE.add(new QueueObj(world, chunk));

@@ -19,11 +19,12 @@ public class Config {
 	
 	public static File CONFIG_PATH;
 	public static long DEFAULT_CHUNK_PRICE, MUNICIPALITY_CREATION_PRICE, STATE_CREATION_PRICE, DISTRICT_CREATION_PRICE, TAX_INTERVAL, LOADED_CHUNKS_TAX;
-	public static int MAP_UPDATES_PER_TICK, BOT_PORT, TRANSIT_ZONE_BOTTOM_LIMIT, TRANSIT_ZONE_TOP_LIMIT, CHUNK_PER_CITIZEN, NICKNAME_LENGTH, LOADED_CHUNKS_PER_MUNICIPALITY;
-	public static boolean ALLOW_WILDERNESS_ACCESS, ALLOW_TRANSIT_ZONES, TAX_OFFLINE_PLAYERS;
+	public static int MAP_UPDATES_PER_SECOND, BOT_PORT, TRANSIT_ZONE_BOTTOM_LIMIT, TRANSIT_ZONE_TOP_LIMIT, CHUNK_PER_CITIZEN, NICKNAME_LENGTH, LOADED_CHUNKS_PER_MUNICIPALITY;
+	public static boolean ALLOW_WILDERNESS_ACCESS, ALLOW_TRANSIT_ZONES, TAX_OFFLINE_PLAYERS, SHOW_MINIMAP;
 	public static String WEBHOOK, BOT_KEY, WEBHOOK_ICON, WEBHOOK_BROADCASTER_NAME;
 	//
 	public static final String DEFAULT_CAT = "Default Settings";
+	public static final String CLIENT_CAT = "Client Settings";
 	//
 	private static Configuration config;
 	
@@ -34,6 +35,9 @@ public class Config {
 		config.setCategoryRequiresMcRestart(DEFAULT_CAT, true);
 		config.setCategoryRequiresWorldRestart(DEFAULT_CAT, true);
 		config.setCategoryComment(DEFAULT_CAT, "General State Settings.");
+		config.setCategoryRequiresMcRestart(CLIENT_CAT, false);
+		config.setCategoryRequiresWorldRestart(CLIENT_CAT, false);
+		config.setCategoryComment(CLIENT_CAT, "Client Settings.");
 		refresh();
 		config.save();
 	}
@@ -55,7 +59,7 @@ public class Config {
 			MunicipalityType.clearEntries();
 			for(String str : arr){ new MunicipalityType(JsonUtil.getFromString(str).getAsJsonObject()); }
 		}
-		MAP_UPDATES_PER_TICK = config.getInt("map_updates_per_tick", DEFAULT_CAT, 1, 0, 128, "Max amount of Map updates per Server Tick.");
+		MAP_UPDATES_PER_SECOND = config.getInt("map_updates_per_second", DEFAULT_CAT, 20, 0, 128, "Max amount of Map updates per second.");
 		ALLOW_WILDERNESS_ACCESS = config.getBoolean("allow_wilderness_access", DEFAULT_CAT, false, "Should players be able to break, place or interact with blocks in Wilderness? (District:-1)");
 		MUNICIPALITY_CREATION_PRICE = config.getInt("municipality_creation_price", DEFAULT_CAT, 2500000, 0, Integer.MAX_VALUE, "Amount of Money needed to create a municipality. (1000 == 1F$)");
 		STATE_CREATION_PRICE = config.getInt("state_creation_price", DEFAULT_CAT, 52000000, 0, Integer.MAX_VALUE, "Amount of Money needed to create a state. (1000 == 1F$)");
@@ -74,6 +78,7 @@ public class Config {
 		TAX_INTERVAL = config.getInt("tax_interval", DEFAULT_CAT, (int)Time.DAY_MS, 1000, Integer.MAX_VALUE, "Intervals between tax collection cycles, 1000 = 1 second.");
 		LOADED_CHUNKS_TAX = config.getInt("loaded_chunks_tax", DEFAULT_CAT, 25000, 0, Integer.MAX_VALUE, "Tax a Municipality has to pay the Server for having force-loaded chunks.");
 		TAX_OFFLINE_PLAYERS = config.getBoolean("tax_offline_players", DEFAULT_CAT, false, "If offline (inactive since more than one interval) players should be taxed as well.");
+		SHOW_MINIMAP = config.getBoolean("show_minimap", CLIENT_CAT, true, "If the States Minimap should be shown.");
 		updateWebHook();
 	}
 

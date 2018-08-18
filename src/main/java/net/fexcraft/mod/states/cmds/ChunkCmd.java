@@ -196,7 +196,7 @@ public class ChunkCmd extends CommandBase {
 			}
 			case "queue":{
 				Print.chat(sender, "&9There are &2" + ImageCache.getQueue().size() + "&9 chunk map updates queued.");
-				Print.chat(sender, "&9Current Config allows for &3" + net.fexcraft.mod.states.util.Config.MAP_UPDATES_PER_TICK + "&9 map updates per server tick.");
+				Print.chat(sender, "&9Current Config allows for &3" + net.fexcraft.mod.states.util.Config.MAP_UPDATES_PER_SECOND + "&9 map updates per second.");
 				return;
 			}
 			case "unclaim":{

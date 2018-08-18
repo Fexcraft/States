@@ -21,8 +21,10 @@ public class ChunkEvents {
     
     @SubscribeEvent
     public static void onLoad(ChunkEvent.Load event){
-        if(event.getWorld().isRemote || event.getWorld().provider.getDimension() != 0){
-            return;
+        if(event.getWorld().provider.getDimension() != 0) return;
+        if(event.getWorld().isRemote){
+    		//net.fexcraft.mod.states.guis.Minimap.loadChunk(event.getChunk());
+    		return;
         }
         if(!WorldEvents.LOADED){
         	WorldEvents.onWorldLoad(null);
@@ -36,9 +38,11 @@ public class ChunkEvents {
     
     @SubscribeEvent
     public static void onUnload(ChunkEvent.Unload event){
-        if(event.getWorld().isRemote || event.getWorld().provider.getDimension() != 0){
-            return;
-        }
+        if(event.getWorld().provider.getDimension() != 0) return;
+    	if(event.getWorld().isRemote){
+    		//net.fexcraft.mod.states.guis.Minimap.unloadChunk(event.getChunk());
+    		return;
+    	}
         Chunk chunk = StateUtil.getChunk(event.getChunk());
         //Chunk chunk = event.getChunk().getCapability(StatesCapabilities.CHUNK, null).getStatesChunk(true);
         if(!(chunk == null)){
@@ -48,7 +52,7 @@ public class ChunkEvents {
             File file = chunk.getChunkFile();
             boolean matches = file.exists() && JsonUtil.get(file).get("changed").getAsLong() == chunk.getChanged();
             chunk.save();
-            if(!matches){
+            if(!matches || chunk.getEdited() > chunk.getChanged()){
             	ImageCache.update(event.getWorld(), event.getChunk());
             }
         }

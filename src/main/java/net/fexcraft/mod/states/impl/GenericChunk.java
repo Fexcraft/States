@@ -33,7 +33,7 @@ public class GenericChunk implements Chunk {
 	private long price;
 	private int x, z;
 	private ChunkPos link;
-	private long created, changed;
+	private long created, changed, edited;
 	private UUID creator;
 	private ArrayList<ResourceLocation> linked;
 	private ChunkType type;
@@ -47,6 +47,32 @@ public class GenericChunk implements Chunk {
 		this.x = pos.x; this.z = pos.z; this.pos = pos;
 		JsonElement jsn = StateUtil.read(getChunkFile());
 		JsonObject obj = jsn == null ? new JsonObject() : jsn.getAsJsonObject();
+		parseJson(obj);
+		//
+		if(!getChunkFile().exists() && create){
+			save();
+			//ImageCache.update(world, world.getChunkFromChunkCoords(x, z));
+			World world = Static.getServer().getWorld(0);
+			ImageCache.update(world, world.getChunkProvider().getLoadedChunk(x, z));
+		}
+		if(Time.getDate() - JsonUtil.getIfExists(obj, "last_save", 0).longValue() > Time.DAY_MS){
+			//ImageCache.update(world, world.getChunkFromChunkCoords(x, z));
+			World world = Static.getServer().getWorld(0);
+			ImageCache.update(world, world.getChunkProvider().getLoadedChunk(x, z));
+		}
+		if(district != null && this.district.getId() == -2 && this.getChanged() + Time.DAY_MS < Time.getDate()){
+			StateLogger.log(StateLogger.LoggerType.CHUNK, StateLogger.district(-2) + " time of " + StateLogger.chunk(this) + " expired! Setting back to " + StateLogger.district(-1) + "!");
+			this.setDistrict(StateUtil.getDistrict(-1));
+			save();
+		}
+		TaxSystem.processChunkTax(TaxSystem.getProbableSchedule(), this);
+	}
+
+	public GenericChunk(ChunkPos pos){
+		this(pos, true);
+	}
+	
+	protected void parseJson(JsonObject obj){
 		price = JsonUtil.getIfExists(obj, "price", Config.DEFAULT_CHUNK_PRICE).longValue();
 		district = StateUtil.getDistrict(JsonUtil.getIfExists(obj, "district", -1).intValue());
 		created = JsonUtil.getIfExists(obj, "created", Time.getDate()).longValue();
@@ -85,28 +111,6 @@ public class GenericChunk implements Chunk {
 				}
 			}
 		}
-		//
-		if(!getChunkFile().exists() && create){
-			save();
-			//ImageCache.update(world, world.getChunkFromChunkCoords(x, z));
-			World world = Static.getServer().getWorld(0);
-			ImageCache.update(world, world.getChunkProvider().getLoadedChunk(x, z));
-		}
-		if(Time.getDate() - JsonUtil.getIfExists(obj, "last_save", 0).longValue() > Time.DAY_MS){
-			//ImageCache.update(world, world.getChunkFromChunkCoords(x, z));
-			World world = Static.getServer().getWorld(0);
-			ImageCache.update(world, world.getChunkProvider().getLoadedChunk(x, z));
-		}
-		if(district != null && this.district.getId() == -2 && this.getChanged() + Time.DAY_MS < Time.getDate()){
-			StateLogger.log(StateLogger.LoggerType.CHUNK, StateLogger.district(-2) + " time of " + StateLogger.chunk(this) + " expired! Setting back to " + StateLogger.district(-1) + "!");
-			this.setDistrict(StateUtil.getDistrict(-1));
-			save();
-		}
-		TaxSystem.processChunkTax(TaxSystem.getProbableSchedule(), this);
-	}
-
-	public GenericChunk(ChunkPos pos){
-		this(pos, true);
 	}
 
 	@Override
@@ -166,6 +170,7 @@ public class GenericChunk implements Chunk {
 		}
 		obj.addProperty("last_tax_collection", lastTaxCollection());
 		if(ctax > 0){ obj.addProperty("custom_tax", ctax); }
+		obj.addProperty("edited", edited);
 		return obj;
 	}
 
@@ -300,6 +305,16 @@ public class GenericChunk implements Chunk {
 	@Override
 	public void setCustomTax(long newtax){
 		this.ctax = newtax;
+	}
+
+	@Override
+	public long getEdited(){
+		return edited;
+	}
+
+	@Override
+	public void setEdited(long new_change){
+		edited = new_change;
 	}
 
 }

@@ -22,6 +22,7 @@ import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
 import net.minecraft.util.ResourceLocation;
+import net.minecraft.util.math.ChunkPos;
 import net.minecraft.world.World;
 import net.minecraft.world.chunk.Chunk;
 
@@ -31,6 +32,7 @@ public class AreaView extends GuiContainer {
 	public static final ResourceLocation empty_tex = new ResourceLocation("states:textures/gui/empty.png");
 	public static final ResourceLocation map_texture = new ResourceLocation("states:temp/area_view_map.png");
 	protected int x, z, px, pz, mode, m;
+	private ChunkPos pos;
 	private boolean terrain, sent;
 	private NBTTagList list;
 	private NBTTagCompound namelist;
@@ -50,6 +52,7 @@ public class AreaView extends GuiContainer {
 		Chunk chunk = world.getChunkFromBlockCoords(player.getPosition());
 		int[] i = ImageCache.getRegion(chunk.x, chunk.z);
 		this.x = px = i[0]; this.z = pz = i[1];
+		this.pos = chunk.getPos();
 		terrain = false; mode = 0;
 		instance = this;
 		requestData();
@@ -57,6 +60,8 @@ public class AreaView extends GuiContainer {
 
 	@Override
 	protected void drawGuiContainerBackgroundLayer(float partialTicks, int mouseX, int mouseY){
+		try{ this.pos = mc.world.getChunkFromBlockCoords(mc.player.getPosition()).getPos(); } catch(Exception e){}
+		//
 		this.mc.getTextureManager().bindTexture(texture);
 		this.drawTexturedModalRect(this.guiLeft, this.guiTop, 0, 0, xSize + 12, ySize);
 		//
@@ -209,6 +214,9 @@ public class AreaView extends GuiContainer {
 			if(!visible){ return; }
 			mc.getTextureManager().bindTexture(instance.terrain ? map_texture : empty_tex);
             GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
+            GlStateManager.enableBlend();
+            GlStateManager.tryBlendFuncSeparate(GlStateManager.SourceFactor.SRC_ALPHA, GlStateManager.DestFactor.ONE_MINUS_SRC_ALPHA, GlStateManager.SourceFactor.ONE, GlStateManager.DestFactor.ZERO);
+            GlStateManager.blendFunc(GlStateManager.SourceFactor.SRC_ALPHA, GlStateManager.DestFactor.ONE_MINUS_SRC_ALPHA);
             this.hovered = mouseX >= this.x && mouseY >= this.y && mouseX < this.x + this.width && mouseY < this.y + this.height;
             xx = mouseX - x; yy = mouseY - this.y;
             if(xx >= 224){ xx = -1; } if(yy >= 224){ yy = -1; }
@@ -222,20 +230,24 @@ public class AreaView extends GuiContainer {
     			l += j > 0 ? 1 : 0;
     			instance.m = l + (k * 32);
             }
+            int ppos = instance.x == instance.px && instance.z == instance.pz ? ((instance.pos.x % 32) * 32) + instance.pos.z % 32 : -1;
             //
             if(instance.mode != 0){
+    			RGB rgb = null;
             	for(int yy = 0; yy < 32; yy++){
             		for(int xx = 0; xx < 32; xx++){
             			int i = xx * 32 + yy;
-            			RGB rgb = null;
             			if(instance.m == i){
                 			Color color = new Color(instance.list.getCompoundTagAt(i).getInteger("color"));
                 			rgb = new RGB(color.getRed() + 255 / 2, color.getGreen() + 255 / 2, + color.getBlue() + 255 / 2);
                 		}
+            			else if(ppos == i){
+            				rgb = new RGB(RGB.BLACK);
+            			}
                 		else{
                 			rgb = new RGB(instance.list.getCompoundTagAt(i).getInteger("color"));
                 		}
-            			rgb.alpha = 0.8f;
+            			rgb.alpha = instance.terrain ? 0.8f : 1f;
             			rgb.glColorApply();
             			int x = this.x + (xx * 7), y = this.y + (yy * 7);
             			int tx = xx * 8, ty = yy * 8;
@@ -285,6 +297,9 @@ public class AreaView extends GuiContainer {
             	}
             	if(compound.hasKey("price") && compound.getLong("price") > 0){
             		arr.add(Formatter.PARAGRAPH_SIGN + "6Price: " + Config.getWorthAsString(compound.getLong("price")));
+            	}
+            	if(ppos == instance.m){
+            		arr.add(Formatter.format("&8&oYour current position."));
             	}
     		    instance.drawHoveringText(arr, mouseX, mouseY, mc.fontRenderer);
             }

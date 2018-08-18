@@ -43,6 +43,10 @@ public interface Chunk extends BuyableType, Taxable {
 	
 	public void setChanged(long new_change);
 	
+	public long getEdited();
+	
+	public void setEdited(long new_change);
+	
 	public List<ResourceLocation> getLinkedChunks();
 	
 	public ChunkType getType();

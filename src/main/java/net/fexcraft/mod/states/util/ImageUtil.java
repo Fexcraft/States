@@ -3,6 +3,7 @@ package net.fexcraft.mod.states.util;
 import java.awt.Color;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
+import java.util.TimerTask;
 import java.util.TreeMap;
 
 import javax.annotation.Nullable;
@@ -17,10 +18,8 @@ import net.minecraft.init.Blocks;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
-import net.minecraftforge.fml.common.gameevent.TickEvent;
 
-public class ImageUtil {
+public class ImageUtil extends TimerTask {
 	
 	public static TreeMap<Long, ResourceLocation> TEMP_IMAGES = new TreeMap<>();
 
@@ -36,27 +35,20 @@ public class ImageUtil {
 	public static void load(ResourceLocation texture, BufferedImage image) {
 		Minecraft.getMinecraft().renderEngine.loadTexture(texture, new TempTexture(texture, image));
 	}
-	public static class TickHandler {
-		
-		private static int check;
-		
-		@SubscribeEvent
-		public void onTick(TickEvent.ServerTickEvent event){
-			try{
-				if(++check >= 2000){
-					check = 0; long time = Time.getDate();
-					for(long key : ImageUtil.TEMP_IMAGES.keySet()){
-						if((key + Time.MIN_MS) < time){
-							ImageUtil.TEMP_IMAGES.remove(key);
-						}
-					}
+	
+	@Override
+	public void run(){
+		try{
+			long time = Time.getDate();
+			for(long key : ImageUtil.TEMP_IMAGES.keySet()){
+				if((key + Time.MIN_MS) < time){
+					ImageUtil.TEMP_IMAGES.remove(key);
 				}
 			}
-			catch(Exception e){
-				e.printStackTrace();
-			}
 		}
-		
+		catch(Exception e){
+			e.printStackTrace();
+		}
 	}
 	
 	public static class TempChunkTexture extends SimpleTexture {

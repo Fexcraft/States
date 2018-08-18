@@ -24,9 +24,13 @@ public class LocationUpdate extends GuiScreen {
 	private static Minecraft client;
 	private static final LocationUpdate THIS = new LocationUpdate();
 	
+	public static boolean shown(){
+		return till >= Time.getDate();
+	}
+	
 	@SubscribeEvent
 	public void displayLocationUpdate(RenderGameOverlayEvent event){
-		if(event.getType() == ElementType.HOTBAR && till >= Time.getDate()){
+		if(event.getType() == ElementType.HOTBAR && shown()){
 			if(client == null){ client = Minecraft.getMinecraft(); }
 			ModelBase.bindTexture(texture);
 			THIS.drawTexturedModalRect(0, 0, 0, 0, 256, 38);

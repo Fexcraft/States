@@ -74,12 +74,13 @@ public class WorldEvents {
 	
 	@SubscribeEvent
 	public static void onExplosion(ExplosionEvent event){
-		/*for(BlockPos pos : event.getExplosion().getAffectedBlockPositions()){
-			if(StateUtil.getChunk(event.getWorld(), pos).getDistrict().getId() >= 0){
-				event.getExplosion().getAffectedBlockPositions().remove(pos);
-			}
-		}*/
-		//event.setCanceled(true);
+		try{
+			event.getExplosion().getAffectedBlockPositions().clear();
+			//TODO add config for no-wilderness/all/specific protection
+		}
+		catch(Exception e){
+			e.printStackTrace();
+		}
 	}
 	
 	//

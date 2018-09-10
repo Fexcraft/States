@@ -5,8 +5,8 @@ import java.util.List;
 
 import net.fexcraft.mod.lib.network.PacketHandler;
 import net.fexcraft.mod.lib.network.packet.PacketNBTTagCompound;
+import net.fexcraft.mod.lib.util.common.Formatter;
 import net.fexcraft.mod.lib.util.common.Print;
-import net.fexcraft.mod.lib.util.common.Static;
 import net.fexcraft.mod.lib.util.math.Time;
 import net.fexcraft.mod.states.States;
 import net.fexcraft.mod.states.api.Chunk;
@@ -36,11 +36,15 @@ import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.tileentity.TileEntitySign;
 import net.minecraft.util.EnumHand;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.text.ITextComponent;
+import net.minecraft.util.text.TextComponentString;
+import net.minecraft.util.text.TextComponentTranslation;
 import net.minecraft.world.World;
 import net.minecraftforge.event.ServerChatEvent;
 import net.minecraftforge.event.entity.player.PlayerInteractEvent;
 import net.minecraftforge.event.world.BlockEvent;
 import net.minecraftforge.fml.common.Mod;
+import net.minecraftforge.fml.common.eventhandler.EventPriority;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.gameevent.PlayerEvent.PlayerLoggedInEvent;
 import net.minecraftforge.fml.common.gameevent.PlayerEvent.PlayerLoggedOutEvent;
@@ -205,12 +209,14 @@ public class PlayerEvents {
 		}
 	}
 
-	@SubscribeEvent
+	@SubscribeEvent(priority = EventPriority.LOWEST)
 	public static void onMessage(ServerChatEvent event){
-			event.setCanceled(true);
-			Static.getServer().addScheduledTask(() -> {
-				Sender.sendAs(event.getPlayer(), event.getMessage());
-			});
+		PlayerCapability cap = event.getPlayer().getCapability(StatesCapabilities.PLAYER, null);
+		//event.setCanceled(true); Static.getServer().addScheduledTask(() -> { Sender.sendAs(event.getPlayer(), event.getMessage()); });
+		TextComponentTranslation com = (TextComponentTranslation)event.getComponent();
+		com.getFormatArgs()[0] = new TextComponentString(Formatter.format("&" + (StateUtil.isAdmin(event.getPlayer()) ? "4" : "6") + "#&8] " + cap.getFormattedNickname() + "&0:"));
+		com.getFormatArgs()[1] = new TextComponentString(Formatter.format("&7" + ((ITextComponent)com.getFormatArgs()[1]).getUnformattedText()));
+		event.setComponent(new TextComponentTranslation("states.chattext", com.getFormatArgs()));
 	}
 	
 	@SubscribeEvent

@@ -46,6 +46,7 @@ import net.fexcraft.mod.states.util.StateUtil;
 import net.fexcraft.mod.states.util.StatesPermissions;
 import net.fexcraft.mod.states.util.TaxSystem;
 import net.fexcraft.mod.states.util.UpdateHandler;
+import net.minecraft.server.MinecraftServer;
 import net.minecraftforge.common.ForgeChunkManager;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.common.capabilities.CapabilityManager;
@@ -64,7 +65,7 @@ import net.minecraftforge.server.permission.PermissionAPI;
 @Mod(modid = States.MODID, name = "States", version = States.VERSION, dependencies = "required-after:fcl", /*serverSideOnly = true,*/ guiFactory = "net.fexcraft.mod.states.util.GuiFactory", acceptedMinecraftVersions = "*", acceptableRemoteVersions = "*")
 public class States {
 	
-	public static final String VERSION = "1.2.3";
+	public static final String VERSION = "1.2.4";
 	public static final String MODID = "states";
 	public static final String ADMIN_PERM = "states.external.admin";
 	public static final String PREFIX = "&0[&2States&0]";
@@ -118,12 +119,17 @@ public class States {
 		UpdateHandler.initialize();
 	}
 	
-	public static final File getWorldDirectory(){
+	/*public static final File getWorldDirectory(){
 		return Static.getServer().getEntityWorld().getSaveHandler().getWorldDirectory();
-	}
+	}*/
 	
 	public static final File getSaveDirectory(){
-		return new File(Static.getServer().getEntityWorld().getSaveHandler().getWorldDirectory(), "states/");
+		MinecraftServer server = Static.getServer();
+		if(server.worlds == null || server.worlds.length < 1){
+			Static.exception(new Exception("No worlds loaded! Save directory will be invalid!"), true);
+			return new File(server.getDataDirectory(), "states/");
+		}
+		return new File(server.worlds[0].getSaveHandler().getWorldDirectory(), "states/");
 	}
 	
 	@Mod.EventHandler

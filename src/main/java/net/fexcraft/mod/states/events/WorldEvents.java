@@ -79,7 +79,7 @@ public class WorldEvents {
 				event.getExplosion().getAffectedBlockPositions().remove(pos);
 			}
 		}*/
-		event.setCanceled(true);
+		//event.setCanceled(true);
 	}
 	
 	//

@@ -211,11 +211,12 @@ public class PlayerEvents {
 
 	@SubscribeEvent(priority = EventPriority.LOWEST)
 	public static void onMessage(ServerChatEvent event){
-		PlayerCapability cap = event.getPlayer().getCapability(StatesCapabilities.PLAYER, null);
+		if(!Config.STATES_CHAT) return;
 		//event.setCanceled(true); Static.getServer().addScheduledTask(() -> { Sender.sendAs(event.getPlayer(), event.getMessage()); });
-		TextComponentTranslation com = (TextComponentTranslation)event.getComponent();
+		PlayerCapability cap = event.getPlayer().getCapability(StatesCapabilities.PLAYER, null); TextComponentTranslation com = (TextComponentTranslation)event.getComponent();
 		com.getFormatArgs()[0] = new TextComponentString(Formatter.format("&" + (StateUtil.isAdmin(event.getPlayer()) ? "4" : "6") + "#&8] " + cap.getFormattedNickname() + "&0:"));
 		com.getFormatArgs()[1] = new TextComponentString(Formatter.format("&7" + ((ITextComponent)com.getFormatArgs()[1]).getUnformattedText()));
+		event.setComponent(new TextComponentTranslation("states.chat.text", com.getFormatArgs()));
 	}
 	
 	@SubscribeEvent

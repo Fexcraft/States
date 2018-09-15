@@ -185,6 +185,7 @@ public class PlayerEvents {
 	}
 	
 	private static boolean hp(Chunk chunk, PlayerCapability pl){
+		if(pl == null) return false;
 		switch(chunk.getType()){
 			case PRIVATE:{
 				return chunk.getOwner().equals(pl.getUUIDAsString()) || chunk.getPlayerWhitelist().contains(pl.getUUID()) || pl.isMayorOf(chunk.getDistrict().getMunicipality()) || pl.isStateLeaderOf(chunk.getDistrict().getMunicipality().getState());

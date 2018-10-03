@@ -1,9 +1,9 @@
-allprojects {
+/*allprojects {
     repositories {
         jcenter()
         maven { url = 'https://jitpack.io' }
     }
-}
+}*/
 buildscript {
     repositories {
         jcenter()
@@ -40,10 +40,10 @@ minecraft {
 }
 
 dependencies {
-	//compile project(':FCL')
-	//compile project(':FSMM')
-	compile 'com.github.Fexcraft:FCL:1.12.2-SNAPSHOT'
-	compile 'com.github.Fexcraft:FSMM:1.12.2-SNAPSHOT'
+	compile project(':FCL')
+	compile project(':FSMM')
+	//compile 'com.github.Fexcraft:FCL:1.12.2-SNAPSHOT'
+	//compile 'com.github.Fexcraft:FSMM:1.12.2-SNAPSHOT'
 }
 
 processResources {

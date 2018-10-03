@@ -25,11 +25,7 @@ public class ChunkEvents {
         if(event.getWorld().isRemote){
     		//net.fexcraft.mod.states.guis.Minimap.loadChunk(event.getChunk());
     		return;
-        }
-        if(!WorldEvents.LOADED){
-        	WorldEvents.onWorldLoad(null);
-        	WorldEvents.LOADED = true;
-        }
+        } /*if(!WorldEvents.LOADED){ WorldEvents.onWorldLoad(null); WorldEvents.LOADED = true; }*/
         ChunkPos pos = new ChunkPos(event.getChunk().x, event.getChunk().z);
         if(!States.CHUNKS.containsKey(pos)){
             States.CHUNKS.put(pos, new GenericChunk(pos));

@@ -46,7 +46,7 @@ import net.fexcraft.mod.states.util.StateUtil;
 import net.fexcraft.mod.states.util.StatesPermissions;
 import net.fexcraft.mod.states.util.TaxSystem;
 import net.fexcraft.mod.states.util.UpdateHandler;
-import net.minecraft.server.MinecraftServer;
+import net.minecraft.world.World;
 import net.minecraftforge.common.ForgeChunkManager;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.common.capabilities.CapabilityManager;
@@ -119,17 +119,14 @@ public class States {
 		UpdateHandler.initialize();
 	}
 	
-	/*public static final File getWorldDirectory(){
-		return Static.getServer().getEntityWorld().getSaveHandler().getWorldDirectory();
-	}*/
+	private static File statesdir;
+	
+	public static final File updateSaveDirectory(World world){
+		return statesdir = new File(world.getSaveHandler().getWorldDirectory(), "states/");
+	}
 	
 	public static final File getSaveDirectory(){
-		MinecraftServer server = Static.getServer();
-		if(server.worlds == null || server.worlds.length < 1){
-			Static.exception(new Exception("No worlds loaded! Save directory will be invalid!"), true);
-			return new File(server.getDataDirectory(), "states/");
-		}
-		return new File(server.worlds[0].getSaveHandler().getWorldDirectory(), "states/");
+		return statesdir;
 	}
 	
 	@Mod.EventHandler

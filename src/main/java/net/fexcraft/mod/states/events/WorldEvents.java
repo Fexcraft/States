@@ -15,7 +15,6 @@ import net.fexcraft.mod.states.util.StateUtil;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.tileentity.TileEntitySign;
 import net.minecraft.util.ResourceLocation;
-import net.minecraftforge.common.util.FakePlayer;
 import net.minecraftforge.event.AttachCapabilitiesEvent;
 import net.minecraftforge.event.world.ExplosionEvent;
 import net.minecraftforge.event.world.WorldEvent;
@@ -32,9 +31,8 @@ public class WorldEvents {
 	
 	@SubscribeEvent
 	public static void onWorldLoad(WorldEvent.Load event){
-		if(event != null && (event.getWorld().provider.getDimension() != 0 || event.getWorld().isRemote)){
-			return;
-		}
+		if(event != null && (event.getWorld().provider.getDimension() != 0 || event.getWorld().isRemote)) return;
+		States.updateSaveDirectory(event.getWorld());
 		if(!LOADED){
 			StateLogger.log("all", "Loading World...");
 			for(int i : def_st){
@@ -53,9 +51,7 @@ public class WorldEvents {
 				}
 			}
 		}
-		if(event != null){
-			ImageCache.loadQueue();
-		}
+		if(event != null) ImageCache.loadQueue();
 		ForcedChunksManager.load();
 		LOADED = true;
 		//event.getWorld().addEventListener(new TestListener());
@@ -96,9 +92,6 @@ public class WorldEvents {
 	@SubscribeEvent
 	public static void onAttachEventEntityPlayer(AttachCapabilitiesEvent<net.minecraft.entity.Entity> event){
 		if(event.getObject() instanceof EntityPlayer && !event.getObject().world.isRemote){
-			event.addCapability(PlayerCapabilityUtil.REGISTRY_NAME, new PlayerCapabilityUtil((EntityPlayer)event.getObject()));
-		}
-		if(event.getObject() instanceof FakePlayer && !event.getObject().world.isRemote){
 			event.addCapability(PlayerCapabilityUtil.REGISTRY_NAME, new PlayerCapabilityUtil((EntityPlayer)event.getObject()));
 		}
 	}

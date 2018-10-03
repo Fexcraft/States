@@ -1,8 +1,7 @@
 package net.fexcraft.mod.states.objects;
 
-import net.fexcraft.mod.lib.util.common.Print;
-import net.fexcraft.mod.states.api.Mailbox;
 import net.minecraft.block.Block;
+import net.minecraft.block.ITileEntityProvider;
 import net.minecraft.block.material.MapColor;
 import net.minecraft.block.material.Material;
 import net.minecraft.block.properties.IProperty;
@@ -12,7 +11,6 @@ import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.EnumHand;
 import net.minecraft.util.math.AxisAlignedBB;
@@ -20,7 +18,7 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
 
-public class MailboxBase extends Block implements Mailbox {
+public abstract class MailboxBase extends Block implements ITileEntityProvider {
 	
 	public static final PropertyDirection FACING = PropertyDirection.create("facing", EnumFacing.Plane.HORIZONTAL);
 	
@@ -48,9 +46,12 @@ public class MailboxBase extends Block implements Mailbox {
     @Override
     public void onBlockPlacedBy(World world, BlockPos pos, IBlockState state, EntityLivingBase placer, ItemStack stack){
         world.setBlockState(pos, state.withProperty(FACING, placer.getHorizontalFacing().getOpposite()), 2);
+        setupMailbox(world, pos, state, placer, stack);
     }
 
-    @Override
+    protected abstract void setupMailbox(World world, BlockPos pos, IBlockState state, EntityLivingBase placer, ItemStack stack);
+
+	@Override
     public int getMetaFromState(IBlockState state){
         return state.getValue(FACING).getHorizontalIndex();
     }
@@ -78,17 +79,5 @@ public class MailboxBase extends Block implements Mailbox {
     	//TODO
     	return false;
     }
-	
-	///----///
-
-	@Override
-	public boolean accepts(RecipientType rectype, String receiver){
-		return true;//TODO
-	}
-
-	@Override
-	public void insert(RecipientType rectype, String receiver, String sender, String message, MailType type, long expiry, NBTTagCompound compound){
-		Print.debug(rectype, receiver, sender, message, type, expiry, compound);
-	}
 	
 }

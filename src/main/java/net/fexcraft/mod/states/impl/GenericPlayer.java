@@ -21,6 +21,7 @@ import net.fexcraft.mod.states.util.StateUtil;
 import net.fexcraft.mod.states.util.TaxSystem;
 import net.minecraft.command.ICommandSender;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.util.math.BlockPos;
 
 public class GenericPlayer implements PlayerCapability {
 	
@@ -31,6 +32,7 @@ public class GenericPlayer implements PlayerCapability {
 	private long lastsave, lastpos, lasttaxcoll, customtax;
 	private Account account;
 	private Chunk last_chunk, current_chunk;
+	private BlockPos mailbox;
 	//
 	private Municipality municipality;
 	private boolean loaded;
@@ -58,6 +60,7 @@ public class GenericPlayer implements PlayerCapability {
 		obj.addProperty("municipality", municipality == null ? -1 : municipality.getId());
 		obj.addProperty("last_tax_collection", lasttaxcoll);
 		if(customtax > 0){ obj.addProperty("custom_tax", customtax); }
+		if(mailbox != null) obj.addProperty("mailbox", mailbox.toLong());
 		return obj;
 	}
 
@@ -82,6 +85,7 @@ public class GenericPlayer implements PlayerCapability {
 		this.account = this.isOnlinePlayer() ? entity.getCapability(FSMMCapabilities.PLAYER, null).getAccount() : DataManager.getAccount("player:" + uuid.toString(), true, true);
 		this.lasttaxcoll = JsonUtil.getIfExists(obj, "last_tax_collection", 0).longValue();
 		this.customtax = JsonUtil.getIfExists(obj, "custom_tax", 0).longValue();
+		this.mailbox = obj.has("mailbox") ? BlockPos.fromLong(obj.get("mailbox").getAsLong()) : null;
 		loaded = true;
 		TaxSystem.processPlayerTax(TaxSystem.getProbableSchedule(), this);
 	}
@@ -281,6 +285,18 @@ public class GenericPlayer implements PlayerCapability {
 	@Override
 	public Bank getBank(){
 		return this.isOnlinePlayer() ? entity.getCapability(FSMMCapabilities.PLAYER, null).getBank() : DataManager.getBank(account.getBankId(), true, true);
+	}
+
+	@Override
+	public BlockPos getMailbox(){
+		return mailbox;
+	}
+
+	@Override
+	public boolean setMailbox(BlockPos pos){
+		//TODO
+		mailbox = pos;
+		return false;
 	}
 
 }

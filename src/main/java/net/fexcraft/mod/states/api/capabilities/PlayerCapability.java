@@ -17,6 +17,7 @@ import net.fexcraft.mod.states.api.root.Taxable;
 import net.minecraft.command.ICommandSender;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.server.MinecraftServer;
+import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 
 public interface PlayerCapability extends ICommandSender, Taxable, AccountHolder {
@@ -107,5 +108,9 @@ public interface PlayerCapability extends ICommandSender, Taxable, AccountHolder
 	}
 
 	public boolean isLoaded();
+	
+	public BlockPos getMailbox();
+	
+	public boolean setMailbox(BlockPos pos);
 
 }

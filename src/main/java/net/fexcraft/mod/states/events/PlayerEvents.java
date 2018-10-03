@@ -2,7 +2,6 @@ package net.fexcraft.mod.states.events;
 
 import java.util.Arrays;
 import java.util.List;
-
 import net.fexcraft.mod.lib.network.PacketHandler;
 import net.fexcraft.mod.lib.network.packet.PacketNBTTagCompound;
 import net.fexcraft.mod.lib.util.common.Formatter;
@@ -40,6 +39,7 @@ import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.TextComponentString;
 import net.minecraft.util.text.TextComponentTranslation;
 import net.minecraft.world.World;
+import net.minecraftforge.common.util.FakePlayer;
 import net.minecraftforge.event.ServerChatEvent;
 import net.minecraftforge.event.entity.player.PlayerInteractEvent;
 import net.minecraftforge.event.world.BlockEvent;
@@ -176,30 +176,37 @@ public class PlayerEvents {
 					return false;
 				}
 			}
-			if(hp(chunk, player.getCapability(StatesCapabilities.PLAYER, null))){
+			if(hp(chunk, player)){
 				chunk.setEdited(Time.getDate());
 				return true;
 			}
 			return false;
 	}
 	
-	private static boolean hp(Chunk chunk, PlayerCapability pl){
-		if(pl == null) return false;
+	private static boolean hp(Chunk chunk, EntityPlayer player){
+		PlayerCapability cap = player.getCapability(StatesCapabilities.PLAYER, null);
+		if(cap == null){
+			if(player instanceof FakePlayer){
+				cap = StateUtil.getPlayer(player.getGameProfile().getId(), true);
+				if(cap == null) return false;
+			}
+			else return false;
+		}
 		switch(chunk.getType()){
 			case PRIVATE:{
-				return chunk.getOwner().equals(pl.getUUIDAsString()) || chunk.getPlayerWhitelist().contains(pl.getUUID()) || pl.isMayorOf(chunk.getDistrict().getMunicipality()) || pl.isStateLeaderOf(chunk.getDistrict().getMunicipality().getState());
+				return chunk.getOwner().equals(cap.getUUIDAsString()) || chunk.getPlayerWhitelist().contains(cap.getUUID()) || cap.isMayorOf(chunk.getDistrict().getMunicipality()) || cap.isStateLeaderOf(chunk.getDistrict().getMunicipality().getState());
 			}
 			case NORMAL:{
-				return pl.getMunicipality().getId() == chunk.getDistrict().getMunicipality().getId();
+				return cap.getMunicipality().getId() == chunk.getDistrict().getMunicipality().getId();
 			}
 			case DISTRICT:{
-				return pl.isDistrictManagerOf(chunk.getDistrict()) || pl.isMayorOf(chunk.getDistrict().getMunicipality()) || pl.isStateLeaderOf(chunk.getDistrict().getMunicipality().getState());
+				return cap.isDistrictManagerOf(chunk.getDistrict()) || cap.isMayorOf(chunk.getDistrict().getMunicipality()) || cap.isStateLeaderOf(chunk.getDistrict().getMunicipality().getState());
 			}
 			case MUNICIPAL:{
-				return pl.isMayorOf(chunk.getDistrict().getMunicipality()) || pl.isStateLeaderOf(chunk.getDistrict().getMunicipality().getState());
+				return cap.isMayorOf(chunk.getDistrict().getMunicipality()) || cap.isStateLeaderOf(chunk.getDistrict().getMunicipality().getState());
 			}
 			case STATEOWNED:{
-				return pl.isStateLeaderOf(chunk.getDistrict().getMunicipality().getState());
+				return cap.isStateLeaderOf(chunk.getDistrict().getMunicipality().getState());
 			}
 			case COMPANY: return false;//TODO
 			case PUBLIC: return true;

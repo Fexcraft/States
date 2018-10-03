@@ -145,7 +145,13 @@ public class StateUtil extends TimerTask {
 	
 	@Nullable
 	public static PlayerCapability getPlayer(UUID uuid, boolean loadtemp){
-		return States.PLAYERS.containsKey(uuid) ? States.PLAYERS.get(uuid) : loadtemp ? GenericPlayer.getOfflineInstance(uuid) : null;
+		if(States.PLAYERS.containsKey(uuid)) return States.PLAYERS.get(uuid);
+		else{
+			if(loadtemp){
+				PlayerCapability cap = GenericPlayer.getOfflineInstance(uuid);
+				States.PLAYERS.put(uuid, cap); return cap;
+			} else return null;
+		}
 	}
 	
 	@Nullable
@@ -328,6 +334,14 @@ public class StateUtil extends TimerTask {
 				if(States.MUNICIPALITIES.values().stream().filter(pre -> pre.getState().getId() == state.getId()).count() <= 0){
 					States.STATES.remove(state.getId());
 					state.save(); state.unload();
+				}
+			}
+			Print.debug("Scheduled check for offline user cache.");
+			ImmutableList<PlayerCapability> collP = ImmutableList.copyOf(States.PLAYERS.values());
+			for(PlayerCapability cap : collP){
+				if(!cap.isOnlinePlayer()){
+					States.PLAYERS.remove(cap.getUUID());
+					cap.save(); cap.unload();
 				}
 			}
 		}

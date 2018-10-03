@@ -35,8 +35,7 @@ public class MailUtil {
 				BlockPos mailboxpos = getMailbox(rectype, receiver.toString(), null);
 				World world = Static.getServer().getWorld(0);
 				if(world == null || mailboxpos == null){
-					printFailure(0, rectype, receiver, sender, message, type, expiry, compound);
-					return;
+					printFailure(0, rectype, receiver, sender, message, type, expiry, compound); return;
 				}
 				ChunkPos pos = new ChunkPos(mailboxpos);
 				Ticket ticket = null;
@@ -46,10 +45,10 @@ public class MailUtil {
 				}
 				Mailbox mailbox = (Mailbox)Static.getServer().getWorld(0).getTileEntity(mailboxpos);
 				if(mailbox == null){
-					printFailure(1, rectype, receiver, sender, message, type, expiry, compound);
+					printFailure(1, rectype, receiver, sender, message, type, expiry, compound); return;
 				}
 				if(!mailbox.accepts(rectype, receiver.toString())){
-					printFailure(2, rectype, receiver, sender, message, type, expiry, compound);
+					printFailure(2, rectype, receiver, sender, message, type, expiry, compound); return;
 				}
 				try{
 					mailbox.insert(rectype, receiver.toString(), sender, message, type, expiry, compound);
@@ -60,6 +59,7 @@ public class MailUtil {
 				if(ticket != null){
 					ForgeChunkManager.unforceChunk(ticket, pos);
 				}
+				return;
 			}
 			catch(Exception e){
 				e.printStackTrace(); printFailure(-1, rectype, receiver, sender, message, type, expiry, compound);

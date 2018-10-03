@@ -18,6 +18,7 @@ import net.fexcraft.mod.states.api.DistrictType;
 import net.fexcraft.mod.states.api.Municipality;
 import net.fexcraft.mod.states.impl.capabilities.SignTileEntityCapabilityUtil;
 import net.fexcraft.mod.states.util.StateUtil;
+import net.minecraft.util.math.BlockPos;
 
 public class GenericDistrict implements District {
 	
@@ -29,6 +30,7 @@ public class GenericDistrict implements District {
 	private String name, color, icon;
 	private Municipality municipality;
 	private boolean cfs, onbankrupt;
+	private BlockPos mailbox;
 	
 	public GenericDistrict(int id){
 		this.id = id;
@@ -48,6 +50,7 @@ public class GenericDistrict implements District {
 		chunks = JsonUtil.getIfExists(obj, "chunks", 0).intValue();
 		chunktax = JsonUtil.getIfExists(obj, "chunktax", 0).longValue();
 		onbankrupt = JsonUtil.getIfExists(obj, "unclaim_chunks_if_bankrupt", false);
+		mailbox = obj.has("mailbox") ? BlockPos.fromLong(obj.get("mailbox").getAsLong()) : null;
 	}
 
 	@Override
@@ -69,6 +72,7 @@ public class GenericDistrict implements District {
 		obj.addProperty("chunks", chunks);
 		if(chunktax > 0){ obj.addProperty("chunktax", chunktax); }
 		obj.addProperty("unclaim_chunks_if_bankrupt", onbankrupt);
+		if(mailbox != null) obj.addProperty("mailbox", mailbox.toLong());
 		return obj;
 	}
 
@@ -237,6 +241,16 @@ public class GenericDistrict implements District {
 	@Override
 	public void setUnclaimIfBankrupt(boolean newvalue){
 		onbankrupt = newvalue;
+	}
+
+	@Override
+	public BlockPos getMailbox(){
+		return mailbox;
+	}
+
+	@Override
+	public void setMailbox(BlockPos pos){
+		this.mailbox = pos;
 	}
 
 }

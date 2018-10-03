@@ -16,6 +16,7 @@ import net.fexcraft.mod.lib.util.math.Time;
 import net.fexcraft.mod.states.States;
 import net.fexcraft.mod.states.api.State;
 import net.fexcraft.mod.states.util.StateUtil;
+import net.minecraft.util.math.BlockPos;
 
 public class GenericState implements State {
 	
@@ -27,6 +28,7 @@ public class GenericState implements State {
 	private ArrayList<Integer> neighbors, municipalities, blacklist;
 	private ArrayList<UUID> council;
 	private byte chunktaxpercent, citizentaxpercent;
+	private BlockPos mailbox;
 
 	public GenericState(int value){
 		id = value;
@@ -47,6 +49,7 @@ public class GenericState implements State {
 		icon = JsonUtil.getIfExists(obj, "icon", States.DEFAULT_ICON);
 		chunktaxpercent = JsonUtil.getIfExists(obj, "chunk_tax_percent", 0).byteValue();
 		citizentaxpercent = JsonUtil.getIfExists(obj, "citizen_tax_percent", 0).byteValue();
+		mailbox = obj.has("mailbox") ? BlockPos.fromLong(obj.get("mailbox").getAsLong()) : null;
 	}
 
 	@Override
@@ -235,6 +238,16 @@ public class GenericState implements State {
 	@Override
 	public Bank getBank(){
 		return DataManager.getBank(account.getBankId(), true, true);
+	}
+
+	@Override
+	public BlockPos getMailbox(){
+		return mailbox;
+	}
+
+	@Override
+	public void setMailbox(BlockPos pos){
+		this.mailbox = pos;
 	}
 	
 }

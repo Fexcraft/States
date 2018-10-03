@@ -13,6 +13,7 @@ import javax.annotation.Nullable;
 import com.google.common.collect.ImmutableList;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
+import com.mojang.authlib.GameProfile;
 
 import net.fexcraft.mod.lib.util.common.Formatter;
 import net.fexcraft.mod.lib.util.common.Print;
@@ -145,6 +146,18 @@ public class StateUtil extends TimerTask {
 	@Nullable
 	public static PlayerCapability getPlayer(UUID uuid, boolean loadtemp){
 		return States.PLAYERS.containsKey(uuid) ? States.PLAYERS.get(uuid) : loadtemp ? GenericPlayer.getOfflineInstance(uuid) : null;
+	}
+	
+	@Nullable
+	public static PlayerCapability getPlayer(String receiver, boolean loadtemp){
+		try{
+			UUID uuid = UUID.fromString(receiver);
+			return getPlayer(uuid, loadtemp);
+		}
+		catch(Exception e){
+			GameProfile gp = Static.getServer().getPlayerProfileCache().getGameProfileForUsername(receiver);
+			return gp == null ? null : getPlayer(gp.getId(), loadtemp);
+		}
 	}
 
 	public static void announce(MinecraftServer server, String string){

@@ -26,8 +26,8 @@ import net.fexcraft.mod.states.api.root.AnnounceLevel;
 import net.fexcraft.mod.states.impl.GenericDistrict;
 import net.fexcraft.mod.states.impl.GenericMunicipality;
 import net.fexcraft.mod.states.util.MailUtil;
-import net.fexcraft.mod.states.util.MailUtil.MailType;
-import net.fexcraft.mod.states.util.MailUtil.RecipientType;
+import net.fexcraft.mod.states.api.Mailbox.MailType;
+import net.fexcraft.mod.states.api.Mailbox.RecipientType;
 import net.fexcraft.mod.states.util.StateLogger;
 import net.fexcraft.mod.states.util.StateUtil;
 import net.minecraft.command.CommandBase;
@@ -576,10 +576,11 @@ public class MunicipalityCmd extends CommandBase {
 				if(!ply.canLeave(sender)){
 					return;
 				}
+				MailUtil.send(RecipientType.MUNICIPALITY, ply.getMunicipality().getId(), sender.getName(), player.getGameProfile().getName() + " left the Municipality. At " + Time.getAsString(-1), MailType.SYSTEM);
 				StateUtil.announce(server, AnnounceLevel.MUNICIPALITY, "&o" + ply.getFormattedNickname() + " &e&oleft the Municipality!", ply.getMunicipality().getId());
 				StateLogger.log(StateLogger.LoggerType.MUNICIPALITY, StateLogger.player(player) + " left " + StateLogger.municipality(ply.getMunicipality()) + ".");
 				ply.setMunicipality(mun);
-				MailUtil.send(RecipientType.MUNICIPALITY, null, sender.getName(), player.getGameProfile().getName() + " joined the Municipality. At " + Time.getAsString(-1), MailType.SYSTEM);
+				MailUtil.send(RecipientType.MUNICIPALITY, ply.getMunicipality().getId(), sender.getName(), player.getGameProfile().getName() + " joined the Municipality. At " + Time.getAsString(-1), MailType.SYSTEM);
 				StateUtil.announce(server, AnnounceLevel.MUNICIPALITY, "&o" + ply.getFormattedNickname() + " &2&ojoined the Municipality!", ply.getMunicipality().getId());
 				StateLogger.log(StateLogger.LoggerType.MUNICIPALITY, StateLogger.player(player) + " joined " + StateLogger.municipality(ply.getMunicipality()) + ".");
 				return;
@@ -592,7 +593,7 @@ public class MunicipalityCmd extends CommandBase {
 				if(!ply.canLeave(sender)){
 					return;
 				}
-				MailUtil.send(RecipientType.MUNICIPALITY, null, sender.getName(), player.getGameProfile().getName() + " left the Municipality. At " + Time.getAsString(-1), MailType.SYSTEM);
+				MailUtil.send(RecipientType.MUNICIPALITY, ply.getMunicipality().getId(), sender.getName(), player.getGameProfile().getName() + " left the Municipality. At " + Time.getAsString(-1), MailType.SYSTEM);
 				StateUtil.announce(server, AnnounceLevel.MUNICIPALITY, "&o" + ply.getFormattedNickname() + " &e&oleft the Municipality!", ply.getMunicipality().getId());
 				StateLogger.log(StateLogger.LoggerType.MUNICIPALITY, StateLogger.player(player) + " left " + StateLogger.municipality(mun) + ".");
 				ply.setMunicipality(StateUtil.getMunicipality(-1));

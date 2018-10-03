@@ -11,8 +11,9 @@ import net.fexcraft.mod.states.api.root.AccountHolder;
 import net.fexcraft.mod.states.api.root.BuyableType;
 import net.fexcraft.mod.states.api.root.ColorHolder;
 import net.fexcraft.mod.states.api.root.IconHolder;
+import net.fexcraft.mod.states.api.root.MailReceiver;
 
-public interface State extends ColorHolder, BuyableType, IconHolder, AccountHolder {
+public interface State extends ColorHolder, BuyableType, IconHolder, AccountHolder, MailReceiver {
 	
 	public int getId();
 	

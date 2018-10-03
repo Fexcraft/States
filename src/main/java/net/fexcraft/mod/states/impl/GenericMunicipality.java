@@ -88,6 +88,7 @@ public class GenericMunicipality implements Municipality/*, Taxable*/ {
 		if(icon != null){ obj.addProperty("icon", icon); }
 		obj.addProperty("kick_if_bankrupt", kib);
 		obj.addProperty("citizen_tax", citizentax);
+		if(mailbox != null) obj.addProperty("mailbox", mailbox.toLong());
 		return obj;
 	}
 

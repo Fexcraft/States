@@ -25,33 +25,26 @@ import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.TextComponentString;
 import net.minecraft.util.text.event.ClickEvent;
 
-public class Sender {
+public class MessageSender {
     
     public static Receiver RECEIVER;
     
-    public static void sendTo(ICommandSender receiver, String message){
+    public static void to(ICommandSender receiver, String message){
         if(receiver == null){ Print.log("RECEIVER NULL || " + message); }
         receiver.sendMessage(new TextComponentString(Formatter.format(message)));
     }
     
-    public static void sendAs(EntityPlayer sender, String message){
-        sendAs(sender, message, true);
-    }
+    public static void as(EntityPlayer sender, String message){ as(sender, message, true); }
     
-    public static void sendAs(EntityPlayer sender, String message, boolean webhook){
-    	String name; PlayerCapability cap = null;
-        if(sender == null){
-        	name = "&9#&8] &2" + Config.WEBHOOK_BROADCASTER_NAME;
-        }
-        else{
-            cap = sender.getCapability(StatesCapabilities.PLAYER, null);
-            name = "&" + (StateUtil.isAdmin(sender) ? "4" : "6") + "#&8] " + cap.getFormattedNickname();
-        }
+    public static void as(EntityPlayer sender, String message, boolean webhook){
+    	PlayerCapability cap = null;
+    	String name = sender == null ? "&9#&8] &2" + Config.WEBHOOK_BROADCASTER_NAME :
+    		"&" + (StateUtil.isAdmin(sender) ? "4" : "6") + "#&8] " + sender.getCapability(StatesCapabilities.PLAYER, null).getFormattedNickname(); 
         Static.getServer().getPlayerList().sendMessage(new TextComponentString(Formatter.format(name + "&0: &7" + message)));
-        if(webhook){ sendToWebhook(cap, message);}
+        if(webhook) toWebhook(cap, message);
     }
     
-    public static void sendFromDiscord(JsonObject obj){
+    public static void fromDiscord(JsonObject obj){
         String name = "&5#&8] &2" + obj.get("username").getAsString();
         ITextComponent text = null;
         if(obj.get("content").isJsonArray()){
@@ -64,7 +57,7 @@ public class Sender {
         Static.getServer().getPlayerList().sendMessage(text);
     }
     
-    public static void sendToWebhook(PlayerCapability sender, String message){
+    public static void toWebhook(PlayerCapability sender, String message){
         if(RECEIVER == null){ return; }
         try{
             URL url = new URL(Config.WEBHOOK);
@@ -122,7 +115,7 @@ public class Sender {
         @Override
         public void run(){
             Print.log("[States-Webhook] Starting Message Listener on port " + Config.BOT_PORT);
-            sendToWebhook(null, "Starting Server Message Receiver...");
+            toWebhook(null, "Starting Server Message Receiver...");
             try{
                 ServerSocket socket = new ServerSocket(Config.BOT_PORT);
                 while(running){
@@ -136,7 +129,7 @@ public class Sender {
                         in.close(); client.close();
                         JsonElement obj = JsonUtil.getFromString(response.toString());
                         if(obj != null && valid(obj)){
-                            Sender.sendFromDiscord(obj.getAsJsonObject());
+                            MessageSender.fromDiscord(obj.getAsJsonObject());
                         }
                         else{
                             Print.debug("Received invalid message: " + obj);
@@ -152,7 +145,7 @@ public class Sender {
                 e.printStackTrace();
             }
             Print.log("[States-Webhook] Stopping Message Listener on port " + Config.BOT_PORT);
-            sendToWebhook(null, "Server Message Receiver stopped.");
+            toWebhook(null, "Server Message Receiver stopped.");
         }
         
         private boolean valid(JsonElement obj){
@@ -160,7 +153,7 @@ public class Sender {
         }
         
         public void halt(){
-            sendToWebhook(null, "Stopping Server Message Receiver...");
+            toWebhook(null, "Stopping Server Message Receiver...");
             running = false;
         }
     }

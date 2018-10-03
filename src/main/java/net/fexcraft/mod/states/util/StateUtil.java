@@ -204,7 +204,7 @@ public class StateUtil extends TimerTask {
 		switch(level){
 			case ALL:
 				server.getPlayerList().sendMessage(new TextComponentString(Formatter.format(string)), true);
-				Sender.sendToWebhook(null, string);
+				MessageSender.toWebhook(null, string);
 				break;
 			case UNION:
 				//TODO doesn't exists yet.
@@ -362,7 +362,7 @@ public class StateUtil extends TimerTask {
 			}
 		}
 		catch(Exception e){
-			Sender.sendAs(null, "SCHEDULED DATA UNLOAD ERRORED");
+			MessageSender.as(null, "SCHEDULED DATA UNLOAD ERRORED");
 			e.printStackTrace();
 		}
 	}

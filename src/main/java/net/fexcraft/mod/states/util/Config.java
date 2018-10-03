@@ -87,12 +87,12 @@ public class Config {
 		if(WEBHOOK != null && WEBHOOK.equals("null")){
 			WEBHOOK = null;
 		}
-		if(Sender.RECEIVER != null){
-			Sender.RECEIVER.halt();
+		if(MessageSender.RECEIVER != null){
+			MessageSender.RECEIVER.halt();
 		}
 		if(WEBHOOK != null && BOT_PORT != -1 && Static.getServer() != null){
-			Sender.RECEIVER = new Sender.Receiver();
-			Sender.RECEIVER.start();
+			MessageSender.RECEIVER = new MessageSender.Receiver();
+			MessageSender.RECEIVER.start();
 		}
 	}
 	

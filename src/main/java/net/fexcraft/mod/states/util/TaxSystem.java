@@ -46,7 +46,7 @@ public class TaxSystem extends TimerTask {
 				Print.log("LTAX: " + last_interval + " + INTERVAL: " + Config.TAX_INTERVAL + " > NOW: " + date);
 				return;
 			}
-			Sender.sendAs(null, "Starting regular tax collection.");
+			MessageSender.as(null, "Starting regular tax collection.");
 			StateLogger.log(StateLogger.LoggerType.CHUNK, "Collecting tax from loaded chunks...");
 			ImmutableMap<ChunkPos, Chunk> map = ImmutableMap.copyOf(States.CHUNKS);
 			for(Chunk chunk  : map.values()){
@@ -67,11 +67,11 @@ public class TaxSystem extends TimerTask {
 			for(Entry<Integer, List<ChunkPos>> entry : maplc.entrySet()){
 				TaxSystem.processLoadedChunkTax(date, entry.getKey(), entry.getValue());
 			}
-			Sender.sendAs(null, "Finished collecting tax.");
+			MessageSender.as(null, "Finished collecting tax.");
 			last_interval = date; save();
 		}
 		catch(Exception e){
-			Sender.sendAs(null, "TAX COLLECTION ERRORED!");
+			MessageSender.as(null, "TAX COLLECTION ERRORED!");
 			Print.log("Error while collecting Tax!");
 			StateLogger.log("chunk", "An error occured while collecting tax, further collection is halted for this interval.");
 			StateLogger.log("player", "An error occured while collecting tax, further collection is halted for this interval.");

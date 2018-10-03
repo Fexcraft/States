@@ -41,7 +41,7 @@ import net.fexcraft.mod.states.util.Config;
 import net.fexcraft.mod.states.util.ForcedChunksManager;
 import net.fexcraft.mod.states.util.ImageCache;
 import net.fexcraft.mod.states.util.ImageUtil;
-import net.fexcraft.mod.states.util.Sender;
+import net.fexcraft.mod.states.util.MessageSender;
 import net.fexcraft.mod.states.util.StateUtil;
 import net.fexcraft.mod.states.util.StatesPermissions;
 import net.fexcraft.mod.states.util.TaxSystem;
@@ -134,9 +134,7 @@ public class States {
 	
 	@Mod.EventHandler
 	public void serverStarting(FMLServerStartingEvent event){
-		if(Sender.RECEIVER == null){
-			Config.updateWebHook();
-		}
+		if(MessageSender.RECEIVER == null) Config.updateWebHook();
 	}
 	
 	@Mod.EventHandler
@@ -163,9 +161,7 @@ public class States {
 	
 	@Mod.EventHandler
 	public void serverStopping(FMLServerStoppingEvent event){
-		if(Sender.RECEIVER != null){
-			Sender.RECEIVER.halt();
-		}
+		if(MessageSender.RECEIVER != null) MessageSender.RECEIVER.halt();
 	}
 
 }

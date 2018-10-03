@@ -14,7 +14,7 @@ import net.fexcraft.mod.states.api.capabilities.PlayerCapability;
 import net.fexcraft.mod.states.api.capabilities.SignTileEntityCapability;
 import net.fexcraft.mod.states.api.capabilities.StatesCapabilities;
 import net.fexcraft.mod.states.util.Config;
-import net.fexcraft.mod.states.util.Sender;
+import net.fexcraft.mod.states.util.MessageSender;
 import net.fexcraft.mod.states.util.StateUtil;
 import net.fexcraft.mod.states.util.TaxSystem;
 import net.fexcraft.mod.states.util.UpdateHandler;
@@ -81,14 +81,14 @@ public class PlayerEvents {
 			Print.chat(event.player, UpdateHandler.STATE);
 		}
 		//
-		Sender.sendToWebhook(null, event.player.getGameProfile().getName() + " joined.");
+		MessageSender.toWebhook(null, event.player.getGameProfile().getName() + " joined.");
 		TaxSystem.processPlayerTax(TaxSystem.getProbableSchedule(), player);
 	}
 	
 	@SubscribeEvent
 	public static void onLogout(PlayerLoggedOutEvent event){
 		States.PLAYERS.remove(event.player.getGameProfile().getId());
-		Sender.sendToWebhook(null, event.player.getGameProfile().getName() + " left.");
+		MessageSender.toWebhook(null, event.player.getGameProfile().getName() + " left.");
 	}
 	
 	@SubscribeEvent

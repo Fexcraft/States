@@ -15,6 +15,7 @@ import net.fexcraft.mod.states.util.StateUtil;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.tileentity.TileEntitySign;
 import net.minecraft.util.ResourceLocation;
+import net.minecraftforge.common.util.FakePlayer;
 import net.minecraftforge.event.AttachCapabilitiesEvent;
 import net.minecraftforge.event.world.ExplosionEvent;
 import net.minecraftforge.event.world.WorldEvent;
@@ -95,6 +96,9 @@ public class WorldEvents {
 	@SubscribeEvent
 	public static void onAttachEventEntityPlayer(AttachCapabilitiesEvent<net.minecraft.entity.Entity> event){
 		if(event.getObject() instanceof EntityPlayer && !event.getObject().world.isRemote){
+			event.addCapability(PlayerCapabilityUtil.REGISTRY_NAME, new PlayerCapabilityUtil((EntityPlayer)event.getObject()));
+		}
+		if(event.getObject() instanceof FakePlayer && !event.getObject().world.isRemote){
 			event.addCapability(PlayerCapabilityUtil.REGISTRY_NAME, new PlayerCapabilityUtil((EntityPlayer)event.getObject()));
 		}
 	}

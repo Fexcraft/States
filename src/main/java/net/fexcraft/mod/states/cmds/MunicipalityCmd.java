@@ -5,7 +5,6 @@ import java.util.Collection;
 
 import org.apache.commons.lang3.math.NumberUtils;
 
-import com.google.gson.JsonObject;
 import com.mojang.authlib.GameProfile;
 
 import net.fexcraft.mod.fsmm.api.Bank;

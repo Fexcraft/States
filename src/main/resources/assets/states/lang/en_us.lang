@@ -1,1 +1,8 @@
+# Chat override
 states.chat.text=%s %s
+
+# Creative Tab
+itemGroup.state=States Stuff
+
+# Blocks/Items
+tile.states:general_mailbox.name=General Mailbox

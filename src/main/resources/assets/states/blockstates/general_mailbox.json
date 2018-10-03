@@ -1,0 +1,9 @@
+{
+    "variants": {
+        "normal": { "model": "states:general_mailbox" },
+        "facing=north": { "model": "states:general_mailbox", "y": 0 },
+        "facing=south": { "model": "states:general_mailbox", "y": 180 },
+        "facing=west":  { "model": "states:general_mailbox", "y": 270 },
+        "facing=east":  { "model": "states:general_mailbox", "y": 90 }
+    }
+}

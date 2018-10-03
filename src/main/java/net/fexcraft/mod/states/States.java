@@ -18,6 +18,7 @@ import net.fexcraft.mod.lib.network.PacketHandler;
 import net.fexcraft.mod.lib.network.handlers.NBTTagCompoundPacketHandler;
 import net.fexcraft.mod.lib.util.common.Static;
 import net.fexcraft.mod.lib.util.math.Time;
+import net.fexcraft.mod.lib.util.registry.RegistryUtil;
 import net.fexcraft.mod.states.api.Chunk;
 import net.fexcraft.mod.states.api.ChunkPos;
 import net.fexcraft.mod.states.api.District;
@@ -96,6 +97,7 @@ public class States {
 		CapabilityManager.INSTANCE.register(WorldCapability.class, new WorldCapabilityUtil.Storage(), new WorldCapabilityUtil.Callable());
 		CapabilityManager.INSTANCE.register(PlayerCapability.class, new PlayerCapabilityUtil.Storage(), new PlayerCapabilityUtil.Callable());
 		ForgeChunkManager.setForcedChunkLoadingCallback(this, new ForcedChunksManager());
+		RegistryUtil.newAutoRegistry(MODID);
 	}
 	
 	@Mod.EventHandler

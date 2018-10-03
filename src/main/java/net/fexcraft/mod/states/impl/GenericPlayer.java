@@ -293,10 +293,8 @@ public class GenericPlayer implements PlayerCapability {
 	}
 
 	@Override
-	public boolean setMailbox(BlockPos pos){
-		//TODO
-		mailbox = pos;
-		return false;
+	public void setMailbox(BlockPos pos){
+		this.mailbox = pos;
 	}
 
 }

@@ -18,8 +18,6 @@ import net.fexcraft.mod.states.States;
 import net.fexcraft.mod.states.api.Chunk;
 import net.fexcraft.mod.states.api.ChunkType;
 import net.fexcraft.mod.states.api.DistrictType;
-import net.fexcraft.mod.states.api.Mail;
-import net.fexcraft.mod.states.api.MailType;
 import net.fexcraft.mod.states.api.Municipality;
 import net.fexcraft.mod.states.api.MunicipalityType;
 import net.fexcraft.mod.states.api.State;
@@ -27,14 +25,17 @@ import net.fexcraft.mod.states.api.capabilities.PlayerCapability;
 import net.fexcraft.mod.states.api.capabilities.StatesCapabilities;
 import net.fexcraft.mod.states.api.root.AnnounceLevel;
 import net.fexcraft.mod.states.impl.GenericDistrict;
-import net.fexcraft.mod.states.impl.GenericMail;
 import net.fexcraft.mod.states.impl.GenericMunicipality;
+import net.fexcraft.mod.states.util.MailUtil;
+import net.fexcraft.mod.states.util.MailUtil.MailType;
+import net.fexcraft.mod.states.util.MailUtil.RecipientType;
 import net.fexcraft.mod.states.util.StateLogger;
 import net.fexcraft.mod.states.util.StateUtil;
 import net.minecraft.command.CommandBase;
 import net.minecraft.command.CommandException;
 import net.minecraft.command.ICommandSender;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.server.MinecraftServer;
 
 @fCommand
@@ -442,14 +443,12 @@ public class MunicipalityCmd extends CommandBase {
 							}
 						}
 						String invmsg = "You have been invited become a Municipality Countil Member " + mun.getName() + " (" + mun.getId() + ")!" + (msg == null ? "" : " MSG: " + msg);
-						JsonObject obj = new JsonObject();
-						obj.addProperty("type", "municipality_council");
-						obj.addProperty("id", mun.getId());
-						obj.addProperty("from", player.getGameProfile().getId().toString());
-						obj.addProperty("at", Time.getDate());
-						obj.addProperty("valid", Time.DAY_MS * 5);
-						Mail mail = new GenericMail("player", gp.getId().toString(), player.getGameProfile().getId().toString(), invmsg, MailType.INVITE, obj);
-						StateUtil.sendMail(mail);
+						NBTTagCompound compound = new NBTTagCompound();
+						compound.setString("type", "municipality_council");
+						compound.setInteger("id", mun.getId());
+						compound.setString("from", player.getGameProfile().getId().toString());
+						compound.setLong("at", Time.getDate());
+						MailUtil.send(RecipientType.PLAYER, gp.getId().toString(), player.getGameProfile().getId().toString(), invmsg, MailType.INVITE, Time.DAY_MS * 5, compound);
 						Print.chat(sender, "&7&oInvite sent! (Will be valid for 5 days.)");
 						StateLogger.log(StateLogger.LoggerType.MUNICIPALITY, StateLogger.player(player) + " invited " + StateLogger.player(gp) + " to the council of " + StateLogger.municipality(mun) + ".");
 						return;
@@ -554,10 +553,9 @@ public class MunicipalityCmd extends CommandBase {
 				}
 				mun.getCitizen().remove(gp.getId());
 				String kickmsg = "You have been kicked from the Municipality (" + mun.getId() + ") for: " + (reason == null ? "No Kick reason given." : reason);
-				Mail mail = new GenericMail("player", gp.getId().toString(), player.getGameProfile().getId().toString(), kickmsg, MailType.SYSTEM, null);
 				PlayerCapability playr = StateUtil.getPlayer(gp.getId(), false);
 				if(playr != null){ playr.setMunicipality(StateUtil.getMunicipality(-1)); }
-				StateUtil.sendMail(mail);
+				MailUtil.send(RecipientType.PLAYER, gp.getId().toString(), player.getGameProfile().getId().toString(), kickmsg, MailType.SYSTEM, Time.DAY_MS * 64);
 				Print.chat(sender, "&7Player &9" + gp.getName() + "&7 kicked from the Municipality!");
 				StateLogger.log(StateLogger.LoggerType.MUNICIPALITY, StateLogger.player(player) + " kicked " + StateLogger.player(gp) + " from " + StateLogger.municipality(mun) + ".");
 				return;
@@ -582,9 +580,7 @@ public class MunicipalityCmd extends CommandBase {
 				StateUtil.announce(server, AnnounceLevel.MUNICIPALITY, "&o" + ply.getFormattedNickname() + " &e&oleft the Municipality!", ply.getMunicipality().getId());
 				StateLogger.log(StateLogger.LoggerType.MUNICIPALITY, StateLogger.player(player) + " left " + StateLogger.municipality(ply.getMunicipality()) + ".");
 				ply.setMunicipality(mun);
-				if(mun.getMayor() != null){
-					StateUtil.sendMail(new GenericMail("player", States.CONSOLE_UUID, mun.getMayor().toString(), player.getGameProfile().getName() + " joined the Municipality. At " + Time.getAsString(-1), MailType.SYSTEM, null));
-				}
+				MailUtil.send(RecipientType.MUNICIPALITY, null, sender.getName(), player.getGameProfile().getName() + " joined the Municipality. At " + Time.getAsString(-1), MailType.SYSTEM);
 				StateUtil.announce(server, AnnounceLevel.MUNICIPALITY, "&o" + ply.getFormattedNickname() + " &2&ojoined the Municipality!", ply.getMunicipality().getId());
 				StateLogger.log(StateLogger.LoggerType.MUNICIPALITY, StateLogger.player(player) + " joined " + StateLogger.municipality(ply.getMunicipality()) + ".");
 				return;
@@ -597,9 +593,7 @@ public class MunicipalityCmd extends CommandBase {
 				if(!ply.canLeave(sender)){
 					return;
 				}
-				if(ply.getMunicipality().getMayor() != null){
-					StateUtil.sendMail(new GenericMail("player", States.CONSOLE_UUID, ply.getMunicipality().getMayor().toString(), player.getGameProfile().getName() + " left the Municipality. At " + Time.getAsString(-1), MailType.SYSTEM, null));
-				}
+				MailUtil.send(RecipientType.MUNICIPALITY, null, sender.getName(), player.getGameProfile().getName() + " left the Municipality. At " + Time.getAsString(-1), MailType.SYSTEM);
 				StateUtil.announce(server, AnnounceLevel.MUNICIPALITY, "&o" + ply.getFormattedNickname() + " &e&oleft the Municipality!", ply.getMunicipality().getId());
 				StateLogger.log(StateLogger.LoggerType.MUNICIPALITY, StateLogger.player(player) + " left " + StateLogger.municipality(mun) + ".");
 				ply.setMunicipality(StateUtil.getMunicipality(-1));
@@ -633,14 +627,12 @@ public class MunicipalityCmd extends CommandBase {
 					}
 				}
 				String invmsg = "You have been invited to join the Municipality " + mun.getName() + " (" + mun.getId() + ")!" + (msg == null ? "" : " MSG: " + msg);
-				JsonObject obj = new JsonObject();
-				obj.addProperty("type", "municipality");
-				obj.addProperty("id", mun.getId());
-				obj.addProperty("from", player.getGameProfile().getId().toString());
-				obj.addProperty("at", Time.getDate());
-				obj.addProperty("valid", Time.DAY_MS * 2);
-				Mail mail = new GenericMail("player", gp.getId().toString(), player.getGameProfile().getId().toString(), invmsg, MailType.INVITE, obj);
-				StateUtil.sendMail(mail);
+				NBTTagCompound compound = new NBTTagCompound();
+				compound.setString("type", "municipality");
+				compound.setInteger("id", mun.getId());
+				compound.setString("from", player.getGameProfile().getId().toString());
+				compound.setLong("at", Time.getDate());
+				MailUtil.send(RecipientType.PLAYER, gp.getId().toString(), player.getGameProfile().getId().toString(), invmsg, MailType.INVITE, Time.DAY_MS * 2, compound);
 				Print.chat(sender, "&7&oInvite sent! (Will be valid for 2 days.)");
 				StateLogger.log(StateLogger.LoggerType.MUNICIPALITY, StateLogger.player(player) + " invited " + StateLogger.player(gp) + " to join "+ StateLogger.municipality(mun) + ".");
 				return;

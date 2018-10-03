@@ -22,7 +22,6 @@ import net.fexcraft.mod.states.States;
 import net.fexcraft.mod.states.api.Chunk;
 import net.fexcraft.mod.states.api.ChunkPos;
 import net.fexcraft.mod.states.api.District;
-import net.fexcraft.mod.states.api.Mail;
 import net.fexcraft.mod.states.api.Municipality;
 import net.fexcraft.mod.states.api.State;
 import net.fexcraft.mod.states.api.capabilities.PlayerCapability;
@@ -30,7 +29,6 @@ import net.fexcraft.mod.states.api.capabilities.StatesCapabilities;
 import net.fexcraft.mod.states.api.root.AnnounceLevel;
 import net.fexcraft.mod.states.impl.GenericChunk;
 import net.fexcraft.mod.states.impl.GenericDistrict;
-import net.fexcraft.mod.states.impl.GenericMail;
 import net.fexcraft.mod.states.impl.GenericMunicipality;
 import net.fexcraft.mod.states.impl.GenericPlayer;
 import net.fexcraft.mod.states.impl.GenericState;
@@ -147,47 +145,6 @@ public class StateUtil extends TimerTask {
 	@Nullable
 	public static PlayerCapability getPlayer(UUID uuid, boolean loadtemp){
 		return States.PLAYERS.containsKey(uuid) ? States.PLAYERS.get(uuid) : loadtemp ? GenericPlayer.getOfflineInstance(uuid) : null;
-	}
-
-	public static void sendMail(Mail mail){
-		if(mail.getRecipientType().equals("player")){
-			UUID uuid = UUID.fromString(mail.getRecipient());
-			EntityPlayerMP player = Static.getServer().getPlayerList().getPlayerByUUID(uuid);
-			if(player != null){
-				Print.chat(player, "&0[&eSt&0]&6 You have got new mail!");
-			}
-		}
-		mail.save();
-	}
-
-	public static List<Mail> gatherMailOf(String type, String string, boolean read){
-		File folder = new File(States.getSaveDirectory(), "mails/" + type + "/" + string + "/");
-		ArrayList<Mail> list = new ArrayList<>();
-		if(!folder.exists()){ return list; }
-		for(File file : folder.listFiles()){
-			if(file.getName().endsWith(read ? ".read" : ".unread")){
-				try{
-					list.add(new GenericMail(file.getName().replace(read ? ".read" : ".unread", ""), type, string));
-				}
-				catch (Exception e){
-					e.printStackTrace();
-				}
-			}
-		}
-		return list;
-	}
-
-	public static int getUnreadMailsOf(String rectype, String string){
-		File folder = new File(States.getSaveDirectory(), "mails/" + rectype + "/" + string + "/");
-		int i = 0;
-		if(folder.exists()){
-			for(String file : folder.list()){
-				if(file.endsWith(".unread")){
-					i++;
-				}
-			}
-		}
-		return i;
 	}
 
 	public static void announce(MinecraftServer server, String string){

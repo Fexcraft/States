@@ -25,6 +25,7 @@ import net.fexcraft.mod.states.util.Config;
 import net.fexcraft.mod.states.util.ForcedChunksManager;
 import net.fexcraft.mod.states.util.StateUtil;
 import net.minecraft.command.ICommandSender;
+import net.minecraft.util.math.BlockPos;
 
 public class GenericMunicipality implements Municipality/*, Taxable*/ {
 	
@@ -38,6 +39,7 @@ public class GenericMunicipality implements Municipality/*, Taxable*/ {
 	private MunicipalityType type;
 	private State state;
 	private boolean open, kib;
+	private BlockPos mailbox;
 	
 	public GenericMunicipality(int id){
 		this.id = id;
@@ -62,6 +64,7 @@ public class GenericMunicipality implements Municipality/*, Taxable*/ {
 		icon = JsonUtil.getIfExists(obj, "icon", States.DEFAULT_ICON);
 		kib = JsonUtil.getIfExists(obj, "kick_if_bankrupt", false);
 		citizentax = JsonUtil.getIfExists(obj, "citizen_tax", 0).longValue();
+		mailbox = obj.has("mailbox") ? BlockPos.fromLong(obj.get("mailbox").getAsLong()) : null;
 	}
 
 	@Override
@@ -333,6 +336,16 @@ public class GenericMunicipality implements Municipality/*, Taxable*/ {
 	@Override
 	public Bank getBank(){
 		return DataManager.getBank(account.getBankId(), true, true);
+	}
+
+	@Override
+	public BlockPos getMailbox(){
+		return mailbox;
+	}
+
+	@Override
+	public void setMailbox(BlockPos pos){
+		this.mailbox = pos;
 	}
 
 }

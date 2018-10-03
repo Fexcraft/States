@@ -6,7 +6,6 @@ import java.util.UUID;
 
 import org.apache.commons.lang3.math.NumberUtils;
 
-import com.google.gson.JsonObject;
 import com.mojang.authlib.GameProfile;
 
 import net.fexcraft.mod.fsmm.api.Bank;
@@ -17,21 +16,22 @@ import net.fexcraft.mod.lib.util.common.Static;
 import net.fexcraft.mod.lib.util.math.Time;
 import net.fexcraft.mod.states.States;
 import net.fexcraft.mod.states.api.Chunk;
-import net.fexcraft.mod.states.api.Mail;
-import net.fexcraft.mod.states.api.MailType;
 import net.fexcraft.mod.states.api.Municipality;
 import net.fexcraft.mod.states.api.State;
 import net.fexcraft.mod.states.api.capabilities.PlayerCapability;
 import net.fexcraft.mod.states.api.capabilities.StatesCapabilities;
 import net.fexcraft.mod.states.api.root.AnnounceLevel;
-import net.fexcraft.mod.states.impl.GenericMail;
 import net.fexcraft.mod.states.impl.GenericState;
+import net.fexcraft.mod.states.util.MailUtil;
 import net.fexcraft.mod.states.util.StateLogger;
 import net.fexcraft.mod.states.util.StateUtil;
+import net.fexcraft.mod.states.util.MailUtil.MailType;
+import net.fexcraft.mod.states.util.MailUtil.RecipientType;
 import net.minecraft.command.CommandBase;
 import net.minecraft.command.CommandException;
 import net.minecraft.command.ICommandSender;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.server.MinecraftServer;
 
 @fCommand
@@ -386,14 +386,12 @@ public class StateCmd extends CommandBase {
 							}
 						}
 						String invmsg = "You have been invited become a State Countil Member " + state.getName() + " (" + state.getId() + ")!" + (msg == null ? "" : " MSG: " + msg);
-						JsonObject obj = new JsonObject();
-						obj.addProperty("type", "state_council");
-						obj.addProperty("id", state.getId());
-						obj.addProperty("from", player.getGameProfile().getId().toString());
-						obj.addProperty("at", Time.getDate());
-						obj.addProperty("valid", Time.DAY_MS * 5);
-						Mail mail = new GenericMail("player", gp.getId().toString(), player.getGameProfile().getId().toString(), invmsg, MailType.INVITE, obj);
-						StateUtil.sendMail(mail);
+						NBTTagCompound compound = new NBTTagCompound();
+						compound.setString("type", "state_council");
+						compound.setInteger("id", state.getId());
+						compound.setString("from", player.getGameProfile().getId().toString());
+						compound.setLong("at", Time.getDate());
+						MailUtil.send(RecipientType.PLAYER, gp.getId().toString(), player.getGameProfile().getId().toString(), invmsg, MailType.INVITE, Time.DAY_MS * 5, compound);
 						Print.chat(sender, "&7&oInvite sent! (Will be valid for 5 days.)");
 						StateLogger.log(StateLogger.LoggerType.STATE, StateLogger.player(player) + " invited " + StateLogger.player(gp) + " to the council of " + StateLogger.state(state) + ".");
 						return;
@@ -407,10 +405,10 @@ public class StateCmd extends CommandBase {
 			}
 			case "mun": case "municipality":{
 				if(args.length == 1){
-                                    Print.chat(sender, "&7/st mun list");
-                                    Print.chat(sender, "&7/st mun invite <municipality id>");
-                                    Print.chat(sender, "&7/st mun kick/remove");
-                                    return;
+					Print.chat(sender, "&7/st mun list");
+					Print.chat(sender, "&7/st mun invite <municipality id>");
+					Print.chat(sender, "&7/st mun kick/remove");
+					return;
 				}
 				switch(args[1]){
 					case "list":{
@@ -437,16 +435,13 @@ public class StateCmd extends CommandBase {
 								return;
 							}
 							String invmsg = "Your Municipality was invited to join the State of " + state.getName() + " (" + state.getId() + ")!";
-							JsonObject obj = new JsonObject();
-							obj.addProperty("type", "state_municipality");
-							obj.addProperty("id", state.getId());
-							obj.addProperty("from", player.getGameProfile().getId().toString());
-							obj.addProperty("at", Time.getDate());
-							obj.addProperty("valid", Time.DAY_MS * 12);
-							Mail mail = new GenericMail("player", mun.getMayor().toString(), player.getGameProfile().getId().toString(), invmsg, MailType.INVITE, obj);
-							StateUtil.sendMail(mail);
+							NBTTagCompound compound = new NBTTagCompound();
+							compound.setString("type", "state_municipality");
+							compound.setInteger("id", state.getId());
+							compound.setString("from", player.getGameProfile().getId().toString());
+							compound.setLong("at", Time.getDate());
+							MailUtil.send(RecipientType.MUNICIPALITY, null, player.getGameProfile().getId().toString(), invmsg, MailType.INVITE, Time.DAY_MS * 12, compound);
 							Print.chat(sender, "&7&oInvite sent! (Will be valid for 12 days.)");
-
 							StateLogger.log(StateLogger.LoggerType.MUNICIPALITY, StateLogger.player(player) + " invited " + StateLogger.municipality(mun) + " to join the State of " + StateLogger.state(state));
 							return;
 						}

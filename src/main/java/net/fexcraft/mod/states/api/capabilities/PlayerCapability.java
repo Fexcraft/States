@@ -13,14 +13,14 @@ import net.fexcraft.mod.states.api.District;
 import net.fexcraft.mod.states.api.Municipality;
 import net.fexcraft.mod.states.api.State;
 import net.fexcraft.mod.states.api.root.AccountHolder;
+import net.fexcraft.mod.states.api.root.MailReceiver;
 import net.fexcraft.mod.states.api.root.Taxable;
 import net.minecraft.command.ICommandSender;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.server.MinecraftServer;
-import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 
-public interface PlayerCapability extends ICommandSender, Taxable, AccountHolder {
+public interface PlayerCapability extends ICommandSender, Taxable, AccountHolder, MailReceiver {
 	
 	public Municipality getMunicipality();
 	
@@ -108,9 +108,5 @@ public interface PlayerCapability extends ICommandSender, Taxable, AccountHolder
 	}
 
 	public boolean isLoaded();
-	
-	public BlockPos getMailbox();
-	
-	public boolean setMailbox(BlockPos pos);
 
 }

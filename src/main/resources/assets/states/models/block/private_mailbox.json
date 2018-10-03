@@ -1,0 +1,127 @@
+{
+	"__comment": "Designed by Ferdinand (FEX___96) with Cubik Studio",
+	"textures": {
+		"particle": "blocks/anvil_base",
+		"texture": "states:blocks/pm_andesite",
+		"mail_status": "blocks/wool_colored_yellow"
+	},
+	"elements": [ 	 
+		{
+			"__comment": "Box3",
+			"from": [ 0, 0, 0 ],
+			"to": [ 16, 1, 16 ],
+			"faces": {
+				"down": { "uv": [ 0, 0, 16, 16 ], "texture": "#texture" },
+				"up": { "uv": [ 0, 0, 16, 16 ], "texture": "#texture" },
+				"north": { "uv": [ 0, 15, 16, 16 ], "texture": "#texture" },
+				"south": { "uv": [ 0, 15, 16, 16 ], "texture": "#texture" },
+				"west": { "uv": [ 0, 15, 16, 16 ], "texture": "#texture" },
+				"east": { "uv": [ 0, 15, 16, 16 ], "texture": "#texture" }
+			}
+		},
+		{
+			"__comment": "Box4",
+			"from": [ 0, 15, 0 ],
+			"to": [ 16, 16, 16 ],
+			"faces": {
+				"down": { "uv": [ 0, 0, 16, 16 ], "texture": "#texture" },
+				"up": { "uv": [ 0, 0, 16, 16 ], "texture": "#texture" },
+				"north": { "uv": [ 0, 0, 16, 1 ], "texture": "#texture" },
+				"south": { "uv": [ 0, 0, 16, 1 ], "texture": "#texture" },
+				"west": { "uv": [ 0, 0, 16, 1 ], "texture": "#texture" },
+				"east": { "uv": [ 0, 0, 16, 1 ], "texture": "#texture" }
+			}
+		},
+		{
+			"__comment": "Box5",
+			"from": [ 0, 1, 0 ],
+			"to": [ 1, 15, 16 ],
+			"faces": {
+				"down": { "uv": [ 0, 0, 1, 16 ], "texture": "#texture" },
+				"up": { "uv": [ 0, 0, 1, 16 ], "texture": "#texture" },
+				"north": { "uv": [ 15, 1, 16, 15 ], "texture": "#texture" },
+				"south": { "uv": [ 0, 1, 1, 15 ], "texture": "#texture" },
+				"west": { "uv": [ 0, 1, 16, 15 ], "texture": "#texture" },
+				"east": { "uv": [ 0, 1, 16, 15 ], "texture": "#texture" }
+			}
+		},
+		{
+			"__comment": "Box5",
+			"from": [ 15, 1, 0 ],
+			"to": [ 16, 15, 16 ],
+			"faces": {
+				"down": { "uv": [ 0, 0, 1, 16 ], "texture": "#texture" },
+				"up": { "uv": [ 0, 0, 1, 16 ], "texture": "#texture" },
+				"north": { "uv": [ 15, 1, 16, 15 ], "texture": "#texture" },
+				"south": { "uv": [ 0, 1, 1, 15 ], "texture": "#texture" },
+				"west": { "uv": [ 0, 1, 16, 15 ], "texture": "#texture" },
+				"east": { "uv": [ 0, 1, 16, 15 ], "texture": "#texture" }
+			}
+		},
+		{
+			"__comment": "Box7",
+			"from": [ 1, 1, 15 ],
+			"to": [ 15, 15, 16 ],
+			"faces": {
+				"down": { "uv": [ 1, 0, 15, 1 ], "texture": "#texture" },
+				"up": { "uv": [ 1, 15, 15, 16 ], "texture": "#texture" },
+				"north": { "uv": [ 1, 1, 15, 15 ], "texture": "#texture" },
+				"south": { "uv": [ 1, 1, 15, 15 ], "texture": "#texture" },
+				"west": { "uv": [ 15, 1, 16, 15 ], "texture": "#texture" },
+				"east": { "uv": [ 0, 1, 1, 15 ], "texture": "#texture" }
+			}
+		},
+		{
+			"__comment": "mail_status",
+			"from": [ 1, 11, 1 ],
+			"to": [ 15, 15, 2 ],
+			"faces": {
+				"down": { "uv": [ 0, 0, 16, 1 ], "texture": "#mail_status" },
+				"up": { "uv": [ 0, 15, 16, 16 ], "texture": "#mail_status" },
+				"north": { "uv": [ 0, 1, 16, 5 ], "texture": "#mail_status" },
+				"south": { "uv": [ 0, 1, 16, 5 ], "texture": "#mail_status" },
+				"west": { "uv": [ 15, 1, 16, 5 ], "texture": "#mail_status" },
+				"east": { "uv": [ 0, 1, 1, 5 ], "texture": "#mail_status" }
+			}
+		},
+		{
+			"__comment": "Box7",
+			"from": [ 1, 1, 0 ],
+			"to": [ 15, 11, 1 ],
+			"faces": {
+				"down": { "uv": [ 1, 0, 15, 1 ], "texture": "#texture" },
+				"up": { "uv": [ 1, 15, 15, 16 ], "texture": "#texture" },
+				"north": { "uv": [ 1, 4, 15, 14 ], "texture": "#texture" },
+				"south": { "uv": [ 1, 1, 15, 15 ], "texture": "#texture" },
+				"west": { "uv": [ 15, 1, 16, 15 ], "texture": "#texture" },
+				"east": { "uv": [ 0, 1, 1, 15 ], "texture": "#texture" }
+			}
+		}
+	],
+	"display": {
+		"thirdperson_righthand": {
+			"rotation":  [ 75, 45, 0 ],
+			"translation":  [ 0, 2.5, 0 ],
+			"scale":  [ 0.375, 0.375, 0.375 ]
+		},
+		"thirdperson_lefthand": {
+			"rotation":  [ 75, 45, 0 ],
+			"translation":  [ 0, 2.5, 0 ],
+			"scale":  [ 0.375, 0.375, 0.375 ]
+		},
+		"firstperson_righthand": {
+			"rotation":  [ 0, 135, 0 ],
+			"scale":  [ 0.4, 0.4, 0.4 ]
+		},
+		"firstperson_lefthand": {
+			"rotation":  [ 0, 135, 0 ],
+			"scale":  [ 0.4, 0.4, 0.4 ]
+		},
+		"gui": {
+			"rotation":  [ 0, 180, 0 ]
+		},
+		"ground": {
+			"translation":  [ 0, 4, 0 ]
+		}
+	}
+}

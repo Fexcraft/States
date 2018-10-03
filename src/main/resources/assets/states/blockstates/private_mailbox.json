@@ -1,0 +1,9 @@
+{
+    "variants": {
+        "normal": { "model": "states:private_mailbox" },
+        "facing=north": { "model": "states:private_mailbox", "y": 0 },
+        "facing=south": { "model": "states:private_mailbox", "y": 180 },
+        "facing=west":  { "model": "states:private_mailbox", "y": 270 },
+        "facing=east":  { "model": "states:private_mailbox", "y": 90 }
+    }
+}

@@ -1,0 +1,9 @@
+{
+    "variants": {
+        "normal": { "model": "states:stacked_mailbox" },
+        "facing=north": { "model": "states:stacked_mailbox", "y": 0 },
+        "facing=south": { "model": "states:stacked_mailbox", "y": 180 },
+        "facing=west":  { "model": "states:stacked_mailbox", "y": 270 },
+        "facing=east":  { "model": "states:stacked_mailbox", "y": 90 }
+    }
+}

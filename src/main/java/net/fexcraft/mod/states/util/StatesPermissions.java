@@ -160,6 +160,9 @@ public class StatesPermissions {
 		PERMISSIONS.put("state.set.citizen-tax-percentage", new Permission(PermissionGroup.STATE, PermissionLevel.ADMIN));
 		PERMISSIONS.put("municipality.set.mayor", new Permission(PermissionGroup.SKIP, PermissionLevel.MUNICIPALITY_MAYOR, PermissionLevel.ADMIN));
 		PERMISSIONS.put("state.set.leader", new Permission(PermissionGroup.SKIP, PermissionLevel.STATE_LEADER, PermissionLevel.ADMIN));
+		PERMISSIONS.put("state.set.mailbox", new Permission(PermissionGroup.STATE, PermissionLevel.STATE_COUNCIL, PermissionLevel.ADMIN));
+		PERMISSIONS.put("municipality.set.mailbox", new Permission(PermissionGroup.MUNICIPALITY, PermissionLevel.MUNICIPALITY_COUNCIL, PermissionLevel.ADMIN));
+		PERMISSIONS.put("district.set.mailbox", new Permission(PermissionGroup.DISTRICT, PermissionLevel.MUNICIPALITY_COUNCIL, PermissionLevel.ADMIN));
 		
 	}
 

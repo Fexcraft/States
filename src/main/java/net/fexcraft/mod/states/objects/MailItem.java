@@ -22,6 +22,7 @@ public class MailItem extends Item {
 	
 	public MailItem(){
 		this.setCreativeTab(CreativeTab.INSTANCE);
+		this.setMaxStackSize(1);
 	}
 	
     @SideOnly(Side.CLIENT)

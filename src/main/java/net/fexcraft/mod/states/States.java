@@ -31,6 +31,7 @@ import net.fexcraft.mod.states.api.capabilities.WorldCapability;
 import net.fexcraft.mod.states.guis.GuiHandler;
 import net.fexcraft.mod.states.guis.Listener;
 import net.fexcraft.mod.states.guis.Receiver;
+import net.fexcraft.mod.states.impl.SignMailbox;
 import net.fexcraft.mod.states.impl.SignShop;
 import net.fexcraft.mod.states.impl.capabilities.ChunkCapabilityUtil;
 import net.fexcraft.mod.states.impl.capabilities.PlayerCapabilityUtil;
@@ -92,6 +93,7 @@ public class States {
 		Config.initialize(event);
 		StatesPermissions.init();
 		SignCapabilityUtil.addListener(SignShop.class);
+		SignCapabilityUtil.addListener(SignMailbox.class);
 		CapabilityManager.INSTANCE.register(SignTileEntityCapability.class, new SignTileEntityCapabilityUtil.Storage(), new SignTileEntityCapabilityUtil.Callable());
 		CapabilityManager.INSTANCE.register(ChunkCapability.class, new ChunkCapabilityUtil.Storage(), new ChunkCapabilityUtil.Callable());
 		CapabilityManager.INSTANCE.register(WorldCapability.class, new WorldCapabilityUtil.Storage(), new WorldCapabilityUtil.Callable());

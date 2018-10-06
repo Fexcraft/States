@@ -76,6 +76,7 @@ public class GenericState implements State {
 		if(citizentaxpercent > 0){
 			obj.addProperty("citizen_tax_percent", citizentaxpercent);
 		}
+		if(mailbox != null) obj.addProperty("mailbox", mailbox.toLong());
 		return obj;
 	}
 

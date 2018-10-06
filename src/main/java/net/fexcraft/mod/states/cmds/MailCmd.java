@@ -77,7 +77,7 @@ public class MailCmd extends CommandBase {
 				compound.setString("type", "municipality");
 				compound.setString("from", player.getGameProfile().getId().toString());
 				compound.setLong("at", Time.getDate());
-				MailUtil.send(RecipientType.PLAYER, player.getGameProfile().getId().toString(), player.getGameProfile().getId().toString(), invmsg, MailType.INVITE, Time.DAY_MS * 2, compound);
+				MailUtil.send(sender, RecipientType.PLAYER, player.getGameProfile().getId().toString(), player.getGameProfile().getId().toString(), invmsg, MailType.INVITE, Time.DAY_MS * 2, compound);
 				return;
 			}
 			case "send":{
@@ -99,8 +99,8 @@ public class MailCmd extends CommandBase {
 							msg += " " + args[i];
 						}
 					}
-					MailUtil.send(RecipientType.PLAYER, receiver, player.getGameProfile().getId().toString(), msg, MailType.PRIVATE);
-					Print.chat(sender, "&6Mail sent!");
+					MailUtil.send(sender, RecipientType.PLAYER, receiver, player.getGameProfile().getId().toString(), msg, MailType.PRIVATE);
+					Print.chat(sender, "&6Mail queued!");
 				}
 				catch(Exception e){
 					e.printStackTrace();

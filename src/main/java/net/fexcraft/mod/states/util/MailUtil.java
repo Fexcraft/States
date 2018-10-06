@@ -12,6 +12,7 @@ import net.fexcraft.mod.states.api.Municipality;
 import net.fexcraft.mod.states.api.State;
 import net.fexcraft.mod.states.api.capabilities.PlayerCapability;
 import net.fexcraft.mod.states.impl.SignMailbox;
+import net.minecraft.command.ICommandSender;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.tileentity.TileEntitySign;
@@ -24,20 +25,20 @@ public class MailUtil {
 	
 	private static final String PRFX = "[StatesMail]";
 	
-	public static void send(RecipientType rectype, Object receiver, String sender, String message, MailType type){
-		send(rectype, receiver, sender, message, type, Time.DAY_MS * 14);
+	public static void send(ICommandSender ics, RecipientType rectype, Object receiver, String sender, String message, MailType type){
+		send(ics, rectype, receiver, sender, message, type, Time.DAY_MS * 14);
 	}
 
-	public static void send(RecipientType rectype, Object receiver, String sender, String message, MailType type, long expiry){
-		send(rectype, receiver, sender, message, type, Time.DAY_MS * 14, null);
+	public static void send(ICommandSender ics, RecipientType rectype, Object receiver, String sender, String message, MailType type, long expiry){
+		send(ics, rectype, receiver, sender, message, type, Time.DAY_MS * 14, null);
 	}
 
-	public static void send(RecipientType rectype, Object receiver, String sender, String message, MailType type, long expiry, NBTTagCompound compound){
+	public static void send(ICommandSender ics, RecipientType rectype, Object receiver, String sender, String message, MailType type, long expiry, NBTTagCompound compound){
 		Static.getServer().addScheduledTask(() -> {
 			try{
 				World world = Static.getServer().getWorld(0);
 				if(world == null){
-					printFailure(0, rectype, receiver, sender, message, type, expiry, compound, null, null); return;
+					printFailure(ics, 0, rectype, receiver, sender, message, type, expiry, compound, null, null); return;
 				}
 				BlockPos mailbox = null; RecipientType rety = rectype; String rec = receiver.toString();
 				while(mailbox == null){
@@ -59,7 +60,7 @@ public class MailUtil {
 						}
 						case PLAYER:{
 							PlayerCapability cap = StateUtil.getPlayer(rec.toString(), true);
-							if(cap == null){ printFailure(1, rectype, receiver, sender, message, type, expiry, compound, rety, rec); return; }
+							if(cap == null){ printFailure(ics, 1, rectype, receiver, sender, message, type, expiry, compound, rety, rec); return; }
 							if(cap.getMailbox() == null){ rety = RecipientType.MUNICIPALITY; rec = cap.getMunicipality().getId() + ""; continue; }
 							mailbox = validate(world, cap.getMailbox(), rety, rec.toString());
 							if(mailbox == null){ rety = RecipientType.MUNICIPALITY; rec = cap.getMunicipality().getId() + "";  continue; }
@@ -72,7 +73,7 @@ public class MailUtil {
 									rety = RecipientType.STATE; rec = "-1"; continue;
 								}
 								else{
-									printFailure(1, rectype, receiver, sender, message, type, expiry, compound, rety, rec); return;
+									printFailure(ics, 1, rectype, receiver, sender, message, type, expiry, compound, rety, rec); return;
 								}
 							}
 							mailbox = validate(world, state.getMailbox(), rety, rec.toString());
@@ -81,7 +82,7 @@ public class MailUtil {
 									rety = RecipientType.STATE; rec = "-1"; continue;
 								}
 								else{
-									printFailure(2, rectype, receiver, sender, message, type, expiry, compound, rety, rec); return;
+									printFailure(ics, 2, rectype, receiver, sender, message, type, expiry, compound, rety, rec); return;
 								}
 							}
 							break;
@@ -96,11 +97,11 @@ public class MailUtil {
 				}
 				TileEntity tile = Static.getServer().getWorld(0).getTileEntity(mailbox);
 				if(tile == null){
-					printFailure(3, rectype, receiver, sender, message, type, expiry, compound, null, null); return;
+					printFailure(ics, 3, rectype, receiver, sender, message, type, expiry, compound, null, null); return;
 				}
 				try{
 					SignMailbox sign = tile.getCapability(SignCapabilityUtil.SIGN_CAPABILITY, null).getListener(SignMailbox.class, SignMailbox.RESLOC);
-					if(!sign.insert((TileEntitySign)tile, rectype, receiver.toString(), sender, message, type, expiry, compound)){
+					if(!sign.insert(ics, (TileEntitySign)tile, rectype, receiver.toString(), sender, message, type, expiry, compound)){
 						//TODO warning?
 					}
 				}
@@ -113,7 +114,7 @@ public class MailUtil {
 				return;
 			}
 			catch(Exception e){
-				e.printStackTrace(); printFailure(-1, rectype, receiver, sender, message, type, expiry, compound, null, null);
+				e.printStackTrace(); printFailure(ics, -1, rectype, receiver, sender, message, type, expiry, compound, null, null);
 			}
 		});
 	}
@@ -134,7 +135,8 @@ public class MailUtil {
 		else{ ForgeChunkManager.unforceChunk(ticket, pos); return null; }
 	}
 
-	private static void printFailure(int i, RecipientType rectype, Object receiver, String sender, String message, MailType type, long expiry, NBTTagCompound compound, RecipientType rety, Object rec){
+	private static void printFailure(ICommandSender ics, int i, RecipientType rectype, Object receiver, String sender, String message, MailType type, long expiry, NBTTagCompound compound, RecipientType rety, Object rec){
+		if(ics != null) Print.chat(ics, "Mail couldn't be sent, see log for details. ERRLVL:(" + i + ");");
 		Print.log(PRFX + " Mailbox for receiver '" + receiver.toString() + (rec == null ? "" : "/" + rec.toString()) + "' not found or errored! Message cannot be sent!");
 		Print.log(PRFX + " Content: " + message);
 		Print.log(PRFX + " Level: " + i +" ||  Type: " + type.name() + (rety == null ? "" : "/" + rety.name()) + " || Expiry: " + Time.getAsString(Time.getDate() + expiry) + " || NBT: " + (compound == null ? "none" : compound.toString()));

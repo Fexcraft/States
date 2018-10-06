@@ -392,7 +392,7 @@ public class StateCmd extends CommandBase {
 						compound.setInteger("id", state.getId());
 						compound.setString("from", player.getGameProfile().getId().toString());
 						compound.setLong("at", Time.getDate());
-						MailUtil.send(RecipientType.PLAYER, gp.getId().toString(), player.getGameProfile().getId().toString(), invmsg, MailType.INVITE, Time.DAY_MS * 5, compound);
+						MailUtil.send(sender, RecipientType.PLAYER, gp.getId().toString(), player.getGameProfile().getId().toString(), invmsg, MailType.INVITE, Time.DAY_MS * 5, compound);
 						Print.chat(sender, "&7&oInvite sent! (Will be valid for 5 days.)");
 						StateLogger.log(StateLogger.LoggerType.STATE, StateLogger.player(player) + " invited " + StateLogger.player(gp) + " to the council of " + StateLogger.state(state) + ".");
 						return;
@@ -441,7 +441,7 @@ public class StateCmd extends CommandBase {
 							compound.setInteger("id", state.getId());
 							compound.setString("from", player.getGameProfile().getId().toString());
 							compound.setLong("at", Time.getDate());
-							MailUtil.send(RecipientType.MUNICIPALITY, mun.getId(), player.getGameProfile().getId().toString(), invmsg, MailType.INVITE, Time.DAY_MS * 12, compound);
+							MailUtil.send(sender, RecipientType.MUNICIPALITY, mun.getId(), player.getGameProfile().getId().toString(), invmsg, MailType.INVITE, Time.DAY_MS * 12, compound);
 							Print.chat(sender, "&7&oInvite sent! (Will be valid for 12 days.)");
 							StateLogger.log(StateLogger.LoggerType.MUNICIPALITY, StateLogger.player(player) + " invited " + StateLogger.municipality(mun) + " to join the State of " + StateLogger.state(state));
 							return;

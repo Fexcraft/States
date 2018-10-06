@@ -17,6 +17,7 @@ import net.fexcraft.mod.states.util.StateUtil;
 import net.fexcraft.mod.states.util.StatesPermissions;
 import net.minecraft.block.BlockWallSign;
 import net.minecraft.block.state.IBlockState;
+import net.minecraft.command.ICommandSender;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTBase;
 import net.minecraft.nbt.NBTTagCompound;
@@ -177,7 +178,7 @@ public class SignMailbox implements SignCapability.Listener {
 		}
 	}
 
-	public final boolean insert(TileEntitySign tile, RecipientType rectype, String receiver, String sender, String message, MailType type, long expiry, NBTTagCompound compound){
+	public final boolean insert(ICommandSender ics, TileEntitySign tile, RecipientType rectype, String receiver, String sender, String message, MailType type, long expiry, NBTTagCompound compound){
 		ItemStack stack = new ItemStack(MailItem.INSTANCE, 1, type.toMetadata());
 		NBTTagCompound nbt = new NBTTagCompound();
 		nbt.setString("Receiver", rectype.name().toLowerCase() + ":" + receiver);
@@ -197,6 +198,7 @@ public class SignMailbox implements SignCapability.Listener {
 			}
 		}
 		if(stack == null || !stack.isEmpty()){
+			if(ics != null) Print.chat(ics, "Failed to send mail, mailbox of recipient may be full!");
 			Print.log("Failed to insert mail! Probably no space in target mailbox!");
 			Print.log(tile + " || " + rectype + " || " + receiver + " || " + sender + " || " + message + " || " + type + " || " + expiry + " || " + compound);
 			return false;

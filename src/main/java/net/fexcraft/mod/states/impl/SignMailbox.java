@@ -99,6 +99,12 @@ public class SignMailbox implements SignCapability.Listener {
 						}
 						break;
 					}
+					case "center": case "central": case "fallback":{
+						if(!StatesPermissions.hasPermission(event.getEntityPlayer(), "admin", chunk.getDistrict())){
+							Print.chat(event.getEntityPlayer(), "No permission to set the Central/Fallback Mailbox."); return false;
+						}
+						break;
+					}
 					default:{
 						Print.chat(event.getEntityPlayer(), "Invalid mailbox type.");
 						return false;
@@ -118,6 +124,10 @@ public class SignMailbox implements SignCapability.Listener {
 							else{
 								StateUtil.getPlayer(recipient, true).setMailbox(tileentity.getPos());
 							}
+							break;
+						}
+						/*case "center":*/ case "central": case "fallback":{
+							StateUtil.getState(-1).setMailbox(tileentity.getPos());
 							break;
 						}
 					}
@@ -166,14 +176,10 @@ public class SignMailbox implements SignCapability.Listener {
 		}
 	}
 
-	public boolean accepts(BlockPos pos, RecipientType type, String receiver){
+	public boolean accepts(BlockPos pos, RecipientType rtype, String receiver){
 		Chunk chunk = StateUtil.getChunk(pos);
-		switch(type){
+		switch(rtype){
 			case COMPANY: return false;//TODO
-			case DISTRICT: return this.type.equals("district") && receiver.equals(chunk.getDistrict().getId() + "");
-			case MUNICIPALITY: return this.type.equals("municipality") && receiver.equals(chunk.getMunicipality().getId() + "");
-			case PLAYER: return this.type.equals("player") && receiver.equals(recipient.toString());
-			case STATE: return this.type.equals("state") && receiver.equals(chunk.getState().getId() + "");
 			default: return false;
 		}
 	}

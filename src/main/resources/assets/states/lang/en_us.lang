@@ -4,10 +4,7 @@ states.chat.text=%s %s
 # Creative Tab
 itemGroup.states=States Stuff
 
-# Blocks/Items
-tile.states:general_mailbox.name=General Mailbox
-tile.states:stacked_mailbox.name=Stacked Mailbox
-tile.states:private_mailbox.name=Private Mailbox
+# Items
 item.states:mail.name=Invalid Mail
 item.states:mail_empty.name=Empty Mail
 item.states:mail_expired.name=Expired Mail

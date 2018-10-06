@@ -122,7 +122,7 @@ public class SignMailbox implements SignCapability.Listener {
 						}
 					}
 					if(te instanceof TileEntityChest){
-						((TileEntityChest)te).setCustomName(Formatter.format("&9Mailbox&0: &5" + type + (type.equals("player") ? Static.getPlayerNameByUUID(recipient) : "")));
+						((TileEntityChest)te).setCustomName(Formatter.format("&9Mailbox&0: &5" + (type.equals("player") ? Static.getPlayerNameByUUID(recipient) : type)));
 					}
 					this.type = type; cap.setActive(); this.active = true;
 					this.sendUpdate(tileentity);

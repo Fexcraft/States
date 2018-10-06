@@ -61,6 +61,7 @@ public class MailCmd extends CommandBase {
 			case "inbox":{
 				if(cap.getMailbox() == null){
 					Print.chat(player, "&7You do not have a mailbox set!");
+					Print.chat(player, "&7Your mail will be redirected to State or Municipality Mailbox!");
 				}
 				else{
 					Print.chat(player, "&7Your mailbox is at: " + cap.getMailbox().toString());
@@ -99,8 +100,9 @@ public class MailCmd extends CommandBase {
 							msg += " " + args[i];
 						}
 					}
-					MailUtil.send(sender, RecipientType.PLAYER, receiver, player.getGameProfile().getId().toString(), msg, MailType.PRIVATE);
-					Print.chat(sender, "&6Mail queued!");
+					if(MailUtil.send(sender, RecipientType.PLAYER, receiver, player.getGameProfile().getId().toString(), msg, MailType.PRIVATE)){
+						Print.chat(sender, "&6Mail sent!");
+					}
 				}
 				catch(Exception e){
 					e.printStackTrace();

@@ -1,5 +1,7 @@
 package net.fexcraft.mod.states.util;
 
+import java.util.UUID;
+
 import net.fexcraft.mod.lib.capabilities.sign.SignCapabilityUtil;
 import net.fexcraft.mod.lib.util.common.Print;
 import net.fexcraft.mod.lib.util.common.Static;
@@ -13,6 +15,7 @@ import net.fexcraft.mod.states.api.State;
 import net.fexcraft.mod.states.api.capabilities.PlayerCapability;
 import net.fexcraft.mod.states.impl.SignMailbox;
 import net.minecraft.command.ICommandSender;
+import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.tileentity.TileEntitySign;
@@ -107,6 +110,10 @@ public class MailUtil {
 			}
 			if(ticket != null){
 				ForgeChunkManager.unforceChunk(ticket, pos);
+			}
+			if(rectype == RecipientType.PLAYER){
+				EntityPlayer player = Static.getServer().getPlayerList().getPlayerByUUID(UUID.fromString(receiver.toString()));
+				if(player != null) Print.chat(player, "&6&oYou have got new mail!");
 			}
 		}
 		catch(Exception e){

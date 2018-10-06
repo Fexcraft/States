@@ -60,6 +60,9 @@ public class MailItem extends Item {
         		tooltip.add(Formatter.format("&5InviteType: &7" + nbt.getString("type")));
         		tooltip.add(Formatter.format("&5At: &7" + Time.getAsString(compound.getLong("at"))));
         		tooltip.add(Formatter.format("&5Target ID: &7" + nbt.getInteger("id")));
+        		if(nbt.hasKey("status")){
+        			tooltip.add(Formatter.format("&aStatus: &7" + nbt.getString("status")));
+        		}
         	}
     	}
     }

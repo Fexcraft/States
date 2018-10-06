@@ -9,12 +9,17 @@ import net.fexcraft.mod.lib.util.common.Static;
 import net.fexcraft.mod.lib.util.math.Time;
 import net.fexcraft.mod.states.api.capabilities.PlayerCapability;
 import net.fexcraft.mod.states.api.capabilities.StatesCapabilities;
+import net.fexcraft.mod.states.api.root.AnnounceLevel;
 import net.fexcraft.mod.states.objects.MailItem;
 import net.fexcraft.mod.states.util.MailUtil;
+import net.fexcraft.mod.states.util.StateLogger;
+import net.fexcraft.mod.states.util.StateUtil;
 import net.fexcraft.mod.states.util.StatesPermissions;
 import net.fexcraft.mod.states.States;
 import net.fexcraft.mod.states.api.Mailbox.MailType;
 import net.fexcraft.mod.states.api.Mailbox.RecipientType;
+import net.fexcraft.mod.states.api.Municipality;
+import net.fexcraft.mod.states.api.State;
 import net.minecraft.command.CommandBase;
 import net.minecraft.command.CommandException;
 import net.minecraft.command.ICommandSender;
@@ -22,6 +27,7 @@ import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.server.MinecraftServer;
+import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.text.TextComponentString;
 import net.minecraft.util.text.event.ClickEvent;
 
@@ -87,8 +93,33 @@ public class MailCmd extends CommandBase {
 						}
 						Print.chat(player, "Item has no data to read."); return;
 					}
-					else if(!(stack.getTagCompound().getString("Receiver").equals(player.getGameProfile().getId().toString()) || StatesPermissions.hasPermission(player, "admin", null))){
-						Print.chat(player, "Receiver and your UUID do not match."); return;
+					if(!StatesPermissions.hasPermission(player, "admin", null) && !StatesPermissions.hasPermission(player, "mail.read.any", null)){
+						ResourceLocation loc = new ResourceLocation(stack.getTagCompound().getString("Receiver"));
+						switch(loc.getResourceDomain()){
+							case "player":{
+								if(!stack.getTagCompound().getString("Receiver").replace("player:", "").equals(player.getGameProfile().getId().toString())){
+									Print.chat(player, "Receiver and your UUID do not match."); return;
+								} break;
+							}
+							case "district":{
+								if(!cap.isDistrictManagerOf(StateUtil.getDistrict(Integer.parseInt(loc.getResourcePath())))
+									&& !cap.isMayorOf(StateUtil.getDistrict(Integer.parseInt(loc.getResourcePath())).getMunicipality())){
+									Print.chat(player, "Your are not District Manager or Mayor to read this."); return;
+								} break;
+							}
+							case "municipality":{
+								if(!cap.isMayorOf(StateUtil.getMunicipality(Integer.parseInt(loc.getResourcePath())))
+									&& !StateUtil.getMunicipality(Integer.parseInt(loc.getResourcePath())).getCouncil().contains(player.getGameProfile().getId())){
+									Print.chat(player, "Your are not Mayor or Council Member to read this."); return;
+								} break;
+							}
+							case "state":{
+								if(!cap.isStateLeaderOf(StateUtil.getState(Integer.parseInt(loc.getResourcePath())))
+									&& !StateUtil.getState(Integer.parseInt(loc.getResourcePath())).getCouncil().contains(player.getGameProfile().getId())){
+									Print.chat(player, "Your are not State Leader or Council Member to read this."); return;
+								} break;
+							}
+						}
 					}
 					Print.chat(player, "&e====-====-====-====-====-====" + States.PREFIX);
 					String str = stack.getTagCompound().getString("Type");
@@ -96,7 +127,7 @@ public class MailCmd extends CommandBase {
 					Print.chat(player, "&9Type: &7" + str);
 					Print.chat(player, stack.getTagCompound().getString("Content"));
 					Print.chat(player, "&cExpires: &7" + Time.getAsString(stack.getTagCompound().getLong("Expiry")));
-					if(str.equals("invite")){
+					if(str.toLowerCase().equals("invite") && stack.getTagCompound().hasKey("StatesData")){
 						TextComponentString text = new TextComponentString(Formatter.format("&a&l[ACCEPT] "));
 						text.getStyle().setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/mail accept"));
 						TextComponentString text2 = new TextComponentString(Formatter.format(" &c&l[DENY]"));
@@ -150,25 +181,47 @@ public class MailCmd extends CommandBase {
 			}
 			case "accept": case "deny": {
 				try{
-					/*PlayerCapability cap = player.getCapability(StatesCapabilities.PLAYER, null);
-					GenericMail mail = new GenericMail(args[1], args[2], args[3]);
-					if(mail.expired() || mail.getData().has("status")){
-						Print.chat(sender, "&8&lInvite Expired.");
+					if(player.getHeldItemMainhand().isEmpty()){
+						Print.chat(player, "No mail item in hand.");
+					}
+					ItemStack stack = player.getHeldItemMainhand();
+					if(stack.getItem() instanceof MailItem == false){
+						Print.chat(player, "Not a valid Mail Item in hand."); return;
+					}
+					else if(stack.getTagCompound() == null || stack.getMetadata() != 3){
+						Print.chat(player, "Item in hand is not an Invite Mail."); return;
+					}
+					else if(!stack.getTagCompound().getString("Receiver").replace("player:", "").equals(player.getGameProfile().getId().toString())){
+						Print.chat(player, "Receiver and your UUID do not match.");
+						if(Static.dev()){
+							Print.chat(player, stack.getTagCompound().getString("Receiver"));
+							Print.chat(player, player.getGameProfile().getId().toString());
+						}
 						return;
 					}
-					else if(args[0].equals("deny")){
-						mail.getData().addProperty("status", "denied");
-						mail.archive();
+					if(Time.getDate() >= stack.getTagCompound().getLong("Expiry")){
+						Print.chat(player, "&cInvite Expired."); return;
+					}
+					NBTTagCompound invdata = stack.getTagCompound().getCompoundTag("StatesData");
+					if(invdata == null){
+						Print.chat(player, "&cNo invite data in Item stored."); return;
+					}
+					if(invdata.hasKey("status")){
+						Print.chat(player, "&aYou replied to this mail already."); return;
+					}
+					//
+					if(args[0].equals("deny")){
+						invdata.setString("status", "denied");
 						Print.chat(sender, "&e&lInvite denied.");
 					}
 					else{
-						switch(mail.getData().get("type").getAsString()){
+						switch(invdata.getString("type")){
 							case "municipality":{
 								if(cap.getMunicipality().getId() >= 0){
 									Print.chat(sender, "&9You must leave your current Municipality first.");
 									return;
 								}
-								Municipality mun = StateUtil.getMunicipality(mail.getData().get("id").getAsInt(), false);
+								Municipality mun = StateUtil.getMunicipality(invdata.getInteger("id"), false);
 								if(mun == null || mun.getId() < 0){
 									Print.chat(sender, "&9Municipality not found.");
 									return;
@@ -186,7 +239,7 @@ public class MailCmd extends CommandBase {
 								break;
 							}
 							case "municipality_council":{
-								Municipality mun = StateUtil.getMunicipality(mail.getData().get("id").getAsInt(), false);
+								Municipality mun = StateUtil.getMunicipality(invdata.getInteger("id"), false);
 								if(mun == null || mun.getId() < 0){
 									Print.chat(sender, "&9Municipality not found.");
 									return;
@@ -202,7 +255,7 @@ public class MailCmd extends CommandBase {
 								break;
 							}
 							case "state_council":{
-								State state = StateUtil.getState(mail.getData().get("id").getAsInt(), false);
+								State state = StateUtil.getState(invdata.getInteger("id"), false);
 								if(state == null || state.getId() < 0){
 									Print.chat(sender, "&6State not found.");
 									return;
@@ -218,7 +271,7 @@ public class MailCmd extends CommandBase {
 								break;
 							}
 							case "state_municipality":{
-								State state = StateUtil.getState(mail.getData().get("id").getAsInt(), false);
+								State state = StateUtil.getState(invdata.getInteger("id"), false);
 								if(state == null || state.getId() < 0){
 									Print.chat(sender, "&6State not found.");
 									return;
@@ -237,10 +290,9 @@ public class MailCmd extends CommandBase {
 								break;
 							}
 						}
-						mail.getData().addProperty("status", "accepted");
-						mail.archive();
+						invdata.setString("status", "accepted");
 						Print.chat(sender, "&a&lInvite accepted.");
-					}*/
+					}
 				}
 				catch(Exception e){
 					e.printStackTrace();

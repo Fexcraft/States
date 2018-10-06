@@ -106,6 +106,7 @@ public class StateCmd extends CommandBase {
 					Print.chat(sender, "&c-> &9" + st.getName() + " &7(" + st.getId() + ");");
 				});
 				Print.chat(sender, "&2Created by &7" + Static.getPlayerNameByUUID(state.getCreator()) + "&2 at &8" + Time.getAsString(state.getCreated()));
+				Print.chat(sender, "&6Mailbox: &7" + (state.getMailbox() == null ? "No mailbox set." : state.getMailbox().toString()));
 				return;
 			}
 			case "set":{

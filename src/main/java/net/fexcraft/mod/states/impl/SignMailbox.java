@@ -6,26 +6,34 @@ import net.fexcraft.mod.lib.capabilities.sign.SignCapability;
 import net.fexcraft.mod.lib.util.common.Formatter;
 import net.fexcraft.mod.lib.util.common.Print;
 import net.fexcraft.mod.lib.util.common.Static;
+import net.fexcraft.mod.lib.util.math.Time;
 import net.fexcraft.mod.states.api.Chunk;
+import net.fexcraft.mod.states.api.Mailbox.MailType;
+import net.fexcraft.mod.states.api.Mailbox.RecipientType;
 import net.fexcraft.mod.states.api.capabilities.StatesCapabilities;
 import net.fexcraft.mod.states.events.PlayerEvents;
+import net.fexcraft.mod.states.objects.MailItem;
 import net.fexcraft.mod.states.util.StateUtil;
 import net.fexcraft.mod.states.util.StatesPermissions;
 import net.minecraft.block.BlockWallSign;
 import net.minecraft.block.state.IBlockState;
+import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTBase;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.tileentity.TileEntity;
+import net.minecraft.tileentity.TileEntityChest;
 import net.minecraft.tileentity.TileEntitySign;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.ResourceLocation;
+import net.minecraft.util.math.BlockPos;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.event.entity.player.PlayerInteractEvent;
 import net.minecraftforge.items.CapabilityItemHandler;
+import net.minecraftforge.items.IItemHandler;
 
 public class SignMailbox implements SignCapability.Listener {
 	
-	private static final ResourceLocation RESLOC = new ResourceLocation("states:mailbox");
+	public static final ResourceLocation RESLOC = new ResourceLocation("states:mailbox");
 	private boolean active;
 	private UUID recipient;
 	private String type;
@@ -112,6 +120,9 @@ public class SignMailbox implements SignCapability.Listener {
 							break;
 						}
 					}
+					if(te instanceof TileEntityChest){
+						((TileEntityChest)te).setCustomName(Formatter.format("&9Mailbox&0: &5" + type + (type.equals("player") ? Static.getPlayerNameByUUID(recipient) : "")));
+					}
 					this.type = type; cap.setActive(); this.active = true;
 					this.sendUpdate(tileentity);
 				}
@@ -152,6 +163,45 @@ public class SignMailbox implements SignCapability.Listener {
 			e.printStackTrace();
 			active = false;
 		}
+	}
+
+	public boolean accepts(BlockPos pos, RecipientType type, String receiver){
+		Chunk chunk = StateUtil.getChunk(pos);
+		switch(type){
+			case COMPANY: return false;//TODO
+			case DISTRICT: return this.type.equals("district") && receiver.equals(chunk.getDistrict().getId() + "");
+			case MUNICIPALITY: return this.type.equals("municipality") && receiver.equals(chunk.getMunicipality().getId() + "");
+			case PLAYER: return this.type.equals("player") && receiver.equals(recipient.toString());
+			case STATE: return this.type.equals("state") && receiver.equals(chunk.getState().getId() + "");
+			default: return false;
+		}
+	}
+
+	public final boolean insert(TileEntitySign tile, RecipientType rectype, String receiver, String sender, String message, MailType type, long expiry, NBTTagCompound compound){
+		ItemStack stack = new ItemStack(MailItem.INSTANCE, 1, type.toMetadata());
+		NBTTagCompound nbt = new NBTTagCompound();
+		nbt.setString("Receiver", rectype.name().toLowerCase() + ":" + receiver);
+		nbt.setString("Sender", sender);
+		nbt.setString("Message", message);
+		nbt.setString("Type", type.name());
+		if(compound != null) nbt.setTag("StatesData", compound);
+		if(expiry > 0) nbt.setLong("Expiry", Time.getDate() + expiry);
+		stack.setTagCompound(nbt);
+		EnumFacing facing = tile.getWorld().getBlockState(tile.getPos()).getBlock() instanceof BlockWallSign ? EnumFacing.getFront(tile.getBlockMetadata()) : null;
+		TileEntity te = tile.getWorld().getTileEntity(getPosAtBack(tile.getWorld().getBlockState(tile.getPos()), tile));
+		IItemHandler handler = te.getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, facing);
+		for(int i = 0; i < handler.getSlots(); i++){
+			if(handler.insertItem(i, stack, true).isEmpty()){
+				stack = handler.insertItem(i, stack, false);
+				if(stack == null || stack.isEmpty()) break;
+			}
+		}
+		if(stack == null || !stack.isEmpty()){
+			Print.log("Failed to insert mail! Probably no space in target mailbox!");
+			Print.log(tile + " || " + rectype + " || " + receiver + " || " + sender + " || " + message + " || " + type + " || " + expiry + " || " + compound);
+			return false;
+		}
+		return true;
 	}
 	
 }

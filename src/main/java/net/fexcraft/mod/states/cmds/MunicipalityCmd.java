@@ -116,6 +116,7 @@ public class MunicipalityCmd extends CommandBase {
 				if(coll != null && coll.size() > 0){
 					Print.chat(sender, "&4Force-Loaded Chunks: " + coll.size());
 				}
+				Print.chat(sender, "&6Mailbox: &7" + (mun.getMailbox() == null ? "No mailbox set." : mun.getMailbox().toString()));
 				return;
 			}
 			case "types":{

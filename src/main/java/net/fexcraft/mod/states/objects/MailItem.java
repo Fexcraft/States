@@ -4,15 +4,24 @@ import java.util.List;
 
 import javax.annotation.Nullable;
 
+import org.apache.commons.lang3.math.NumberUtils;
+
 import net.fexcraft.mod.lib.api.item.fItem;
 import net.fexcraft.mod.lib.util.common.Formatter;
+import net.fexcraft.mod.lib.util.common.Static;
+import net.fexcraft.mod.lib.util.math.Time;
 import net.fexcraft.mod.states.States;
 import net.minecraft.client.util.ITooltipFlag;
 import net.minecraft.creativetab.CreativeTabs;
+import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.util.EnumActionResult;
+import net.minecraft.util.EnumFacing;
+import net.minecraft.util.EnumHand;
 import net.minecraft.util.NonNullList;
+import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
@@ -20,9 +29,12 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 @fItem(modid = States.MODID, name = "mail", variants = 5, custom_variants = { "empty", "expired", "private", "invite", "system" })
 public class MailItem extends Item {
 	
+	public static MailItem INSTANCE;
+	
 	public MailItem(){
 		this.setCreativeTab(CreativeTab.INSTANCE);
-		this.setMaxStackSize(1);
+		this.setMaxStackSize(1); INSTANCE = this;
+		//this.setContainerItem(this);
 	}
 	
     @SideOnly(Side.CLIENT)
@@ -38,8 +50,23 @@ public class MailItem extends Item {
     		if(stack.getTagCompound() == null) return;
         	NBTTagCompound compound = stack.getTagCompound();
         	tooltip.add(Formatter.format("&9Type: &7" + compound.getString("Type")));
-        	tooltip.add(Formatter.format("&9Sender: &7" + compound.getString("Sender")));
+        	tooltip.add(Formatter.format("&9Sender: &7" + Static.getPlayerNameByUUID(compound.getString("Sender"))));
+        	tooltip.add(Formatter.format("&9Receiver: &7" + (NumberUtils.isCreatable(compound.getString("Receiver")) ? compound.getString("Receiver") : Static.getPlayerNameByUUID(compound.getString("Receiver").replace("player:", "")))));
+        	if(compound.hasKey("Expiry")){
+            	tooltip.add(Formatter.format("&9Expires: &7" + Time.getAsString(compound.getLong("Expiry"))));
+        	}
+        	if(compound.hasKey("StatesData")){
+        		NBTTagCompound nbt = compound.getCompoundTag("StatesData");
+        		tooltip.add(Formatter.format("&5InviteType: &7" + nbt.getString("type")));
+        		tooltip.add(Formatter.format("&5At: &7" + Time.getAsString(compound.getLong("at"))));
+        		tooltip.add(Formatter.format("&5Target ID: &7" + nbt.getString("id")));
+        	}
     	}
+    }
+    
+    @Override
+    public EnumActionResult onItemUse(EntityPlayer player, World world, BlockPos pos, EnumHand hand, EnumFacing facing, float hitX, float hitY, float hitZ){
+        return EnumActionResult.PASS;
     }
     
     @Override

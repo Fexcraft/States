@@ -81,6 +81,10 @@ public class MailCmd extends CommandBase {
 				return;
 			}
 			case "send":{
+				if(args.length < 3){
+					Print.chat(sender, "&7/mail send <receiver> <msg...>");
+					return;
+				}
 				try{
 					String receiver = args[1]; try{
 						UUID uuid = UUID.fromString(receiver);

@@ -92,6 +92,7 @@ public class DistrictCmd extends CommandBase {
 				Print.chat(sender, "&7Can Foreigners Settle: " + dis.canForeignersSettle());
 				Print.chat(sender, "&8Unclaim if Bankrupt: " + dis.unclaimIfBankrupt());
 				Print.chat(sender, "&2Created by &7" + Static.getPlayerNameByUUID(dis.getCreator()) + "&2 at &8" + Time.getAsString(dis.getCreated()));
+				Print.chat(sender, "&6Mailbox: &7" + (dis.getMailbox() == null ? "No mailbox set." : dis.getMailbox().toString()));
 				return;
 			}
 			case "types":{

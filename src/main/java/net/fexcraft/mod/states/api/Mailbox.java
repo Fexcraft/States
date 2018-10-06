@@ -12,7 +12,13 @@ public interface Mailbox {
 	
 	public static enum MailType {
 		
-		PRIVATE, INVITE, SYSTEM;
+		PRIVATE(2), INVITE(3), SYSTEM(4);
+		
+		MailType(int id){ this.id = id; }
+		
+		private int id;
+
+		public int toMetadata(){ return id; }
 		
 	}
 

@@ -59,13 +59,16 @@ public class MailItem extends Item {
         		NBTTagCompound nbt = compound.getCompoundTag("StatesData");
         		tooltip.add(Formatter.format("&5InviteType: &7" + nbt.getString("type")));
         		tooltip.add(Formatter.format("&5At: &7" + Time.getAsString(compound.getLong("at"))));
-        		tooltip.add(Formatter.format("&5Target ID: &7" + nbt.getString("id")));
+        		tooltip.add(Formatter.format("&5Target ID: &7" + nbt.getInteger("id")));
         	}
     	}
     }
     
     @Override
     public EnumActionResult onItemUse(EntityPlayer player, World world, BlockPos pos, EnumHand hand, EnumFacing facing, float hitX, float hitY, float hitZ){
+    	if(world.isRemote) return EnumActionResult.PASS;
+    	ItemStack stack = player.getHeldItem(hand);
+    	if(stack.getMetadata() > 1){ Static.getServer().commandManager.executeCommand(player, "/mail read"); }
         return EnumActionResult.PASS;
     }
     

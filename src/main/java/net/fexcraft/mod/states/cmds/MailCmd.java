@@ -3,20 +3,27 @@ package net.fexcraft.mod.states.cmds;
 import java.util.UUID;
 
 import net.fexcraft.mod.lib.api.common.fCommand;
+import net.fexcraft.mod.lib.util.common.Formatter;
 import net.fexcraft.mod.lib.util.common.Print;
 import net.fexcraft.mod.lib.util.common.Static;
 import net.fexcraft.mod.lib.util.math.Time;
 import net.fexcraft.mod.states.api.capabilities.PlayerCapability;
 import net.fexcraft.mod.states.api.capabilities.StatesCapabilities;
+import net.fexcraft.mod.states.objects.MailItem;
 import net.fexcraft.mod.states.util.MailUtil;
+import net.fexcraft.mod.states.util.StatesPermissions;
+import net.fexcraft.mod.states.States;
 import net.fexcraft.mod.states.api.Mailbox.MailType;
 import net.fexcraft.mod.states.api.Mailbox.RecipientType;
 import net.minecraft.command.CommandBase;
 import net.minecraft.command.CommandException;
 import net.minecraft.command.ICommandSender;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.server.MinecraftServer;
+import net.minecraft.util.text.TextComponentString;
+import net.minecraft.util.text.event.ClickEvent;
 
 @fCommand
 public class MailCmd extends CommandBase {
@@ -69,7 +76,38 @@ public class MailCmd extends CommandBase {
 				return;
 			}
 			case "read":{
-				//TODO check mail item in hand
+				if(!player.getHeldItemMainhand().isEmpty()){
+					ItemStack stack = player.getHeldItemMainhand();
+					if(stack.getItem() instanceof MailItem == false){
+						Print.chat(player, "Not a valid Mail Item in hand."); return;
+					}
+					else if(stack.getTagCompound() == null || stack.getMetadata() < 2){
+						if(stack.getMetadata() == 1){
+							Print.chat(player, "Mail expired, it cannot be read anymore."); return;
+						}
+						Print.chat(player, "Item has no data to read."); return;
+					}
+					else if(!(stack.getTagCompound().getString("Receiver").equals(player.getGameProfile().getId().toString()) || StatesPermissions.hasPermission(player, "admin", null))){
+						Print.chat(player, "Receiver and your UUID do not match."); return;
+					}
+					Print.chat(player, "&e====-====-====-====-====-====" + States.PREFIX);
+					String str = stack.getTagCompound().getString("Type");
+					Print.chat(player, "&9From: &7" + Static.getPlayerNameByUUID(stack.getTagCompound().getString("Sender")));
+					Print.chat(player, "&9Type: &7" + str);
+					Print.chat(player, stack.getTagCompound().getString("Content"));
+					Print.chat(player, "&cExpires: &7" + Time.getAsString(stack.getTagCompound().getLong("Expiry")));
+					if(str.equals("invite")){
+						TextComponentString text = new TextComponentString(Formatter.format("&a&l[ACCEPT] "));
+						text.getStyle().setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/mail accept"));
+						TextComponentString text2 = new TextComponentString(Formatter.format(" &c&l[DENY]"));
+						text2.getStyle().setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/mail deny"));
+						sender.sendMessage(text.appendSibling(text2));
+					}
+					Print.chat(player, "&e====-====-====-====-====-====" + States.PREFIX);
+				}
+				else{
+					Print.chat(player, "No mail item in hand.");
+				}
 				return;
 			}
 			case "temp":{
@@ -78,6 +116,7 @@ public class MailCmd extends CommandBase {
 				compound.setString("type", "municipality");
 				compound.setString("from", player.getGameProfile().getId().toString());
 				compound.setLong("at", Time.getDate());
+				compound.setInteger("id", 0);
 				MailUtil.send(sender, RecipientType.PLAYER, player.getGameProfile().getId().toString(), player.getGameProfile().getId().toString(), invmsg, MailType.INVITE, Time.DAY_MS * 2, compound);
 				return;
 			}
@@ -109,11 +148,7 @@ public class MailCmd extends CommandBase {
 				}
 				return;
 			}
-			/*case "accept": case "deny": {
-				if(args.length < 4){
-					Print.chat(sender, "Missing arguments.");
-					return;
-				}
+			case "accept": case "deny": {
 				try{
 					/*PlayerCapability cap = player.getCapability(StatesCapabilities.PLAYER, null);
 					GenericMail mail = new GenericMail(args[1], args[2], args[3]);
@@ -205,13 +240,13 @@ public class MailCmd extends CommandBase {
 						mail.getData().addProperty("status", "accepted");
 						mail.archive();
 						Print.chat(sender, "&a&lInvite accepted.");
-					}
+					}*/
 				}
 				catch(Exception e){
 					e.printStackTrace();
 				}
 				return;
-			}*/
+			}
 		}
 	}
 	

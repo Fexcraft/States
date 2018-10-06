@@ -180,6 +180,13 @@ public class SignMailbox implements SignCapability.Listener {
 		Chunk chunk = StateUtil.getChunk(pos);
 		switch(rtype){
 			case COMPANY: return false;//TODO
+			case DISTRICT: return type.equals("district") && receiver.equals(chunk.getDistrict().getId() + "");
+			case MUNICIPALITY: return type.equals("municipality") && receiver.equals(chunk.getMunicipality().getId() + "");
+			case PLAYER: return type.equals("player") && receiver.equals(recipient.toString());
+			case STATE:{
+				if(type.equals("central") || type.equals("fallback")) return true;
+				return type.equals("state") && receiver.equals(chunk.getState().getId() + "");
+			}
 			default: return false;
 		}
 	}
@@ -191,6 +198,7 @@ public class SignMailbox implements SignCapability.Listener {
 		nbt.setString("Sender", sender);
 		nbt.setString("Message", message);
 		nbt.setString("Type", type.name());
+		nbt.setString("Content", message);
 		if(compound != null) nbt.setTag("StatesData", compound);
 		if(expiry > 0) nbt.setLong("Expiry", Time.getDate() + expiry);
 		stack.setTagCompound(nbt);

@@ -88,8 +88,12 @@ public class ChunkCmd extends CommandBase {
 		Chunk chunk = StateUtil.getChunk(player);
 		switch(args[0]){
 			case "claim": case "reclaim":{
-				if(args.length == 1){
+				if(args.length == 1 ){
 					Print.chat(sender, "&7/ck claim <district>");
+					return;
+				}
+				if(!NumberUtils.isCreatable(args[1])){
+					Print.chat(sender, "&7Please enter the numerical district ID as second argument!");
 					return;
 				}
 				player.openGui(States.INSTANCE, 10, player.world, Integer.parseInt(args[1]), args[0].equals("claim") ? 0 : 1, 0);
@@ -661,7 +665,7 @@ public class ChunkCmd extends CommandBase {
 				return;
 			}
 			default:{
-				Print.chat(sender, "//TODO");
+				Print.chat(sender, "Unknown Argument.");
 				return;
 			}
 		}

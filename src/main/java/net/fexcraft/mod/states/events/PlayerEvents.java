@@ -147,40 +147,40 @@ public class PlayerEvents {
 	}
 	
 	public static boolean checkAccess(World world, BlockPos pos, IBlockState state, EntityPlayer player){
-			if(StateUtil.isAdmin(player)){ return true; }
-			Chunk chunk = StateUtil.getChunk(pos);
-			if(chunk.getDistrict().getId() < 0){
-				if(chunk.getDistrict().getId() == -1){
-					if(Config.ALLOW_WILDERNESS_ACCESS){
-						chunk.setEdited(Time.getDate());
-						return true;
-					}
-					return false;
+		if(StateUtil.isAdmin(player)){ return true; }
+		Chunk chunk = StateUtil.getChunk(pos);
+		if(chunk.getDistrict().getId() < 0){
+			if(chunk.getDistrict().getId() == -1){
+				if(Config.ALLOW_WILDERNESS_ACCESS){
+					chunk.setEdited(Time.getDate());
+					return true;
 				}
-				else if(chunk.getDistrict().getId() == -2){
-					if(chunk.getChanged() + Time.DAY_MS < Time.getDate()){
-						chunk.setDistrict(StateUtil.getDistrict(-1));
-						//TODO log
-						chunk.save();
-						Print.chat(player, "Updating chunk...");
-							return false;
-					}
-					if(pos.getY() > Config.TRANSIT_ZONE_BOTTOM_LIMIT && pos.getY() < Config.TRANSIT_ZONE_TOP_LIMIT){
-						chunk.setEdited(Time.getDate());
-						return true;
-					}
-					return false;
-				}
-				else{
-					Print.chat(player, "Unknown district type.");
-					return false;
-				}
+				return false;
 			}
-			if(hp(chunk, player)){
-				chunk.setEdited(Time.getDate());
-				return true;
+			else if(chunk.getDistrict().getId() == -2){
+				if(chunk.getChanged() + Time.DAY_MS < Time.getDate()){
+					chunk.setDistrict(StateUtil.getDistrict(-1));
+					//TODO log
+					chunk.save();
+					Print.chat(player, "Updating chunk...");
+						return false;
+				}
+				if(pos.getY() > Config.TRANSIT_ZONE_BOTTOM_LIMIT && pos.getY() < Config.TRANSIT_ZONE_TOP_LIMIT){
+					chunk.setEdited(Time.getDate());
+					return true;
+				}
+				return false;
 			}
-			return false;
+			else{
+				Print.chat(player, "Unknown district type.");
+				return false;
+			}
+		}
+		if(hp(chunk, player)){
+			chunk.setEdited(Time.getDate());
+			return true;
+		}
+		return false;
 	}
 	
 	private static boolean hp(Chunk chunk, EntityPlayer player){

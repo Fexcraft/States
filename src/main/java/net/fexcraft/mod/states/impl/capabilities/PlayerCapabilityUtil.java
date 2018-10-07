@@ -20,7 +20,8 @@ public class PlayerCapabilityUtil implements ICapabilitySerializable<NBTBase>{
 	
 	public PlayerCapabilityUtil(EntityPlayer player){
 		instance = StatesCapabilities.PLAYER.getDefaultInstance();
-		instance.setEntityPlayer(player);
+		instance.setEntityPlayer(player); instance.load();
+		//States.PLAYERS.put(player.getGameProfile().getId(), instance);
 	}
 
 	@Override

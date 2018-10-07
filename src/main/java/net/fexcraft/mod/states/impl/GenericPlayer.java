@@ -40,8 +40,7 @@ public class GenericPlayer implements PlayerCapability {
 	public GenericPlayer(){}
 
 	public GenericPlayer(UUID uuid){
-		this.uuid = uuid;
-		this.load();
+		this.uuid = uuid; this.load();
 	}
 
 	@Override
@@ -66,14 +65,14 @@ public class GenericPlayer implements PlayerCapability {
 
 	@Override
 	public void load(){
-		if(this.isOnlinePlayer()){
-			uuid = entity.getGameProfile().getId();
+		if(isOnlinePlayer()){
+			uuid = EntityPlayer.getUUID(entity.getGameProfile());
 		}
 		JsonObject obj = JsonUtil.get(this.getPlayerFile());
 		this.nick = obj.has("nickname") ? obj.get("nickname").getAsString() : null;
 		this.color = JsonUtil.getIfExists(obj, "color", 2).intValue();
 		Municipality mun = StateUtil.getMunicipality(JsonUtil.getIfExists(obj, "municipality", -1).intValue());
-		if(mun.getId() >= 0 && mun.getCitizen().contains(uuid)){
+		if(mun != null && mun.getId() >= 0 && mun.getCitizen().contains(uuid)){
 			this.setMunicipality(mun);
 		}
 		else{

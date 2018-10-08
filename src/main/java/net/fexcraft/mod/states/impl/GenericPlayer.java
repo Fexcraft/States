@@ -10,7 +10,6 @@ import net.fexcraft.mod.fsmm.api.FSMMCapabilities;
 import net.fexcraft.mod.fsmm.util.DataManager;
 import net.fexcraft.mod.lib.util.common.Formatter;
 import net.fexcraft.mod.lib.util.common.Print;
-import net.fexcraft.mod.lib.util.common.Static;
 import net.fexcraft.mod.lib.util.json.JsonUtil;
 import net.fexcraft.mod.lib.util.math.Time;
 import net.fexcraft.mod.states.api.Chunk;
@@ -28,7 +27,7 @@ public class GenericPlayer implements PlayerCapability {
 	
 	private EntityPlayer entity;
 	private String nick;
-	private UUID uuid;
+	private UUID offuuid;
 	private int color = 2;
 	private long lastsave, lastpos, lasttaxcoll, customtax;
 	private Account account;
@@ -41,7 +40,7 @@ public class GenericPlayer implements PlayerCapability {
 	public GenericPlayer(){}
 
 	public GenericPlayer(UUID uuid){
-		this.uuid = uuid; this.load();
+		this.offuuid = uuid; this.load();
 	}
 
 	@Override
@@ -66,24 +65,21 @@ public class GenericPlayer implements PlayerCapability {
 
 	@Override
 	public void load(){
-		if(isOnlinePlayer()){
-			uuid = entity.getGameProfile().getId() == null ?
-				Static.getServer().getPlayerProfileCache().getGameProfileForUsername(entity.getGameProfile().getName()).getId() : entity.getGameProfile().getId();
-		}
+		offuuid = this.getUUID();
 		JsonObject obj = JsonUtil.get(this.getPlayerFile());
 		this.nick = obj.has("nickname") ? obj.get("nickname").getAsString() : null;
 		this.color = JsonUtil.getIfExists(obj, "color", 2).intValue();
 		Municipality mun = StateUtil.getMunicipality(JsonUtil.getIfExists(obj, "municipality", -1).intValue());
-		if(mun != null && mun.getId() >= 0 && mun.getCitizen().contains(uuid)){
+		if(mun != null && mun.getId() >= 0 && mun.getCitizen().contains(getUUID())){
 			this.setMunicipality(mun);
 		}
 		else{
 			this.setMunicipality(mun == null ? StateUtil.getMunicipality(-1) : mun);
-			if(!this.municipality.getCitizen().contains(uuid)){
-				this.municipality.getCitizen().add(uuid);
+			if(!this.municipality.getCitizen().contains(getUUID())){
+				this.municipality.getCitizen().add(getUUID());
 			}
 		}
-		this.account = this.isOnlinePlayer() ? entity.getCapability(FSMMCapabilities.PLAYER, null).getAccount() : DataManager.getAccount("player:" + uuid.toString(), true, true);
+		this.account = this.isOnlinePlayer() ? entity.getCapability(FSMMCapabilities.PLAYER, null).getAccount() : DataManager.getAccount("player:" + getUUID().toString(), true, true);
 		this.lasttaxcoll = JsonUtil.getIfExists(obj, "last_tax_collection", 0).longValue();
 		this.customtax = JsonUtil.getIfExists(obj, "custom_tax", 0).longValue();
 		this.mailbox = obj.has("mailbox") ? BlockPos.fromLong(obj.get("mailbox").getAsLong()) : null;
@@ -147,7 +143,7 @@ public class GenericPlayer implements PlayerCapability {
 
 	@Override
 	public UUID getUUID(){
-		return uuid;
+		return entity == null ? offuuid : entity.getUniqueID();
 	}
 
 	@Override
@@ -157,28 +153,28 @@ public class GenericPlayer implements PlayerCapability {
 
 	@Override
 	public String getUUIDAsString(){
-		return uuid == null ? "null-uuid" : uuid.toString();
+		return getUUID() == null ? "null-uuid" : getUUID().toString();
 	}
 
 	@Override
 	public boolean isDistrictManagerOf(District district){
-		return district.getManager() != null && district.getManager().equals(uuid);
+		return district.getManager() != null && district.getManager().equals(getUUID());
 	}
 
 	@Override
 	public boolean isMayorOf(Municipality municipality){
-		return municipality.getMayor() != null && municipality.getMayor().equals(uuid);
+		return municipality.getMayor() != null && municipality.getMayor().equals(getUUID());
 	}
 
 	@Override
 	public boolean isStateLeaderOf(State state){
-		return state.getLeader() != null && state.getLeader().equals(uuid);
+		return state.getLeader() != null && state.getLeader().equals(getUUID());
 	}
 
 	@Override
 	public boolean canLeave(ICommandSender sender){
 		if(this.municipality == null){ return true; }
-		if(this.municipality.getMayor().equals(uuid)){
+		if(this.municipality.getMayor().equals(getUUID())){
 			Print.chat(sender, "&eYou must assign a new Mayor first, or remove youself as one, before you can leave the Municipality.");
 			return false;
 		}

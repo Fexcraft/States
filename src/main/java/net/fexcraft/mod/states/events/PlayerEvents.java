@@ -187,8 +187,10 @@ public class PlayerEvents {
 		PlayerCapability cap = player.getCapability(StatesCapabilities.PLAYER, null);
 		if(cap == null || cap.getUUID() == null || cap.getMunicipality() == null){
 			if(player instanceof FakePlayer){
-				cap = StateUtil.getPlayer(player.getGameProfile().getId(), true);
-				if(cap == null || cap.getUUID() == null || cap.getMunicipality() == null) return false;
+				cap = StateUtil.getPlayer(player.getUniqueID(), true);
+				if(cap == null || cap.getUUID() == null || cap.getMunicipality() == null){
+					return false;
+				}
 			}
 			else return false;
 		}

@@ -185,10 +185,10 @@ public class PlayerEvents {
 	
 	private static boolean hp(Chunk chunk, EntityPlayer player){
 		PlayerCapability cap = player.getCapability(StatesCapabilities.PLAYER, null);
-		if(cap == null || cap.getUUID() == null){
+		if(cap == null || cap.getUUID() == null || cap.getMunicipality() == null){
 			if(player instanceof FakePlayer){
 				cap = StateUtil.getPlayer(player.getGameProfile().getId(), true);
-				if(cap == null) return false;
+				if(cap == null || cap.getUUID() == null || cap.getMunicipality() == null) return false;
 			}
 			else return false;
 		}

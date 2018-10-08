@@ -10,6 +10,7 @@ import net.fexcraft.mod.fsmm.api.FSMMCapabilities;
 import net.fexcraft.mod.fsmm.util.DataManager;
 import net.fexcraft.mod.lib.util.common.Formatter;
 import net.fexcraft.mod.lib.util.common.Print;
+import net.fexcraft.mod.lib.util.common.Static;
 import net.fexcraft.mod.lib.util.json.JsonUtil;
 import net.fexcraft.mod.lib.util.math.Time;
 import net.fexcraft.mod.states.api.Chunk;
@@ -66,7 +67,8 @@ public class GenericPlayer implements PlayerCapability {
 	@Override
 	public void load(){
 		if(isOnlinePlayer()){
-			uuid = EntityPlayer.getUUID(entity.getGameProfile());
+			uuid = entity.getGameProfile().getId() == null ?
+				Static.getServer().getPlayerProfileCache().getGameProfileForUsername(entity.getGameProfile().getName()).getId() : entity.getGameProfile().getId();
 		}
 		JsonObject obj = JsonUtil.get(this.getPlayerFile());
 		this.nick = obj.has("nickname") ? obj.get("nickname").getAsString() : null;

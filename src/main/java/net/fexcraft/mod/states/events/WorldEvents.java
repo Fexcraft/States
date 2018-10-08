@@ -91,7 +91,7 @@ public class WorldEvents {
 	
 	@SubscribeEvent
 	public static void onAttachEventEntityPlayer(AttachCapabilitiesEvent<net.minecraft.entity.Entity> event){
-		if(event.getObject() instanceof EntityPlayer && !event.getObject().world.isRemote && ((EntityPlayer)event.getObject()).getGameProfile() != null){
+		if(event.getObject() instanceof EntityPlayer && !event.getObject().world.isRemote){
 			event.addCapability(PlayerCapabilityUtil.REGISTRY_NAME, new PlayerCapabilityUtil((EntityPlayer)event.getObject()));
 		}
 	}

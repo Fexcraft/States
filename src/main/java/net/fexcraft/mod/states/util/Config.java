@@ -112,7 +112,7 @@ public class Config {
 		public static String allToString(){
 			String str = new String();
 			for(ProtectionLevel level : values()){
-				str += level.name().toLowerCase() + "  ";
+				str += level.name().toLowerCase() + ", ";
 			} return str;
 		}
 		

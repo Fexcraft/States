@@ -62,7 +62,7 @@ public class StatesPermissions {
 		}
 		Print.debug(entity.getName() + " | " + permission + " | PS: " + group);
 		Print.debug("Perm Check End;");
-		if(admin){ Print.chat(player, "&7&oAdmin mode."); }
+		if(admin){ Print.chat(entity, "&7&oAdmin mode."); }
 		return group;
 	}
 	

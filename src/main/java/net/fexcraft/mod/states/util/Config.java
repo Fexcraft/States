@@ -26,6 +26,7 @@ public class Config {
 	public static final String DEFAULT_CAT = "Default Settings";
 	public static final String CLIENT_CAT = "Client Settings";
 	//
+	public static ProtectionLevel PROTLVL = ProtectionLevel.BASIC;
 	private static Configuration config;
 	
 	public static void initialize(FMLPreInitializationEvent event){
@@ -80,6 +81,7 @@ public class Config {
 		TAX_OFFLINE_PLAYERS = config.getBoolean("tax_offline_players", DEFAULT_CAT, false, "If offline (inactive since more than one interval) players should be taxed as well.");
 		SHOW_MINIMAP = config.getBoolean("show_minimap", CLIENT_CAT, true, "If the States Minimap should be shown.");
 		STATES_CHAT = config.getBoolean("states_chat", DEFAULT_CAT, true, "States chat override.");
+		PROTLVL = ProtectionLevel.fromString(config.getString("protection_level", DEFAULT_CAT, "basic", "Available: " + ProtectionLevel.allToString()));
 		updateWebHook();
 	}
 
@@ -94,6 +96,26 @@ public class Config {
 			MessageSender.RECEIVER = new MessageSender.Receiver();
 			MessageSender.RECEIVER.start();
 		}
+	}
+	
+	public static enum ProtectionLevel {
+		
+		BASIC, ADVANCED, ABSOLUTE;
+		
+		public static ProtectionLevel fromString(String string){
+			if(string.equals(ABSOLUTE.name().toLowerCase())) return ABSOLUTE;
+			else if(string.equals(ADVANCED.name().toLowerCase())) return ADVANCED;
+			else if(string.equals(BASIC.name().toLowerCase())) return BASIC;
+			else return ProtectionLevel.BASIC;
+		}
+
+		public static String allToString(){
+			String str = new String();
+			for(ProtectionLevel level : values()){
+				str += level.name().toLowerCase() + "  ";
+			} return str;
+		}
+		
 	}
 	
 }

@@ -100,7 +100,7 @@ public class SignMailbox implements SignCapability.Listener {
 						break;
 					}
 					case "center": case "central": case "fallback":{
-						if(!StatesPermissions.hasPermission(event.getEntityPlayer(), "admin", chunk.getDistrict())){
+						if(!StatesPermissions.hasPermission(event.getEntityPlayer(), "admin", chunk)){
 							Print.chat(event.getEntityPlayer(), "No permission to set the Central/Fallback Mailbox."); return false;
 						}
 						break;

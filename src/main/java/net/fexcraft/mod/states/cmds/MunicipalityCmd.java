@@ -442,7 +442,7 @@ public class MunicipalityCmd extends CommandBase {
 								}
 							}
 						}
-						String invmsg = "You have been invited become a Municipality Countil Member " + mun.getName() + " (" + mun.getId() + ")!" + (msg == null ? "" : " MSG: " + msg);
+						String invmsg = "You have been invited become a Municipality Council Member " + mun.getName() + " (" + mun.getId() + ")!" + (msg == null ? "" : " MSG: " + msg);
 						NBTTagCompound compound = new NBTTagCompound();
 						compound.setString("type", "municipality_council");
 						compound.setInteger("id", mun.getId());

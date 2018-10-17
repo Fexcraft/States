@@ -8,6 +8,9 @@ import net.fexcraft.mod.states.States;
 import net.fexcraft.mod.states.api.Chunk;
 import net.fexcraft.mod.states.api.ChunkPos;
 import net.fexcraft.mod.states.impl.GenericChunk;
+import net.fexcraft.mod.states.impl.GenericDistrict;
+import net.fexcraft.mod.states.impl.GenericMunicipality;
+import net.fexcraft.mod.states.impl.GenericState;
 import net.fexcraft.mod.states.impl.capabilities.SignTileEntityCapabilityUtil;
 import net.fexcraft.mod.states.util.ImageCache;
 import net.fexcraft.mod.states.util.StateLogger;
@@ -18,9 +21,36 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 
 @Mod.EventBusSubscriber
 public class ChunkEvents {
+	
+	private static int[] def_st = new int[]{ -1, 0 };
+	private static int[] def_mun = new int[]{ -1, 0 };
+	private static int[] def_dis = new int[]{ -2, -1, 0 };
+	public static boolean LOADED = false;
     
     @SubscribeEvent
     public static void onLoad(ChunkEvent.Load event){
+		if(!LOADED){
+			States.updateSaveDirectory(event.getWorld());
+			StateLogger.log("all", "Loading World...");
+			for(int i : def_st){
+				if(!States.STATES.containsKey(i)){
+					States.STATES.put(i, new GenericState(i));
+					States.STATES.get(i).save();
+				}
+			}
+			for(int i : def_mun){
+				if(!States.MUNICIPALITIES.containsKey(i)){
+					States.MUNICIPALITIES.put(i, new GenericMunicipality(i));
+					States.MUNICIPALITIES.get(i).save();
+				}
+			}
+			for(int i : def_dis){
+				if(!States.DISTRICTS.containsKey(i)){
+					States.DISTRICTS.put(i, new GenericDistrict(i));
+					States.DISTRICTS.get(i).save();
+				}
+			} LOADED = true;
+		}
         if(event.getWorld().provider.getDimension() != 0) return;
         if(event.getWorld().isRemote){
     		//net.fexcraft.mod.states.guis.Minimap.loadChunk(event.getChunk());

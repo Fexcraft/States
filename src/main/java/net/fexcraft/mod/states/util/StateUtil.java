@@ -93,7 +93,7 @@ public class StateUtil extends TimerTask {
 		if(States.DISTRICTS.containsKey(value)){
 			return States.DISTRICTS.get(value);
 		}
-		if(District.getDistrictFile(value).exists() || isDefaultAvailable("districts", value)){
+		else if(District.getDistrictFile(value).exists() || isDefaultAvailable("districts", value)){
 			District district = new GenericDistrict(value);
 			States.DISTRICTS.put(value, district);
 			return district;
@@ -109,7 +109,7 @@ public class StateUtil extends TimerTask {
 		if(States.MUNICIPALITIES.containsKey(value)){
 			return States.MUNICIPALITIES.get(value);
 		}
-		if(Municipality.getMunicipalityFile(value).exists() || isDefaultAvailable("municipalities", value)){
+		else if(Municipality.getMunicipalityFile(value).exists() || isDefaultAvailable("municipalities", value)){
 			Municipality municipality = new GenericMunicipality(value);
 			States.MUNICIPALITIES.put(value, municipality);
 			return municipality;
@@ -125,7 +125,7 @@ public class StateUtil extends TimerTask {
 		if(States.STATES.containsKey(value)){
 			return States.STATES.get(value);
 		}
-		if(State.getStateFile(value).exists() || isDefaultAvailable("states", value)){
+		else if(State.getStateFile(value).exists() || isDefaultAvailable("states", value)){
 			State state = new GenericState(value);
 			States.STATES.put(value, state);
 			return state;
@@ -355,6 +355,10 @@ public class StateUtil extends TimerTask {
 		for(District dis : States.DISTRICTS.values()){ dis.save(); }
 		for(Municipality mun : States.MUNICIPALITIES.values()){ mun.save(); mun.unload(); }
 		for(State state : States.STATES.values()){ state.save(); state.unload(); }
+	}
+
+	public static void clearAll(){
+		States.DISTRICTS.clear(); States.MUNICIPALITIES.clear(); States.STATES.clear();
 	}
 
 }

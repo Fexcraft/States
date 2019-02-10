@@ -3,7 +3,7 @@ package net.fexcraft.mod.states.api;
 import java.util.TreeSet;
 import com.google.gson.JsonObject;
 
-import net.fexcraft.mod.lib.util.json.JsonUtil;
+import net.fexcraft.lib.common.json.JsonUtil;
 import net.fexcraft.mod.states.util.Config;
 
 public class MunicipalityType implements Comparable<MunicipalityType>{

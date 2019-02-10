@@ -2,11 +2,12 @@ package net.fexcraft.mod.states.events;
 
 import java.util.Arrays;
 import java.util.List;
-import net.fexcraft.mod.lib.network.PacketHandler;
-import net.fexcraft.mod.lib.network.packet.PacketNBTTagCompound;
-import net.fexcraft.mod.lib.util.common.Formatter;
-import net.fexcraft.mod.lib.util.common.Print;
-import net.fexcraft.mod.lib.util.math.Time;
+
+import net.fexcraft.lib.common.math.Time;
+import net.fexcraft.lib.mc.network.PacketHandler;
+import net.fexcraft.lib.mc.network.packet.PacketNBTTagCompound;
+import net.fexcraft.lib.mc.utils.Formatter;
+import net.fexcraft.lib.mc.utils.Print;
 import net.fexcraft.mod.states.States;
 import net.fexcraft.mod.states.api.Chunk;
 import net.fexcraft.mod.states.api.capabilities.PlayerCapability;
@@ -218,12 +219,16 @@ public class PlayerEvents {
 
 	@SubscribeEvent(priority = EventPriority.LOWEST)
 	public static void onMessage(ServerChatEvent event){
-		if(!Config.STATES_CHAT) return;
+		if(!Config.STATES_CHAT){
+			MessageSender.toWebhook(event.getPlayer().getCapability(StatesCapabilities.PLAYER, null), event.getMessage());
+			return;
+		}
 		//event.setCanceled(true); Static.getServer().addScheduledTask(() -> { Sender.sendAs(event.getPlayer(), event.getMessage()); });
 		PlayerCapability cap = event.getPlayer().getCapability(StatesCapabilities.PLAYER, null); TextComponentTranslation com = (TextComponentTranslation)event.getComponent();
 		com.getFormatArgs()[0] = new TextComponentString(Formatter.format("&" + (StateUtil.isAdmin(event.getPlayer()) ? "4" : "6") + "#&8] " + cap.getFormattedNickname() + "&0:"));
 		com.getFormatArgs()[1] = new TextComponentString(Formatter.format("&7" + ((ITextComponent)com.getFormatArgs()[1]).getUnformattedText()));
 		event.setComponent(new TextComponentTranslation("states.chat.text", com.getFormatArgs()));
+		MessageSender.toWebhook(cap, event.getMessage());
 	}
 	
 	@SubscribeEvent

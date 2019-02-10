@@ -1,12 +1,12 @@
 package net.fexcraft.mod.states.impl;
 
+import net.fexcraft.lib.mc.capabilities.sign.SignCapability;
+import net.fexcraft.lib.mc.utils.Formatter;
+import net.fexcraft.lib.mc.utils.Print;
 import net.fexcraft.mod.fsmm.api.Account;
 import net.fexcraft.mod.fsmm.api.Bank;
 import net.fexcraft.mod.fsmm.util.Config;
 import net.fexcraft.mod.fsmm.util.DataManager;
-import net.fexcraft.mod.lib.capabilities.sign.SignCapability;
-import net.fexcraft.mod.lib.util.common.Formatter;
-import net.fexcraft.mod.lib.util.common.Print;
 import net.fexcraft.mod.states.States;
 import net.fexcraft.mod.states.api.Chunk;
 import net.fexcraft.mod.states.api.capabilities.StatesCapabilities;

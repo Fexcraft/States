@@ -3,12 +3,12 @@ package net.fexcraft.mod.states.guis;
 import java.awt.Color;
 import java.util.ArrayList;
 
+import net.fexcraft.lib.common.math.RGB;
+import net.fexcraft.lib.mc.network.PacketHandler;
+import net.fexcraft.lib.mc.network.packet.PacketNBTTagCompound;
+import net.fexcraft.lib.mc.utils.Formatter;
+import net.fexcraft.lib.mc.utils.Print;
 import net.fexcraft.mod.fsmm.util.Config;
-import net.fexcraft.mod.lib.network.PacketHandler;
-import net.fexcraft.mod.lib.network.packet.PacketNBTTagCompound;
-import net.fexcraft.mod.lib.util.common.Formatter;
-import net.fexcraft.mod.lib.util.common.Print;
-import net.fexcraft.mod.lib.util.render.RGB;
 import net.fexcraft.mod.states.util.ImageCache;
 import net.minecraft.block.material.MapColor;
 import net.minecraft.client.Minecraft;

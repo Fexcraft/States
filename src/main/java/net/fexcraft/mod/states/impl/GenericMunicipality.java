@@ -8,13 +8,13 @@ import java.util.UUID;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 
+import net.fexcraft.lib.common.json.JsonUtil;
+import net.fexcraft.lib.common.lang.ArrayList;
+import net.fexcraft.lib.common.math.Time;
+import net.fexcraft.lib.mc.utils.Print;
 import net.fexcraft.mod.fsmm.api.Account;
 import net.fexcraft.mod.fsmm.api.Bank;
 import net.fexcraft.mod.fsmm.util.DataManager;
-import net.fexcraft.mod.lib.util.common.Print;
-import net.fexcraft.mod.lib.util.json.JsonUtil;
-import net.fexcraft.mod.lib.util.lang.ArrayList;
-import net.fexcraft.mod.lib.util.math.Time;
 import net.fexcraft.mod.states.States;
 import net.fexcraft.mod.states.api.ChunkPos;
 import net.fexcraft.mod.states.api.District;
@@ -83,7 +83,7 @@ public class GenericMunicipality implements Municipality/*, Taxable*/ {
 		obj.addProperty("state", state.getId());
 		obj.addProperty("balance", account.getBalance());
 		obj.addProperty("color", color);
-		obj.addProperty("open", false);
+		obj.addProperty("open", open);
 		obj.addProperty("price", price);
 		if(icon != null){ obj.addProperty("icon", icon); }
 		obj.addProperty("kick_if_bankrupt", kib);

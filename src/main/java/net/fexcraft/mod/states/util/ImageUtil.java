@@ -8,7 +8,7 @@ import java.util.TreeMap;
 
 import javax.annotation.Nullable;
 
-import net.fexcraft.mod.lib.util.math.Time;
+import net.fexcraft.lib.common.math.Time;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.texture.SimpleTexture;

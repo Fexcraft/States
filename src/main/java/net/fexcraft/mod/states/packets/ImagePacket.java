@@ -4,11 +4,11 @@ import java.awt.image.BufferedImage;
 import java.nio.charset.StandardCharsets;
 
 import io.netty.buffer.ByteBuf;
-import net.fexcraft.mod.lib.api.network.IPacket;
+import net.fexcraft.lib.mc.api.packet.IPacket;
 import net.fexcraft.mod.states.util.ImageCache;
 import net.minecraftforge.fml.common.network.simpleimpl.IMessage;
 
-public class ImagePacket implements IPacket, IMessage{
+public class ImagePacket implements IPacket, IMessage {
 	
 	public BufferedImage image;
 	public String target;

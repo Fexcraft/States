@@ -2,8 +2,8 @@ package net.fexcraft.mod.states.cmds;
 
 import org.apache.commons.lang3.StringUtils;
 
-import net.fexcraft.mod.lib.api.common.fCommand;
-import net.fexcraft.mod.lib.util.common.Print;
+import net.fexcraft.lib.mc.api.registry.fCommand;
+import net.fexcraft.lib.mc.utils.Print;
 import net.fexcraft.mod.states.api.capabilities.PlayerCapability;
 import net.fexcraft.mod.states.api.capabilities.StatesCapabilities;
 import net.fexcraft.mod.states.util.Config;

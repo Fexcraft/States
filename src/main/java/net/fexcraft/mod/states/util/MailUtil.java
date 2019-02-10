@@ -2,10 +2,10 @@ package net.fexcraft.mod.states.util;
 
 import java.util.UUID;
 
-import net.fexcraft.mod.lib.capabilities.sign.SignCapabilityUtil;
-import net.fexcraft.mod.lib.util.common.Print;
-import net.fexcraft.mod.lib.util.common.Static;
-import net.fexcraft.mod.lib.util.math.Time;
+import net.fexcraft.lib.common.math.Time;
+import net.fexcraft.lib.mc.capabilities.FCLCapabilities;
+import net.fexcraft.lib.mc.utils.Print;
+import net.fexcraft.lib.mc.utils.Static;
 import net.fexcraft.mod.states.api.ChunkPos;
 import net.fexcraft.mod.states.api.District;
 import net.fexcraft.mod.states.api.Mailbox.MailType;
@@ -102,7 +102,7 @@ public class MailUtil {
 				printFailure(ics, 3, rectype, receiver, sender, message, type, expiry, compound, null, null); return false;
 			}
 			try{
-				SignMailbox sign = tile.getCapability(SignCapabilityUtil.SIGN_CAPABILITY, null).getListener(SignMailbox.class, SignMailbox.RESLOC);
+				SignMailbox sign = tile.getCapability(FCLCapabilities.SIGN_CAPABILITY, null).getListener(SignMailbox.class, SignMailbox.RESLOC);
 				return sign.insert(ics, (TileEntitySign)tile, rectype, receiver.toString(), sender, message, type, expiry, compound);
 			}
 			catch(Exception e){
@@ -129,10 +129,10 @@ public class MailUtil {
 			ForgeChunkManager.forceChunk(ticket, pos);
 		}
 		TileEntity entity = world.getTileEntity(mailbox);
-		if(entity == null || !entity.hasCapability(SignCapabilityUtil.SIGN_CAPABILITY, null)){
+		if(entity == null || !entity.hasCapability(FCLCapabilities.SIGN_CAPABILITY, null)){
 			ForgeChunkManager.unforceChunk(ticket, pos);return null;
 		}
-		if(entity.getCapability(SignCapabilityUtil.SIGN_CAPABILITY, null).getListener(SignMailbox.class, SignMailbox.RESLOC).accepts(mailbox, type, receiver)){
+		if(entity.getCapability(FCLCapabilities.SIGN_CAPABILITY, null).getListener(SignMailbox.class, SignMailbox.RESLOC).accepts(mailbox, type, receiver)){
 			ForgeChunkManager.unforceChunk(ticket, pos); return mailbox;
 		}
 		else{ ForgeChunkManager.unforceChunk(ticket, pos); return null; }

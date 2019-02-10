@@ -1,10 +1,10 @@
 package net.fexcraft.mod.states.guis;
 
-import net.fexcraft.mod.lib.api.network.IPacketListener;
-import net.fexcraft.mod.lib.network.packet.PacketNBTTagCompound;
-import net.fexcraft.mod.lib.util.common.Print;
-import net.fexcraft.mod.lib.util.math.Time;
-import net.fexcraft.mod.lib.util.render.ExternalTextureHelper;
+import net.fexcraft.lib.common.math.Time;
+import net.fexcraft.lib.mc.api.packet.IPacketListener;
+import net.fexcraft.lib.mc.network.packet.PacketNBTTagCompound;
+import net.fexcraft.lib.mc.render.ExternalTextureHelper;
+import net.fexcraft.lib.mc.utils.Print;
 
 public class Receiver implements IPacketListener<PacketNBTTagCompound> {
 

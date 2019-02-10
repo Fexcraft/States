@@ -2,8 +2,8 @@ package net.fexcraft.mod.states.util;
 
 import java.util.TreeMap;
 
-import net.fexcraft.mod.lib.util.common.Print;
-import net.fexcraft.mod.lib.util.common.Static;
+import net.fexcraft.lib.mc.utils.Print;
+import net.fexcraft.lib.mc.utils.Static;
 import net.fexcraft.mod.states.api.Chunk;
 import net.fexcraft.mod.states.api.District;
 import net.fexcraft.mod.states.api.Municipality;
@@ -127,7 +127,7 @@ public class StatesPermissions {
 		PERMISSIONS.put("municipality.set.name", new Permission(PermissionGroup.SKIP, PermissionLevel.MUNICIPALITY_MAYOR, PermissionLevel.ADMIN));
 		PERMISSIONS.put("municipality.set.price", new Permission(PermissionGroup.SKIP, PermissionLevel.MUNICIPALITY_MAYOR, PermissionLevel.STATE_COUNCIL, PermissionLevel.STATE_LEADER, PermissionLevel.ADMIN));
 		PERMISSIONS.put("municipality.set.color", new Permission(PermissionGroup.SKIP, PermissionLevel.MUNICIPALITY_MAYOR, PermissionLevel.MUNICIPALITY_COUNCIL, PermissionLevel.ADMIN));
-		PERMISSIONS.put("municipality.set.color", new Permission(PermissionGroup.SKIP, PermissionLevel.MUNICIPALITY_MAYOR, PermissionLevel.ADMIN));
+		PERMISSIONS.put("municipality.set.open", new Permission(PermissionGroup.SKIP, PermissionLevel.MUNICIPALITY_MAYOR, PermissionLevel.ADMIN));
 		PERMISSIONS.put("municipality.blacklist.edit", new Permission(PermissionGroup.SKIP, PermissionLevel.MUNICIPALITY_COUNCIL));
 		PERMISSIONS.put("municipality.kick", new Permission(PermissionGroup.SKIP, PermissionLevel.MUNICIPALITY_COUNCIL));
 		PERMISSIONS.put("municipality.invite", new Permission(PermissionGroup.SKIP, PermissionLevel.MUNICIPALITY_COUNCIL));

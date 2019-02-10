@@ -15,10 +15,10 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.mojang.authlib.GameProfile;
 
-import net.fexcraft.mod.lib.util.common.Formatter;
-import net.fexcraft.mod.lib.util.common.Print;
-import net.fexcraft.mod.lib.util.common.Static;
-import net.fexcraft.mod.lib.util.json.JsonUtil;
+import net.fexcraft.lib.common.json.JsonUtil;
+import net.fexcraft.lib.mc.utils.Formatter;
+import net.fexcraft.lib.mc.utils.Print;
+import net.fexcraft.lib.mc.utils.Static;
 import net.fexcraft.mod.states.States;
 import net.fexcraft.mod.states.api.Chunk;
 import net.fexcraft.mod.states.api.ChunkPos;
@@ -71,12 +71,12 @@ public class StateUtil extends TimerTask {
     
     public static Chunk getTempChunk(int x, int z){
         Chunk chunk = getChunk(x, z);
-        return chunk == null ? new GenericChunk(new ChunkPos(x, z), false) : chunk;
+        return chunk == null ? new GenericChunk(null, new ChunkPos(x, z), false) : chunk;
     }
     
     public static Chunk getTempChunk(ChunkPos pos){
         Chunk chunk = getChunk(pos);
-        return chunk == null ? new GenericChunk(pos, false) : chunk;
+        return chunk == null ? new GenericChunk(null, pos, false) : chunk;
     }
     
     public static Chunk getTempChunk(ResourceLocation ckpos){

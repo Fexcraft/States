@@ -2,8 +2,8 @@ package net.fexcraft.mod.states.events;
 
 import java.io.File;
 
-import net.fexcraft.mod.lib.util.common.Print;
-import net.fexcraft.mod.lib.util.json.JsonUtil;
+import net.fexcraft.lib.common.json.JsonUtil;
+import net.fexcraft.lib.mc.utils.Print;
 import net.fexcraft.mod.states.States;
 import net.fexcraft.mod.states.api.Chunk;
 import net.fexcraft.mod.states.api.ChunkPos;
@@ -58,7 +58,7 @@ public class ChunkEvents {
         } /*if(!WorldEvents.LOADED){ WorldEvents.onWorldLoad(null); WorldEvents.LOADED = true; }*/
         ChunkPos pos = new ChunkPos(event.getChunk().x, event.getChunk().z);
         if(!States.CHUNKS.containsKey(pos)){
-            States.CHUNKS.put(pos, new GenericChunk(pos));
+            States.CHUNKS.put(pos, new GenericChunk(event.getWorld(), pos));
         }
     }
     

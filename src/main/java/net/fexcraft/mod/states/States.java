@@ -11,14 +11,14 @@ import java.util.Timer;
 import java.util.TreeMap;
 import java.util.UUID;
 
+import net.fexcraft.lib.common.math.Time;
+import net.fexcraft.lib.mc.capabilities.sign.SignCapabilitySerializer;
+import net.fexcraft.lib.mc.network.PacketHandler;
+import net.fexcraft.lib.mc.network.handlers.NBTTagCompoundPacketHandler;
+import net.fexcraft.lib.mc.registry.FCLRegistry;
+import net.fexcraft.lib.mc.utils.Static;
 import net.fexcraft.mod.fsmm.api.Account;
 import net.fexcraft.mod.fsmm.util.DataManager;
-import net.fexcraft.mod.lib.capabilities.sign.SignCapabilityUtil;
-import net.fexcraft.mod.lib.network.PacketHandler;
-import net.fexcraft.mod.lib.network.handlers.NBTTagCompoundPacketHandler;
-import net.fexcraft.mod.lib.util.common.Static;
-import net.fexcraft.mod.lib.util.math.Time;
-import net.fexcraft.mod.lib.util.registry.RegistryUtil;
 import net.fexcraft.mod.states.api.Chunk;
 import net.fexcraft.mod.states.api.ChunkPos;
 import net.fexcraft.mod.states.api.District;
@@ -67,7 +67,7 @@ import net.minecraftforge.server.permission.PermissionAPI;
 @Mod(modid = States.MODID, name = "States", version = States.VERSION, dependencies = "required-after:fcl", /*serverSideOnly = true,*/ guiFactory = "net.fexcraft.mod.states.util.GuiFactory", acceptedMinecraftVersions = "*", acceptableRemoteVersions = "*")
 public class States {
 	
-	public static final String VERSION = "1.3.1";
+	public static final String VERSION = "1.3.3";
 	public static final String MODID = "states";
 	public static final String ADMIN_PERM = "states.external.admin";
 	public static final String PREFIX = "&0[&2States&0]";
@@ -92,14 +92,14 @@ public class States {
 	public void preInit(FMLPreInitializationEvent event){
 		Config.initialize(event);
 		StatesPermissions.init();
-		SignCapabilityUtil.addListener(SignShop.class);
-		SignCapabilityUtil.addListener(SignMailbox.class);
+		SignCapabilitySerializer.addListener(SignShop.class);
+		SignCapabilitySerializer.addListener(SignMailbox.class);
 		CapabilityManager.INSTANCE.register(SignTileEntityCapability.class, new SignTileEntityCapabilityUtil.Storage(), new SignTileEntityCapabilityUtil.Callable());
 		CapabilityManager.INSTANCE.register(ChunkCapability.class, new ChunkCapabilityUtil.Storage(), new ChunkCapabilityUtil.Callable());
 		CapabilityManager.INSTANCE.register(WorldCapability.class, new WorldCapabilityUtil.Storage(), new WorldCapabilityUtil.Callable());
 		CapabilityManager.INSTANCE.register(PlayerCapability.class, new PlayerCapabilityUtil.Storage(), new PlayerCapabilityUtil.Callable());
 		ForgeChunkManager.setForcedChunkLoadingCallback(this, new ForcedChunksManager());
-		RegistryUtil.newAutoRegistry(MODID);
+		FCLRegistry.newAutoRegistry(MODID);
 	}
 	
 	@Mod.EventHandler

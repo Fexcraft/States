@@ -2,7 +2,7 @@ package net.fexcraft.mod.states.api.root;
 
 import java.awt.Color;
 
-import net.fexcraft.mod.lib.util.common.Print;
+import net.fexcraft.lib.mc.utils.Print;
 import net.minecraft.command.ICommandSender;
 
 public interface ColorHolder {

@@ -5,7 +5,7 @@ import org.apache.logging.log4j.Logger;
 
 import com.mojang.authlib.GameProfile;
 
-import net.fexcraft.mod.lib.util.common.Print;
+import net.fexcraft.lib.mc.utils.Print;
 import net.fexcraft.mod.states.api.Chunk;
 import net.fexcraft.mod.states.api.ChunkPos;
 import net.fexcraft.mod.states.api.District;

@@ -9,10 +9,9 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 
-import net.fexcraft.mod.lib.util.common.Static;
-import net.fexcraft.mod.lib.util.json.JsonUtil;
-import net.fexcraft.mod.lib.util.lang.ArrayList;
-import net.fexcraft.mod.lib.util.math.Time;
+import net.fexcraft.lib.common.json.JsonUtil;
+import net.fexcraft.lib.common.lang.ArrayList;
+import net.fexcraft.lib.common.math.Time;
 import net.fexcraft.mod.states.States;
 import net.fexcraft.mod.states.api.Chunk;
 import net.fexcraft.mod.states.api.ChunkPos;
@@ -43,7 +42,7 @@ public class GenericChunk implements Chunk {
 	private ChunkPos pos;
 	private long lasttaxcheck, ctax;
 	
-	public GenericChunk(ChunkPos pos, boolean create){
+	public GenericChunk(World world, ChunkPos pos, boolean create){
 		this.x = pos.x; this.z = pos.z; this.pos = pos;
 		JsonElement jsn = StateUtil.read(getChunkFile());
 		JsonObject obj = jsn == null ? new JsonObject() : jsn.getAsJsonObject();
@@ -52,12 +51,12 @@ public class GenericChunk implements Chunk {
 		if(!getChunkFile().exists() && create){
 			save();
 			//ImageCache.update(world, world.getChunkFromChunkCoords(x, z));
-			World world = Static.getServer().getWorld(0);
+			//World world = Static.getServer().getWorld(0);
 			ImageCache.update(world, world.getChunkProvider().getLoadedChunk(x, z));
 		}
 		if(Time.getDate() - JsonUtil.getIfExists(obj, "last_save", 0).longValue() > Time.DAY_MS){
 			//ImageCache.update(world, world.getChunkFromChunkCoords(x, z));
-			World world = Static.getServer().getWorld(0);
+			//World world = Static.getServer().getWorld(0);
 			ImageCache.update(world, world.getChunkProvider().getLoadedChunk(x, z));
 		}
 		if(district != null && this.district.getId() == -2 && this.getChanged() + Time.DAY_MS < Time.getDate()){
@@ -68,8 +67,8 @@ public class GenericChunk implements Chunk {
 		TaxSystem.processChunkTax(TaxSystem.getProbableSchedule(), this);
 	}
 
-	public GenericChunk(ChunkPos pos){
-		this(pos, true);
+	public GenericChunk(World world, ChunkPos pos){
+		this(world, pos, true);
 	}
 	
 	protected void parseJson(JsonObject obj){

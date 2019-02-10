@@ -1,8 +1,8 @@
 package net.fexcraft.mod.states.guis;
 
-import net.fexcraft.mod.lib.tmt.ModelBase;
-import net.fexcraft.mod.lib.util.common.Formatter;
-import net.fexcraft.mod.lib.util.math.Time;
+import net.fexcraft.lib.common.math.Time;
+import net.fexcraft.lib.mc.utils.Formatter;
+import net.fexcraft.lib.tmt.ModelBase;
 import net.minecraft.block.material.MapColor;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiScreen;

@@ -88,7 +88,7 @@ public class ChunkCmd extends CommandBase {
 		Chunk chunk = StateUtil.getChunk(player);
 		switch(args[0]){
 			case "claim": case "reclaim":{
-				if(args.length == 1 ){
+				if(args.length == 1){
 					Print.chat(sender, "&7/ck claim <district>");
 					return;
 				}
@@ -104,7 +104,7 @@ public class ChunkCmd extends CommandBase {
 				return;
 			}
 			case "map":{
-				/*int r = 9, rh = 4;
+				int r = 9, rh = 4;
 				for(int i = 0; i < r; i++){
 					String str = "&0[";
 					for(int j = 0; j < r; j++){
@@ -126,8 +126,8 @@ public class ChunkCmd extends CommandBase {
 					}
 					Print.chat(sender, str + "&0]");
 				}
-				Print.chat(sender, "&4#&7 - null &8| &9#&7 - claimed &8| &2#&7 - not claimed &8| &7+ your position.");*/
-				player.openGui(States.INSTANCE, 1, player.world, 0, 0, 0);
+				Print.chat(sender, "&4#&7 - null &8| &9#&7 - claimed &8| &2#&7 - not claimed &8| &7+ your position.");
+				//player.openGui(States.INSTANCE, 1, player.world, 0, 0, 0);
 				return;
 			}
 			case "info":{

@@ -334,7 +334,7 @@ public class Listener implements IPacketListener<PacketNBTTagCompound> {
 		coords[3] = new int[]{  0, -1 };
 	}
 
-	private void updateNeighbors(Chunk ck){
+	public static void updateNeighbors(Chunk ck){
 		Chunk chunk = null;
 		for(int[] cor : coords){
 			chunk = StateUtil.getChunk(ck.xCoord() + cor[0], ck.zCoord() + cor[1]);

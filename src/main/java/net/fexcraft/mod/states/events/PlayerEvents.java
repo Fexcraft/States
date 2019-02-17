@@ -41,6 +41,7 @@ import net.minecraft.util.text.TextComponentString;
 import net.minecraft.util.text.TextComponentTranslation;
 import net.minecraft.world.World;
 import net.minecraftforge.event.ServerChatEvent;
+import net.minecraftforge.event.entity.player.PlayerEvent;
 import net.minecraftforge.event.entity.player.PlayerInteractEvent;
 import net.minecraftforge.event.world.BlockEvent;
 import net.minecraftforge.fml.common.Mod;
@@ -88,6 +89,15 @@ public class PlayerEvents {
 	public static void onLogout(PlayerLoggedOutEvent event){
 		States.PLAYERS.remove(event.player.getGameProfile().getId());
 		MessageSender.toWebhook(null, event.player.getGameProfile().getName() + " left.");
+	}
+	
+	@SubscribeEvent
+	public static void onRespawn(PlayerEvent.Clone event){
+		event.getEntityPlayer().getCapability(StatesCapabilities.PLAYER, null)
+			.copyFromOld(event.getOriginal().getCapability(StatesCapabilities.PLAYER, null));
+		States.PLAYERS.put(event.getEntityPlayer().getGameProfile().getId(),
+			event.getEntityPlayer().getCapability(StatesCapabilities.PLAYER, null));
+		MessageSender.toWebhook(null, event.getEntityPlayer().getGameProfile().getName() + " respawned.");
 	}
 	
 	@SubscribeEvent

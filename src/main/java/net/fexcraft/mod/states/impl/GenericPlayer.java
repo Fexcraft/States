@@ -294,4 +294,21 @@ public class GenericPlayer implements PlayerCapability {
 		this.mailbox = pos;
 	}
 
+	@Override
+	public void copyFromOld(PlayerCapability capability){
+		GenericPlayer player = (GenericPlayer)capability;
+		this.nick = player.nick;
+		this.offuuid = player.offuuid;
+		this.color = player.color;
+		this.lastsave = player.lastsave;
+		this.lastpos = player.lastpos;
+		this.lasttaxcoll = player.lasttaxcoll;
+		this.customtax = player.customtax;
+		this.account = player.account;
+		this.last_chunk = player.last_chunk;
+		this.current_chunk = player.current_chunk;
+		this.mailbox = player.mailbox;
+		this.municipality = player.municipality;
+	}
+
 }

@@ -109,4 +109,6 @@ public interface PlayerCapability extends ICommandSender, Taxable, AccountHolder
 
 	public boolean isLoaded();
 
+	public void copyFromOld(PlayerCapability capability);
+
 }

@@ -1,5 +1,5 @@
 # States
-_A Successor to the FSU "Nations" series.    
+_A Successor to the FSU "Nations" series._    
 (Wiki: https://github.com/Fexcraft/States/wiki)
 
 ### What is "States"?

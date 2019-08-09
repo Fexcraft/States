@@ -82,12 +82,13 @@ and seriously, we're here to enjoy our free time, not recreate world problems in
 "States" is a more neutral name, a state is an organizational unit, you can assign towns/villages to it    
 and the state's job is to keep all running smoothly, and eventually protect from current/future issues.
 
-**Does that mean I cannot do something against that annoying neighbor?**
+**Does that mean I cannot do something against that annoying neighbor?**    
 Economy, eventually _economy_. "Comapnies" are a planned future feature.    
 You'll be able to setup tolls or even banish companies from another State.    
-Additionally if you would add some nice survival mods into a Server/Modpack with a large Map and keep wilderness-access    
-off (like for example I (plan to) do), it can become a nice challenging gameplay, as people will need to trade some    
-resources to get further, or play along nicely. _Well, at least in theory._
+Additionally if you would add some nice survival mods into a Server/Modpack with a large Map and keep    
+wilderness-access off (like for example I (plan to) do), it can become a nice challenging gameplay,    
+as people will need to trade some resources to get further, or play along nicely.    
+_Well, at least in theory._
 
 
 ### Anything else I need to know?

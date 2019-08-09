@@ -92,7 +92,8 @@ _Well, at least in theory._
 
 
 ### Anything else I need to know?
-_**Ask**, as I have partial memory loss, and already did forgot some of things I wanted to write. At least I think._
+- _**Ask**, as I have partial memory loss, and already did forget some of things I wanted to write. At least I think._
+- Eventually check the Wiki, although it might not be complete yet.
 
 ### Depencencies
 - [FCL](https://github.com/Fexcraft/FCL) - Fexcraft Common Library

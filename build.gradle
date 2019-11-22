@@ -1,3 +1,9 @@
+allprojects {
+    repositories {
+        jcenter()
+        maven { url = 'https://jitpack.io' }
+    }
+}
 buildscript {
     repositories {
         jcenter()
@@ -38,10 +44,16 @@ repositories {
 }
 
 dependencies {
-	compile project(':FCL')
-	compile project(':FSMM')
-	//compile 'com.github.Fexcraft:FCL:1.12.2-SNAPSHOT'
-	//compile 'com.github.Fexcraft:FSMM:1.12.2-SNAPSHOT'
+	def localrepos = new File(project.projectDir, '/localrepos');
+	if(localrepos.exists()){
+		print "LocalRepos marker exists, using local copies.\n"
+		compile project(':FCL')
+		compile project(':FSMM')
+	}
+	else{
+		compile 'com.github.Fexcraft:FCL:1.12.2-SNAPSHOT'
+		compile 'com.github.Fexcraft:FSMM:1.12.2-SNAPSHOT'
+	}
 }
 
 processResources {

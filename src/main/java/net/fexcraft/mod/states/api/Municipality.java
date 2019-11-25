@@ -10,12 +10,13 @@ import javax.annotation.Nullable;
 import com.google.gson.JsonObject;
 
 import net.fexcraft.mod.states.States;
-import net.fexcraft.mod.states.api.root.AccountHolder;
-import net.fexcraft.mod.states.api.root.BuyableType;
-import net.fexcraft.mod.states.api.root.ColorHolder;
-import net.fexcraft.mod.states.api.root.IconHolder;
-import net.fexcraft.mod.states.api.root.MailReceiver;
+import net.fexcraft.mod.states.data.ChunkPos;
 import net.fexcraft.mod.states.data.RuleSet.RuleHolder;
+import net.fexcraft.mod.states.data.root.AccountHolder;
+import net.fexcraft.mod.states.data.root.BuyableType;
+import net.fexcraft.mod.states.data.root.ColorHolder;
+import net.fexcraft.mod.states.data.root.IconHolder;
+import net.fexcraft.mod.states.data.root.MailReceiver;
 import net.minecraft.command.ICommandSender;
 
 public interface Municipality extends ColorHolder, BuyableType, IconHolder, AccountHolder, MailReceiver, RuleHolder {

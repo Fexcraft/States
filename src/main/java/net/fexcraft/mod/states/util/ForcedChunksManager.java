@@ -17,7 +17,7 @@ import com.google.gson.JsonObject;
 import net.fexcraft.lib.common.json.JsonUtil;
 import net.fexcraft.lib.mc.utils.Static;
 import net.fexcraft.mod.states.States;
-import net.fexcraft.mod.states.api.ChunkPos;
+import net.fexcraft.mod.states.data.ChunkPos;
 import net.minecraft.world.World;
 import net.minecraftforge.common.ForgeChunkManager;
 import net.minecraftforge.common.ForgeChunkManager.LoadingCallback;

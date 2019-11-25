@@ -1,4 +1,4 @@
-package net.fexcraft.mod.states.api;
+package net.fexcraft.mod.states.data;
 
 import net.minecraft.util.math.BlockPos;
 

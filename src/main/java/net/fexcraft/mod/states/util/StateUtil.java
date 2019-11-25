@@ -20,15 +20,14 @@ import net.fexcraft.lib.mc.utils.Formatter;
 import net.fexcraft.lib.mc.utils.Print;
 import net.fexcraft.lib.mc.utils.Static;
 import net.fexcraft.mod.states.States;
-import net.fexcraft.mod.states.api.Chunk;
-import net.fexcraft.mod.states.api.ChunkPos;
 import net.fexcraft.mod.states.api.District;
 import net.fexcraft.mod.states.api.Municipality;
 import net.fexcraft.mod.states.api.State;
 import net.fexcraft.mod.states.api.capabilities.PlayerCapability;
 import net.fexcraft.mod.states.api.capabilities.StatesCapabilities;
-import net.fexcraft.mod.states.api.root.AnnounceLevel;
-import net.fexcraft.mod.states.impl.GenericChunk;
+import net.fexcraft.mod.states.data.Chunk;
+import net.fexcraft.mod.states.data.ChunkPos;
+import net.fexcraft.mod.states.data.root.AnnounceLevel;
 import net.fexcraft.mod.states.impl.GenericDistrict;
 import net.fexcraft.mod.states.impl.GenericMunicipality;
 import net.fexcraft.mod.states.impl.GenericPlayer;
@@ -71,12 +70,12 @@ public class StateUtil extends TimerTask {
     
     public static Chunk getTempChunk(int x, int z){
         Chunk chunk = getChunk(x, z);
-        return chunk == null ? new GenericChunk(null, new ChunkPos(x, z), false) : chunk;
+        return chunk == null ? new Chunk(null, new ChunkPos(x, z), false) : chunk;
     }
     
     public static Chunk getTempChunk(ChunkPos pos){
         Chunk chunk = getChunk(pos);
-        return chunk == null ? new GenericChunk(null, pos, false) : chunk;
+        return chunk == null ? new Chunk(null, pos, false) : chunk;
     }
     
     public static Chunk getTempChunk(ResourceLocation ckpos){

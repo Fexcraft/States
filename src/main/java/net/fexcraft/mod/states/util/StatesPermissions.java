@@ -4,12 +4,12 @@ import java.util.TreeMap;
 
 import net.fexcraft.lib.mc.utils.Print;
 import net.fexcraft.lib.mc.utils.Static;
-import net.fexcraft.mod.states.api.Chunk;
 import net.fexcraft.mod.states.api.District;
 import net.fexcraft.mod.states.api.Municipality;
 import net.fexcraft.mod.states.api.State;
 import net.fexcraft.mod.states.api.capabilities.PlayerCapability;
 import net.fexcraft.mod.states.api.capabilities.StatesCapabilities;
+import net.fexcraft.mod.states.data.Chunk;
 import net.minecraft.entity.player.EntityPlayer;
 
 public class StatesPermissions {

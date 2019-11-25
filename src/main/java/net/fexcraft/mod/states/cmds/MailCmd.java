@@ -14,7 +14,7 @@ import net.fexcraft.mod.states.api.Municipality;
 import net.fexcraft.mod.states.api.State;
 import net.fexcraft.mod.states.api.capabilities.PlayerCapability;
 import net.fexcraft.mod.states.api.capabilities.StatesCapabilities;
-import net.fexcraft.mod.states.api.root.AnnounceLevel;
+import net.fexcraft.mod.states.data.root.AnnounceLevel;
 import net.fexcraft.mod.states.objects.MailItem;
 import net.fexcraft.mod.states.util.MailUtil;
 import net.fexcraft.mod.states.util.StateLogger;

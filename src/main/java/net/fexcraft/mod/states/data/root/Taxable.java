@@ -1,4 +1,4 @@
-package net.fexcraft.mod.states.api.root;
+package net.fexcraft.mod.states.data.root;
 
 public interface Taxable {
 

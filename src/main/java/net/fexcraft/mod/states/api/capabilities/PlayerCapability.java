@@ -8,13 +8,13 @@ import javax.annotation.Nullable;
 import com.google.gson.JsonObject;
 
 import net.fexcraft.mod.states.States;
-import net.fexcraft.mod.states.api.Chunk;
 import net.fexcraft.mod.states.api.District;
 import net.fexcraft.mod.states.api.Municipality;
 import net.fexcraft.mod.states.api.State;
-import net.fexcraft.mod.states.api.root.AccountHolder;
-import net.fexcraft.mod.states.api.root.MailReceiver;
-import net.fexcraft.mod.states.api.root.Taxable;
+import net.fexcraft.mod.states.data.Chunk;
+import net.fexcraft.mod.states.data.root.AccountHolder;
+import net.fexcraft.mod.states.data.root.MailReceiver;
+import net.fexcraft.mod.states.data.root.Taxable;
 import net.minecraft.command.ICommandSender;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.server.MinecraftServer;

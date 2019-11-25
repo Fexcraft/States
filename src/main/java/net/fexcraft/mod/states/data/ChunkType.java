@@ -1,6 +1,6 @@
-package net.fexcraft.mod.states.api;
+package net.fexcraft.mod.states.data;
 
-import net.fexcraft.mod.states.api.root.ColorHolder;
+import net.fexcraft.mod.states.data.root.ColorHolder;
 
 public enum ChunkType implements ColorHolder {
 	

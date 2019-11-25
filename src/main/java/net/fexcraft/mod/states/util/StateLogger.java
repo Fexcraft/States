@@ -6,12 +6,12 @@ import org.apache.logging.log4j.Logger;
 import com.mojang.authlib.GameProfile;
 
 import net.fexcraft.lib.mc.utils.Print;
-import net.fexcraft.mod.states.api.Chunk;
-import net.fexcraft.mod.states.api.ChunkPos;
 import net.fexcraft.mod.states.api.District;
 import net.fexcraft.mod.states.api.Municipality;
 import net.fexcraft.mod.states.api.State;
 import net.fexcraft.mod.states.api.capabilities.PlayerCapability;
+import net.fexcraft.mod.states.data.Chunk;
+import net.fexcraft.mod.states.data.ChunkPos;
 import net.minecraft.entity.player.EntityPlayer;
 
 public class StateLogger {

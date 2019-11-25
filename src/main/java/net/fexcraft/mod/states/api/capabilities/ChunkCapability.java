@@ -8,8 +8,8 @@ public interface ChunkCapability {
     
     public void setChunk(Chunk chunk);
     
-    public net.fexcraft.mod.states.api.Chunk getStatesChunk();
+    public net.fexcraft.mod.states.data.Chunk getStatesChunk();
 
-    public net.fexcraft.mod.states.api.Chunk getStatesChunk(boolean allownull);
+    public net.fexcraft.mod.states.data.Chunk getStatesChunk(boolean allownull);
 
 }

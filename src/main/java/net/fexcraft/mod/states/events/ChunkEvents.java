@@ -5,9 +5,8 @@ import java.io.File;
 import net.fexcraft.lib.common.json.JsonUtil;
 import net.fexcraft.lib.mc.utils.Print;
 import net.fexcraft.mod.states.States;
-import net.fexcraft.mod.states.api.Chunk;
-import net.fexcraft.mod.states.api.ChunkPos;
-import net.fexcraft.mod.states.impl.GenericChunk;
+import net.fexcraft.mod.states.data.Chunk;
+import net.fexcraft.mod.states.data.ChunkPos;
 import net.fexcraft.mod.states.impl.GenericDistrict;
 import net.fexcraft.mod.states.impl.GenericMunicipality;
 import net.fexcraft.mod.states.impl.GenericState;
@@ -58,7 +57,7 @@ public class ChunkEvents {
         } /*if(!WorldEvents.LOADED){ WorldEvents.onWorldLoad(null); WorldEvents.LOADED = true; }*/
         ChunkPos pos = new ChunkPos(event.getChunk().x, event.getChunk().z);
         if(!States.CHUNKS.containsKey(pos)){
-            States.CHUNKS.put(pos, new GenericChunk(event.getWorld(), pos));
+            States.CHUNKS.put(pos, new Chunk(event.getWorld(), pos));
         }
     }
     

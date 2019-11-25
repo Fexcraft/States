@@ -72,7 +72,7 @@ public class ChunkCapabilityUtil implements ICapabilitySerializable<NBTBase>{
     public static class Implementation implements ChunkCapability {
         
         private Chunk chunk;
-        private net.fexcraft.mod.states.api.Chunk statechunk;
+        private net.fexcraft.mod.states.data.Chunk statechunk;
         
         @Override
         public void setChunk(Chunk chunk){
@@ -80,12 +80,12 @@ public class ChunkCapabilityUtil implements ICapabilitySerializable<NBTBase>{
         }
         
         @Override
-        public net.fexcraft.mod.states.api.Chunk getStatesChunk(){
+        public net.fexcraft.mod.states.data.Chunk getStatesChunk(){
             return getStatesChunk(false);
         }
 
         @Override
-        public net.fexcraft.mod.states.api.Chunk getStatesChunk(boolean allownull){
+        public net.fexcraft.mod.states.data.Chunk getStatesChunk(boolean allownull){
             if(allownull){ return statechunk; }
             if(statechunk == null){
                 statechunk = StateUtil.getChunk(chunk.x, chunk.z);

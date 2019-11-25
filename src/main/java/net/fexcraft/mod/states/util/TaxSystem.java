@@ -19,14 +19,14 @@ import net.fexcraft.mod.fsmm.api.Account;
 import net.fexcraft.mod.fsmm.api.Bank;
 import net.fexcraft.mod.fsmm.util.DataManager;
 import net.fexcraft.mod.states.States;
-import net.fexcraft.mod.states.api.Chunk;
-import net.fexcraft.mod.states.api.ChunkPos;
-import net.fexcraft.mod.states.api.ChunkType;
 import net.fexcraft.mod.states.api.Mailbox.MailType;
 import net.fexcraft.mod.states.api.Mailbox.RecipientType;
 import net.fexcraft.mod.states.api.Municipality;
 import net.fexcraft.mod.states.api.capabilities.PlayerCapability;
 import net.fexcraft.mod.states.api.capabilities.StatesCapabilities;
+import net.fexcraft.mod.states.data.Chunk;
+import net.fexcraft.mod.states.data.ChunkPos;
+import net.fexcraft.mod.states.data.ChunkType;
 import net.fexcraft.mod.states.impl.GenericPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
 

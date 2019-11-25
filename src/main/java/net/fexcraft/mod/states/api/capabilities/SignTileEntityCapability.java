@@ -2,7 +2,7 @@ package net.fexcraft.mod.states.api.capabilities;
 
 import javax.annotation.Nullable;
 
-import net.fexcraft.mod.states.api.Chunk;
+import net.fexcraft.mod.states.data.Chunk;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.nbt.NBTBase;
 import net.minecraft.tileentity.TileEntitySign;

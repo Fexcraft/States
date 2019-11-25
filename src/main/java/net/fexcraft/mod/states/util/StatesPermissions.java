@@ -163,6 +163,9 @@ public class StatesPermissions {
 		PERMISSIONS.put("state.set.mailbox", new Permission(PermissionGroup.STATE, PermissionLevel.STATE_COUNCIL, PermissionLevel.ADMIN));
 		PERMISSIONS.put("municipality.set.mailbox", new Permission(PermissionGroup.MUNICIPALITY, PermissionLevel.MUNICIPALITY_COUNCIL, PermissionLevel.ADMIN));
 		PERMISSIONS.put("district.set.mailbox", new Permission(PermissionGroup.DISTRICT, PermissionLevel.MUNICIPALITY_COUNCIL, PermissionLevel.ADMIN));
+		PERMISSIONS.put("state.open.mailbox", new Permission(PermissionGroup.STATE, PermissionLevel.STATE_COUNCIL, PermissionLevel.ADMIN));
+		PERMISSIONS.put("municipality.open.mailbox", new Permission(PermissionGroup.MUNICIPALITY, PermissionLevel.MUNICIPALITY_COUNCIL, PermissionLevel.ADMIN));
+		PERMISSIONS.put("district.open.mailbox", new Permission(PermissionGroup.DISTRICT, PermissionLevel.MUNICIPALITY_COUNCIL, PermissionLevel.ADMIN));
 		
 	}
 

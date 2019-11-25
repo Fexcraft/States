@@ -90,7 +90,7 @@ public class SignMailbox implements SignCapability.Listener {
 						}
 						break;
 					}
-					case "center": case "central": case "fallback":{
+					case "central": case "fallback":{
 						if(!StatesPermissions.hasPermission(event.getEntityPlayer(), "admin", chunk)){
 							Print.chat(event.getEntityPlayer(), "No permission to set the Central/Fallback Mailbox."); return false;
 						} reci = "state";
@@ -117,7 +117,7 @@ public class SignMailbox implements SignCapability.Listener {
 							}
 							break;
 						}
-						/*case "center":*/ case "central": case "fallback":{
+						case "central": case "fallback":{
 							StateUtil.getState(-1).setMailbox(tileentity.getPos());
 							break;
 						}
@@ -134,7 +134,42 @@ public class SignMailbox implements SignCapability.Listener {
 			else return false;
 		}
 		else{
-			//TODO open mailbox GUI
+			Chunk chunk = StateUtil.getChunk(tileentity.getPos());
+			switch(type){
+				case "state":{
+					if(!StatesPermissions.hasPermission(event.getEntityPlayer(), "state.open.mailbox", chunk.getState())){
+						Print.chat(event.getEntityPlayer(), "No permission to open the State Mailbox."); return false;
+					}
+				}
+				case "municipality":{
+					if(!StatesPermissions.hasPermission(event.getEntityPlayer(), "municipality.open.mailbox", chunk.getMunicipality())){
+						Print.chat(event.getEntityPlayer(), "No permission to open the Municipality Mailbox."); return false;
+					}
+				}
+				case "district":{
+					if(!StatesPermissions.hasPermission(event.getEntityPlayer(), "district.open.mailbox", chunk.getDistrict())){
+						Print.chat(event.getEntityPlayer(), "No permission to open the District Mailbox."); return false;
+					}
+				}
+				case "company": break;//TODO
+				case "player":{
+					if(!event.getEntityPlayer().getGameProfile().getId().toString().equals(reci)){
+						Print.chat(event.getEntityPlayer(), "No permission to open mailbox of that player."); return false;
+					}
+					break;
+				}
+				case "central": case "fallback":{
+					if(!StatesPermissions.hasPermission(event.getEntityPlayer(), "admin", chunk)){
+						Print.chat(event.getEntityPlayer(), "No permission to set the Central/Fallback Mailbox."); return false;
+					}
+					break;
+				}
+				default:{
+					Print.chat(event.getEntityPlayer(), "Invalid mailbox type.");
+					return false;
+				}
+			}
+			//TODO open GUI
 			Print.chat(event.getEntityPlayer(), "&k!000-000!000-000!");
 		}
 		return false;

@@ -3,8 +3,7 @@ package net.fexcraft.mod.states.data;
 import java.util.ArrayList;
 import java.util.Collection;
 
-import net.fexcraft.mod.states.data.RuleSet.Initiator;
-import net.fexcraft.mod.states.data.RuleSet.Rule;
+import net.fexcraft.mod.states.data.root.Initiator;
 
 public class Rules {
 	

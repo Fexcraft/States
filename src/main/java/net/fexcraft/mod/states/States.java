@@ -67,7 +67,7 @@ import net.minecraftforge.server.permission.PermissionAPI;
 @Mod(modid = States.MODID, name = "States", version = States.VERSION, dependencies = "required-after:fcl", /*serverSideOnly = true,*/ guiFactory = "net.fexcraft.mod.states.util.GuiFactory", acceptedMinecraftVersions = "*", acceptableRemoteVersions = "*")
 public class States {
 	
-	public static final String VERSION = "1.3.3";
+	public static final String VERSION = "@VERSION@";
 	public static final String MODID = "states";
 	public static final String ADMIN_PERM = "states.external.admin";
 	public static final String PREFIX = "&0[&2States&0]";

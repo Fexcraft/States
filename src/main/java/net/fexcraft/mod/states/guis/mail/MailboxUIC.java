@@ -70,7 +70,7 @@ public class MailboxUIC extends GenericContainer {
     @Override
     public void onContainerClosed(EntityPlayer player){
         super.onContainerClosed(player);
-        if(!player.world.isRemote) box.updateSize(sign, box.getMails().size(), true);
+        if(!player.world.isRemote) box.updateSize(sign, true);
     }
     
     @Override

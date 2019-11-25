@@ -97,7 +97,7 @@ public class SignMailbox implements SignCapability.Listener {
 					case "central": case "fallback":{
 						if(!StatesPermissions.hasPermission(event.getEntityPlayer(), "admin", chunk)){
 							Print.chat(event.getEntityPlayer(), "No permission to set the Central/Fallback Mailbox."); return false;
-						} reci = "state";
+						} reci = "-1";
 						break;
 					}
 					default:{
@@ -126,8 +126,8 @@ public class SignMailbox implements SignCapability.Listener {
 							break;
 						}
 					}
-					this.type = type; cap.setActive(); this.active = true;
-					this.sendUpdate(tileentity);
+					this.type = type.equals("fallback") || type.equals("central") ? "state" : type;
+					cap.setActive(); this.active = true; this.sendUpdate(tileentity);
 				}
 				catch(Exception e){
 					e.printStackTrace();
@@ -211,10 +211,13 @@ public class SignMailbox implements SignCapability.Listener {
 		return compound;
 	}
 	
-	public void updateSize(TileEntity tile, int size, boolean update){
+	public void updateSize(TileEntity tile, boolean update){
+		if(tile.getWorld() == null || tile.getWorld().isRemote) return;
 		mails.removeIf(stack -> stack.isEmpty());
-		((TileEntitySign)tile).signText[3] = Formatter.newTextComponentString(size + "");
-		this.sendUpdate((TileEntitySign)tile);
+		if(((TileEntitySign)tile).signText != null){
+			((TileEntitySign)tile).signText[3] = Formatter.newTextComponentString(mails.size() + "");
+			this.sendUpdate((TileEntitySign)tile);
+		}
 		//
 		NBTTagList list = new NBTTagList();
 		for(ItemStack stack : mails){
@@ -256,7 +259,6 @@ public class SignMailbox implements SignCapability.Listener {
 					}
 				}
 			}
-			this.updateSize(capability.getDefaultInstance().getTileEntity(), mails.size(), true);
 		}
 		catch(Exception e){
 			e.printStackTrace();

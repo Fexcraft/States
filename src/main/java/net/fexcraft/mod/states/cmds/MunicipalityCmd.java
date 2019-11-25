@@ -190,7 +190,7 @@ public class MunicipalityCmd extends CommandBase {
 				}
 				switch(args[1]){
 					case "mayor":{
-						if(hasPerm("municipality.set.mayor", player, mun)){
+						if(mun.isAuthorized("set.mayor", ply.getUUID()) || StateUtil.bypass(player)){
 							if(args.length < 3){
 								Print.chat(sender, "&9Missing Argument!");
 								break;
@@ -198,6 +198,10 @@ public class MunicipalityCmd extends CommandBase {
 							GameProfile gp = Static.getServer().getPlayerProfileCache().getGameProfileForUsername(args[2]);
 							if(gp == null || gp.getId() == null){
 								Print.chat(sender, "&cPlayer not found in Cache.");
+								break;
+							}
+							if(!mun.getCouncil().contains(gp.getId()) && !mun.getCitizen().contains(gp.getId())){
+								Print.chat(sender, "&cPlayer not found in Council or Citizens.");
 								break;
 							}
 							mun.setHead(gp.getId());
@@ -212,7 +216,7 @@ public class MunicipalityCmd extends CommandBase {
 						break;
 					}
 					case "name":{
-						if(mun.isAuthorized("change.name", ply.getUUID())){
+						if(mun.isAuthorized("set.name", ply.getUUID()) || StateUtil.bypass(player)){
 							if(args.length < 3){
 								Print.chat(sender, "&9Missing Arguments!");
 								break;
@@ -239,7 +243,7 @@ public class MunicipalityCmd extends CommandBase {
 						break;
 					}
 					case "price":{
-						if(hasPerm("municipality.set.price", player, mun)){
+						if(mun.isAuthorized("set.price", ply.getUUID()) || StateUtil.bypass(player)){
 							if(args.length < 3){
 								Print.chat(sender, "&9Missing Argument!");
 								Print.chat(sender, "&7Setting the price to \"0\" makes the municipality not buyable.");

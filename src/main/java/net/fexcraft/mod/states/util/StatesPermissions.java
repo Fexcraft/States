@@ -124,8 +124,8 @@ public class StatesPermissions {
 		PERMISSIONS.put("district.set.manager", new Permission(PermissionGroup.SKIP, PermissionLevel.ADMIN, PermissionLevel.STATE_LEADER, PermissionLevel.STATE_COUNCIL, PermissionLevel.MUNICIPALITY_COUNCIL,  PermissionLevel.MUNICIPALITY_MAYOR));
 		PERMISSIONS.put("district.set.color", new Permission(PermissionGroup.DISTRICT, PermissionLevel.MUNICIPALITY_COUNCIL, PermissionLevel.ADMIN));
 		PERMISSIONS.put("district.set.cfs", new Permission(PermissionGroup.DISTRICT, PermissionLevel.MUNICIPALITY_COUNCIL, PermissionLevel.ADMIN));
-		PERMISSIONS.put("municipality.set.name", new Permission(PermissionGroup.SKIP, PermissionLevel.MUNICIPALITY_MAYOR, PermissionLevel.ADMIN));
-		PERMISSIONS.put("municipality.set.price", new Permission(PermissionGroup.SKIP, PermissionLevel.MUNICIPALITY_MAYOR, PermissionLevel.STATE_COUNCIL, PermissionLevel.STATE_LEADER, PermissionLevel.ADMIN));
+		//PERMISSIONS.put("municipality.set.name", new Permission(PermissionGroup.SKIP, PermissionLevel.MUNICIPALITY_MAYOR, PermissionLevel.ADMIN));
+		//PERMISSIONS.put("municipality.set.price", new Permission(PermissionGroup.SKIP, PermissionLevel.MUNICIPALITY_MAYOR, PermissionLevel.STATE_COUNCIL, PermissionLevel.STATE_LEADER, PermissionLevel.ADMIN));
 		PERMISSIONS.put("municipality.set.color", new Permission(PermissionGroup.SKIP, PermissionLevel.MUNICIPALITY_MAYOR, PermissionLevel.MUNICIPALITY_COUNCIL, PermissionLevel.ADMIN));
 		PERMISSIONS.put("municipality.set.open", new Permission(PermissionGroup.SKIP, PermissionLevel.MUNICIPALITY_MAYOR, PermissionLevel.ADMIN));
 		PERMISSIONS.put("municipality.blacklist.edit", new Permission(PermissionGroup.SKIP, PermissionLevel.MUNICIPALITY_COUNCIL));
@@ -158,7 +158,7 @@ public class StatesPermissions {
 		PERMISSIONS.put("municipality.set.citizentax", new Permission(PermissionGroup.MUNICIPALITY, PermissionLevel.MUNICIPALITY_COUNCIL, PermissionLevel.STATE_COUNCIL, PermissionLevel.ADMIN));
 		PERMISSIONS.put("municipality.set.kick-if-bankrupt", new Permission(PermissionGroup.SKIP, PermissionLevel.MUNICIPALITY_MAYOR, PermissionLevel.MUNICIPALITY_COUNCIL, PermissionLevel.ADMIN));
 		PERMISSIONS.put("state.set.citizen-tax-percentage", new Permission(PermissionGroup.STATE, PermissionLevel.ADMIN));
-		PERMISSIONS.put("municipality.set.mayor", new Permission(PermissionGroup.SKIP, PermissionLevel.MUNICIPALITY_MAYOR, PermissionLevel.ADMIN));
+		//PERMISSIONS.put("municipality.set.mayor", new Permission(PermissionGroup.SKIP, PermissionLevel.MUNICIPALITY_MAYOR, PermissionLevel.ADMIN));
 		PERMISSIONS.put("state.set.leader", new Permission(PermissionGroup.SKIP, PermissionLevel.STATE_LEADER, PermissionLevel.ADMIN));
 		PERMISSIONS.put("state.set.mailbox", new Permission(PermissionGroup.STATE, PermissionLevel.STATE_COUNCIL, PermissionLevel.ADMIN));
 		PERMISSIONS.put("municipality.set.mailbox", new Permission(PermissionGroup.MUNICIPALITY, PermissionLevel.MUNICIPALITY_COUNCIL, PermissionLevel.ADMIN));

@@ -69,7 +69,7 @@ public class GenericMunicipality implements Municipality/*, Taxable*/ {
 		citizentax = JsonUtil.getIfExists(obj, "citizen_tax", 0).longValue();
 		mailbox = obj.has("mailbox") ? BlockPos.fromLong(obj.get("mailbox").getAsLong()) : null;
 		rules = new RuleSet(this, Rules.MUNICIPIAL);
-		rules.load(obj.has("rules") ? obj.get("rules").getAsJsonObject() : new JsonObject());
+		rules.load(obj.has("ruleset") ? obj.get("ruleset").getAsJsonObject() : new JsonObject());
 	}
 
 	@Override
@@ -94,7 +94,7 @@ public class GenericMunicipality implements Municipality/*, Taxable*/ {
 		obj.addProperty("kick_if_bankrupt", kib);
 		obj.addProperty("citizen_tax", citizentax);
 		if(mailbox != null) obj.addProperty("mailbox", mailbox.toLong());
-		obj.add("rules", rules.save());
+		obj.add("ruleset", rules.save());
 		return obj;
 	}
 

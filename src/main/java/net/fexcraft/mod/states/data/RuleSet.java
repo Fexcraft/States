@@ -14,18 +14,19 @@ import net.fexcraft.mod.states.api.Municipality;
 public class RuleSet {
 	
 	public final TreeMap<String, Rule> rules = new TreeMap<>();
+	public final TreeMap<String, Norm> norms = new TreeMap<>();
 	public final RuleHolder ruleholder;
 	public String name = "Standard Ruleset";
 	
 	public RuleSet(RuleHolder holder, Collection<Rule> rules){
-		this.ruleholder = holder;
+		this.ruleholder = holder; for(Rule rule : rules) this.rules.put(rule.id, rule.copy());
 	}
 	
 	public void load(JsonObject obj){
 		name = obj.has("name") ? obj.get("name").getAsString() : null;
 		//
-		if(obj.has("set")){
-			JsonArray array = obj.get("set").getAsJsonArray();
+		if(obj.has("rules")){
+			JsonArray array = obj.get("rules").getAsJsonArray();
 			for(JsonElement elm : array){
 				JsonObject jsn = elm.getAsJsonObject();
 				if(!jsn.has("id")) continue;
@@ -42,7 +43,7 @@ public class RuleSet {
 		//
 		JsonArray array = new JsonArray();
 		for(Rule rule : rules.values()) array.add(rule.save());
-		obj.add("set", array);
+		obj.add("rules", array);
 		return obj;
 	}
 	
@@ -98,11 +99,12 @@ public class RuleSet {
 		
 		public final String id;
 		private Boolean value;
+		private boolean votable;
 		public Initiator reviser;
 		public Initiator setter;
 		
-		public Rule(String id, Boolean def, Initiator rev, Initiator setter){
-			this.id = id; value = def; reviser = rev; this.setter = setter;
+		public Rule(String id, Boolean def, boolean votable, Initiator rev, Initiator setter){
+			this.id = id; value = def; reviser = rev; this.setter = setter; this.votable = votable;
 		}
 		
 		public Rule set(boolean val){
@@ -128,6 +130,10 @@ public class RuleSet {
 			setter = Initiator.valueOf(obj.get("setter").getAsString());
 			return this;
 		}
+		
+		public Rule copy(){
+			return new Rule(id, value, votable, reviser, setter);
+		}
 
 		/** Call to see if this player can SET/APPLY this rule. */
 		public boolean isAuthorized(RuleHolder holder, UUID uuid){
@@ -139,6 +145,7 @@ public class RuleSet {
 				}
 				case CITIZEN_VOTE:{
 					if(holder instanceof Municipality){
+						if(!votable) return false;
 						//TODO init vote
 						return false;
 					} else return false;
@@ -146,6 +153,7 @@ public class RuleSet {
 				case COUNCIL_ANY: return holder.getCouncil().contains(uuid);
 				case COUNCIL_VOTE:{
 					if(holder.getCouncil().size() == 1) return holder.getCouncil().get(0).equals(uuid);
+					if(!votable) return false;
 					//TODO init vote
 					return false;
 				}
@@ -178,6 +186,12 @@ public class RuleSet {
 				default: return false;
 			}
 		}
+		
+	}
+	
+	public static class Norm {
+		
+		
 		
 	}
 	

@@ -20,15 +20,14 @@ import net.fexcraft.lib.mc.utils.Formatter;
 import net.fexcraft.lib.mc.utils.Print;
 import net.fexcraft.lib.mc.utils.Static;
 import net.fexcraft.mod.states.States;
-import net.fexcraft.mod.states.api.Municipality;
 import net.fexcraft.mod.states.api.State;
 import net.fexcraft.mod.states.data.Chunk;
 import net.fexcraft.mod.states.data.ChunkPos;
 import net.fexcraft.mod.states.data.District;
+import net.fexcraft.mod.states.data.Municipality;
 import net.fexcraft.mod.states.data.capabilities.PlayerCapability;
 import net.fexcraft.mod.states.data.capabilities.StatesCapabilities;
 import net.fexcraft.mod.states.data.root.AnnounceLevel;
-import net.fexcraft.mod.states.impl.GenericMunicipality;
 import net.fexcraft.mod.states.impl.GenericPlayer;
 import net.fexcraft.mod.states.impl.GenericState;
 import net.minecraft.command.ICommandSender;
@@ -108,7 +107,7 @@ public class StateUtil extends TimerTask {
 			return States.MUNICIPALITIES.get(value);
 		}
 		else if(Municipality.getMunicipalityFile(value).exists() || isDefaultAvailable("municipalities", value)){
-			Municipality municipality = new GenericMunicipality(value);
+			Municipality municipality = new Municipality(value);
 			States.MUNICIPALITIES.put(value, municipality);
 			return municipality;
 		}

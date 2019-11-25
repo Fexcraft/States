@@ -14,19 +14,18 @@ import net.fexcraft.lib.mc.utils.Static;
 import net.fexcraft.mod.fsmm.api.Bank;
 import net.fexcraft.mod.fsmm.util.Config;
 import net.fexcraft.mod.states.States;
-import net.fexcraft.mod.states.api.Mailbox.MailType;
-import net.fexcraft.mod.states.api.Mailbox.RecipientType;
-import net.fexcraft.mod.states.api.Municipality;
-import net.fexcraft.mod.states.api.MunicipalityType;
 import net.fexcraft.mod.states.api.State;
 import net.fexcraft.mod.states.data.Chunk;
 import net.fexcraft.mod.states.data.ChunkType;
 import net.fexcraft.mod.states.data.District;
 import net.fexcraft.mod.states.data.DistrictType;
+import net.fexcraft.mod.states.data.Municipality;
+import net.fexcraft.mod.states.data.MunicipalityType;
 import net.fexcraft.mod.states.data.capabilities.PlayerCapability;
 import net.fexcraft.mod.states.data.capabilities.StatesCapabilities;
 import net.fexcraft.mod.states.data.root.AnnounceLevel;
-import net.fexcraft.mod.states.impl.GenericMunicipality;
+import net.fexcraft.mod.states.data.root.Mailbox.MailType;
+import net.fexcraft.mod.states.data.root.Mailbox.RecipientType;
 import net.fexcraft.mod.states.util.MailUtil;
 import net.fexcraft.mod.states.util.StateLogger;
 import net.fexcraft.mod.states.util.StateUtil;
@@ -674,7 +673,7 @@ public class MunicipalityCmd extends CommandBase {
 							name += " " + args[i];
 						}
 					}
-					GenericMunicipality newmun = new GenericMunicipality(sender.getEntityWorld().getCapability(StatesCapabilities.WORLD, null).getNewMunicipalityId());
+					Municipality newmun = new Municipality(sender.getEntityWorld().getCapability(StatesCapabilities.WORLD, null).getNewMunicipalityId());
 					if(newmun.getMunicipalityFile().exists() || StateUtil.getMunicipality(newmun.getId()).getId() >= 0){
 						throw new Exception("Tried to create new Municipality with ID '" + newmun.getId() + "', but savefile already exists.");
 					}

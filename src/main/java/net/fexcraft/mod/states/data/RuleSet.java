@@ -9,8 +9,6 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 
-import net.fexcraft.mod.states.api.Municipality;
-
 public class RuleSet {
 	
 	public final TreeMap<String, Rule> rules = new TreeMap<>();

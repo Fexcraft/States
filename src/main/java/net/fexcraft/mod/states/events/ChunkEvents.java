@@ -8,7 +8,7 @@ import net.fexcraft.mod.states.States;
 import net.fexcraft.mod.states.data.Chunk;
 import net.fexcraft.mod.states.data.ChunkPos;
 import net.fexcraft.mod.states.data.District;
-import net.fexcraft.mod.states.impl.GenericMunicipality;
+import net.fexcraft.mod.states.data.Municipality;
 import net.fexcraft.mod.states.impl.GenericState;
 import net.fexcraft.mod.states.impl.capabilities.SignTileEntityCapabilityUtil;
 import net.fexcraft.mod.states.util.ImageCache;
@@ -39,7 +39,7 @@ public class ChunkEvents {
 			}
 			for(int i : def_mun){
 				if(!States.MUNICIPALITIES.containsKey(i)){
-					States.MUNICIPALITIES.put(i, new GenericMunicipality(i));
+					States.MUNICIPALITIES.put(i, new Municipality(i));
 					States.MUNICIPALITIES.get(i).save();
 				}
 			}

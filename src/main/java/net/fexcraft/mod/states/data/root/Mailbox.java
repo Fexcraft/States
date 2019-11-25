@@ -1,4 +1,4 @@
-package net.fexcraft.mod.states.api;
+package net.fexcraft.mod.states.data.root;
 
 public interface Mailbox {
 	

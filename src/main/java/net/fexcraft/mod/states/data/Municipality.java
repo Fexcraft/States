@@ -3,9 +3,11 @@ package net.fexcraft.mod.states.data;
 import java.io.File;
 import java.util.Collection;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 
 import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 
 import net.fexcraft.lib.common.json.JsonUtil;
@@ -20,9 +22,11 @@ import net.fexcraft.mod.states.data.root.AccountHolder;
 import net.fexcraft.mod.states.data.root.BuyableType;
 import net.fexcraft.mod.states.data.root.ColorHolder;
 import net.fexcraft.mod.states.data.root.IconHolder;
+import net.fexcraft.mod.states.data.root.Initiator;
 import net.fexcraft.mod.states.data.root.MailReceiver;
 import net.fexcraft.mod.states.util.Config;
 import net.fexcraft.mod.states.util.ForcedChunksManager;
+import net.fexcraft.mod.states.util.RuleMap;
 import net.fexcraft.mod.states.util.StateUtil;
 import net.minecraft.command.ICommandSender;
 import net.minecraft.util.math.BlockPos;
@@ -40,7 +44,8 @@ public class Municipality implements ColorHolder, BuyableType, IconHolder, Accou
 	private State state;
 	private boolean open, kib;
 	private BlockPos mailbox;
-	private RuleSet rules;
+	private RuleMap rules = new RuleMap();
+	private String ruleset_name;
 	
 	public Municipality(int id){
 		this.id = id;
@@ -66,8 +71,19 @@ public class Municipality implements ColorHolder, BuyableType, IconHolder, Accou
 		kib = JsonUtil.getIfExists(obj, "kick_if_bankrupt", false);
 		citizentax = JsonUtil.getIfExists(obj, "citizen_tax", 0).longValue();
 		mailbox = obj.has("mailbox") ? BlockPos.fromLong(obj.get("mailbox").getAsLong()) : null;
-		rules = new RuleSet(this, Rules.MUNICIPIAL);
-		rules.load(obj.has("ruleset") ? obj.get("ruleset").getAsJsonObject() : new JsonObject());
+		ruleset_name = JsonUtil.getIfExists(obj, "ruleset", "Standard Ruleset");
+		rules.add(new Rule("set.name", null, true, Initiator.COUNCIL_VOTE, Initiator.INCHARGE));
+		rules.add(new Rule("set.price", null, true, Initiator.COUNCIL_VOTE, Initiator.INCHARGE));
+		rules.add(new Rule("set.mayor", null, true, Initiator.COUNCIL_VOTE, Initiator.INCHARGE));
+		if(obj.has("rules")){
+			JsonArray array = obj.get("rules").getAsJsonArray();
+			for(JsonElement elm : array){
+				JsonObject jsn = elm.getAsJsonObject();
+				if(!jsn.has("id")) continue;
+				Rule rule = rules.get(jsn.get("id").getAsString());
+				if(rule != null) rule.load(jsn);
+			}
+		}
 	}
 
 	public JsonObject toJsonObject(){
@@ -91,7 +107,10 @@ public class Municipality implements ColorHolder, BuyableType, IconHolder, Accou
 		obj.addProperty("kick_if_bankrupt", kib);
 		obj.addProperty("citizen_tax", citizentax);
 		if(mailbox != null) obj.addProperty("mailbox", mailbox.toLong());
-		obj.add("ruleset", rules.save());
+		obj.addProperty("ruleset", ruleset_name);
+		JsonArray rells = new JsonArray();
+		for(Rule rule : rules.values()) rells.add(rule.save());
+		obj.add("rules", rells);
 		return obj;
 	}
 
@@ -334,8 +353,13 @@ public class Municipality implements ColorHolder, BuyableType, IconHolder, Accou
 	}
 
 	@Override
-	public RuleSet getRules(){
+	public Map<String, Rule> getRules(){
 		return rules;
+	}
+
+	@Override
+	public String getRulesetTitle(){
+		return ruleset_name;
 	}
 
 }

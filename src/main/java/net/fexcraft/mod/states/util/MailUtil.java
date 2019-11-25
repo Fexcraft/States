@@ -50,30 +50,40 @@ public class MailUtil {
 					case COMPANY: return false;//TODO
 					case DISTRICT:{
 						District dis = StateUtil.getDistrict(Integer.parseInt(rec));
-						if(dis.getMailbox() == null){ rety = RecipientType.MUNICIPALITY; rec = dis.getMunicipality().getId() + ""; continue; }
+						if(dis.getMailbox() == null){
+							rety = RecipientType.MUNICIPALITY; rec = dis.getMunicipality().getId() + "";
+							Print.chat(ics, "&c&oDistrict &7&oMailbox not found, redirecting to &a&oMunicipality&7&o."); continue;
+						} else mailbox = dis.getMailbox();
 						break;
 					}
 					case MUNICIPALITY:{
 						Municipality mun = StateUtil.getMunicipality(Integer.parseInt(rec));
-						if(mun.getMailbox() == null){ rety = RecipientType.STATE; rec = mun.getState().getId() + ""; continue; }
+						if(mun.getMailbox() == null){
+							rety = RecipientType.STATE; rec = mun.getState().getId() + "";
+							Print.chat(ics, "&c&oMunicipality &7&oMailbox not found, redirecting to &a&oState&7&o."); continue;
+						} else mailbox = mun.getMailbox();
 						break;
 					}
 					case PLAYER:{
 						PlayerCapability cap = StateUtil.getPlayer(rec.toString(), true);
 						if(cap == null){ printFailure(ics, 1, rectype, receiver, sender, message, type, expiry, compound, rety, rec); return false; }
-						if(cap.getMailbox() == null){ rety = RecipientType.MUNICIPALITY; rec = cap.getMunicipality().getId() + ""; continue; }
+						if(cap.getMailbox() == null){
+							rety = RecipientType.MUNICIPALITY; rec = cap.getMunicipality().getId() + "";
+							Print.chat(ics, "&c&oPlayer &7&oMailbox not found, redirecting to &a&oMunicipality&7&o."); continue;
+						} else mailbox = cap.getMailbox();
 						break;
 					}
 					case STATE:{
 						State state = StateUtil.getState(Integer.parseInt(rec));
 						if(state.getMailbox() == null){
 							if(state.getId() >= 0){
-								rety = RecipientType.STATE; rec = "-1"; continue;
+								rety = RecipientType.STATE; rec = "-1";
+								Print.chat(ics, "&c&oState &7&oMailbox not found, redirecting to &a&oServer/Fallback&7&o."); continue;
 							}
 							else{
 								printFailure(ics, 1, rectype, receiver, sender, message, type, expiry, compound, rety, rec); return false;
 							}
-						}
+						} else mailbox = state.getMailbox();
 						break;
 					}
 				}

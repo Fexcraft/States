@@ -1,9 +1,9 @@
 package net.fexcraft.mod.states.impl.capabilities;
 
 import net.fexcraft.mod.states.data.Municipality;
+import net.fexcraft.mod.states.data.PlayerImpl;
 import net.fexcraft.mod.states.data.capabilities.PlayerCapability;
 import net.fexcraft.mod.states.data.capabilities.StatesCapabilities;
-import net.fexcraft.mod.states.impl.GenericPlayer;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.nbt.NBTBase;
 import net.minecraft.nbt.NBTTagInt;
@@ -73,7 +73,7 @@ public class PlayerCapabilityUtil implements ICapabilitySerializable<NBTBase>{
 
 		@Override
 		public PlayerCapability call() throws Exception {
-			return new GenericPlayer();
+			return new PlayerImpl();
 		}
 		
 	}

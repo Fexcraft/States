@@ -23,11 +23,11 @@ import net.fexcraft.mod.states.data.Chunk;
 import net.fexcraft.mod.states.data.ChunkPos;
 import net.fexcraft.mod.states.data.ChunkType;
 import net.fexcraft.mod.states.data.Municipality;
+import net.fexcraft.mod.states.data.PlayerImpl;
 import net.fexcraft.mod.states.data.capabilities.PlayerCapability;
 import net.fexcraft.mod.states.data.capabilities.StatesCapabilities;
 import net.fexcraft.mod.states.data.root.Mailbox.MailType;
 import net.fexcraft.mod.states.data.root.Mailbox.RecipientType;
-import net.fexcraft.mod.states.impl.GenericPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
 
 public class TaxSystem extends TimerTask {
@@ -110,7 +110,7 @@ public class TaxSystem extends TimerTask {
 			try{
 				UUID uuid = UUID.fromString(file.getName().replace(".json", ""));
 				if(isOnline(uuid)){ continue; }
-				GenericPlayer player = new GenericPlayer(uuid);
+				PlayerImpl player = new PlayerImpl(uuid);
 				processPlayerTax(date, player); player.save();
 				player.unload();
 			}

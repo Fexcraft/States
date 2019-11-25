@@ -24,11 +24,11 @@ import net.fexcraft.mod.states.data.Chunk;
 import net.fexcraft.mod.states.data.ChunkPos;
 import net.fexcraft.mod.states.data.District;
 import net.fexcraft.mod.states.data.Municipality;
+import net.fexcraft.mod.states.data.PlayerImpl;
 import net.fexcraft.mod.states.data.State;
 import net.fexcraft.mod.states.data.capabilities.PlayerCapability;
 import net.fexcraft.mod.states.data.capabilities.StatesCapabilities;
 import net.fexcraft.mod.states.data.root.AnnounceLevel;
-import net.fexcraft.mod.states.impl.GenericPlayer;
 import net.minecraft.command.ICommandSender;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
@@ -144,7 +144,7 @@ public class StateUtil extends TimerTask {
 		if(States.PLAYERS.containsKey(uuid)) return States.PLAYERS.get(uuid);
 		else{
 			if(loadtemp){
-				PlayerCapability cap = GenericPlayer.getOfflineInstance(uuid);
+				PlayerCapability cap = PlayerImpl.getOfflineInstance(uuid);
 				States.PLAYERS.put(uuid, cap); return cap;
 			} else return null;
 		}

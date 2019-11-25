@@ -15,15 +15,14 @@ import net.fexcraft.lib.mc.utils.Static;
 import net.fexcraft.mod.fsmm.api.Bank;
 import net.fexcraft.mod.fsmm.util.Config;
 import net.fexcraft.mod.states.States;
-import net.fexcraft.mod.states.api.State;
 import net.fexcraft.mod.states.data.Chunk;
 import net.fexcraft.mod.states.data.Municipality;
+import net.fexcraft.mod.states.data.State;
 import net.fexcraft.mod.states.data.capabilities.PlayerCapability;
 import net.fexcraft.mod.states.data.capabilities.StatesCapabilities;
 import net.fexcraft.mod.states.data.root.AnnounceLevel;
 import net.fexcraft.mod.states.data.root.Mailbox.MailType;
 import net.fexcraft.mod.states.data.root.Mailbox.RecipientType;
-import net.fexcraft.mod.states.impl.GenericState;
 import net.fexcraft.mod.states.util.MailUtil;
 import net.fexcraft.mod.states.util.StateLogger;
 import net.fexcraft.mod.states.util.StateUtil;
@@ -508,7 +507,7 @@ public class StateCmd extends CommandBase {
 							name += " " + args[i];
 						}
 					}
-					GenericState newstate = new GenericState(sender.getEntityWorld().getCapability(StatesCapabilities.WORLD, null).getNewStateId());
+					State newstate = new State(sender.getEntityWorld().getCapability(StatesCapabilities.WORLD, null).getNewStateId());
 					if(newstate.getStateFile().exists() || StateUtil.getState(newstate.getId()).getId() >= 0){
 						throw new Exception("Tried to create new State with ID '" + newstate.getId() + "', but savefile already exists.");
 					}

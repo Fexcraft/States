@@ -8,10 +8,10 @@ import javax.annotation.Nullable;
 import com.google.gson.JsonObject;
 
 import net.fexcraft.mod.states.States;
-import net.fexcraft.mod.states.api.State;
 import net.fexcraft.mod.states.data.Chunk;
 import net.fexcraft.mod.states.data.District;
 import net.fexcraft.mod.states.data.Municipality;
+import net.fexcraft.mod.states.data.State;
 import net.fexcraft.mod.states.data.root.AccountHolder;
 import net.fexcraft.mod.states.data.root.MailReceiver;
 import net.fexcraft.mod.states.data.root.Taxable;

@@ -9,7 +9,7 @@ import net.fexcraft.mod.states.data.Chunk;
 import net.fexcraft.mod.states.data.ChunkPos;
 import net.fexcraft.mod.states.data.District;
 import net.fexcraft.mod.states.data.Municipality;
-import net.fexcraft.mod.states.impl.GenericState;
+import net.fexcraft.mod.states.data.State;
 import net.fexcraft.mod.states.impl.capabilities.SignTileEntityCapabilityUtil;
 import net.fexcraft.mod.states.util.ImageCache;
 import net.fexcraft.mod.states.util.StateLogger;
@@ -33,7 +33,7 @@ public class ChunkEvents {
 			StateLogger.log("all", "Loading World...");
 			for(int i : def_st){
 				if(!States.STATES.containsKey(i)){
-					States.STATES.put(i, new GenericState(i));
+					States.STATES.put(i, new State(i));
 					States.STATES.get(i).save();
 				}
 			}

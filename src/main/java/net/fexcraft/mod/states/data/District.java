@@ -12,7 +12,6 @@ import net.fexcraft.lib.common.lang.ArrayList;
 import net.fexcraft.lib.common.math.Time;
 import net.fexcraft.lib.mc.utils.Static;
 import net.fexcraft.mod.states.States;
-import net.fexcraft.mod.states.api.State;
 import net.fexcraft.mod.states.data.root.BuyableType;
 import net.fexcraft.mod.states.data.root.ColorHolder;
 import net.fexcraft.mod.states.data.root.IconHolder;

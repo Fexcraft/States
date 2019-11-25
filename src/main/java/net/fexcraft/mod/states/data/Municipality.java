@@ -16,7 +16,6 @@ import net.fexcraft.mod.fsmm.api.Account;
 import net.fexcraft.mod.fsmm.api.Bank;
 import net.fexcraft.mod.fsmm.util.DataManager;
 import net.fexcraft.mod.states.States;
-import net.fexcraft.mod.states.api.State;
 import net.fexcraft.mod.states.data.RuleSet.RuleHolder;
 import net.fexcraft.mod.states.data.root.AccountHolder;
 import net.fexcraft.mod.states.data.root.BuyableType;

@@ -88,7 +88,7 @@ public class MailUtil {
 					}
 				}
 			}
-			if(!world.isBlockLoaded(mailbox)){
+			if(world.isBlockLoaded(mailbox)){
 				TileEntity tile = Static.getServer().getWorld(0).getTileEntity(mailbox);
 				if(tile == null){
 					printFailure(ics, 2, rectype, receiver, sender, message, type, expiry, compound, null, null); return false;

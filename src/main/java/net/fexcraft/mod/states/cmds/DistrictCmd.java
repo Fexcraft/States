@@ -13,16 +13,15 @@ import net.fexcraft.lib.mc.utils.Static;
 import net.fexcraft.mod.fsmm.api.Bank;
 import net.fexcraft.mod.fsmm.util.Config;
 import net.fexcraft.mod.states.States;
-import net.fexcraft.mod.states.api.District;
-import net.fexcraft.mod.states.api.DistrictAttribute;
-import net.fexcraft.mod.states.api.DistrictType;
 import net.fexcraft.mod.states.api.Municipality;
 import net.fexcraft.mod.states.api.MunicipalityType;
 import net.fexcraft.mod.states.api.capabilities.PlayerCapability;
 import net.fexcraft.mod.states.api.capabilities.StatesCapabilities;
 import net.fexcraft.mod.states.data.Chunk;
+import net.fexcraft.mod.states.data.District;
+import net.fexcraft.mod.states.data.DistrictAttribute;
+import net.fexcraft.mod.states.data.DistrictType;
 import net.fexcraft.mod.states.guis.Listener;
-import net.fexcraft.mod.states.impl.GenericDistrict;
 import net.fexcraft.mod.states.util.StateLogger;
 import net.fexcraft.mod.states.util.StateUtil;
 import net.minecraft.command.CommandBase;
@@ -363,7 +362,7 @@ public class DistrictCmd extends CommandBase {
 						}
 					}
 					try{
-						GenericDistrict newdis = new GenericDistrict(sender.getEntityWorld().getCapability(StatesCapabilities.WORLD, null).getNewDistrictId());
+						District newdis = new District(sender.getEntityWorld().getCapability(StatesCapabilities.WORLD, null).getNewDistrictId());
 						if(newdis.getDistrictFile().exists() || StateUtil.getDistrict(newdis.getId()).getId() >= 0){
 							throw new Exception("Tried to create new District with ID '" + newdis.getId() + "', but savefile already exists.");
 						}

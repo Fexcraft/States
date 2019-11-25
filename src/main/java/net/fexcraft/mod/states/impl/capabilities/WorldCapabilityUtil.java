@@ -7,11 +7,11 @@ import org.apache.commons.io.FilenameUtils;
 import com.google.common.collect.ImmutableMap;
 
 import net.fexcraft.mod.states.States;
-import net.fexcraft.mod.states.api.District;
 import net.fexcraft.mod.states.api.Municipality;
 import net.fexcraft.mod.states.api.State;
 import net.fexcraft.mod.states.api.capabilities.StatesCapabilities;
 import net.fexcraft.mod.states.api.capabilities.WorldCapability;
+import net.fexcraft.mod.states.data.District;
 import net.minecraft.nbt.NBTBase;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.EnumFacing;

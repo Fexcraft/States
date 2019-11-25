@@ -21,6 +21,8 @@ import net.fexcraft.mod.states.api.District;
 import net.fexcraft.mod.states.api.Municipality;
 import net.fexcraft.mod.states.api.MunicipalityType;
 import net.fexcraft.mod.states.api.State;
+import net.fexcraft.mod.states.data.RuleSet;
+import net.fexcraft.mod.states.data.Rules;
 import net.fexcraft.mod.states.util.Config;
 import net.fexcraft.mod.states.util.ForcedChunksManager;
 import net.fexcraft.mod.states.util.StateUtil;
@@ -40,6 +42,7 @@ public class GenericMunicipality implements Municipality/*, Taxable*/ {
 	private State state;
 	private boolean open, kib;
 	private BlockPos mailbox;
+	private RuleSet rules;
 	
 	public GenericMunicipality(int id){
 		this.id = id;
@@ -65,6 +68,8 @@ public class GenericMunicipality implements Municipality/*, Taxable*/ {
 		kib = JsonUtil.getIfExists(obj, "kick_if_bankrupt", false);
 		citizentax = JsonUtil.getIfExists(obj, "citizen_tax", 0).longValue();
 		mailbox = obj.has("mailbox") ? BlockPos.fromLong(obj.get("mailbox").getAsLong()) : null;
+		rules = new RuleSet(this, Rules.MUNICIPIAL);
+		rules.load(obj.has("rules") ? obj.get("rules").getAsJsonObject() : new JsonObject());
 	}
 
 	@Override
@@ -89,6 +94,7 @@ public class GenericMunicipality implements Municipality/*, Taxable*/ {
 		obj.addProperty("kick_if_bankrupt", kib);
 		obj.addProperty("citizen_tax", citizentax);
 		if(mailbox != null) obj.addProperty("mailbox", mailbox.toLong());
+		obj.add("rules", rules.save());
 		return obj;
 	}
 
@@ -166,12 +172,12 @@ public class GenericMunicipality implements Municipality/*, Taxable*/ {
 	}
 
 	@Override
-	public UUID getMayor(){
+	public UUID getHead(){
 		return mayor;
 	}
 
 	@Override
-	public void setMayor(UUID uuid){
+	public void setHead(UUID uuid){
 		mayor = uuid;
 	}
 
@@ -347,6 +353,11 @@ public class GenericMunicipality implements Municipality/*, Taxable*/ {
 	@Override
 	public void setMailbox(BlockPos pos){
 		this.mailbox = pos;
+	}
+
+	@Override
+	public RuleSet getRules(){
+		return rules;
 	}
 
 }

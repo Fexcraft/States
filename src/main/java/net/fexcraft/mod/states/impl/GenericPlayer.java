@@ -163,7 +163,7 @@ public class GenericPlayer implements PlayerCapability {
 
 	@Override
 	public boolean isMayorOf(Municipality municipality){
-		return municipality.getMayor() != null && municipality.getMayor().equals(getUUID());
+		return municipality.getHead() != null && municipality.getHead().equals(getUUID());
 	}
 
 	@Override
@@ -174,7 +174,7 @@ public class GenericPlayer implements PlayerCapability {
 	@Override
 	public boolean canLeave(ICommandSender sender){
 		if(this.municipality == null){ return true; }
-		if(this.municipality.getMayor().equals(getUUID())){
+		if(this.municipality.getHead().equals(getUUID())){
 			Print.chat(sender, "&eYou must assign a new Mayor first, or remove youself as one, before you can leave the Municipality.");
 			return false;
 		}

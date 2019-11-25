@@ -16,6 +16,8 @@ import net.fexcraft.mod.fsmm.api.Bank;
 import net.fexcraft.mod.fsmm.util.Config;
 import net.fexcraft.mod.states.States;
 import net.fexcraft.mod.states.api.Chunk;
+import net.fexcraft.mod.states.api.Mailbox.MailType;
+import net.fexcraft.mod.states.api.Mailbox.RecipientType;
 import net.fexcraft.mod.states.api.Municipality;
 import net.fexcraft.mod.states.api.State;
 import net.fexcraft.mod.states.api.capabilities.PlayerCapability;
@@ -25,8 +27,6 @@ import net.fexcraft.mod.states.impl.GenericState;
 import net.fexcraft.mod.states.util.MailUtil;
 import net.fexcraft.mod.states.util.StateLogger;
 import net.fexcraft.mod.states.util.StateUtil;
-import net.fexcraft.mod.states.api.Mailbox.MailType;
-import net.fexcraft.mod.states.api.Mailbox.RecipientType;
 import net.minecraft.command.CommandBase;
 import net.minecraft.command.CommandException;
 import net.minecraft.command.ICommandSender;
@@ -431,7 +431,7 @@ public class StateCmd extends CommandBase {
 								Print.chat(sender, "&6Municipality not found.");
 								return;
 							}
-							if(mun.getMayor() == null){
+							if(mun.getHead() == null){
 								Print.chat(sender, "&7Municipality has no Mayor.");
 								return;
 							}

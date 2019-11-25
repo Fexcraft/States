@@ -2,14 +2,6 @@ package net.fexcraft.mod.states.cmds;
 
 import java.util.UUID;
 
-import net.fexcraft.mod.states.api.capabilities.PlayerCapability;
-import net.fexcraft.mod.states.api.capabilities.StatesCapabilities;
-import net.fexcraft.mod.states.api.root.AnnounceLevel;
-import net.fexcraft.mod.states.objects.MailItem;
-import net.fexcraft.mod.states.util.MailUtil;
-import net.fexcraft.mod.states.util.StateLogger;
-import net.fexcraft.mod.states.util.StateUtil;
-import net.fexcraft.mod.states.util.StatesPermissions;
 import net.fexcraft.lib.common.math.Time;
 import net.fexcraft.lib.mc.api.registry.fCommand;
 import net.fexcraft.lib.mc.utils.Formatter;
@@ -20,6 +12,14 @@ import net.fexcraft.mod.states.api.Mailbox.MailType;
 import net.fexcraft.mod.states.api.Mailbox.RecipientType;
 import net.fexcraft.mod.states.api.Municipality;
 import net.fexcraft.mod.states.api.State;
+import net.fexcraft.mod.states.api.capabilities.PlayerCapability;
+import net.fexcraft.mod.states.api.capabilities.StatesCapabilities;
+import net.fexcraft.mod.states.api.root.AnnounceLevel;
+import net.fexcraft.mod.states.objects.MailItem;
+import net.fexcraft.mod.states.util.MailUtil;
+import net.fexcraft.mod.states.util.StateLogger;
+import net.fexcraft.mod.states.util.StateUtil;
+import net.fexcraft.mod.states.util.StatesPermissions;
 import net.minecraft.command.CommandBase;
 import net.minecraft.command.CommandException;
 import net.minecraft.command.ICommandSender;
@@ -280,7 +280,7 @@ public class MailCmd extends CommandBase {
 									Print.chat(sender, "&6You must leave your current State first!");
 									return;
 								}
-								if(!cap.getMunicipality().getMayor().equals(cap.getUUID())){
+								if(!cap.getMunicipality().getHead().equals(cap.getUUID())){
 									Print.chat(sender, "&7No permission.");
 									return;
 								}

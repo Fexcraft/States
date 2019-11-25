@@ -15,9 +15,10 @@ import net.fexcraft.mod.states.api.root.BuyableType;
 import net.fexcraft.mod.states.api.root.ColorHolder;
 import net.fexcraft.mod.states.api.root.IconHolder;
 import net.fexcraft.mod.states.api.root.MailReceiver;
+import net.fexcraft.mod.states.data.RuleSet.RuleHolder;
 import net.minecraft.command.ICommandSender;
 
-public interface Municipality extends ColorHolder, BuyableType, IconHolder, AccountHolder, MailReceiver {
+public interface Municipality extends ColorHolder, BuyableType, IconHolder, AccountHolder, MailReceiver, RuleHolder {
 	
 	public int getId();
 	
@@ -52,12 +53,6 @@ public interface Municipality extends ColorHolder, BuyableType, IconHolder, Acco
 	public JsonObject toJsonObject();
 
 	public void save();
-	
-	public UUID getMayor();
-	
-	public void setMayor(UUID uuid);
-	
-	public List<UUID> getCouncil();
 	
 	public MunicipalityType getType();
 	

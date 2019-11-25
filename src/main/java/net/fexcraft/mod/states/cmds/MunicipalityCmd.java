@@ -17,6 +17,8 @@ import net.fexcraft.mod.states.States;
 import net.fexcraft.mod.states.api.Chunk;
 import net.fexcraft.mod.states.api.ChunkType;
 import net.fexcraft.mod.states.api.DistrictType;
+import net.fexcraft.mod.states.api.Mailbox.MailType;
+import net.fexcraft.mod.states.api.Mailbox.RecipientType;
 import net.fexcraft.mod.states.api.Municipality;
 import net.fexcraft.mod.states.api.MunicipalityType;
 import net.fexcraft.mod.states.api.State;
@@ -26,8 +28,6 @@ import net.fexcraft.mod.states.api.root.AnnounceLevel;
 import net.fexcraft.mod.states.impl.GenericDistrict;
 import net.fexcraft.mod.states.impl.GenericMunicipality;
 import net.fexcraft.mod.states.util.MailUtil;
-import net.fexcraft.mod.states.api.Mailbox.MailType;
-import net.fexcraft.mod.states.api.Mailbox.RecipientType;
 import net.fexcraft.mod.states.util.StateLogger;
 import net.fexcraft.mod.states.util.StateUtil;
 import net.minecraft.command.CommandBase;
@@ -90,7 +90,7 @@ public class MunicipalityCmd extends CommandBase {
 				Print.chat(sender, "&e====-====-====-====-====-====&0[&2States&0]");
 				Print.chat(sender, "&6Info of Municipality &7" + mun.getName() + " (" + mun.getId() + ")&2:");
 				Print.chat(sender, "&9State: &7" + mun.getState().getName() + " (" + mun.getState().getId() + ")");
-				Print.chat(sender, "&9Mayor: &7" + (mun.getMayor() == null ? "no one" : Static.getPlayerNameByUUID(mun.getMayor())));
+				Print.chat(sender, "&9Mayor: &7" + (mun.getHead() == null ? "no one" : Static.getPlayerNameByUUID(mun.getHead())));
 				Print.chat(sender, "&9Price: &7" + (mun.getPrice() > 0 ? Config.getWorthAsString(mun.getPrice()) : "not for sale"));
 				Print.chat(sender, "&9Type: &7" + mun.getType().getTitle());
 				Print.chat(sender, "&6Color: &7" + mun.getColor());
@@ -162,7 +162,7 @@ public class MunicipalityCmd extends CommandBase {
 						mun.setState(playerstate);
 						mun.getCouncil().clear();
 						mun.setChanged(Time.getDate());
-						mun.setMayor(null);
+						mun.setHead(null);
 						mun.setPrice(0);
 						mun.save();
 						mun.getState().save();
@@ -200,7 +200,7 @@ public class MunicipalityCmd extends CommandBase {
 								Print.chat(sender, "&cPlayer not found in Cache.");
 								break;
 							}
-							mun.setMayor(gp.getId());
+							mun.setHead(gp.getId());
 							mun.setChanged(Time.getDate());
 							mun.save();
 							Print.chat(sender, "&2Set &7" + gp.getName() + "&2 to new Municipality Mayor!");
@@ -212,7 +212,7 @@ public class MunicipalityCmd extends CommandBase {
 						break;
 					}
 					case "name":{
-						if(hasPerm("municipality.set.name", player, mun)){
+						if(mun.isAuthorized("change.name", ply.getUUID())){
 							if(args.length < 3){
 								Print.chat(sender, "&9Missing Arguments!");
 								break;
@@ -677,7 +677,7 @@ public class MunicipalityCmd extends CommandBase {
 					else{
 						newmun.setCreator(ply.getUUID());
 						newmun.setName(name);
-						newmun.setMayor(ply.getUUID());
+						newmun.setHead(ply.getUUID());
 						newmun.setOpen(false);
 						newmun.setPrice(0);
 						newmun.getCitizen().add(ply.getUUID());

@@ -1,5 +1,7 @@
 package net.fexcraft.mod.states.guis;
 
+import net.fexcraft.mod.states.guis.mail.MailboxUI;
+import net.fexcraft.mod.states.guis.mail.MailboxUIC;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.world.World;
 import net.minecraftforge.fml.common.network.IGuiHandler;
@@ -18,11 +20,12 @@ public class GuiHandler implements IGuiHandler{
 	 * 8 Player Data
 	 * 9 empty
 	 * 10 Chunk claiming.
+	 * 20 Mailbox
 	 * */
 
 	@Override
 	public Object getServerGuiElement(int ID, EntityPlayer player, World world, int x, int y, int z){
-		return new PlaceholderContainer();
+		return ID == 20 ? new MailboxUIC(player, world, x, y, z) : new PlaceholderContainer();
 	}
 
 	@Override
@@ -38,6 +41,9 @@ public class GuiHandler implements IGuiHandler{
 			//
 			case 10:{
 				return new ClaimMap(player, world, x, y, z);
+			}
+			case 20:{
+				return new MailboxUI(player, world, x, y, z);
 			}
 		}
 		return null;

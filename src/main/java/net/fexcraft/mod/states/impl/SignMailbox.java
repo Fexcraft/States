@@ -169,10 +169,14 @@ public class SignMailbox implements SignCapability.Listener {
 					return false;
 				}
 			}
-			//TODO open GUI
-			Print.chat(event.getEntityPlayer(), "&k!000-000!000-000!");
+			if(mails.isEmpty()){
+				Print.chat(event.getEntity(), "&aThere is no new mail!"); 
+				return true;
+			}
+			event.getEntityPlayer().openGui(States.INSTANCE, 20, event.getWorld(), tileentity.getPos().getX(), tileentity.getPos().getY(), tileentity.getPos().getZ());
+			//Print.chat(event.getEntityPlayer(), "&k!000-000!000-000!");
+        	Print.chat(event.getEntity(), "&7&oOpening Mailbox UI."); return true;
 		}
-		return false;
 	}
 
 	@Override

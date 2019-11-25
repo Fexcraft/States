@@ -2,9 +2,17 @@ package net.fexcraft.mod.states.guis;
 
 import net.fexcraft.lib.common.math.Time;
 import net.fexcraft.lib.mc.api.packet.IPacketListener;
+import net.fexcraft.lib.mc.capabilities.FCLCapabilities;
 import net.fexcraft.lib.mc.network.packet.PacketNBTTagCompound;
 import net.fexcraft.lib.mc.render.ExternalTextureHelper;
 import net.fexcraft.lib.mc.utils.Print;
+import net.fexcraft.mod.states.impl.SignMailbox;
+import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.item.ItemStack;
+import net.minecraft.nbt.NBTBase;
+import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.nbt.NBTTagList;
+import net.minecraft.util.math.BlockPos;
 
 public class Receiver implements IPacketListener<PacketNBTTagCompound> {
 
@@ -65,6 +73,14 @@ public class Receiver implements IPacketListener<PacketNBTTagCompound> {
 			}
 			case "area_view_list":{
 				AreaView.update(packet.nbt);
+				return;
+			}
+			case "update_mailbox":{
+				BlockPos mailbox = BlockPos.fromLong(packet.nbt.getLong("pos"));
+				EntityPlayer player = (EntityPlayer)objs[0];
+				SignMailbox box = player.world.getTileEntity(mailbox).getCapability(FCLCapabilities.SIGN_CAPABILITY, null).getListener(SignMailbox.class, SignMailbox.RESLOC);
+				box.getMails().clear(); NBTTagList list = (NBTTagList)packet.nbt.getTag("mails");
+				for(NBTBase base : list) box.getMails().add(new ItemStack((NBTTagCompound)base));
 				return;
 			}
 		}

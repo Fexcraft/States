@@ -97,6 +97,7 @@ public class MailUtil {
 				if(!insert(null, sign, rectype, receiver.toString(), sender, message, type, expiry, compound)){
 					printFailure(ics, 3, rectype, receiver, sender, message, type, expiry, compound, null, null);
 				}
+				sign.updateSize(tile, sign.getMails().size(), true);
 			}
 			else{
 				File file = new File(States.getSaveDirectory(), "mailboxes/" + rety.name().toLowerCase() + "_" + rec + ".nbt");

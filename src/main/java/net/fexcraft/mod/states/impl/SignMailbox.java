@@ -4,6 +4,8 @@ import java.io.File;
 
 import net.fexcraft.lib.common.math.Time;
 import net.fexcraft.lib.mc.capabilities.sign.SignCapability;
+import net.fexcraft.lib.mc.network.PacketHandler;
+import net.fexcraft.lib.mc.network.packet.PacketNBTTagCompound;
 import net.fexcraft.lib.mc.utils.Formatter;
 import net.fexcraft.lib.mc.utils.Print;
 import net.fexcraft.lib.mc.utils.Static;
@@ -19,6 +21,7 @@ import net.minecraft.nbt.CompressedStreamTools;
 import net.minecraft.nbt.NBTBase;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
+import net.minecraft.tileentity.TileEntity;
 import net.minecraft.tileentity.TileEntitySign;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.NonNullList;
@@ -26,6 +29,7 @@ import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.event.entity.player.PlayerInteractEvent;
+import net.minecraftforge.fml.common.network.NetworkRegistry.TargetPoint;
 
 public class SignMailbox implements SignCapability.Listener {
 	
@@ -206,6 +210,24 @@ public class SignMailbox implements SignCapability.Listener {
 		}
 		return compound;
 	}
+	
+	public void updateSize(TileEntity tile, int size, boolean update){
+		mails.removeIf(stack -> stack.isEmpty());
+		((TileEntitySign)tile).signText[3] = Formatter.newTextComponentString(size + "");
+		this.sendUpdate((TileEntitySign)tile);
+		//
+		NBTTagList list = new NBTTagList();
+		for(ItemStack stack : mails){
+			list.appendTag(stack.serializeNBT());
+		}
+		NBTTagCompound compound = new NBTTagCompound();
+		compound.setString("target_listener", "states:gui");
+		compound.setString("task", "update_mailbox");
+		compound.setLong("pos", tile.getPos().toLong());
+		compound.setTag("mails", list);
+		PacketHandler.getInstance().sendToAllAround(new PacketNBTTagCompound(compound),
+			new TargetPoint(tile.getWorld().provider.getDimension(), tile.getPos().getX(), tile.getPos().getY(), tile.getPos().getZ(), 256));
+	}
 
 	@Override
 	public void readNBT(Capability<SignCapability> capability, EnumFacing side, NBTBase nbt){
@@ -221,6 +243,7 @@ public class SignMailbox implements SignCapability.Listener {
 				if(type == null) type = com.getString("type");
 				if(reci == null) reci = com.getString("id");
 				mails.clear(); NBTTagList list = (NBTTagList)com.getTag("mails");
+				if(list == null) return;
 				for(NBTBase base : list){
 					try{
 						ItemStack stack = new ItemStack((NBTTagCompound)base);
@@ -233,6 +256,7 @@ public class SignMailbox implements SignCapability.Listener {
 					}
 				}
 			}
+			this.updateSize(capability.getDefaultInstance().getTileEntity(), mails.size(), true);
 		}
 		catch(Exception e){
 			e.printStackTrace();

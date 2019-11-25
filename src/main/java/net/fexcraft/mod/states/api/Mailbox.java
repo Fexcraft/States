@@ -1,7 +1,5 @@
 package net.fexcraft.mod.states.api;
 
-import net.minecraft.nbt.NBTTagCompound;
-
 public interface Mailbox {
 	
 	public static enum RecipientType {
@@ -21,9 +19,5 @@ public interface Mailbox {
 		public int toMetadata(){ return id; }
 		
 	}
-
-	public boolean accepts(RecipientType rectype, String receiver);
-
-	public void insert(RecipientType rectype, String receiver, String sender, String message, MailType type, long expiry, NBTTagCompound compound);
 
 }

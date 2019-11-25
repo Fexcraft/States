@@ -1,42 +1,37 @@
 package net.fexcraft.mod.states.impl;
 
-import java.util.UUID;
+import java.io.File;
 
-import net.fexcraft.lib.common.math.Time;
 import net.fexcraft.lib.mc.capabilities.sign.SignCapability;
 import net.fexcraft.lib.mc.utils.Formatter;
 import net.fexcraft.lib.mc.utils.Print;
 import net.fexcraft.lib.mc.utils.Static;
+import net.fexcraft.mod.states.States;
 import net.fexcraft.mod.states.api.Chunk;
-import net.fexcraft.mod.states.api.Mailbox.MailType;
-import net.fexcraft.mod.states.api.Mailbox.RecipientType;
 import net.fexcraft.mod.states.api.capabilities.StatesCapabilities;
 import net.fexcraft.mod.states.events.PlayerEvents;
-import net.fexcraft.mod.states.objects.MailItem;
 import net.fexcraft.mod.states.util.StateUtil;
 import net.fexcraft.mod.states.util.StatesPermissions;
-import net.minecraft.block.BlockWallSign;
 import net.minecraft.block.state.IBlockState;
-import net.minecraft.command.ICommandSender;
 import net.minecraft.item.ItemStack;
+import net.minecraft.nbt.CompressedStreamTools;
 import net.minecraft.nbt.NBTBase;
 import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.tileentity.TileEntity;
-import net.minecraft.tileentity.TileEntityChest;
+import net.minecraft.nbt.NBTTagList;
 import net.minecraft.tileentity.TileEntitySign;
 import net.minecraft.util.EnumFacing;
+import net.minecraft.util.NonNullList;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.event.entity.player.PlayerInteractEvent;
-import net.minecraftforge.items.CapabilityItemHandler;
-import net.minecraftforge.items.IItemHandler;
 
 public class SignMailbox implements SignCapability.Listener {
 	
 	public static final ResourceLocation RESLOC = new ResourceLocation("states:mailbox");
+	private NonNullList<ItemStack> mails = NonNullList.<ItemStack>create();
 	private boolean active;
-	private UUID recipient;
+	private String reci;
 	private String type;
 
 	@Override
@@ -54,14 +49,9 @@ public class SignMailbox implements SignCapability.Listener {
 		if(event.getWorld().isRemote){ return false; }
 		if(!active){
 			if(tileentity.signText[0].getUnformattedText().toLowerCase().equals("[st-mailbox]")){
-				TileEntity te = event.getWorld().getTileEntity(getPosAtBack(state, tileentity));
-				if(te == null){ Print.chat(event.getEntityPlayer(), "Not a valid mailbox position."); return false; }
-				EnumFacing facing = state.getBlock() instanceof BlockWallSign ? EnumFacing.getFront(tileentity.getBlockMetadata()) : null;
-				if(!te.hasCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, facing)){
-					Print.chat(event.getEntityPlayer(), "Block/TileEntity cannot store items."); return false;
-				}
-				if(!PlayerEvents.checkAccess(te.getWorld(), te.getPos(), te.getWorld().getBlockState(te.getPos()), event.getEntityPlayer())){
-					Print.chat(event.getEntityPlayer(), "Block/TileEntity cannot be accessed."); return false;
+				BlockPos back = getPosAtBack(state, tileentity);
+				if(!PlayerEvents.checkAccess(event.getWorld(), back, event.getWorld().getBlockState(back), event.getEntityPlayer())){
+					Print.chat(event.getEntityPlayer(), "Block/TileEntity behind sign cannot be accessed."); return false;
 				}
 				Chunk chunk = StateUtil.getChunk(tileentity.getPos());
 				String type = tileentity.signText[1].getUnformattedText().toLowerCase();
@@ -69,17 +59,17 @@ public class SignMailbox implements SignCapability.Listener {
 					case "state":{
 						if(!StatesPermissions.hasPermission(event.getEntityPlayer(), "state.set.mailbox", chunk.getState())){
 							Print.chat(event.getEntityPlayer(), "No permission to set the State Mailbox."); return false;
-						}
+						} reci = type;
 					}
 					case "municipality":{
 						if(!StatesPermissions.hasPermission(event.getEntityPlayer(), "municipality.set.mailbox", chunk.getMunicipality())){
 							Print.chat(event.getEntityPlayer(), "No permission to set the Municipality Mailbox."); return false;
-						}
+						} reci = type;
 					}
 					case "district":{
 						if(!StatesPermissions.hasPermission(event.getEntityPlayer(), "district.set.mailbox", chunk.getDistrict())){
 							Print.chat(event.getEntityPlayer(), "No permission to set the District Mailbox."); return false;
-						}
+						} reci = type;
 					}
 					case "company": break;//TODO
 					case "player":{
@@ -90,7 +80,7 @@ public class SignMailbox implements SignCapability.Listener {
 							return false;
 						}
 						if(prof.getId().equals(event.getEntityPlayer().getGameProfile().getId()) || StatesPermissions.hasPermission(event.getEntityPlayer(), "admin", null)){
-							this.recipient = prof.getId();
+							this.reci = prof.getId().toString();
 							tileentity.signText[1] = Formatter.newTextComponentString(prof.getName());
 							tileentity.signText[2] = Formatter.newTextComponentString("");
 						}//TODO municipality check
@@ -116,13 +106,13 @@ public class SignMailbox implements SignCapability.Listener {
 						case "state": chunk.getState().setMailbox(tileentity.getPos()); break;
 						case "municipality": chunk.getMunicipality().setMailbox(tileentity.getPos()); break;
 						case "district": chunk.getDistrict().setMailbox(tileentity.getPos()); break;
-						case "companry": break;//TODO
+						case "company": break;//TODO
 						case "player":{
-							if(event.getEntityPlayer().getGameProfile().getId().equals(recipient)){
+							if(event.getEntityPlayer().getGameProfile().getId().toString().equals(reci)){
 								event.getEntityPlayer().getCapability(StatesCapabilities.PLAYER, null).setMailbox(tileentity.getPos());
 							}
 							else{
-								StateUtil.getPlayer(recipient, true).setMailbox(tileentity.getPos());
+								StateUtil.getPlayer(reci, true).setMailbox(tileentity.getPos());
 							}
 							break;
 						}
@@ -130,9 +120,6 @@ public class SignMailbox implements SignCapability.Listener {
 							StateUtil.getState(-1).setMailbox(tileentity.getPos());
 							break;
 						}
-					}
-					if(te instanceof TileEntityChest){
-						((TileEntityChest)te).setCustomName(Formatter.format("&9Mailbox&0: &5" + (type.equals("player") ? Static.getPlayerNameByUUID(recipient) : type)));
 					}
 					this.type = type; cap.setActive(); this.active = true;
 					this.sendUpdate(tileentity);
@@ -146,6 +133,7 @@ public class SignMailbox implements SignCapability.Listener {
 			else return false;
 		}
 		else{
+			//TODO open mailbox GUI
 			Print.chat(event.getEntityPlayer(), "&k!000-000!000-000!");
 		}
 		return false;
@@ -157,7 +145,25 @@ public class SignMailbox implements SignCapability.Listener {
 		NBTTagCompound compound = new NBTTagCompound();
 		compound.setBoolean("sign:active", active);
 		compound.setString("sign:type", type);
-		if(recipient != null) compound.setString("sign:recipient", recipient.toString());
+		compound.setString("sign:recipient", reci.toString());
+		if(!mails.isEmpty()){
+			try{
+				File file = new File(States.getSaveDirectory(), "mailboxes/" + type + "_" + reci + ".nbt");
+				NBTTagCompound com = file.exists() ? CompressedStreamTools.read(file) : new NBTTagCompound();
+				if(com.hasNoTags()){
+					com.setString("type", type); com.setString("id", reci);
+				}
+				NBTTagList list = new NBTTagList();
+				for(ItemStack stack : mails){
+					list.appendTag(stack.serializeNBT());
+				}
+				if(!file.exists()) file.getParentFile().mkdirs();
+				CompressedStreamTools.write(com, file);
+			}
+			catch(Exception e){
+				e.printStackTrace();
+			}
+		}
 		return compound;
 	}
 
@@ -168,7 +174,22 @@ public class SignMailbox implements SignCapability.Listener {
 		try{
 			active = compound.getBoolean("sign:active");
 			type = compound.getString("sign:type");
-			recipient = compound.hasKey("sign:recipient") ? UUID.fromString(compound.getString("sign:recipient")) : null;
+			reci = compound.getString("sign:recipient");
+			File file = new File(States.getSaveDirectory(), "mailboxes/" + type + "_" + reci + ".nbt");
+			if(file.exists()){
+				NBTTagCompound com = CompressedStreamTools.read(file);
+				if(type == null) type = com.getString("type");
+				if(reci == null) reci = com.getString("id");
+				mails.clear(); NBTTagList list = (NBTTagList)com.getTag("mails");
+				for(NBTBase base : list){
+					try{
+						mails.add(new ItemStack((NBTTagCompound)base));
+					}
+					catch(Exception e){
+						e.printStackTrace();
+					}
+				}
+			}
 		}
 		catch(Exception e){
 			e.printStackTrace();
@@ -176,48 +197,8 @@ public class SignMailbox implements SignCapability.Listener {
 		}
 	}
 
-	public boolean accepts(BlockPos pos, RecipientType rtype, String receiver){
-		Chunk chunk = StateUtil.getChunk(pos);
-		switch(rtype){
-			case COMPANY: return false;//TODO
-			case DISTRICT: return type.equals("district") && receiver.equals(chunk.getDistrict().getId() + "");
-			case MUNICIPALITY: return type.equals("municipality") && receiver.equals(chunk.getMunicipality().getId() + "");
-			case PLAYER: return type.equals("player") && receiver.equals(recipient.toString());
-			case STATE:{
-				if(type.equals("central") || type.equals("fallback")) return true;
-				return type.equals("state") && receiver.equals(chunk.getState().getId() + "");
-			}
-			default: return false;
-		}
-	}
-
-	public final boolean insert(ICommandSender ics, TileEntitySign tile, RecipientType rectype, String receiver, String sender, String message, MailType type, long expiry, NBTTagCompound compound){
-		ItemStack stack = new ItemStack(MailItem.INSTANCE, 1, type.toMetadata());
-		NBTTagCompound nbt = new NBTTagCompound();
-		nbt.setString("Receiver", rectype.name().toLowerCase() + ":" + receiver);
-		nbt.setString("Sender", sender);
-		nbt.setString("Message", message);
-		nbt.setString("Type", type.name());
-		nbt.setString("Content", message);
-		if(compound != null) nbt.setTag("StatesData", compound);
-		if(expiry > 0) nbt.setLong("Expiry", Time.getDate() + expiry);
-		stack.setTagCompound(nbt);
-		EnumFacing facing = tile.getWorld().getBlockState(tile.getPos()).getBlock() instanceof BlockWallSign ? EnumFacing.getFront(tile.getBlockMetadata()) : null;
-		TileEntity te = tile.getWorld().getTileEntity(getPosAtBack(tile.getWorld().getBlockState(tile.getPos()), tile));
-		IItemHandler handler = te.getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, facing);
-		for(int i = 0; i < handler.getSlots(); i++){
-			if(handler.insertItem(i, stack, true).isEmpty()){
-				stack = handler.insertItem(i, stack, false);
-				if(stack == null || stack.isEmpty()) break;
-			}
-		}
-		if(stack == null || !stack.isEmpty()){
-			if(ics != null) Print.chat(ics, "Failed to send mail, mailbox of recipient may be full!");
-			Print.log("Failed to insert mail! Probably no space in target mailbox!");
-			Print.log(tile + " || " + rectype + " || " + receiver + " || " + sender + " || " + message + " || " + type + " || " + expiry + " || " + compound);
-			return false;
-		}
-		return true;
+	public NonNullList<ItemStack> getMails(){
+		return mails;
 	}
 	
 }

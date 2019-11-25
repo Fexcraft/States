@@ -1,12 +1,13 @@
 package net.fexcraft.mod.states.util;
 
+import java.io.File;
 import java.util.UUID;
 
 import net.fexcraft.lib.common.math.Time;
 import net.fexcraft.lib.mc.capabilities.FCLCapabilities;
 import net.fexcraft.lib.mc.utils.Print;
 import net.fexcraft.lib.mc.utils.Static;
-import net.fexcraft.mod.states.api.ChunkPos;
+import net.fexcraft.mod.states.States;
 import net.fexcraft.mod.states.api.District;
 import net.fexcraft.mod.states.api.Mailbox.MailType;
 import net.fexcraft.mod.states.api.Mailbox.RecipientType;
@@ -14,15 +15,16 @@ import net.fexcraft.mod.states.api.Municipality;
 import net.fexcraft.mod.states.api.State;
 import net.fexcraft.mod.states.api.capabilities.PlayerCapability;
 import net.fexcraft.mod.states.impl.SignMailbox;
+import net.fexcraft.mod.states.objects.MailItem;
 import net.minecraft.command.ICommandSender;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.item.ItemStack;
+import net.minecraft.nbt.CompressedStreamTools;
 import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.nbt.NBTTagList;
 import net.minecraft.tileentity.TileEntity;
-import net.minecraft.tileentity.TileEntitySign;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
-import net.minecraftforge.common.ForgeChunkManager;
-import net.minecraftforge.common.ForgeChunkManager.Ticket;
 
 public class MailUtil {
 	
@@ -49,23 +51,17 @@ public class MailUtil {
 					case DISTRICT:{
 						District dis = StateUtil.getDistrict(Integer.parseInt(rec));
 						if(dis.getMailbox() == null){ rety = RecipientType.MUNICIPALITY; rec = dis.getMunicipality().getId() + ""; continue; }
-						mailbox = validate(world, dis.getMailbox(), rety, rec.toString());
-						if(mailbox == null){ rety = RecipientType.MUNICIPALITY; rec = dis.getMunicipality().getId() + ""; continue; }
 						break;
 					}
 					case MUNICIPALITY:{
 						Municipality mun = StateUtil.getMunicipality(Integer.parseInt(rec));
 						if(mun.getMailbox() == null){ rety = RecipientType.STATE; rec = mun.getState().getId() + ""; continue; }
-						mailbox = validate(world, mun.getMailbox(), rety, rec.toString());
-						if(mailbox == null){ rety = RecipientType.STATE; rec = mun.getState().getId() + ""; continue; }
 						break;
 					}
 					case PLAYER:{
 						PlayerCapability cap = StateUtil.getPlayer(rec.toString(), true);
 						if(cap == null){ printFailure(ics, 1, rectype, receiver, sender, message, type, expiry, compound, rety, rec); return false; }
 						if(cap.getMailbox() == null){ rety = RecipientType.MUNICIPALITY; rec = cap.getMunicipality().getId() + ""; continue; }
-						mailbox = validate(world, cap.getMailbox(), rety, rec.toString());
-						if(mailbox == null){ rety = RecipientType.MUNICIPALITY; rec = cap.getMunicipality().getId() + "";  continue; }
 						break;
 					}
 					case STATE:{
@@ -78,38 +74,33 @@ public class MailUtil {
 								printFailure(ics, 1, rectype, receiver, sender, message, type, expiry, compound, rety, rec); return false;
 							}
 						}
-						mailbox = validate(world, state.getMailbox(), rety, rec.toString());
-						if(mailbox == null){
-							if(state.getId() >= 0){
-								rety = RecipientType.STATE; rec = "-1"; continue;
-							}
-							else{
-								printFailure(ics, 2, rectype, receiver, sender, message, type, expiry, compound, rety, rec); return false;
-							}
-						}
 						break;
 					}
 				}
 			}
-			ChunkPos pos = new ChunkPos(mailbox);
-			Ticket ticket = null;
 			if(!world.isBlockLoaded(mailbox)){
-				ticket = ForcedChunksManager.getFreeTicket();
-				ForgeChunkManager.forceChunk(ticket, pos);
-			}
-			TileEntity tile = Static.getServer().getWorld(0).getTileEntity(mailbox);
-			if(tile == null){
-				printFailure(ics, 3, rectype, receiver, sender, message, type, expiry, compound, null, null); return false;
-			}
-			try{
+				TileEntity tile = Static.getServer().getWorld(0).getTileEntity(mailbox);
+				if(tile == null){
+					printFailure(ics, 2, rectype, receiver, sender, message, type, expiry, compound, null, null); return false;
+				}
 				SignMailbox sign = tile.getCapability(FCLCapabilities.SIGN_CAPABILITY, null).getListener(SignMailbox.class, SignMailbox.RESLOC);
-				return sign.insert(ics, (TileEntitySign)tile, rectype, receiver.toString(), sender, message, type, expiry, compound);
+				if(!insert(null, sign, rectype, receiver.toString(), sender, message, type, expiry, compound)){
+					printFailure(ics, 3, rectype, receiver, sender, message, type, expiry, compound, null, null);
+				}
 			}
-			catch(Exception e){
-				e.printStackTrace();
-			}
-			if(ticket != null){
-				ForgeChunkManager.unforceChunk(ticket, pos);
+			else{
+				File file = new File(States.getSaveDirectory(), "mailboxes/" + rety.name().toLowerCase() + "_" + rec + ".nbt");
+				NBTTagCompound com = file.exists() ? CompressedStreamTools.read(file) : new NBTTagCompound();
+				if(com.hasNoTags()){
+					com.setString("type", rety.name().toLowerCase());
+					com.setString("id", rec); com.setTag("mails", new NBTTagList());
+				}
+				if(!insert(com, null, rectype, receiver.toString(), sender, message, type, expiry, compound)){
+					printFailure(ics, 4, rectype, receiver, sender, message, type, expiry, compound, null, null);
+				}
+				else{
+					if(!file.exists()) file.getParentFile().mkdirs(); CompressedStreamTools.write(com, file);
+				}
 			}
 			if(rectype == RecipientType.PLAYER){
 				EntityPlayer player = Static.getServer().getPlayerList().getPlayerByUUID(UUID.fromString(receiver.toString()));
@@ -122,20 +113,30 @@ public class MailUtil {
 		return false;
 	}
 
-	private static BlockPos validate(World world, BlockPos mailbox, RecipientType type, String receiver){
-		ChunkPos pos = new ChunkPos(mailbox); Ticket ticket = null;
-		if(!world.isBlockLoaded(mailbox)){
-			ticket = ForcedChunksManager.getFreeTicket();
-			ForgeChunkManager.forceChunk(ticket, pos);
+	private static boolean insert(NBTTagCompound com, SignMailbox box, RecipientType rectype, String receiver, String sender, String message, MailType type, long expiry, NBTTagCompound compound){
+		try{
+			ItemStack stack = new ItemStack(MailItem.INSTANCE, 1, type.toMetadata());
+			NBTTagCompound nbt = new NBTTagCompound();
+			nbt.setString("Receiver", rectype.name().toLowerCase() + ":" + receiver);
+			nbt.setString("Sender", sender);
+			nbt.setString("Message", message);
+			nbt.setString("Type", type.name());
+			nbt.setString("Content", message);
+			if(compound != null) nbt.setTag("StatesData", compound);
+			if(expiry > 0) nbt.setLong("Expiry", Time.getDate() + expiry);
+			stack.setTagCompound(nbt);
+			if(box != null){
+				box.getMails().add(stack);
+			}
+			else{
+				NBTTagList list = (NBTTagList)com.getTag("mails");
+				list.appendTag(stack.serializeNBT());
+			}
+			return true;
 		}
-		TileEntity entity = world.getTileEntity(mailbox);
-		if(entity == null || !entity.hasCapability(FCLCapabilities.SIGN_CAPABILITY, null)){
-			ForgeChunkManager.unforceChunk(ticket, pos);return null;
+		catch(Exception e){
+			e.printStackTrace(); return false;
 		}
-		if(entity.getCapability(FCLCapabilities.SIGN_CAPABILITY, null).getListener(SignMailbox.class, SignMailbox.RESLOC).accepts(mailbox, type, receiver)){
-			ForgeChunkManager.unforceChunk(ticket, pos); return mailbox;
-		}
-		else{ ForgeChunkManager.unforceChunk(ticket, pos); return null; }
 	}
 
 	private static void printFailure(ICommandSender ics, int i, RecipientType rectype, Object receiver, String sender, String message, MailType type, long expiry, NBTTagCompound compound, RecipientType rety, Object rec){

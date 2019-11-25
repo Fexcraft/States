@@ -2,6 +2,7 @@ package net.fexcraft.mod.states.impl;
 
 import java.io.File;
 
+import net.fexcraft.lib.common.math.Time;
 import net.fexcraft.lib.mc.capabilities.sign.SignCapability;
 import net.fexcraft.lib.mc.utils.Formatter;
 import net.fexcraft.lib.mc.utils.Print;
@@ -183,7 +184,10 @@ public class SignMailbox implements SignCapability.Listener {
 				mails.clear(); NBTTagList list = (NBTTagList)com.getTag("mails");
 				for(NBTBase base : list){
 					try{
-						mails.add(new ItemStack((NBTTagCompound)base));
+						ItemStack stack = new ItemStack((NBTTagCompound)base);
+						if(stack.getMetadata() >= 2 && Time.getDate() >= stack.getTagCompound().getLong("Expiry")){
+							stack.setItemDamage(1);//expired
+						} mails.add(stack);
 					}
 					catch(Exception e){
 						e.printStackTrace();

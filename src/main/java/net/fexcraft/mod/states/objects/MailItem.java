@@ -54,6 +54,7 @@ public class MailItem extends Item {
         	tooltip.add(Formatter.format("&9Receiver: &7" + (NumberUtils.isCreatable(compound.getString("Receiver")) ? compound.getString("Receiver") : Static.getPlayerNameByUUID(compound.getString("Receiver").replace("player:", "")))));
         	if(compound.hasKey("Expiry")){
             	tooltip.add(Formatter.format("&9Expires: &7" + Time.getAsString(compound.getLong("Expiry"))));
+				if(Time.getDate() >= stack.getTagCompound().getLong("Expiry")){ stack.setItemDamage(1); }
         	}
         	if(compound.hasKey("StatesData")){
         		NBTTagCompound nbt = compound.getCompoundTag("StatesData");

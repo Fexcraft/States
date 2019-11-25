@@ -1,7 +1,7 @@
 package net.fexcraft.mod.states.impl.capabilities;
 
-import net.fexcraft.mod.states.api.capabilities.ChunkCapability;
-import net.fexcraft.mod.states.api.capabilities.StatesCapabilities;
+import net.fexcraft.mod.states.data.capabilities.ChunkCapability;
+import net.fexcraft.mod.states.data.capabilities.StatesCapabilities;
 import net.fexcraft.mod.states.util.StateUtil;
 import net.minecraft.nbt.NBTBase;
 import net.minecraft.nbt.NBTTagString;

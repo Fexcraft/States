@@ -1,8 +1,8 @@
 package net.fexcraft.mod.states.impl.capabilities;
 
 import net.fexcraft.mod.states.api.Municipality;
-import net.fexcraft.mod.states.api.capabilities.PlayerCapability;
-import net.fexcraft.mod.states.api.capabilities.StatesCapabilities;
+import net.fexcraft.mod.states.data.capabilities.PlayerCapability;
+import net.fexcraft.mod.states.data.capabilities.StatesCapabilities;
 import net.fexcraft.mod.states.impl.GenericPlayer;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.nbt.NBTBase;

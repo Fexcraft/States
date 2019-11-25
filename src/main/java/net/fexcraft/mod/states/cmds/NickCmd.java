@@ -4,8 +4,8 @@ import org.apache.commons.lang3.StringUtils;
 
 import net.fexcraft.lib.mc.api.registry.fCommand;
 import net.fexcraft.lib.mc.utils.Print;
-import net.fexcraft.mod.states.api.capabilities.PlayerCapability;
-import net.fexcraft.mod.states.api.capabilities.StatesCapabilities;
+import net.fexcraft.mod.states.data.capabilities.PlayerCapability;
+import net.fexcraft.mod.states.data.capabilities.StatesCapabilities;
 import net.fexcraft.mod.states.util.Config;
 import net.minecraft.command.CommandBase;
 import net.minecraft.command.CommandException;

@@ -1,4 +1,4 @@
-package net.fexcraft.mod.states.api.capabilities;
+package net.fexcraft.mod.states.data.capabilities;
 
 import javax.annotation.Nullable;
 

@@ -1,4 +1,4 @@
-package net.fexcraft.mod.states.api.capabilities;
+package net.fexcraft.mod.states.data.capabilities;
 
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.capabilities.CapabilityInject;

@@ -2,7 +2,7 @@ package net.fexcraft.mod.states.data;
 
 import java.util.UUID;
 
-import com.google.gson.JsonObject;
+import com.google.gson.JsonArray;
 
 import net.fexcraft.mod.states.data.root.Initiator;
 
@@ -26,19 +26,17 @@ public class Rule {
 		return value;
 	}
 	
-	public JsonObject save(){
-		JsonObject obj = new JsonObject();
-		obj.addProperty("id", id);
-		if(value != null) obj.addProperty("value", value);
-		obj.addProperty("reviser", reviser.name());
-		obj.addProperty("setter", setter.name());
-		return obj;
+	public JsonArray save(){
+		JsonArray arr = new JsonArray();
+		arr.add(reviser.name()); arr.add(setter.name());
+		if(value != null) arr.add(value);
+		return arr;
 	}
 	
-	public Rule load(JsonObject obj){
-		if(obj.has("value")) value = obj.get("value").getAsBoolean();
-		reviser = Initiator.valueOf(obj.get("reviser").getAsString());
-		setter = Initiator.valueOf(obj.get("setter").getAsString());
+	public Rule load(JsonArray array){
+		reviser = Initiator.valueOf(array.get(0).getAsString());
+		setter = Initiator.valueOf(array.get(1).getAsString());
+		if(array.size() > 2) value = array.get(2).getAsBoolean();
 		return this;
 	}
 	

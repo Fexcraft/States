@@ -42,10 +42,12 @@ public class Municipality implements ColorHolder, BuyableType, IconHolder, Accou
 	private ArrayList<UUID> citizen, council, pl_blacklist;
 	private MunicipalityType type;
 	private State state;
-	private boolean open, kib;
+	private boolean kib;
 	private BlockPos mailbox;
+	//
 	private RuleMap rules = new RuleMap();
 	private String ruleset_name;
+	public Rule r_OPEN, r_SET_NAME, r_SET_PRICE, r_SET_MAYOR;
 	
 	public Municipality(int id){
 		this.id = id;
@@ -63,7 +65,6 @@ public class Municipality implements ColorHolder, BuyableType, IconHolder, Accou
 		type = MunicipalityType.getType(this);
 		state = StateUtil.getState(JsonUtil.getIfExists(obj, "state", -1).intValue());
 		color = JsonUtil.getIfExists(obj, "color", "#ffffff");
-		open = JsonUtil.getIfExists(obj, "open", false);
 		com_blacklist = JsonUtil.jsonArrayToIntegerArray(JsonUtil.getIfExists(obj, "company_blacklist", new JsonArray()).getAsJsonArray());
 		pl_blacklist = JsonUtil.jsonArrayToUUIDArray(JsonUtil.getIfExists(obj, "player_blacklist", new JsonArray()).getAsJsonArray());
 		price = JsonUtil.getIfExists(obj, "price", 0).longValue();
@@ -72,17 +73,20 @@ public class Municipality implements ColorHolder, BuyableType, IconHolder, Accou
 		citizentax = JsonUtil.getIfExists(obj, "citizen_tax", 0).longValue();
 		mailbox = obj.has("mailbox") ? BlockPos.fromLong(obj.get("mailbox").getAsLong()) : null;
 		ruleset_name = JsonUtil.getIfExists(obj, "ruleset", "Standard Ruleset");
-		rules.add(new Rule("set.name", null, true, Initiator.COUNCIL_VOTE, Initiator.INCHARGE));
-		rules.add(new Rule("set.price", null, true, Initiator.COUNCIL_VOTE, Initiator.INCHARGE));
-		rules.add(new Rule("set.mayor", null, true, Initiator.COUNCIL_VOTE, Initiator.INCHARGE));
+		rules.add(r_SET_NAME = new Rule("set.name", null, true, Initiator.COUNCIL_VOTE, Initiator.INCHARGE));
+		rules.add(r_SET_PRICE = new Rule("set.price", null, true, Initiator.COUNCIL_VOTE, Initiator.INCHARGE));
+		rules.add(r_SET_MAYOR = new Rule("set.mayor", null, true, Initiator.COUNCIL_VOTE, Initiator.INCHARGE));
+		rules.add(r_OPEN = new Rule("open_to_join", false, true, Initiator.COUNCIL_VOTE, Initiator.COUNCIL_ANY));
 		if(obj.has("rules")){
-			JsonArray array = obj.get("rules").getAsJsonArray();
-			for(JsonElement elm : array){
-				JsonObject jsn = elm.getAsJsonObject();
-				if(!jsn.has("id")) continue;
-				Rule rule = rules.get(jsn.get("id").getAsString());
-				if(rule != null) rule.load(jsn);
+			JsonObject rls = obj.get("rules").getAsJsonObject();
+			for(Map.Entry<String, JsonElement> entry : rls.entrySet()){
+				Rule rule = rules.get(entry.getKey());
+				if(rule != null) rule.load(entry.getValue().getAsJsonArray());
 			}
+		}
+		//import old settings from old saves
+		if(obj.has("open")){
+			r_OPEN.set(obj.get("open").getAsBoolean());
 		}
 	}
 
@@ -101,7 +105,7 @@ public class Municipality implements ColorHolder, BuyableType, IconHolder, Accou
 		obj.addProperty("state", state.getId());
 		obj.addProperty("balance", account.getBalance());
 		obj.addProperty("color", color);
-		obj.addProperty("open", open);
+		//obj.addProperty("open", open);
 		obj.addProperty("price", price);
 		if(icon != null){ obj.addProperty("icon", icon); }
 		obj.addProperty("kick_if_bankrupt", kib);
@@ -225,14 +229,6 @@ public class Municipality implements ColorHolder, BuyableType, IconHolder, Accou
 	@Override
 	public void setColor(String newcolor){
 		color = newcolor;
-	}
-
-	public boolean isOpen(){
-		return open;
-	}
-
-	public void setOpen(boolean bool){
-		open = bool;
 	}
 
 	public List<UUID> getPlayerBlacklist(){

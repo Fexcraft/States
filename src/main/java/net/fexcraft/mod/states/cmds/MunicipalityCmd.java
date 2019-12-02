@@ -107,7 +107,7 @@ public class MunicipalityCmd extends CommandBase {
 					Municipality municipality = StateUtil.getMunicipality(var);
 					Print.chat(sender, "&c-> &9" + municipality.getName() + " &7(" + municipality.getId() + ");");
 				});
-				Print.chat(sender, "&3Open to join: " + mun.isOpen());
+				Print.chat(sender, "&3Open to join: " + mun.r_OPEN.get());
 				Print.chat(sender, "&8Kick if Bankrupt: " + mun.kickIfBankrupt());
 				Print.chat(sender, "&6Chunks: &7" + mun.getClaimedChunks() + "&8/&9" + MunicipalityType.getChunkLimitFor(mun));
 				Print.chat(sender, "&2Created by &7" + Static.getPlayerNameByUUID(mun.getCreator()) + "&2 at &8" + Time.getAsString(mun.getCreated()));
@@ -296,16 +296,16 @@ public class MunicipalityCmd extends CommandBase {
 						break;
 					}
 					case "open":{
-						if(hasPerm("municipality.set.open", player, mun)){
+						if(mun.isAuthorized(mun.r_OPEN.id, ply.getUUID()) || StateUtil.bypass(player)){
 							if(args.length < 3){
 								Print.chat(sender, "&9Missing Argument!");
 								break;
 							}
-							mun.setOpen(Boolean.parseBoolean(args[2]));
+							mun.r_OPEN.set(Boolean.parseBoolean(args[2]));
 							mun.setChanged(Time.getDate());
 							mun.save();
-							Print.chat(sender, "&2Open: &7" + mun.isOpen());
-							StateLogger.log(StateLogger.LoggerType.MUNICIPALITY, StateLogger.player(player) + " set " + StateLogger.municipality(mun) + " to " + (mun.isOpen() ? "OPEN" : "CLOSED") + ".");
+							Print.chat(sender, "&2Open: &7" + mun.r_OPEN.get());
+							StateLogger.log(StateLogger.LoggerType.MUNICIPALITY, StateLogger.player(player) + " set " + StateLogger.municipality(mun) + " to " + (mun.r_OPEN.get() ? "OPEN" : "CLOSED") + ".");
 						}
 						else{
 							Print.chat(sender, "&cNo permission.");
@@ -564,7 +564,7 @@ public class MunicipalityCmd extends CommandBase {
 				return;
 			}
 			case "join":{
-				if(!mun.isOpen()){
+				if(!mun.r_OPEN.get()){
 					Print.chat(sender, "&aYou need an invite to be able to join this Municipality.");
 					return;
 				}
@@ -681,7 +681,7 @@ public class MunicipalityCmd extends CommandBase {
 						newmun.setCreator(ply.getUUID());
 						newmun.setName(name);
 						newmun.setHead(ply.getUUID());
-						newmun.setOpen(false);
+						newmun.r_OPEN.set(false);
 						newmun.setPrice(0);
 						newmun.getCitizen().add(ply.getUUID());
 						newmun.setChanged(Time.getDate());

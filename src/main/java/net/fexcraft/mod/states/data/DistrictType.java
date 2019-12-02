@@ -2,15 +2,15 @@ package net.fexcraft.mod.states.data;
 
 public enum DistrictType {
 
-	WILDERNESS(new boolean[]{false, false, false, false, false}),
-	AGRICULTURAL(new boolean[]{false, false, false, true, false}),
-	MINERAL   (new boolean[]{false, false, true , false, true}),
-	VILLAGE   (new boolean[]{true , false, false, true , false}),
-	RESIDENTAL(new boolean[]{true , true , false, false, false}),
-	COMMERCIAL(new boolean[]{false, true , false, true , false}),
-	INDUSTRIAL(new boolean[]{false, false, true , false, false}),
-	WASTELAND (new boolean[]{false, false, false, false, true }),
-	MUNICIPIAL(new boolean[]{true, true, false, false, false});
+	WILDERNESS(new boolean[]{ false, false, false, false, false }),
+	AGRICULTURAL(new boolean[]{false, false, false, true, false }),
+	MINERAL   (new boolean[]{ false, false, true , false, true  }),
+	VILLAGE   (new boolean[]{ true , false, false, true , false }),
+	RESIDENTAL(new boolean[]{ true , true , false, false, false }),
+	COMMERCIAL(new boolean[]{ false, true , false, true , false }),
+	INDUSTRIAL(new boolean[]{ false, false, true , false, false }),
+	WASTELAND (new boolean[]{ false, false, false, false, true  }),
+	MUNICIPIAL(new boolean[]{ true , true , false, false, false });
 	
 	public boolean housing, commerce, industry, cultivation, exploit;
 	

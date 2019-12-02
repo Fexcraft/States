@@ -108,7 +108,7 @@ public class MunicipalityCmd extends CommandBase {
 					Print.chat(sender, "&c-> &9" + municipality.getName() + " &7(" + municipality.getId() + ");");
 				});
 				Print.chat(sender, "&3Open to join: " + mun.r_OPEN.get());
-				Print.chat(sender, "&8Kick if Bankrupt: " + mun.kickIfBankrupt());
+				Print.chat(sender, "&8Kick if Bankrupt: " + mun.r_KIB.get());
 				Print.chat(sender, "&6Chunks: &7" + mun.getClaimedChunks() + "&8/&9" + MunicipalityType.getChunkLimitFor(mun));
 				Print.chat(sender, "&2Created by &7" + Static.getPlayerNameByUUID(mun.getCreator()) + "&2 at &8" + Time.getAsString(mun.getCreated()));
 				Collection<?> coll = mun.getForceLoadedChunks();
@@ -189,7 +189,7 @@ public class MunicipalityCmd extends CommandBase {
 				}
 				switch(args[1]){
 					case "mayor":{
-						if(mun.isAuthorized("set.mayor", ply.getUUID()) || StateUtil.bypass(player)){
+						if(mun.isAuthorized(mun.r_SET_MAYOR.id, ply.getUUID()) || StateUtil.bypass(player)){
 							if(args.length < 3){
 								Print.chat(sender, "&9Missing Argument!");
 								break;
@@ -215,7 +215,7 @@ public class MunicipalityCmd extends CommandBase {
 						break;
 					}
 					case "name":{
-						if(mun.isAuthorized("set.name", ply.getUUID()) || StateUtil.bypass(player)){
+						if(mun.isAuthorized(mun.r_SET_NAME.id, ply.getUUID()) || StateUtil.bypass(player)){
 							if(args.length < 3){
 								Print.chat(sender, "&9Missing Arguments!");
 								break;
@@ -242,7 +242,7 @@ public class MunicipalityCmd extends CommandBase {
 						break;
 					}
 					case "price":{
-						if(mun.isAuthorized("set.price", ply.getUUID()) || StateUtil.bypass(player)){
+						if(mun.isAuthorized(mun.r_SET_PRICE.id, ply.getUUID()) || StateUtil.bypass(player)){
 							if(args.length < 3){
 								Print.chat(sender, "&9Missing Argument!");
 								Print.chat(sender, "&7Setting the price to \"0\" makes the municipality not buyable.");
@@ -267,7 +267,7 @@ public class MunicipalityCmd extends CommandBase {
 						break;
 					}
 					case "color":{
-						if(hasPerm("municipality.set.color", player, mun)){
+						if(mun.isAuthorized(mun.r_COLOR.id, ply.getUUID()) || StateUtil.bypass(player)){
 							if(args.length < 3){
 								Print.chat(sender, "&9Missing Argument!");
 								break;
@@ -313,7 +313,7 @@ public class MunicipalityCmd extends CommandBase {
 						break;
 					}
 					case "icon":{
-						if(hasPerm("municipality.set.icon", player, mun)){
+						if(mun.isAuthorized(mun.r_ICON.id, ply.getUUID()) || StateUtil.bypass(player)){
 							if(args.length < 3){
 								Print.chat(sender, "&9Missing Argument!");
 								break;
@@ -335,7 +335,7 @@ public class MunicipalityCmd extends CommandBase {
 						break;
 					}
 					case "citizen-tax":{
-						if(hasPerm("municipality.set.citizentax", player, mun)){
+						if(mun.isAuthorized(mun.r_SET_CITIZENTAX.id, ply.getUUID()) || StateUtil.bypass(player)){
 							if(args[2].equals("reset") || args[2].equals("disable")){
 								mun.setCitizenTax(0); mun.save();
 								Print.chat(sender, "&9Municipality's Citizen Tax was reset!");
@@ -351,12 +351,12 @@ public class MunicipalityCmd extends CommandBase {
 						break;
 					}
 					case "kick-if-bankrupt":{
-						if(hasPerm("municipality.set.kick-if-bankrupt", player, mun)){
+						if(mun.isAuthorized(mun.r_KIB.id, ply.getUUID()) || StateUtil.bypass(player)){
 							if(args.length < 3){ Print.chat(sender, "&9Missing Argument!"); break; }
-							mun.setKickIfBankrupt(Boolean.parseBoolean(args[2]));
+							mun.r_KIB.set(Boolean.parseBoolean(args[2]));
 							mun.setChanged(Time.getDate()); mun.save();
-							Print.chat(sender, "&2KIB: &7" + mun.kickIfBankrupt());
-							StateLogger.log(StateLogger.LoggerType.DISRICT, StateLogger.player(player) + " changed 'kick-if-brankrupt' of " + StateLogger.municipality(mun) + " to " + mun.kickIfBankrupt() + ".");
+							Print.chat(sender, "&2KIB: &7" + mun.r_KIB.get());
+							StateLogger.log(StateLogger.LoggerType.DISRICT, StateLogger.player(player) + " changed 'kick-if-brankrupt' of " + StateLogger.municipality(mun) + " to " + mun.r_KIB.get() + ".");
 						}
 						break;
 					}

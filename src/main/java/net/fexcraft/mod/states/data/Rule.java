@@ -2,8 +2,6 @@ package net.fexcraft.mod.states.data;
 
 import java.util.UUID;
 
-import com.google.gson.JsonArray;
-
 import net.fexcraft.mod.states.data.root.Initiator;
 
 public class Rule {
@@ -26,17 +24,16 @@ public class Rule {
 		return value;
 	}
 	
-	public JsonArray save(){
-		JsonArray arr = new JsonArray();
-		arr.add(reviser.name()); arr.add(setter.name());
-		if(value != null) arr.add(value);
-		return arr;
+	public String save(){
+		String string = reviser.name() + "," + setter.name();
+		if(value != null) string += "," + value; return string;
 	}
 	
-	public Rule load(JsonArray array){
-		reviser = Initiator.valueOf(array.get(0).getAsString());
-		setter = Initiator.valueOf(array.get(1).getAsString());
-		if(array.size() > 2) value = array.get(2).getAsBoolean();
+	public Rule load(String string){
+		String[] arr = string.split(",");
+		reviser = Initiator.valueOf(arr[0]);
+		setter = Initiator.valueOf(arr[1]);
+		if(string.length() > 2) value = Boolean.parseBoolean(arr[2]);
 		return this;
 	}
 	

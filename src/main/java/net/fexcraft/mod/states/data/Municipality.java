@@ -83,7 +83,7 @@ public class Municipality implements ColorHolder, BuyableType, IconHolder, Accou
 			JsonObject rls = obj.get("rules").getAsJsonObject();
 			for(Map.Entry<String, JsonElement> entry : rls.entrySet()){
 				Rule rule = rules.get(entry.getKey());
-				if(rule != null) rule.load(entry.getValue().getAsJsonArray());
+				if(rule != null) rule.load(entry.getValue().getAsString());
 			}
 		}
 		//import old settings from old saves
@@ -114,7 +114,7 @@ public class Municipality implements ColorHolder, BuyableType, IconHolder, Accou
 		if(mailbox != null) obj.addProperty("mailbox", mailbox.toLong());
 		obj.addProperty("ruleset", ruleset_name);
 		JsonObject rells = new JsonObject();
-		for(Rule rule : rules.values()) rells.add(rule.id, rule.save());
+		for(Rule rule : rules.values()) rells.addProperty(rule.id, rule.save());
 		obj.add("rules", rells);
 		return obj;
 	}

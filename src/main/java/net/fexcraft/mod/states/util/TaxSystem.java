@@ -140,21 +140,21 @@ public class TaxSystem extends TimerTask {
 			Account state = cap.getState().getAccount();
 			Bank bank = cap.getBank();
 			if(account.getBalance() < tax){
-				if((account.getBalance() <= 0 || bank.isNull()) && cap.getMunicipality().kickIfBankrupt()){
+				if((account.getBalance() <= 0 || bank.isNull()) && cap.getMunicipality().r_KIB.get()){
 					MailUtil.send(null, RecipientType.PLAYER, cap.getUUIDAsString(), COLLECTOR, "You didn't have enough money to pay your citizen tax, as such, you got kicked.", SYSTEMMAIL);
 					MailUtil.send(null, RecipientType.MUNICIPALITY, cap.getMunicipality().getId(), COLLECTOR, StateLogger.player(cap) + " did not have enough money to pay the tax, following the Municipality's settings, that player got kicked.", SYSTEMMAIL);
 					cap.setMunicipality(StateUtil.getMunicipality(-1));
 					cap.onTaxCollected(date);
 					return;
 				}
-				else if(account.getBalance() > 0 && bank != null && cap.getMunicipality().kickIfBankrupt()){
+				else if(account.getBalance() > 0 && bank != null && cap.getMunicipality().r_KIB.get()){
 					bank.processAction(Bank.Action.TRANSFER, Static.getServer(), account, account.getBalance(), cap.getMunicipality().getAccount());
 					MailUtil.send(null, RecipientType.PLAYER, cap.getUUIDAsString(), COLLECTOR, "WARNING! You didn't have enough money to pay your tax, next tax collection cycle you may get kicked!", SYSTEMMAIL);
 					MailUtil.send(null, RecipientType.MUNICIPALITY, cap.getMunicipality().getId(), COLLECTOR, StateLogger.player(cap) + " did not have enough money to pay the full tax.", SYSTEMMAIL);
 					cap.onTaxCollected(date);
 					return;
 				}
-				else if(account.getBalance() > 0 && bank != null && !cap.getMunicipality().kickIfBankrupt()){
+				else if(account.getBalance() > 0 && bank != null && !cap.getMunicipality().r_KIB.get()){
 					bank.processAction(Bank.Action.TRANSFER, Static.getServer(), account, account.getBalance(), cap.getMunicipality().getAccount());
 					MailUtil.send(null, RecipientType.PLAYER, cap.getUUIDAsString(), COLLECTOR, StateLogger.player(cap) + " did not have enough money to pay the full tax.", SYSTEMMAIL);
 					MailUtil.send(null, RecipientType.MUNICIPALITY, cap.getMunicipality().getId(), COLLECTOR, StateLogger.player(cap) + " did not have enough money to pay the full tax.", SYSTEMMAIL);

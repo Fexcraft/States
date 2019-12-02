@@ -3,6 +3,7 @@ package net.fexcraft.mod.states.data;
 import java.util.UUID;
 
 import net.fexcraft.mod.states.data.root.Initiator;
+import net.fexcraft.mod.states.data.root.Ruleable;
 
 public class Rule {
 	
@@ -42,7 +43,7 @@ public class Rule {
 	}
 
 	/** Call to see if this player can SET/APPLY this rule. */
-	public boolean isAuthorized(RuleHolder holder, UUID uuid){
+	public boolean isAuthorized(Ruleable holder, UUID uuid){
 		switch(setter){
 			case CITIZEN_ANY:{
 				if(holder instanceof Municipality){
@@ -56,7 +57,7 @@ public class Rule {
 	}
 	
 	/** Call to see if this player can REVISE/MODIFY this rule. */
-	public boolean canRevise(RuleHolder holder, UUID uuid){
+	public boolean canRevise(Ruleable holder, UUID uuid){
 		switch(setter){
 			case CITIZEN_ANY:{
 				if(holder instanceof Municipality){

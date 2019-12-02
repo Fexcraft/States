@@ -24,6 +24,7 @@ import net.fexcraft.mod.states.data.root.ColorHolder;
 import net.fexcraft.mod.states.data.root.IconHolder;
 import net.fexcraft.mod.states.data.root.Initiator;
 import net.fexcraft.mod.states.data.root.MailReceiver;
+import net.fexcraft.mod.states.data.root.Ruleable;
 import net.fexcraft.mod.states.util.Config;
 import net.fexcraft.mod.states.util.ForcedChunksManager;
 import net.fexcraft.mod.states.util.RuleMap;
@@ -31,7 +32,7 @@ import net.fexcraft.mod.states.util.StateUtil;
 import net.minecraft.command.ICommandSender;
 import net.minecraft.util.math.BlockPos;
 
-public class Municipality implements ColorHolder, BuyableType, IconHolder, AccountHolder, MailReceiver, RuleHolder {
+public class Municipality implements ColorHolder, BuyableType, IconHolder, AccountHolder, MailReceiver, Ruleable {
 	
 	private int id;
 	private String name, color, icon;

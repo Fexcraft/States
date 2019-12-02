@@ -47,8 +47,8 @@ public class Municipality implements ColorHolder, BuyableType, IconHolder, Accou
 	//
 	private RuleMap rules = new RuleMap();
 	private String ruleset_name;
-	public Rule r_OPEN, r_COLOR, r_ICON, r_SET_NAME, r_SET_PRICE, r_SET_MAYOR, r_SET_CITIZENTAX, r_KIB;
-	public Rule r_EDIT_BL, r_KICK, r_INVITE, r_COUNCIL_KICK, r_COUNCIL_INVITE, r_COUNCIL_VOTE;
+	public final Rule r_OPEN, r_COLOR, r_ICON, r_SET_NAME, r_SET_PRICE, r_SET_MAYOR, r_SET_CITIZENTAX, r_KIB;
+	public final Rule r_EDIT_BL, r_KICK, r_INVITE, r_COUNCIL_KICK, r_COUNCIL_INVITE, r_COUNCIL_VOTE;
 	
 	public Municipality(int id){
 		this.id = id;

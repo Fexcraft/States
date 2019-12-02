@@ -88,8 +88,8 @@ public class DistrictCmd extends CommandBase {
 					Print.chat(sender, "&c-> &9" + district.getName() + " &7(" + district.getId() + ");");
 				});
 				Print.chat(sender, "&9Chunks: &7" + dis.getClaimedChunks());
-				Print.chat(sender, "&7Can Foreigners Settle: " + dis.canForeignersSettle());
-				Print.chat(sender, "&8Unclaim if Bankrupt: " + dis.unclaimIfBankrupt());
+				Print.chat(sender, "&7Can Foreigners Settle: " + dis.r_CFS.get());
+				Print.chat(sender, "&8Unclaim if Bankrupt: " + dis.r_ONBANKRUPT.get());
 				Print.chat(sender, "&2Created by &7" + Static.getPlayerNameByUUID(dis.getCreator()) + "&2 at &8" + Time.getAsString(dis.getCreated()));
 				Print.chat(sender, "&6Mailbox: &7" + (dis.getMailbox() == null ? "No mailbox set." : dis.getMailbox().toString()));
 				return;
@@ -260,12 +260,12 @@ public class DistrictCmd extends CommandBase {
 								Print.chat(sender, "&9Missing Argument!");
 								break;
 							}
-							dis.setForeignersSettle(Boolean.parseBoolean(args[2]));
+							dis.r_CFS.set(Boolean.parseBoolean(args[2]));
 							dis.setChanged(Time.getDate());
 							dis.save();
-							Print.chat(sender, "&2FCS: &7" + dis.canForeignersSettle());
+							Print.chat(sender, "&2FCS: &7" + dis.r_CFS.get());
 
-							StateLogger.log(StateLogger.LoggerType.DISRICT, StateLogger.player(player) + " changed 'can-foreigners-settle' of " + StateLogger.district(dis) + " to " + dis.canForeignersSettle() + ".");
+							StateLogger.log(StateLogger.LoggerType.DISRICT, StateLogger.player(player) + " changed 'can-foreigners-settle' of " + StateLogger.district(dis) + " to " + dis.r_CFS.get() + ".");
 						}
 						else{
 							Print.chat(sender, "&cNo permission.");
@@ -317,10 +317,10 @@ public class DistrictCmd extends CommandBase {
 					case "unclaim-if-brankrupt":{
 						if(hasPerm("district.set.unclaim-if-bankrupt", player, dis)){
 							if(args.length < 3){ Print.chat(sender, "&9Missing Argument!"); break; }
-							dis.setUnclaimIfBankrupt(Boolean.parseBoolean(args[2]));
+							dis.r_ONBANKRUPT.set(Boolean.parseBoolean(args[2]));
 							dis.setChanged(Time.getDate()); dis.save();
-							Print.chat(sender, "&2UIB: &7" + dis.unclaimIfBankrupt());
-							StateLogger.log(StateLogger.LoggerType.DISRICT, StateLogger.player(player) + " changed 'unclaim-if-brankrupt' of " + StateLogger.district(dis) + " to " + dis.unclaimIfBankrupt() + ".");
+							Print.chat(sender, "&2UIB: &7" + dis.r_ONBANKRUPT.get());
+							StateLogger.log(StateLogger.LoggerType.DISRICT, StateLogger.player(player) + " changed 'unclaim-if-brankrupt' of " + StateLogger.district(dis) + " to " + dis.r_ONBANKRUPT.get() + ".");
 						}
 						break;
 					}
@@ -373,7 +373,7 @@ public class DistrictCmd extends CommandBase {
 								newdis.setCreator(ply.getUUID());
 								newdis.setClaimedChunks(1);
 								newdis.setName(name);
-								newdis.setForeignersSettle(false);
+								newdis.r_CFS.set(false);
 								newdis.setCreated(Time.getDate());
 								newdis.setChanged(Time.getDate());
 								newdis.setHead(ply.getUUID());

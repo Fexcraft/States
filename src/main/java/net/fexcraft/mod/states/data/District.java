@@ -17,6 +17,7 @@ import net.fexcraft.mod.states.States;
 import net.fexcraft.mod.states.data.root.BuyableType;
 import net.fexcraft.mod.states.data.root.ColorHolder;
 import net.fexcraft.mod.states.data.root.IconHolder;
+import net.fexcraft.mod.states.data.root.Initiator;
 import net.fexcraft.mod.states.data.root.MailReceiver;
 import net.fexcraft.mod.states.data.root.Ruleable;
 import net.fexcraft.mod.states.impl.capabilities.SignTileEntityCapabilityUtil;
@@ -33,11 +34,11 @@ public class District implements ColorHolder, BuyableType, IconHolder, MailRecei
 	private ArrayList<Integer> neighbors;
 	private String name, color, icon;
 	private Municipality municipality;
-	private boolean cfs, onbankrupt;
 	private BlockPos mailbox;
 	//
 	private RuleMap rules = new RuleMap();
 	private String ruleset;
+	public final Rule r_CFS, r_ONBANKRUPT;
 	
 	public District(int id){
 		this.id = id; JsonObject obj = StateUtil.getDistrictJson(id);
@@ -50,14 +51,14 @@ public class District implements ColorHolder, BuyableType, IconHolder, MailRecei
 		municipality = StateUtil.getMunicipality(JsonUtil.getIfExists(obj, "municipality", -1).intValue());
 		manager = obj.has("manager") ? UUID.fromString(obj.get("manager").getAsString()) : null;
 		color = obj.has("color") ? obj.get("color").getAsString() : "#ffffff";
-		cfs = JsonUtil.getIfExists(obj, "can_foreigners_settle", false);
 		price = JsonUtil.getIfExists(obj, "price", 0).longValue();
 		icon = JsonUtil.getIfExists(obj, "icon", States.DEFAULT_ICON);
 		chunks = JsonUtil.getIfExists(obj, "chunks", 0).intValue();
 		chunktax = JsonUtil.getIfExists(obj, "chunktax", 0).longValue();
-		onbankrupt = JsonUtil.getIfExists(obj, "unclaim_chunks_if_bankrupt", false);
 		mailbox = obj.has("mailbox") ? BlockPos.fromLong(obj.get("mailbox").getAsLong()) : null;
 		ruleset = JsonUtil.getIfExists(obj, "ruleset", "Standard Ruleset");
+		rules.add(r_CFS = new Rule("can_foreigners_settle", false, true, Initiator.COUNCIL_ANY, Initiator.INCHARGE));
+		rules.add(r_ONBANKRUPT = new Rule("unclaim_chunks_if_bankrupt", false, true, Initiator.COUNCIL_ANY, Initiator.INCHARGE));
 		if(obj.has("rules")){
 			JsonObject rls = obj.get("rules").getAsJsonObject();
 			for(Map.Entry<String, JsonElement> entry : rls.entrySet()){
@@ -65,6 +66,9 @@ public class District implements ColorHolder, BuyableType, IconHolder, MailRecei
 				if(rule != null) rule.load(entry.getValue().getAsString());
 			}
 		}
+		//import old settings from old saves
+		if(obj.has("can_foreigners_settle")) r_CFS.set(obj.get("can_foreigners_settle").getAsBoolean());
+		if(obj.has("unclaim_chunks_if_bankrupt")) r_ONBANKRUPT.set(obj.get("unclaim_chunks_if_bankrupt").getAsBoolean());
 	}
 
 	public JsonObject toJsonObject(){
@@ -79,13 +83,17 @@ public class District implements ColorHolder, BuyableType, IconHolder, MailRecei
 		obj.add("neighbors", JsonUtil.getArrayFromIntegerList(neighbors));
 		if(!(manager == null)){ obj.addProperty("manager", manager.toString()); }
 		obj.addProperty("color", color);
-		obj.addProperty("can_foreigners_settle", cfs);
+		//obj.addProperty("can_foreigners_settle", cfs);
 		obj.addProperty("price", price);
 		if(icon != null){ obj.addProperty("icon", icon); }
 		obj.addProperty("chunks", chunks);
 		if(chunktax > 0){ obj.addProperty("chunktax", chunktax); }
-		obj.addProperty("unclaim_chunks_if_bankrupt", onbankrupt);
+		//obj.addProperty("unclaim_chunks_if_bankrupt", onbankrupt);
 		if(mailbox != null) obj.addProperty("mailbox", mailbox.toLong());
+		obj.addProperty("ruleset", ruleset);
+		JsonObject rells = new JsonObject();
+		for(Rule rule : rules.values()) rells.addProperty(rule.id, rule.save());
+		obj.add("rules", rells);
 		return obj;
 	}
 
@@ -180,14 +188,6 @@ public class District implements ColorHolder, BuyableType, IconHolder, MailRecei
 		color = newcolor;
 	}
 
-	public boolean canForeignersSettle(){
-		return cfs;
-	}
-
-	public void setForeignersSettle(boolean bool){
-		cfs = bool;
-	}
-
 	@Override
 	public long getPrice(){
 		return price;
@@ -222,14 +222,6 @@ public class District implements ColorHolder, BuyableType, IconHolder, MailRecei
 
 	public void setChunkTax(long tax){
 		chunktax = tax;
-	}
-
-	public boolean unclaimIfBankrupt(){
-		return onbankrupt;
-	}
-
-	public void setUnclaimIfBankrupt(boolean newvalue){
-		onbankrupt = newvalue;
 	}
 
 	@Override

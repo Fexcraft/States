@@ -15,6 +15,10 @@ public class Rule {
 	
 	public Rule(String id, Boolean def, boolean votable, Initiator rev, Initiator setter){
 		this.id = id; value = def; reviser = rev; this.setter = setter; this.votable = votable;
+		if(!setter.isValidAsSetter()){
+			if(setter == Initiator.CITIZEN_VOTE) setter = Initiator.COUNCIL_ANY;
+			else if(setter == Initiator.COUNCIL_VOTE) setter = Initiator.INCHARGE;
+		}
 	}
 	
 	public Rule set(boolean val){

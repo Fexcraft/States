@@ -695,7 +695,7 @@ public class MunicipalityCmd extends CommandBase {
 							newdis.setCreator(ply.getUUID());
 							newdis.setName("Center");
 							newdis.setHead(ply.getUUID());
-							newdis.setForeignersSettle(false);
+							newdis.r_CFS.set(false);
 							newdis.setMunicipality(newmun);
 							newdis.setPrice(0);
 							newdis.setType(DistrictType.VILLAGE);

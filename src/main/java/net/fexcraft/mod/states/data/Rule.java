@@ -49,20 +49,7 @@ public class Rule {
 					return ((Municipality)holder).getCitizen().contains(uuid);
 				} else return false;//it shouldn't get this far
 			}
-			case CITIZEN_VOTE:{
-				if(holder instanceof Municipality){
-					if(!votable) return false;
-					//TODO init vote
-					return false;
-				} else return false;
-			}
 			case COUNCIL_ANY: return holder.getCouncil().contains(uuid);
-			case COUNCIL_VOTE:{
-				if(holder.getCouncil().size() == 1) return holder.getCouncil().get(0).equals(uuid);
-				if(!votable) return false;
-				//TODO init vote
-				return false;
-			}
 			case INCHARGE: return holder.isHead(uuid);
 			default: return false;
 		}

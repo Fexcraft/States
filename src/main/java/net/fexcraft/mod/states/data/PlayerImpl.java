@@ -96,8 +96,8 @@ public class PlayerImpl implements PlayerCapability {
 			for(int id : this.municipality.getDistricts()){
 				District dis = StateUtil.getDistrict(id);
 				if(dis == null){ continue; }
-				if(dis.getManager().equals(this.getUUID())){
-					dis.setManager(null);
+				if(dis.getHead().equals(this.getUUID())){
+					dis.setHead(null);
 					dis.save();
 				}
 			}
@@ -154,7 +154,7 @@ public class PlayerImpl implements PlayerCapability {
 
 	@Override
 	public boolean isDistrictManagerOf(District district){
-		return district.getManager() != null && district.getManager().equals(getUUID());
+		return district.getHead() != null && district.getHead().equals(getUUID());
 	}
 
 	@Override

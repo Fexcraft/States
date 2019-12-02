@@ -2,9 +2,11 @@ package net.fexcraft.mod.states.data;
 
 import java.io.File;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 
 import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 
 import net.fexcraft.lib.common.json.JsonUtil;
@@ -16,11 +18,13 @@ import net.fexcraft.mod.states.data.root.BuyableType;
 import net.fexcraft.mod.states.data.root.ColorHolder;
 import net.fexcraft.mod.states.data.root.IconHolder;
 import net.fexcraft.mod.states.data.root.MailReceiver;
+import net.fexcraft.mod.states.data.root.Ruleable;
 import net.fexcraft.mod.states.impl.capabilities.SignTileEntityCapabilityUtil;
+import net.fexcraft.mod.states.util.RuleMap;
 import net.fexcraft.mod.states.util.StateUtil;
 import net.minecraft.util.math.BlockPos;
 
-public class District implements ColorHolder, BuyableType, IconHolder, MailReceiver {
+public class District implements ColorHolder, BuyableType, IconHolder, MailReceiver, Ruleable {
 	
 	private int id, chunks;
 	private DistrictType type;
@@ -31,6 +35,9 @@ public class District implements ColorHolder, BuyableType, IconHolder, MailRecei
 	private Municipality municipality;
 	private boolean cfs, onbankrupt;
 	private BlockPos mailbox;
+	//
+	private RuleMap rules = new RuleMap();
+	private String ruleset;
 	
 	public District(int id){
 		this.id = id; JsonObject obj = StateUtil.getDistrictJson(id);
@@ -50,6 +57,14 @@ public class District implements ColorHolder, BuyableType, IconHolder, MailRecei
 		chunktax = JsonUtil.getIfExists(obj, "chunktax", 0).longValue();
 		onbankrupt = JsonUtil.getIfExists(obj, "unclaim_chunks_if_bankrupt", false);
 		mailbox = obj.has("mailbox") ? BlockPos.fromLong(obj.get("mailbox").getAsLong()) : null;
+		ruleset = JsonUtil.getIfExists(obj, "ruleset", "Standard Ruleset");
+		if(obj.has("rules")){
+			JsonObject rls = obj.get("rules").getAsJsonObject();
+			for(Map.Entry<String, JsonElement> entry : rls.entrySet()){
+				Rule rule = rules.get(entry.getKey());
+				if(rule != null) rule.load(entry.getValue().getAsString());
+			}
+		}
 	}
 
 	public JsonObject toJsonObject(){
@@ -151,14 +166,6 @@ public class District implements ColorHolder, BuyableType, IconHolder, MailRecei
 		municipality.getDistricts().add(this.getId());
 	}
 
-	public UUID getManager(){
-		return manager;
-	}
-
-	public void setManager(UUID uuid){
-		manager = uuid;
-	}
-
 	public void setType(DistrictType new_type){
 		type = new_type;
 	}
@@ -237,6 +244,36 @@ public class District implements ColorHolder, BuyableType, IconHolder, MailRecei
 
 	public State getState(){
 		return municipality.getState();
+	}
+
+	@Override
+	public Map<String, Rule> getRules(){
+		return rules;
+	}
+
+	@Override
+	public String getRulesetTitle(){
+		return ruleset;
+	}
+
+	@Override
+	public List<UUID> getCouncil(){
+		return municipality.getCouncil();
+	}
+
+	@Override
+	public UUID getHead(){
+		return manager;
+	}
+
+	@Override
+	public void setHead(UUID uuid){
+		manager = uuid;
+	}
+	
+	@Override
+	public boolean isHead(UUID uuid){
+		return getHead().equals(uuid) || municipality.isHead(uuid);
 	}
 
 }

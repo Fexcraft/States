@@ -76,7 +76,7 @@ public class DistrictCmd extends CommandBase {
 				Print.chat(sender, "&e====-====-====-====-====-====&0[&2States&0]");
 				Print.chat(sender, "&6Info of district &7" + dis.getName() + " (" + dis.getId() + ")&2:");
 				Print.chat(sender, "&9Municipality: &7" + dis.getMunicipality().getName() + " (" + dis.getMunicipality().getId() + ")");
-				Print.chat(sender, "&9Manager: &7" + (dis.getManager() == null ? "no one" : Static.getPlayerNameByUUID(dis.getManager())));
+				Print.chat(sender, "&9Manager: &7" + (dis.getHead() == null ? "no one" : Static.getPlayerNameByUUID(dis.getHead())));
 				Print.chat(sender, "&9Price: &7" + (dis.getPrice() > 0 ? Config.getWorthAsString(dis.getPrice()) : "not for sale"));
 				Print.chat(sender, "&9Type: &7" + dis.getType().name().toLowerCase());
 				Print.chat(sender, "&9Color: &7" + dis.getColor());
@@ -214,7 +214,7 @@ public class DistrictCmd extends CommandBase {
 								Print.chat(sender, "&cPlayer not found in Cache.");
 								break;
 							}
-							dis.setManager(gp.getId());
+							dis.setHead(gp.getId());
 							dis.setChanged(Time.getDate());
 							dis.save();
 							Print.chat(sender, "&2Set &7" + gp.getName() + "&2 to new District Manager!");
@@ -376,7 +376,7 @@ public class DistrictCmd extends CommandBase {
 								newdis.setForeignersSettle(false);
 								newdis.setCreated(Time.getDate());
 								newdis.setChanged(Time.getDate());
-								newdis.setManager(ply.getUUID());
+								newdis.setHead(ply.getUUID());
 								newdis.setMunicipality(ply.getMunicipality());
 								newdis.setPrice(0);
 								newdis.setType(DistrictType.WILDERNESS);

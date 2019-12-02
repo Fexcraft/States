@@ -86,7 +86,7 @@ public class SignTileEntityImplementation implements SignTileEntityCapability {
 			case "district":{
 				tileentity.signText[1] = new TextComponentString(Formatter.format("&9" + chunk.getDistrict().getName()));
 				tileentity.signText[2] = new TextComponentString(Formatter.format("&6" + chunk.getDistrict().getType().name().toLowerCase()));
-				tileentity.signText[3] = new TextComponentString(Formatter.format(chunk.getDistrict().getManager() == null ? "&cno manager" : "&2" + Static.getPlayerNameByUUID(chunk.getDistrict().getManager())));
+				tileentity.signText[3] = new TextComponentString(Formatter.format(chunk.getDistrict().getHead() == null ? "&cno manager" : "&2" + Static.getPlayerNameByUUID(chunk.getDistrict().getHead())));
 				//
 				tileentity.signText[0] = new TextComponentString(Formatter.format("&0[&9States&0]&2> &8District"));
 				break;

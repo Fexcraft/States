@@ -113,8 +113,8 @@ public class Municipality implements ColorHolder, BuyableType, IconHolder, Accou
 		obj.addProperty("citizen_tax", citizentax);
 		if(mailbox != null) obj.addProperty("mailbox", mailbox.toLong());
 		obj.addProperty("ruleset", ruleset_name);
-		JsonArray rells = new JsonArray();
-		for(Rule rule : rules.values()) rells.add(rule.save());
+		JsonObject rells = new JsonObject();
+		for(Rule rule : rules.values()) rells.add(rule.id, rule.save());
 		obj.add("rules", rells);
 		return obj;
 	}

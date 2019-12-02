@@ -47,6 +47,7 @@ public class Municipality implements ColorHolder, BuyableType, IconHolder, Accou
 	private RuleMap rules = new RuleMap();
 	private String ruleset_name;
 	public Rule r_OPEN, r_COLOR, r_ICON, r_SET_NAME, r_SET_PRICE, r_SET_MAYOR, r_SET_CITIZENTAX, r_KIB;
+	public Rule r_EDIT_BL, r_KICK, r_INVITE, r_COUNCIL_KICK, r_COUNCIL_INVITE, r_COUNCIL_VOTE;
 	
 	public Municipality(int id){
 		this.id = id;
@@ -74,11 +75,17 @@ public class Municipality implements ColorHolder, BuyableType, IconHolder, Accou
 		rules.add(r_SET_NAME = new Rule("set.name", null, true, Initiator.COUNCIL_VOTE, Initiator.INCHARGE));
 		rules.add(r_SET_PRICE = new Rule("set.price", null, true, Initiator.COUNCIL_VOTE, Initiator.INCHARGE));
 		rules.add(r_SET_MAYOR = new Rule("set.mayor", null, true, Initiator.COUNCIL_VOTE, Initiator.INCHARGE));
-		rules.add(r_OPEN = new Rule("open_to_join", false, true, Initiator.COUNCIL_VOTE, Initiator.COUNCIL_ANY));
+		rules.add(r_OPEN = new Rule("open_to_join", false, true, Initiator.COUNCIL_VOTE, Initiator.INCHARGE));
 		rules.add(r_COLOR = new Rule("set.color", null, true, Initiator.COUNCIL_VOTE, Initiator.INCHARGE));
 		rules.add(r_ICON = new Rule("set.icon", null, true, Initiator.COUNCIL_VOTE, Initiator.INCHARGE));
 		rules.add(r_SET_CITIZENTAX = new Rule("set.citizentax", null, true, Initiator.COUNCIL_VOTE, Initiator.INCHARGE));
-		rules.add(r_KIB = new Rule("kick_if_bankrupt", null, true, Initiator.COUNCIL_VOTE, Initiator.INCHARGE));
+		rules.add(r_KIB = new Rule("kick_if_bankrupt", false, true, Initiator.COUNCIL_VOTE, Initiator.INCHARGE));
+		rules.add(r_EDIT_BL = new Rule("edit.blacklist", null, true, Initiator.COUNCIL_VOTE, Initiator.INCHARGE));
+		rules.add(r_KICK = new Rule("kick_player", null, true, Initiator.COUNCIL_VOTE, Initiator.COUNCIL_ANY));
+		rules.add(r_INVITE = new Rule("invite_player", null, true, Initiator.COUNCIL_VOTE, Initiator.COUNCIL_ANY));
+		rules.add(r_COUNCIL_KICK = new Rule("kick_council", null, true, Initiator.COUNCIL_VOTE, Initiator.COUNCIL_ANY));
+		rules.add(r_COUNCIL_INVITE = new Rule("invite_council", null, true, Initiator.COUNCIL_VOTE, Initiator.COUNCIL_ANY));
+		rules.add(r_COUNCIL_VOTE = new Rule("council_vote", null, true, Initiator.INCHARGE, Initiator.COUNCIL_ANY));
 		if(obj.has("rules")){
 			JsonObject rls = obj.get("rules").getAsJsonObject();
 			for(Map.Entry<String, JsonElement> entry : rls.entrySet()){

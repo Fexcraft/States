@@ -59,7 +59,7 @@ public class MunicipalityCmd extends CommandBase {
         return 0;
     }
 
-	@Override
+	@SuppressWarnings("unused") @Override
 	public void execute(MinecraftServer server, ICommandSender sender, String[] args) throws CommandException {
 		if(args.length == 0){
 			Print.chat(sender, "&7/mun info");
@@ -127,7 +127,7 @@ public class MunicipalityCmd extends CommandBase {
 				return;
 			}
 			case "buy":{
-				if(hasPerm("municipality.buy", player, mun)){
+				if(true){//TODO permission for this will be stored in state ruleset //hasPerm("municipality.buy", player, mun)){
 					if(ply.getMunicipality().getState().getId() < 0){
 						Print.chat(sender, "&7You must be part of a State first!");
 						return;
@@ -378,14 +378,14 @@ public class MunicipalityCmd extends CommandBase {
 				switch(args[1]){
 					case "vote":{
 						Print.chat(sender, "Not available yet.");
-						if(!hasPerm("municipality.council.vote", player, mun)){
+						if(!mun.isAuthorized(mun.r_COUNCIL_VOTE.id, ply.getUUID())){
 							Print.chat(sender, "&4No permission.");
 							return;
 						}
 						break;
 					}
 					case "kick":{
-						if(!hasPerm("municipality.council.kick", player, mun)){
+						if(!(mun.isAuthorized(mun.r_COUNCIL_KICK.id, ply.getUUID()) || StateUtil.bypass(player))){
 							Print.chat(sender, "&4No permission.");
 							return;
 						}
@@ -419,7 +419,7 @@ public class MunicipalityCmd extends CommandBase {
 						StateLogger.log(StateLogger.LoggerType.MUNICIPALITY, StateLogger.player(player) + " left of the council of " + StateLogger.municipality(mun) + ".");
 					}
 					case "invite":{
-						if(!hasPerm("municipality.council.invite", player, mun)){
+						if(!(mun.isAuthorized(mun.r_COUNCIL_INVITE.id, ply.getUUID()) || StateUtil.bypass(player))){
 							Print.chat(sender, "&4No permission.");
 							return;
 						}
@@ -477,7 +477,7 @@ public class MunicipalityCmd extends CommandBase {
 					});//TODO
 					return;
 				}
-				if(!hasPerm("municipality.blacklist.edit", player, mun)){
+				if(!(mun.isAuthorized(mun.r_EDIT_BL.id, ply.getUUID()) || StateUtil.bypass(player))){
 					Print.chat(sender, "&cNo permission!");
 					return;
 				}
@@ -523,7 +523,7 @@ public class MunicipalityCmd extends CommandBase {
 				return;
 			}
 			case "kick":{
-				if(!hasPerm("municipality.kick", player, mun)){
+				if(!(mun.isAuthorized(mun.r_KICK.id, ply.getUUID()) || StateUtil.bypass(player))){
 					Print.chat(sender, "&cNo permission!");
 					return;
 				}
@@ -604,7 +604,7 @@ public class MunicipalityCmd extends CommandBase {
 				return;
 			}
 			case "invite":{
-				if(!hasPerm("municipality.invite", player, mun)){
+				if(!(mun.isAuthorized(mun.r_INVITE.id, ply.getUUID()) || StateUtil.bypass(player))){
 					Print.chat(sender, "&cNo permission!");
 					return;
 				}
@@ -739,10 +739,6 @@ public class MunicipalityCmd extends CommandBase {
 
 	private String ggas(long citizenTax){
 		return ChunkCmd.ggas(citizenTax);
-	}
-
-	public static final boolean hasPerm(String perm, EntityPlayer player, Object obj){
-		return ChunkCmd.hasPerm(perm, player, obj);
 	}
 	
 }

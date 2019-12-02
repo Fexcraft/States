@@ -33,7 +33,7 @@ public class Rule {
 		String[] arr = string.split(",");
 		reviser = Initiator.valueOf(arr[0]);
 		setter = Initiator.valueOf(arr[1]);
-		if(string.length() > 2) value = Boolean.parseBoolean(arr[2]);
+		if(arr.length > 2) value = Boolean.parseBoolean(arr[2]);
 		return this;
 	}
 	

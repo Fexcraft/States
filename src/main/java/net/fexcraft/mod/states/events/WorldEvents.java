@@ -1,5 +1,8 @@
 package net.fexcraft.mod.states.events;
 
+import java.util.ArrayList;
+
+import net.fexcraft.mod.states.data.Chunk;
 import net.fexcraft.mod.states.impl.capabilities.ChunkCapabilityUtil;
 import net.fexcraft.mod.states.impl.capabilities.PlayerCapabilityUtil;
 import net.fexcraft.mod.states.impl.capabilities.SignTileEntityCapabilityUtil;
@@ -11,6 +14,7 @@ import net.fexcraft.mod.states.util.StateUtil;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.tileentity.TileEntitySign;
 import net.minecraft.util.ResourceLocation;
+import net.minecraft.util.math.BlockPos;
 import net.minecraftforge.event.AttachCapabilitiesEvent;
 import net.minecraftforge.event.world.ExplosionEvent;
 import net.minecraftforge.event.world.WorldEvent;
@@ -41,9 +45,14 @@ public class WorldEvents {
 	
 	@SubscribeEvent
 	public static void onExplosion(ExplosionEvent event){
+		if(event.getWorld().provider.getDimension() != 0 || event.getWorld().isRemote) return;
 		try{
-			event.getExplosion().getAffectedBlockPositions().clear();
-			//TODO add config for no-wilderness/all/specific protection
+			ArrayList<BlockPos> torem = new ArrayList<>();
+			for(BlockPos pos : event.getExplosion().getAffectedBlockPositions()){
+				Chunk chunk = StateUtil.getChunk(pos);
+				if(!chunk.getDistrict().r_ALLOW_EXPLOSIONS.get()){ torem.add(pos); }
+			}
+			event.getExplosion().getAffectedBlockPositions().removeAll(torem);
 		}
 		catch(Exception e){
 			e.printStackTrace();

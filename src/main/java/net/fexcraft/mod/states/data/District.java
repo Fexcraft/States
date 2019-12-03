@@ -40,6 +40,7 @@ public class District implements ColorHolder, BuyableType, IconHolder, MailRecei
 	private String ruleset;
 	public final Rule r_CFS, r_ONBANKRUPT, r_SET_MANAGER, r_SET_CHUNKTAX;
 	public final Rule r_SET_TYPE, r_SET_NAME, r_SET_PRICE, r_SET_COLOR, r_SET_ICON;
+	public final Rule r_ALLOW_EXPLOSIONS;
 	
 	public District(int id){
 		this.id = id; JsonObject obj = StateUtil.getDistrictJson(id);
@@ -67,6 +68,7 @@ public class District implements ColorHolder, BuyableType, IconHolder, MailRecei
 		rules.add(r_SET_COLOR = new Rule("set.color", null, true, Initiator.COUNCIL_ANY, Initiator.INCHARGE));
 		rules.add(r_SET_ICON = new Rule("set.icon", null, true, Initiator.COUNCIL_ANY, Initiator.INCHARGE));
 		rules.add(r_SET_CHUNKTAX = new Rule("set.chunktax", null, true, Initiator.COUNCIL_ANY, Initiator.INCHARGE));
+		rules.add(r_ALLOW_EXPLOSIONS = new Rule("allow.explosions", false, true, Initiator.COUNCIL_VOTE, Initiator.HIGHERINCHARGE));
 		if(obj.has("rules")){
 			JsonObject rls = obj.get("rules").getAsJsonObject();
 			for(Map.Entry<String, JsonElement> entry : rls.entrySet()){

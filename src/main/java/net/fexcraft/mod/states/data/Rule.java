@@ -7,18 +7,22 @@ import net.fexcraft.mod.states.data.root.Ruleable;
 
 public class Rule {
 	
-	public final String id;
+	public final String id, name;
 	private Boolean value;
 	private boolean votable;
 	public Initiator reviser;
 	public Initiator setter;
 	
-	public Rule(String id, Boolean def, boolean votable, Initiator rev, Initiator setter){
-		this.id = id; value = def; reviser = rev; this.setter = setter; this.votable = votable;
+	public Rule(String id, Boolean def, boolean votable, Initiator rev, Initiator setter, String name){
+		this.id = id; value = def; reviser = rev; this.setter = setter; this.votable = votable; this.name = name;
 		if(!setter.isValidAsSetter()){
 			if(setter == Initiator.CITIZEN_VOTE) setter = Initiator.COUNCIL_ANY;
 			else if(setter == Initiator.COUNCIL_VOTE) setter = Initiator.INCHARGE;
 		}
+	}
+	
+	public Rule(String id, Boolean def, boolean votable, Initiator rev, Initiator setter){
+		this(id, def, votable, rev, setter, id);
 	}
 	
 	public Rule set(boolean val){
@@ -43,7 +47,7 @@ public class Rule {
 	}
 	
 	public Rule copy(){
-		return new Rule(id, value, votable, reviser, setter);
+		return new Rule(id, value, votable, reviser, setter, name);
 	}
 
 	/** Call to see if this player can SET/APPLY this rule. */

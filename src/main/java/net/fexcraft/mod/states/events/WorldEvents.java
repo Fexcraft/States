@@ -16,11 +16,9 @@ import net.minecraft.tileentity.TileEntitySign;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
 import net.minecraftforge.event.AttachCapabilitiesEvent;
-import net.minecraftforge.event.entity.living.LivingSpawnEvent;
 import net.minecraftforge.event.world.ExplosionEvent;
 import net.minecraftforge.event.world.WorldEvent;
 import net.minecraftforge.fml.common.Mod;
-import net.minecraftforge.fml.common.eventhandler.Event.Result;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 
 @Mod.EventBusSubscriber
@@ -58,15 +56,6 @@ public class WorldEvents {
 		}
 		catch(Exception e){
 			e.printStackTrace();
-		}
-	}
-	
-	@SubscribeEvent
-	public static void onHostileSpawn(LivingSpawnEvent.CheckSpawn event){
-		if(event.getWorld().provider.getDimension() != 0 || event.getWorld().isRemote) return;
-		Chunk chunk = StateUtil.getChunk(event.getX(), event.getZ());
-		if(!chunk.getDistrict().r_ALLOW_ENT_HOSTILE.get()){
-			event.setResult(Result.DENY);
 		}
 	}
 	

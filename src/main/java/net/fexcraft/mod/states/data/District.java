@@ -38,7 +38,8 @@ public class District implements ColorHolder, BuyableType, IconHolder, MailRecei
 	//
 	private RuleMap rules = new RuleMap();
 	private String ruleset;
-	public final Rule r_CFS, r_ONBANKRUPT;
+	public final Rule r_CFS, r_ONBANKRUPT, r_SET_MANAGER, r_SET_CHUNKTAX;
+	public final Rule r_SET_TYPE, r_SET_NAME, r_SET_PRICE, r_SET_COLOR, r_SET_ICON;
 	
 	public District(int id){
 		this.id = id; JsonObject obj = StateUtil.getDistrictJson(id);
@@ -59,6 +60,13 @@ public class District implements ColorHolder, BuyableType, IconHolder, MailRecei
 		ruleset = JsonUtil.getIfExists(obj, "ruleset", "Standard Ruleset");
 		rules.add(r_CFS = new Rule("can_foreigners_settle", false, true, Initiator.COUNCIL_ANY, Initiator.INCHARGE));
 		rules.add(r_ONBANKRUPT = new Rule("unclaim_chunks_if_bankrupt", false, true, Initiator.COUNCIL_ANY, Initiator.INCHARGE));
+		rules.add(r_SET_TYPE = new Rule("set.type", null, true, Initiator.COUNCIL_ANY, Initiator.INCHARGE));
+		rules.add(r_SET_NAME = new Rule("set.name", null, true, Initiator.COUNCIL_ANY, Initiator.INCHARGE));
+		rules.add(r_SET_PRICE = new Rule("set.price", null, true, Initiator.COUNCIL_ANY, Initiator.HIGHERINCHARGE));
+		rules.add(r_SET_MANAGER = new Rule("set.manager", null, true, Initiator.COUNCIL_ANY, Initiator.HIGHERINCHARGE));
+		rules.add(r_SET_COLOR = new Rule("set.color", null, true, Initiator.COUNCIL_ANY, Initiator.INCHARGE));
+		rules.add(r_SET_ICON = new Rule("set.icon", null, true, Initiator.COUNCIL_ANY, Initiator.INCHARGE));
+		rules.add(r_SET_CHUNKTAX = new Rule("set.chunktax", null, true, Initiator.COUNCIL_ANY, Initiator.INCHARGE));
 		if(obj.has("rules")){
 			JsonObject rls = obj.get("rules").getAsJsonObject();
 			for(Map.Entry<String, JsonElement> entry : rls.entrySet()){
@@ -266,6 +274,11 @@ public class District implements ColorHolder, BuyableType, IconHolder, MailRecei
 	@Override
 	public boolean isHead(UUID uuid){
 		return getHead().equals(uuid) || municipality.isHead(uuid);
+	}
+
+	@Override
+	public Ruleable getHigherInstance(){
+		return municipality;
 	}
 
 }

@@ -126,7 +126,7 @@ public class DistrictCmd extends CommandBase {
 				}
 				switch(args[1]){
 					case "type":{
-						if(hasPerm("district.set.type", player, dis)){
+						if(dis.isAuthorized(dis.r_SET_TYPE.id, ply.getUUID()) || StateUtil.bypass(player)){
 							if(args.length < 3){
 								Print.chat(sender, "&9Missing Argument!");
 								Print.chat(sender, "&2You can see available types using &7/dis types&2!");
@@ -152,7 +152,7 @@ public class DistrictCmd extends CommandBase {
 						break;
 					}
 					case "name":{
-						if(hasPerm("district.set.name", player, dis)){
+						if(dis.isAuthorized(dis.r_SET_NAME.id, ply.getUUID()) || StateUtil.bypass(player)){
 							if(args.length < 3){
 								Print.chat(sender, "&9Missing Arguments!");
 								break;
@@ -179,7 +179,7 @@ public class DistrictCmd extends CommandBase {
 						break;
 					}
 					case "price":{
-						if(hasPerm("district.set.price", player, dis)){
+						if(dis.isAuthorized(dis.r_SET_PRICE.id, ply.getUUID()) || StateUtil.bypass(player)){
 							if(args.length < 3){
 								Print.chat(sender, "&9Missing Argument!");
 								Print.chat(sender, "&7Setting the price to \"0\" makes the district not buyable.");
@@ -204,7 +204,7 @@ public class DistrictCmd extends CommandBase {
 						break;
 					}
 					case "manager":{
-						if(hasPerm("district.set.manager", player, dis)){
+						if(dis.isAuthorized(dis.r_SET_MANAGER.id, ply.getUUID()) || StateUtil.bypass(player)){
 							if(args.length < 3){
 								Print.chat(sender, "&9Missing Argument!");
 								break;
@@ -226,7 +226,7 @@ public class DistrictCmd extends CommandBase {
 						break;
 					}
 					case "color":{
-						if(hasPerm("district.set.color", player, dis)){
+						if(dis.isAuthorized(dis.r_SET_COLOR.id, ply.getUUID()) || StateUtil.bypass(player)){
 							if(args.length < 3){
 								Print.chat(sender, "&9Missing Argument!");
 								break;
@@ -255,7 +255,7 @@ public class DistrictCmd extends CommandBase {
 						break;
 					}
 					case "can-foreigners-settle":{
-						if(hasPerm("district.set.cfs", player, dis)){
+						if(dis.isAuthorized(dis.r_CFS.id, ply.getUUID()) || StateUtil.bypass(player)){
 							if(args.length < 3){
 								Print.chat(sender, "&9Missing Argument!");
 								break;
@@ -277,7 +277,7 @@ public class DistrictCmd extends CommandBase {
 						break;
 					}
 					case "icon":{
-						if(hasPerm("district.set.icon", player, dis)){
+						if(dis.isAuthorized(dis.r_SET_ICON.id, ply.getUUID()) || StateUtil.bypass(player)){
 							if(args.length < 3){
 								Print.chat(sender, "&9Missing Argument!");
 								break;
@@ -299,7 +299,7 @@ public class DistrictCmd extends CommandBase {
 						break;
 					}
 					case "chunk-tax":{
-						if(hasPerm("district.set.chunktax", player, dis)){
+						if(dis.isAuthorized(dis.r_SET_CHUNKTAX.id, ply.getUUID()) || StateUtil.bypass(player)){
 							if(args[2].equals("reset") || args[2].equals("disable")){
 								dis.setChunkTax(0); dis.save();
 								Print.chat(sender, "&9District's Chunk Tax was reset!");
@@ -315,7 +315,7 @@ public class DistrictCmd extends CommandBase {
 						break;
 					}
 					case "unclaim-if-brankrupt":{
-						if(hasPerm("district.set.unclaim-if-bankrupt", player, dis)){
+						if(dis.isAuthorized(dis.r_ONBANKRUPT.id, ply.getUUID()) || StateUtil.bypass(player)){
 							if(args.length < 3){ Print.chat(sender, "&9Missing Argument!"); break; }
 							dis.r_ONBANKRUPT.set(Boolean.parseBoolean(args[2]));
 							dis.setChanged(Time.getDate()); dis.save();
@@ -328,7 +328,7 @@ public class DistrictCmd extends CommandBase {
 				return;
 			}
 			case "create":{
-				if(hasPerm("district.create", player, ply.getMunicipality())){
+				if(ply.getMunicipality().isAuthorized(ply.getMunicipality().r_CREATE_DISTRICT.id, ply.getUUID()) || StateUtil.bypass(player)){
 					if(ply.getMunicipality().getDistricts().size() + 1 > MunicipalityType.getType(ply.getMunicipality()).getDistrictLimit()){
 						Print.chat(sender, "&aYour Municipality reached the limit of possible Districts.");
 						return;
@@ -428,10 +428,6 @@ public class DistrictCmd extends CommandBase {
 			}
 		}
 		return false;
-	}
-
-	public static final boolean hasPerm(String perm, EntityPlayer player, Object obj){
-		return ChunkCmd.hasPerm(perm, player, obj);
 	}
 	
 }

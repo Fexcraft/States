@@ -49,6 +49,7 @@ public class Municipality implements ColorHolder, BuyableType, IconHolder, Accou
 	private String ruleset_name;
 	public final Rule r_OPEN, r_COLOR, r_ICON, r_SET_NAME, r_SET_PRICE, r_SET_MAYOR, r_SET_CITIZENTAX, r_KIB;
 	public final Rule r_EDIT_BL, r_KICK, r_INVITE, r_COUNCIL_KICK, r_COUNCIL_INVITE, r_COUNCIL_VOTE;
+	public final Rule r_CREATE_DISTRICT;
 	
 	public Municipality(int id){
 		this.id = id;
@@ -87,6 +88,7 @@ public class Municipality implements ColorHolder, BuyableType, IconHolder, Accou
 		rules.add(r_COUNCIL_KICK = new Rule("kick_council", null, true, Initiator.COUNCIL_VOTE, Initiator.COUNCIL_ANY));
 		rules.add(r_COUNCIL_INVITE = new Rule("invite_council", null, true, Initiator.COUNCIL_VOTE, Initiator.COUNCIL_ANY));
 		rules.add(r_COUNCIL_VOTE = new Rule("council_vote", null, true, Initiator.INCHARGE, Initiator.COUNCIL_ANY));
+		rules.add(r_CREATE_DISTRICT = new Rule("create.district", null, true, Initiator.CITIZEN_VOTE, Initiator.COUNCIL_ANY));
 		if(obj.has("rules")){
 			JsonObject rls = obj.get("rules").getAsJsonObject();
 			for(Map.Entry<String, JsonElement> entry : rls.entrySet()){
@@ -357,6 +359,11 @@ public class Municipality implements ColorHolder, BuyableType, IconHolder, Accou
 	@Override
 	public String getRulesetTitle(){
 		return ruleset_name;
+	}
+
+	@Override
+	public Ruleable getHigherInstance(){
+		return null;//state; //TODO
 	}
 
 }

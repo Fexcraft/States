@@ -54,6 +54,10 @@ public class StateUtil extends TimerTask {
         return getChunk(pos.getX() >> 4, pos.getZ() >> 4);
     }
     
+    public static @Nullable Chunk getChunk(float xent, float yent){
+        return getChunk(((int)xent) >> 4, ((int)yent) >> 4);
+    }
+    
     public static @Nullable Chunk getChunk(ChunkPos pos){
         return States.CHUNKS.get(pos);
     }

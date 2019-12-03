@@ -25,11 +25,11 @@ public class Rule {
 		this(id, def, votable, rev, setter, id);
 	}
 	
-	public Rule set(boolean val){
+	public Rule set(Boolean val){
 		value = val; return this;
 	}
 	
-	public boolean get(){
+	public Boolean get(){
 		return value;
 	}
 	

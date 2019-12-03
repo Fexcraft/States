@@ -57,6 +57,7 @@ public class DistrictCmd extends CommandBase {
 	public void execute(MinecraftServer server, ICommandSender sender, String[] args) throws CommandException {
 		if(args.length == 0){
 			Print.chat(sender, "&7/dis info");
+			Print.chat(sender, "&7/dis rules");
 			Print.chat(sender, "&7/dis types");
 			Print.chat(sender, "&7/dis create");
 			Print.chat(sender, "&7/dis attributes");
@@ -92,6 +93,10 @@ public class DistrictCmd extends CommandBase {
 				Print.chat(sender, "&8Unclaim if Bankrupt: " + dis.r_ONBANKRUPT.get());
 				Print.chat(sender, "&2Created by &7" + Static.getPlayerNameByUUID(dis.getCreator()) + "&2 at &8" + Time.getAsString(dis.getCreated()));
 				Print.chat(sender, "&6Mailbox: &7" + (dis.getMailbox() == null ? "No mailbox set." : dis.getMailbox().toString()));
+				return;
+			}
+			case "rules":{
+				player.openGui(States.INSTANCE, 9, sender.getEntityWorld(), 1, 0, 0);
 				return;
 			}
 			case "types":{

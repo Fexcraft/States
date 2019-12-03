@@ -18,14 +18,14 @@ public class GuiHandler implements IGuiHandler{
 	 * 6 empty
 	 * 7 Companies
 	 * 8 Player Data
-	 * 9 empty
+	 * 9 Rules
 	 * 10 Chunk claiming.
 	 * 20 Mailbox
 	 * */
 
 	@Override
 	public Object getServerGuiElement(int ID, EntityPlayer player, World world, int x, int y, int z){
-		return ID == 20 ? new MailboxUIC(player, world, x, y, z) : new PlaceholderContainer();
+		return ID == 9 ? new RulesUIC(player, world, x, y, z) : ID == 20 ? new MailboxUIC(player, world, x, y, z) : new PlaceholderContainer();
 	}
 
 	@Override
@@ -37,6 +37,9 @@ public class GuiHandler implements IGuiHandler{
 			}
 			case 1:{
 				return new AreaView(player, world, x, y, z);
+			}
+			case 9:{
+				return new RulesUI(player, world, x, y, z);
 			}
 			//
 			case 10:{

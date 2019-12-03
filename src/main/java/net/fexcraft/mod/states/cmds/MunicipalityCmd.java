@@ -63,6 +63,7 @@ public class MunicipalityCmd extends CommandBase {
 	public void execute(MinecraftServer server, ICommandSender sender, String[] args) throws CommandException {
 		if(args.length == 0){
 			Print.chat(sender, "&7/mun info");
+			Print.chat(sender, "&7/mun rules");
 			Print.chat(sender, "&7/mun types");
 			Print.chat(sender, "&7/mun set <option> <value>");
 			Print.chat(sender, "&7/mun buy");
@@ -116,6 +117,10 @@ public class MunicipalityCmd extends CommandBase {
 					Print.chat(sender, "&4Force-Loaded Chunks: " + coll.size());
 				}
 				Print.chat(sender, "&6Mailbox: &7" + (mun.getMailbox() == null ? "No mailbox set." : mun.getMailbox().toString()));
+				return;
+			}
+			case "rules":{
+				player.openGui(States.INSTANCE, 9, sender.getEntityWorld(), 2, 0, 0);
 				return;
 			}
 			case "types":{

@@ -56,6 +56,8 @@ public class Rule {
 			}
 			case COUNCIL_ANY: return holder.getCouncil().contains(uuid);
 			case INCHARGE: return holder.isHead(uuid);
+			case HIGHERINCHARGE:
+				return holder.hasHigherInstance() ? holder.getHigherInstance().isHead(uuid) : holder.isHead(uuid);
 			default: return false;
 		}
 	}
@@ -81,6 +83,8 @@ public class Rule {
 				return false;
 			}
 			case INCHARGE: return holder.isHead(uuid);
+			case HIGHERINCHARGE:
+				return holder.hasHigherInstance() ? holder.getHigherInstance().isHead(uuid) : holder.isHead(uuid);
 			default: return false;
 		}
 	}

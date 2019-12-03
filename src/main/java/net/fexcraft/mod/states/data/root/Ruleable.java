@@ -13,6 +13,12 @@ public interface Ruleable extends RuleHolder {
 	
 	public void setHead(UUID uuid);
 	
+	public Ruleable getHigherInstance();
+	
+	public default boolean hasHigherInstance(){
+		return getHigherInstance() != null;
+	}
+	
 	public default boolean isHead(UUID uuid){
 		return getHead().equals(uuid);
 	}

@@ -34,7 +34,7 @@ public class RulesUIC extends GenericContainer {
 			//case 0: holder = chunk; break;
 			case 1: holder = chunk.getDistrict(); break;
 			case 2: holder = chunk.getMunicipality(); break;
-			//case 3: holder = chunk.getState(); break;
+			case 3: holder = chunk.getState(); break;
 			default: {
 				Print.log("Invalid Layer for Rules GUI"); player.closeScreen(); break;
 			}

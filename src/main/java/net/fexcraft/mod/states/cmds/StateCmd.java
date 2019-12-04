@@ -61,6 +61,7 @@ public class StateCmd extends CommandBase {
 	public void execute(MinecraftServer server, ICommandSender sender, String[] args) throws CommandException {
 		if(args.length == 0){
 			Print.chat(sender, "&7/st info");
+			Print.chat(sender, "&7/st rules");
 			Print.chat(sender, "&7/st set <option> <value>");
 			Print.chat(sender, "&7/st council <args...>");
 			Print.chat(sender, "&7/st blacklist <args...>");
@@ -107,6 +108,10 @@ public class StateCmd extends CommandBase {
 				});
 				Print.chat(sender, "&2Created by &7" + Static.getPlayerNameByUUID(state.getCreator()) + "&2 at &8" + Time.getAsString(state.getCreated()));
 				Print.chat(sender, "&6Mailbox: &7" + (state.getMailbox() == null ? "No mailbox set." : state.getMailbox().toString()));
+				return;
+			}
+			case "rules":{
+				player.openGui(States.INSTANCE, 9, sender.getEntityWorld(), 3, 0, 0);
 				return;
 			}
 			case "set":{

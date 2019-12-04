@@ -1,7 +1,10 @@
 package net.fexcraft.mod.states.guis;
 
+import java.util.UUID;
+
 import net.fexcraft.lib.mc.gui.GenericContainer;
 import net.fexcraft.lib.mc.gui.GenericGui;
+import net.fexcraft.lib.mc.utils.Formatter;
 import net.fexcraft.lib.mc.utils.Print;
 import net.fexcraft.mod.states.States;
 import net.fexcraft.mod.states.data.Chunk;
@@ -47,18 +50,69 @@ public class RulesUIC extends GenericContainer {
 	protected void packet(Side side, NBTTagCompound packet, EntityPlayer player){
 		if(!packet.hasKey("cargo")) return;
 		if(side.isServer()){
-			if(packet.getString("cargo").equals("open")){
-				int[] arr = packet.getIntArray("arr");
-				player.openGui(States.MODID, 9, player.world, arr[0], arr[1], arr[2]);
-			}
-			if(packet.getString("cargo").equals("init")){
-				NBTTagCompound compound = new NBTTagCompound(); compound.setString("cargo", "init");
-				for(int i = 0; i < 16; i++){
-					if(rules[i] == null) break;
-					compound.setString("rule" + i, rules[i].id + "," + rules[i].save());
+			switch(packet.getString("cargo")){
+				case "open": {
+					int[] arr = packet.getIntArray("arr");
+					player.openGui(States.MODID, 9, player.world, arr[0], arr[1], arr[2]);
+					return;
 				}
-				if(holder instanceof Ruleable) compound.setString("ruleset", ((Ruleable)holder).getRulesetTitle());
-				send(Side.CLIENT, compound);
+				case "init": {
+					NBTTagCompound compound = new NBTTagCompound(); compound.setString("cargo", "init");
+					for(int i = 0; i < 16; i++){
+						if(rules[i] == null) break;
+						compound.setString("rule" + i, rules[i].id + "," + rules[i].save());
+					}
+					if(holder instanceof Ruleable) compound.setString("ruleset", ((Ruleable)holder).getRulesetTitle());
+					send(Side.CLIENT, compound);
+					return;
+				}
+				case "val": {
+					int i = packet.getInteger("rule");
+					if(rules[i].get() == null){
+						sendStatus("Rule cannot be set - valueless.");
+						return;
+					}
+					boolean passed = false; UUID uuid = player.getGameProfile().getId();
+					if(StateUtil.isAdmin(player)){ passed = true; }
+					else if(holder instanceof Ruleable && ((Ruleable)holder).isAuthorized(rules[i].id, uuid)){ passed = true; }
+					else{ passed = ((Chunk)holder).isRuleAuthorized(uuid); }
+					if(!passed){
+						sendStatus("&bNo permission to set this rule.");
+					}
+					else{
+						rules[i].set(Boolean.parseBoolean(packet.getString("value")));
+						sendStatus("&aRule updated to: " + rules[i].get());
+					}
+					return;
+				}
+				case "rev": case "set": {
+					int i = packet.getInteger("rule"); boolean set = packet.getString("cargo").equals("set");
+					if(holder instanceof Ruleable){
+						Ruleable ruleable = (Ruleable)holder; UUID uuid = player.getGameProfile().getId();
+						if((set ? ruleable.isAuthorized(rules[i].id, uuid) : ruleable.canRevise(rules[i].id, uuid)) || StateUtil.isAdmin(player)){
+							try{
+								Initiator init = Initiator.valueOf(packet.getString("value").toUpperCase());
+								if(set && !init.isValidAsSetter()){
+									sendStatus("&bInvalid Initiator.");
+								}
+								else{
+									if(set) rules[i].setter = init; else rules[i].reviser = init;
+									sendStatus("&aRule " + (set ? "SET" : "REV") + " updated to: " + init.name());
+								}
+							}
+							catch(Exception e){
+								sendStatus("&bError parsing Initiator.");
+							}
+						}
+						else{
+							sendStatus("&bNo permission to revise this.");
+						}
+					}
+					else{
+						sendStatus("&aNot applicable for Chunks.");
+					}
+					return;
+				}
 			}
 		}
 		else{
@@ -71,9 +125,17 @@ public class RulesUIC extends GenericContainer {
 					rules[i] = new Rule(arr[0], bool, true, Initiator.valueOf(arr[1]), Initiator.valueOf(arr[2]));
 				}
 				if(packet.hasKey("ruleset")) ruleset = packet.getString("ruleset");
-				((RulesUI)gui).initFromContainer();
+				((RulesUI)gui).initFromContainer(); return;
+			}
+			else if(packet.getString("cargo").equals("status")){
+				((RulesUI)gui).status.string = Formatter.format(packet.getString("status"));
 			}
 		}
+	}
+	
+	private void sendStatus(String status){
+		NBTTagCompound compound = new NBTTagCompound(); compound.setString("cargo", "status");
+		compound.setString("status", status);send(Side.CLIENT, compound);
 	}
 
 }

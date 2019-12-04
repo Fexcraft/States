@@ -3,6 +3,7 @@ package net.fexcraft.mod.states.data;
 import java.io.File;
 import java.util.Collection;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 
 import com.google.gson.JsonArray;
@@ -14,17 +15,19 @@ import net.fexcraft.lib.common.lang.ArrayList;
 import net.fexcraft.lib.common.math.Time;
 import net.fexcraft.mod.states.States;
 import net.fexcraft.mod.states.data.root.BuyableType;
+import net.fexcraft.mod.states.data.root.RuleHolder;
 import net.fexcraft.mod.states.data.root.Taxable;
 import net.fexcraft.mod.states.impl.capabilities.SignTileEntityCapabilityUtil;
 import net.fexcraft.mod.states.util.Config;
 import net.fexcraft.mod.states.util.ImageCache;
+import net.fexcraft.mod.states.util.RuleMap;
 import net.fexcraft.mod.states.util.StateLogger;
 import net.fexcraft.mod.states.util.StateUtil;
 import net.fexcraft.mod.states.util.TaxSystem;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.world.World;
 
-public class Chunk implements BuyableType, Taxable {
+public class Chunk implements BuyableType, Taxable, RuleHolder {
 	
 	private District district;
 	private long price, created, changed, edited, lasttaxcheck, ctax;
@@ -36,6 +39,7 @@ public class Chunk implements BuyableType, Taxable {
 	private String owner;
 	private List<UUID> wl_players = new ArrayList<>();
 	private List<Integer> wl_companies = new ArrayList<>();
+	private RuleMap rules = new RuleMap();
 	
 	public Chunk(World world, ChunkPos pos, boolean create){
 		this.x = pos.x; this.z = pos.z; this.pos = pos;
@@ -301,6 +305,32 @@ public class Chunk implements BuyableType, Taxable {
 	
 	public State getState(){
 		return district.getMunicipality().getState();
+	}
+
+	public boolean isRuleAuthorized(UUID uuid){
+		switch(this.type){
+			case COMPANY:{
+				return false;//TODO
+			}
+			case DISTRICT:{
+				return district.r_SET_CHUNKRULES.isAuthorized(district, uuid);
+			}
+			case MUNICIPAL: case NORMAL: case PUBLIC:{
+				return getMunicipality().r_SET_CHUNKRULES.isAuthorized(district, uuid);
+			}
+			case PRIVATE:{
+				return owner != null && owner.equals(uuid.toString());
+			}
+			case STATEOWNED:{
+				return false;//TODO
+			}
+			default: return false;
+		}
+	}
+
+	@Override
+	public Map<String, Rule> getRules(){
+		return rules;
 	}
 
 }

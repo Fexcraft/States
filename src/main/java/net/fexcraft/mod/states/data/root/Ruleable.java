@@ -7,6 +7,8 @@ public interface Ruleable extends RuleHolder {
 	
 	public String getRulesetTitle();
 	
+	public void setRulesetTitle(String title);
+	
 	public List<UUID> getCouncil();
 	
 	public UUID getHead();

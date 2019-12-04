@@ -58,7 +58,7 @@ public class RulesUI extends GenericGui<RulesUIC> {
 			case 0: title.string = "Chunk Rules"; break;
 			case 1: title.string = "Dis.: " + container.ruleset; break;
 			case 2: title.string = "Mun.: " + container.ruleset; break;
-			case 4: title.string = "State: " + container.ruleset; break;
+			case 3: title.string = "State: " + container.ruleset; break;
 			default: title.string = "INVALID LAYER"; break;
 		} status.string = "";
 	}

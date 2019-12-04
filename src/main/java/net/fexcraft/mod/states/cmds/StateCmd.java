@@ -124,6 +124,7 @@ public class StateCmd extends CommandBase {
 					Print.chat(sender, "&7/st set icon <url>");
 					Print.chat(sender, "&7/st set chunk-tax-percentage <0-100/reset>");
 					Print.chat(sender, "&7/st set citizen-tax-percentage <0-100/reset>");
+					Print.chat(sender, "&7/st set ruleset <new name>");
 					return;
 				}
 				switch(args[1]){
@@ -170,6 +171,33 @@ public class StateCmd extends CommandBase {
 							state.save();
 							Print.chat(sender, "&6Name set to: &7" + state.getName());
 							StateLogger.log(StateLogger.LoggerType.STATE, StateLogger.player(player) + " set the name of " + StateLogger.state(state) + " to " + state.getName());
+						}
+						else{
+							Print.chat(sender, "&cNo permission.");
+						}
+						break;
+					}
+					case "rukeset":{
+						if(state.isAuthorized(state.r_SET_RULESET.id, ply.getUUID())){
+							if(args.length < 3){
+								Print.chat(sender, "&9Missing Arguments!");
+								break;
+							}
+							String str = args[2];
+							if(args.length > 3){
+								for(int i = 3; i < args.length; i++){
+									str += " " + args[i];
+								}
+							}
+							if(str.replace(" ", "").length() < 3){
+								Print.chat(sender, "&cName is too short!");
+								break;
+							}
+							state.setRulesetTitle(str);
+							state.setChanged(Time.getDate());
+							state.save();
+							Print.chat(sender, "&6Ruleset Name set to: &7" + state.getName());
+							StateLogger.log(StateLogger.LoggerType.STATE, StateLogger.player(player) + " set the ruleset name of " + StateLogger.state(state) + " to " + state.getName());
 						}
 						else{
 							Print.chat(sender, "&cNo permission.");

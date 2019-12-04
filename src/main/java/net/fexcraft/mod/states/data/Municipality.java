@@ -50,7 +50,7 @@ public class Municipality implements ColorHolder, BuyableType, IconHolder, Accou
 	public final Rule r_OPEN, r_COLOR, r_ICON, r_SET_NAME, r_SET_PRICE, r_SET_MAYOR, r_SET_CITIZENTAX, r_KIB;
 	public final Rule r_EDIT_BL, r_KICK, r_INVITE, r_COUNCIL_KICK, r_COUNCIL_INVITE, r_COUNCIL_VOTE;
 	public final Rule r_CREATE_DISTRICT, r_SET_CHUNKRULES, r_CREATE_SIGN_SHOP, r_SET_MAILBOX, r_OPEN_MAILBOX;
-	public final Rule r_FORCE_LOAD_CHUNKS;
+	public final Rule r_FORCE_LOAD_CHUNKS, r_SET_RULESET;
 	
 	public Municipality(int id){
 		this.id = id;
@@ -95,6 +95,7 @@ public class Municipality implements ColorHolder, BuyableType, IconHolder, Accou
 		rules.add(r_SET_MAILBOX = new Rule("set.mailbox", null, true, Initiator.COUNCIL_VOTE, Initiator.INCHARGE));
 		rules.add(r_OPEN_MAILBOX = new Rule("open.mailbox", null, true, Initiator.COUNCIL_VOTE, Initiator.COUNCIL_ANY));
 		rules.add(r_FORCE_LOAD_CHUNKS = new Rule("force-load.chunks", null, true, Initiator.COUNCIL_VOTE, Initiator.INCHARGE));
+		rules.add(r_SET_RULESET = new Rule("set.ruleset-name", null, true, Initiator.COUNCIL_VOTE, Initiator.INCHARGE));
 		if(obj.has("rules")){
 			JsonObject rls = obj.get("rules").getAsJsonObject();
 			for(Map.Entry<String, JsonElement> entry : rls.entrySet()){
@@ -369,7 +370,12 @@ public class Municipality implements ColorHolder, BuyableType, IconHolder, Accou
 
 	@Override
 	public Ruleable getHigherInstance(){
-		return null;//state; //TODO
+		return state;
+	}
+
+	@Override
+	public void setRulesetTitle(String title){
+		ruleset_name = title;
 	}
 
 }

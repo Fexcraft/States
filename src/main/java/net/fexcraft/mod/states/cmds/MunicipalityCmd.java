@@ -191,6 +191,7 @@ public class MunicipalityCmd extends CommandBase {
 					Print.chat(sender, "&7/mun set icon <url>");
 					Print.chat(sender, "&7/mun set citizen-tax <amount/reset>");
 					Print.chat(sender, "&7/mun set kick-if-bankrupt <true/false>");
+					Print.chat(sender, "&7/mun set ruleset <new name>");
 					return;
 				}
 				switch(args[1]){
@@ -241,6 +242,33 @@ public class MunicipalityCmd extends CommandBase {
 							mun.save();
 							Print.chat(sender, "&6Name set to: &7" + mun.getName());
 							StateLogger.log(StateLogger.LoggerType.MUNICIPALITY, StateLogger.player(player) + " changed name of " + StateLogger.municipality(mun) + " to " + mun.getName() + ".");
+						}
+						else{
+							Print.chat(sender, "&cNo permission.");
+						}
+						break;
+					}
+					case "ruleset":{
+						if(mun.isAuthorized(mun.r_SET_RULESET.id, ply.getUUID()) || StateUtil.bypass(player)){
+							if(args.length < 3){
+								Print.chat(sender, "&9Missing Arguments!");
+								break;
+							}
+							String str = args[2];
+							if(args.length > 3){
+								for(int i = 3; i < args.length; i++){
+									str += " " + args[i];
+								}
+							}
+							if(str.replace(" ", "").length() < 3){
+								Print.chat(sender, "&cName is too short!");
+								break;
+							}
+							mun.setRulesetTitle(str);
+							mun.setChanged(Time.getDate());
+							mun.save();
+							Print.chat(sender, "&6Ruleset Name set to: &7" + mun.getName());
+							StateLogger.log(StateLogger.LoggerType.MUNICIPALITY, StateLogger.player(player) + " changed ruleset name of " + StateLogger.municipality(mun) + " to " + mun.getName() + ".");
 						}
 						else{
 							Print.chat(sender, "&cNo permission.");

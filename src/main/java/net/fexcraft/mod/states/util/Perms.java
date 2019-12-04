@@ -20,8 +20,8 @@ public class Perms {
 		PermissionAPI.registerNode(NICKNAME_CHANGE_OTHERS.get(), DefaultPermissionLevel.OP, "NickName Management - Others");
 		PermissionAPI.registerNode(CREATE_SERVER_SIGN_SHOPS.get(), DefaultPermissionLevel.OP, "Creation of States (SERVER) Sign Shops");
 		PermissionAPI.registerNode(MAIL_READ_ANY.get(), DefaultPermissionLevel.OP, "Permission to open ANY kind of mail.");
-		PermissionAPI.registerNode(CREATE_STATE.get(), DefaultPermissionLevel.OP, "Creation of a new State");
-		PermissionAPI.registerNode(CREATE_MUNICIPALITY.get(), DefaultPermissionLevel.OP, "Creation of a new Municipality");
+		PermissionAPI.registerNode(CREATE_STATE.get(), DefaultPermissionLevel.ALL, "Creation of a new State");
+		PermissionAPI.registerNode(CREATE_MUNICIPALITY.get(), DefaultPermissionLevel.ALL, "Creation of a new Municipality");
 	}
 	
 	public static class Perm {

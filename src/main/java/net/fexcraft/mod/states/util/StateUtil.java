@@ -26,6 +26,7 @@ import net.fexcraft.mod.states.data.District;
 import net.fexcraft.mod.states.data.Municipality;
 import net.fexcraft.mod.states.data.PlayerImpl;
 import net.fexcraft.mod.states.data.State;
+import net.fexcraft.mod.states.data.Vote;
 import net.fexcraft.mod.states.data.capabilities.PlayerCapability;
 import net.fexcraft.mod.states.data.capabilities.StatesCapabilities;
 import net.fexcraft.mod.states.data.root.AnnounceLevel;
@@ -351,6 +352,13 @@ public class StateUtil extends TimerTask {
 					cap.save(); cap.unload();
 				}
 			}
+			Print.debug("Scheduled check for expired Votes.");
+			ImmutableList<Vote> votes = ImmutableList.copyOf(States.VOTES.values());
+			for(Vote vote : votes){
+				if(vote.expired(null)){
+					States.VOTES.remove(vote.id); vote.save();
+				}
+			}
 		}
 		catch(Exception e){
 			MessageSender.as(null, "SCHEDULED DATA UNLOAD ERRORED");
@@ -362,6 +370,7 @@ public class StateUtil extends TimerTask {
 		for(District dis : States.DISTRICTS.values()){ dis.save(); }
 		for(Municipality mun : States.MUNICIPALITIES.values()){ mun.save(); mun.unload(); }
 		for(State state : States.STATES.values()){ state.save(); state.unload(); }
+		for(Vote vote : States.VOTES.values()){ vote.save(); }
 	}
 
 	public static void clearAll(){

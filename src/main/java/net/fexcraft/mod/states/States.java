@@ -24,6 +24,7 @@ import net.fexcraft.mod.states.data.ChunkPos;
 import net.fexcraft.mod.states.data.District;
 import net.fexcraft.mod.states.data.Municipality;
 import net.fexcraft.mod.states.data.State;
+import net.fexcraft.mod.states.data.Vote;
 import net.fexcraft.mod.states.data.capabilities.ChunkCapability;
 import net.fexcraft.mod.states.data.capabilities.PlayerCapability;
 import net.fexcraft.mod.states.data.capabilities.SignTileEntityCapability;
@@ -71,11 +72,12 @@ public class States {
 	public static final String PREFIX = "&0[&2States&0]";
 	//
 	public static final TreeMap<ChunkPos, Chunk> CHUNKS = new TreeMap<>();
-	public static final TreeMap<Integer, District> DISTRICTS = new TreeMap<Integer, District>();
-	public static final TreeMap<Integer, Municipality> MUNICIPALITIES = new TreeMap<Integer, Municipality>();
-	public static final TreeMap<Integer, State> STATES = new TreeMap<Integer, State>();
-	public static final TreeMap<UUID, PlayerCapability> PLAYERS = new TreeMap<UUID, PlayerCapability>();
+	public static final TreeMap<Integer, District> DISTRICTS = new TreeMap<>();
+	public static final TreeMap<Integer, Municipality> MUNICIPALITIES = new TreeMap<>();
+	public static final TreeMap<Integer, State> STATES = new TreeMap<>();
+	public static final TreeMap<UUID, PlayerCapability> PLAYERS = new TreeMap<>();
 	public static final TreeMap<Integer, List<ChunkPos>> LOADED_CHUNKS = new TreeMap<>();
+	public static final TreeMap<Integer, Vote> VOTES = new TreeMap<>();
 	//
 	public static final String DEF_UUID = "66e70cb7-1d96-487c-8255-5c2d7a2b6a0e";
 	public static final String CONSOLE_UUID = "f78a4d8d-d51b-4b39-98a3-230f2de0c670";

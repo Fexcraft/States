@@ -42,11 +42,13 @@ public class RuleCmd extends CommandBase {
 	@SuppressWarnings("unused") @Override
 	public void execute(MinecraftServer server, ICommandSender sender, String[] args) throws CommandException {
 		if(args.length == 0){
-			Print.chat(sender, "&7/rule vote <layer> <rule> <rev/set> <type>");
-			Print.chat(sender, "&7/rule all <layer>");
-			Print.chat(sender, "&7/rule view <layer> <rule>");
-			Print.chat(sender, "&7/rule types");
-			Print.chat(sender, "&7/rule layers");
+			Print.chat(sender, "&7/st-rule vote <layer> <rule> rev <type>");
+			Print.chat(sender, "&7/st-rule vote <layer> <rule> set <type>");
+			Print.chat(sender, "&7/st-rule vote <layer> <rule> value <new value>");
+			Print.chat(sender, "&7/st-rule all <layer>");
+			Print.chat(sender, "&7/st-rule view <layer> <rule>");
+			Print.chat(sender, "&7/st-rule types");
+			Print.chat(sender, "&7/st-rule layers");
 			return;
 		}
 		EntityPlayer player = (EntityPlayer)sender.getCommandSenderEntity();

@@ -49,7 +49,8 @@ public class Municipality implements ColorHolder, BuyableType, IconHolder, Accou
 	private String ruleset_name;
 	public final Rule r_OPEN, r_COLOR, r_ICON, r_SET_NAME, r_SET_PRICE, r_SET_MAYOR, r_SET_CITIZENTAX, r_KIB;
 	public final Rule r_EDIT_BL, r_KICK, r_INVITE, r_COUNCIL_KICK, r_COUNCIL_INVITE, r_COUNCIL_VOTE;
-	public final Rule r_CREATE_DISTRICT, r_SET_CHUNKRULES;
+	public final Rule r_CREATE_DISTRICT, r_SET_CHUNKRULES, r_CREATE_SIGN_SHOP, r_SET_MAILBOX, r_OPEN_MAILBOX;
+	public final Rule r_FORCE_LOAD_CHUNKS;
 	
 	public Municipality(int id){
 		this.id = id;
@@ -90,6 +91,10 @@ public class Municipality implements ColorHolder, BuyableType, IconHolder, Accou
 		rules.add(r_COUNCIL_VOTE = new Rule("council_vote", null, true, Initiator.INCHARGE, Initiator.COUNCIL_ANY));
 		rules.add(r_CREATE_DISTRICT = new Rule("create.district", null, true, Initiator.CITIZEN_VOTE, Initiator.COUNCIL_ANY));
 		rules.add(r_SET_CHUNKRULES = new Rule("set.chunkrules", null, true, Initiator.COUNCIL_VOTE, Initiator.INCHARGE));
+		rules.add(r_CREATE_SIGN_SHOP = new Rule("create.sign-shops", null, true, Initiator.INCHARGE, Initiator.COUNCIL_ANY));
+		rules.add(r_SET_MAILBOX = new Rule("set.mailbox", null, true, Initiator.COUNCIL_VOTE, Initiator.INCHARGE));
+		rules.add(r_OPEN_MAILBOX = new Rule("open.mailbox", null, true, Initiator.COUNCIL_VOTE, Initiator.COUNCIL_ANY));
+		rules.add(r_FORCE_LOAD_CHUNKS = new Rule("force-load.chunks", null, true, Initiator.COUNCIL_VOTE, Initiator.INCHARGE));
 		if(obj.has("rules")){
 			JsonObject rls = obj.get("rules").getAsJsonObject();
 			for(Map.Entry<String, JsonElement> entry : rls.entrySet()){

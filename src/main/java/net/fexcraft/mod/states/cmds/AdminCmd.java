@@ -54,7 +54,7 @@ public class AdminCmd extends CommandBase {
 		EntityPlayer player = getCommandSenderAsPlayer(sender);
 		//PlayerCapability cap = player.getCapability(StatesCapabilities.PLAYER, null);
 		Chunk chunk = StateUtil.getChunk(player);
-		if(!ChunkCmd.hasPerm("admin", player, null)){
+		if(!StateUtil.isAdmin(player)){
 			Print.chat(player, "&7No Permission."); return;
 		}
 		switch(args[0]){

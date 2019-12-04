@@ -21,7 +21,6 @@ import net.fexcraft.mod.states.packets.ImagePacket;
 import net.fexcraft.mod.states.util.ImageCache;
 import net.fexcraft.mod.states.util.StateLogger;
 import net.fexcraft.mod.states.util.StateUtil;
-import net.fexcraft.mod.states.util.StatesPermissions;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
@@ -222,11 +221,11 @@ public class Listener implements IPacketListener<PacketNBTTagCompound> {
 			compound.setString("result", "Chunk data not found.");
 			return compound;
 		}
-		if(dis.getId() != -2 && !StatesPermissions.hasPermission(player, "chunk.claim", dis)){
+		if(dis.getId() != -2 && !dis.isAuthorized(dis.r_CLAIM_CHUNK.id, player.getGameProfile().getId())){
 			compound.setString("result", "No permission. (0)");
 			return compound;
 		}
-		if(mode == 1 && !StatesPermissions.hasPermission(player, "chunk.claim", ck.getDistrict())){
+		if(mode == 1 && !ck.getDistrict().isAuthorized(ck.getDistrict().r_CLAIM_CHUNK.id, player.getGameProfile().getId())){
 			compound.setString("result", "No permission. (1)");
 			return compound;
 		}

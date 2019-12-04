@@ -14,7 +14,6 @@ import net.fexcraft.mod.states.data.Chunk;
 import net.fexcraft.mod.states.data.capabilities.StatesCapabilities;
 import net.fexcraft.mod.states.events.PlayerEvents;
 import net.fexcraft.mod.states.util.StateUtil;
-import net.fexcraft.mod.states.util.StatesPermissions;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.CompressedStreamTools;
@@ -62,17 +61,17 @@ public class SignMailbox implements SignCapability.Listener {
 				String type = tileentity.signText[1].getUnformattedText().toLowerCase();
 				switch(type){
 					case "state":{
-						if(!StatesPermissions.hasPermission(event.getEntityPlayer(), "state.set.mailbox", chunk.getState())){
+						if(!chunk.getState().isAuthorized(chunk.getState().r_SET_MAILBOX.id, event.getEntityPlayer().getGameProfile().getId())){
 							Print.chat(event.getEntityPlayer(), "No permission to set the State Mailbox."); return false;
 						} reci = type;
 					}
 					case "municipality":{
-						if(!StatesPermissions.hasPermission(event.getEntityPlayer(), "municipality.set.mailbox", chunk.getMunicipality())){
+						if(!chunk.getMunicipality().isAuthorized(chunk.getMunicipality().r_SET_MAILBOX.id, event.getEntityPlayer().getGameProfile().getId())){
 							Print.chat(event.getEntityPlayer(), "No permission to set the Municipality Mailbox."); return false;
 						} reci = type;
 					}
 					case "district":{
-						if(!StatesPermissions.hasPermission(event.getEntityPlayer(), "district.set.mailbox", chunk.getDistrict())){
+						if(!chunk.getDistrict().isAuthorized(chunk.getDistrict().r_SET_MAILBOX.id, event.getEntityPlayer().getGameProfile().getId())){
 							Print.chat(event.getEntityPlayer(), "No permission to set the District Mailbox."); return false;
 						} reci = type;
 					}
@@ -84,7 +83,7 @@ public class SignMailbox implements SignCapability.Listener {
 							Print.chat(event.getEntityPlayer(), "Couldn't find player UUID in cache.");
 							return false;
 						}
-						if(prof.getId().equals(event.getEntityPlayer().getGameProfile().getId()) || StatesPermissions.hasPermission(event.getEntityPlayer(), "admin", null)){
+						if(prof.getId().equals(event.getEntityPlayer().getGameProfile().getId()) || StateUtil.isAdmin(event.getEntityPlayer())){
 							this.reci = prof.getId().toString();
 							tileentity.signText[1] = Formatter.newTextComponentString(prof.getName());
 							tileentity.signText[2] = Formatter.newTextComponentString("");
@@ -95,7 +94,7 @@ public class SignMailbox implements SignCapability.Listener {
 						break;
 					}
 					case "central": case "fallback":{
-						if(!StatesPermissions.hasPermission(event.getEntityPlayer(), "admin", chunk)){
+						if(!StateUtil.isAdmin(event.getEntityPlayer())){
 							Print.chat(event.getEntityPlayer(), "No permission to set the Central/Fallback Mailbox."); return false;
 						} reci = "-1";
 						break;
@@ -141,17 +140,17 @@ public class SignMailbox implements SignCapability.Listener {
 			Chunk chunk = StateUtil.getChunk(tileentity.getPos());
 			switch(type){
 				case "state":{
-					if(!StatesPermissions.hasPermission(event.getEntityPlayer(), "state.open.mailbox", chunk.getState())){
+					if(!chunk.getState().isAuthorized(chunk.getState().r_OPEN_MAILBOX.id, event.getEntityPlayer().getGameProfile().getId())){
 						Print.chat(event.getEntityPlayer(), "No permission to open the State Mailbox."); return false;
 					}
 				}
 				case "municipality":{
-					if(!StatesPermissions.hasPermission(event.getEntityPlayer(), "municipality.open.mailbox", chunk.getMunicipality())){
+					if(!chunk.getMunicipality().isAuthorized(chunk.getMunicipality().r_OPEN_MAILBOX.id, event.getEntityPlayer().getGameProfile().getId())){
 						Print.chat(event.getEntityPlayer(), "No permission to open the Municipality Mailbox."); return false;
 					}
 				}
 				case "district":{
-					if(!StatesPermissions.hasPermission(event.getEntityPlayer(), "district.open.mailbox", chunk.getDistrict())){
+					if(!chunk.getDistrict().isAuthorized(chunk.getDistrict().r_OPEN_MAILBOX.id, event.getEntityPlayer().getGameProfile().getId())){
 						Print.chat(event.getEntityPlayer(), "No permission to open the District Mailbox."); return false;
 					}
 				}
@@ -163,7 +162,7 @@ public class SignMailbox implements SignCapability.Listener {
 					break;
 				}
 				case "central": case "fallback":{
-					if(!StatesPermissions.hasPermission(event.getEntityPlayer(), "admin", chunk)){
+					if(!StateUtil.isAdmin(event.getEntityPlayer())){
 						Print.chat(event.getEntityPlayer(), "No permission to set the Central/Fallback Mailbox."); return false;
 					}
 					break;

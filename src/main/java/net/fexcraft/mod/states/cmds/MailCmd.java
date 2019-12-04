@@ -17,9 +17,9 @@ import net.fexcraft.mod.states.data.root.Mailbox.MailType;
 import net.fexcraft.mod.states.data.root.Mailbox.RecipientType;
 import net.fexcraft.mod.states.objects.MailItem;
 import net.fexcraft.mod.states.util.MailUtil;
+import net.fexcraft.mod.states.util.Perms;
 import net.fexcraft.mod.states.util.StateLogger;
 import net.fexcraft.mod.states.util.StateUtil;
-import net.fexcraft.mod.states.util.StatesPermissions;
 import net.minecraft.command.CommandBase;
 import net.minecraft.command.CommandException;
 import net.minecraft.command.ICommandSender;
@@ -93,7 +93,7 @@ public class MailCmd extends CommandBase {
 						}
 						Print.chat(player, "Item has no data to read."); return;
 					}
-					if(!StatesPermissions.hasPermission(player, "admin", null) && !StatesPermissions.hasPermission(player, "mail.read.any", null)){
+					if(!StateUtil.isAdmin(player) && !Perms.MAIL_READ_ANY.has(player)){
 						ResourceLocation loc = new ResourceLocation(stack.getTagCompound().getString("Receiver"));
 						switch(loc.getResourceDomain()){
 							case "player":{

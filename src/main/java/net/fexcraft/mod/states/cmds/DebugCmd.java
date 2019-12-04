@@ -18,8 +18,6 @@ import net.fexcraft.mod.states.data.Chunk;
 import net.fexcraft.mod.states.data.capabilities.StatesCapabilities;
 import net.fexcraft.mod.states.util.ForcedChunksManager;
 import net.fexcraft.mod.states.util.StateUtil;
-import net.fexcraft.mod.states.util.StatesPermissions;
-import net.fexcraft.mod.states.util.StatesPermissions.Permission;
 import net.fexcraft.mod.states.util.UpdateHandler;
 import net.minecraft.command.CommandBase;
 import net.minecraft.command.CommandException;
@@ -60,8 +58,6 @@ public class DebugCmd extends CommandBase {
             Print.chat(sender, "&7/st-debug state");
             Print.chat(sender, "&7/st-debug states");
             Print.chat(sender, "&7/st-debug serveraccount");
-            Print.chat(sender, "&7/st-debug permission <string>");
-            Print.chat(sender, "&7/st-debug permissions");
             Print.chat(sender, "&7/st-debug self");
             Print.chat(sender, "&7/st-debug totals");
             Print.chat(sender, "&7/st-debug check-for-updates");
@@ -140,22 +136,6 @@ public class DebugCmd extends CommandBase {
             }
             case "serveraccount":{
                 Print.chat(sender, "&9Server Account Balance: &7" + Config.getWorthAsString(States.SERVERACCOUNT.getBalance()));
-                return;
-            }
-            case "permission":{
-                if(args.length < 2){
-                    Print.chat(sender, "missing argument");
-                    return;
-                }
-                Print.chat(sender, "&6Permission: &7" + args[1]);
-                Permission perm = StatesPermissions.PERMISSIONS.get(args[1]);
-                Print.chat(sender, perm == null ? "not found" : perm.toString());
-                return;
-            }
-            case "permissions":{
-                StatesPermissions.PERMISSIONS.forEach((key, value) -> {
-                    Print.chat(sender, "&8-> &7" + key);
-                });
                 return;
             }
             case "self":{

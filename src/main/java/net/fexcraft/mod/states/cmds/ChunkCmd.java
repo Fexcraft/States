@@ -23,7 +23,6 @@ import net.fexcraft.mod.states.data.capabilities.StatesCapabilities;
 import net.fexcraft.mod.states.util.ImageCache;
 import net.fexcraft.mod.states.util.StateLogger;
 import net.fexcraft.mod.states.util.StateUtil;
-import net.fexcraft.mod.states.util.StatesPermissions;
 import net.minecraft.command.CommandBase;
 import net.minecraft.command.CommandException;
 import net.minecraft.command.ICommandSender;
@@ -162,7 +161,7 @@ public class ChunkCmd extends CommandBase {
 				return;
 			}
 			case "update":{
-				if(hasPerm("chunk.update", player, chunk)){
+				/*if(hasPerm("chunk.update", player, chunk)){
 					int range = args.length > 1 ? Integer.parseInt(args[1]) : 0;
 					if(range <= 0){
 						ImageCache.update(player.world, player.world.getChunkFromChunkCoords(chunk.xCoord(), chunk.zCoord()));
@@ -195,7 +194,8 @@ public class ChunkCmd extends CommandBase {
 				}
 				else{
 					Print.chat(sender, "&cNo Permission.");
-				}
+				}*/
+				Print.debug("&bCurrently disabled.");
 				return;
 			}
 			case "queue":{
@@ -204,7 +204,7 @@ public class ChunkCmd extends CommandBase {
 				return;
 			}
 			case "unclaim":{
-				if(hasPerm("admin", player, chunk)){
+				if(StateUtil.isAdmin(player)){
 					int range = args.length > 1 ? Integer.parseInt(args[1]) : 0;
 					if(range <= 0){
 						chunk.setClaimer(player.getGameProfile().getId());
@@ -384,7 +384,7 @@ public class ChunkCmd extends CommandBase {
 					}
 					switch(args[1]){
 						case "district":{
-							if(hasPerm("admin", player, chunk)){
+							if(StateUtil.isAdmin(player)){
 								try{
 									chunk.setDistrict(StateUtil.getDistrict(Integer.parseInt(args[2])));
 									Print.chat(sender, "&2District set to: " + chunk.getDistrict().getName() + " (" + chunk.getDistrict().getId() + ");");
@@ -492,7 +492,7 @@ public class ChunkCmd extends CommandBase {
 								Print.chat(sender, "&7/ck set force-loaded false");
 								return;
 							}
-							if(hasPerm("chunk.set.forceloaded", player, chunk)){
+							if(chunk.getMunicipality().r_FORCE_LOAD_CHUNKS.isAuthorized(chunk.getMunicipality(), playerdata.getUUID())){
 								if(chunk.getMunicipality().getAccount().getBalance() < net.fexcraft.mod.states.util.Config.LOADED_CHUNKS_TAX){
 									Print.chat(sender, "Not enough money to pay the tax.");
 									return;
@@ -514,7 +514,7 @@ public class ChunkCmd extends CommandBase {
 								Print.chat(sender, "&7/ck set custom-tax reset/disable");
 								return;
 							}
-							if(hasPerm("chunk.set.customtax", player, chunk)){
+							if(chunk.getDistrict().isAuthorized(chunk.getDistrict().r_SET_CUSTOM_CHUNKTAX.id, playerdata.getUUID())){
 								if(args[2].equals("reset") || args[2].equals("disable")){
 									chunk.setCustomTax(0); chunk.save();
 									Print.chat(sender, "&9Chunk's Custom Tax was reset!");
@@ -679,7 +679,7 @@ public class ChunkCmd extends CommandBase {
 			Print.chat(player, "&7Alternatively unlink this chunk.");
 			return false;
 		}
-		if(hasPerm("admin", player, chunk)){
+		if(StateUtil.isAdmin(player)){
 			Print.chat(player, "&7&oAdmin bypass.");
 			return true;
 		}
@@ -687,8 +687,8 @@ public class ChunkCmd extends CommandBase {
 		UUID uuid = player.getGameProfile().getId();
 		boolean isco = chunk.getOwner().equals(uuid.toString());
 		boolean ismn = chunk.getDistrict().getHead() != null && chunk.getDistrict().getHead().equals(uuid);
-		boolean ismy = chunk.getDistrict().getMunicipality().getHead() != null && chunk.getDistrict().getMunicipality().getHead().equals(uuid);
-		boolean isst = chunk.getDistrict().getMunicipality().getState().getCouncil().contains(uuid) || (chunk.getDistrict().getMunicipality().getState().getLeader() != null && chunk.getDistrict().getMunicipality().getState().getLeader().equals(uuid));
+		boolean ismy = chunk.getMunicipality().getHead() != null && chunk.getMunicipality().getHead().equals(uuid);
+		boolean isst = chunk.getState().getCouncil().contains(uuid) || (chunk.getState().getHead() != null && chunk.getState().getHead().equals(uuid));
 		boolean iscm = false;//TODO companies
 		Print.debug(isco, ismn, ismy, isst, iscm);
 		switch(chunk.getType()){
@@ -715,7 +715,7 @@ public class ChunkCmd extends CommandBase {
 			Print.chat(player, "&7Alternatively unlink this chunk.");
 			return false;
 		}
-		if(hasPerm("admin", player, chunk)){
+		if(StateUtil.isAdmin(player)){
 			Print.chat(player, "&7&oAdmin bypass.");
 			return true;
 		}
@@ -723,8 +723,8 @@ public class ChunkCmd extends CommandBase {
 		UUID uuid = player.getGameProfile().getId();
 		boolean isco = chunk.getOwner().equals(uuid.toString());
 		boolean ismn = chunk.getDistrict().getHead() != null && chunk.getDistrict().getHead().equals(uuid);
-		boolean ismy = chunk.getDistrict().getMunicipality().getHead() != null && chunk.getDistrict().getMunicipality().getHead().equals(uuid);
-		boolean isst = chunk.getDistrict().getMunicipality().getState().getCouncil().contains(uuid) || (chunk.getDistrict().getMunicipality().getState().getLeader() != null && chunk.getDistrict().getMunicipality().getState().getLeader().equals(uuid));
+		boolean ismy = chunk.getMunicipality().getHead() != null && chunk.getMunicipality().getHead().equals(uuid);
+		boolean isst = chunk.getState().getCouncil().contains(uuid) || (chunk.getState().getHead() != null && chunk.getState().getHead().equals(uuid));
 		boolean iscm = false;//TODO companies
 		Print.debug(isco, ismn, ismy, isst, iscm);
 		switch(chunk.getType()){
@@ -741,10 +741,6 @@ public class ChunkCmd extends CommandBase {
 			Print.chat(player, "&7No Permission.");
 		}
 		return result;
-	}
-
-	public static final boolean hasPerm(String perm, EntityPlayer player, Object obj){
-		return StatesPermissions.hasPermission(player, perm, obj);
 	}
 
 }

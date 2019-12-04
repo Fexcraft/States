@@ -40,7 +40,8 @@ public class District implements ColorHolder, BuyableType, IconHolder, MailRecei
 	private String ruleset;
 	public final Rule r_CFS, r_ONBANKRUPT, r_SET_MANAGER, r_SET_CHUNKTAX;
 	public final Rule r_SET_TYPE, r_SET_NAME, r_SET_PRICE, r_SET_COLOR, r_SET_ICON;
-	public final Rule r_ALLOW_EXPLOSIONS, r_SET_CHUNKRULES;
+	public final Rule r_ALLOW_EXPLOSIONS, r_SET_CHUNKRULES, r_SET_CUSTOM_CHUNKTAX;
+	public final Rule r_CLAIM_CHUNK, r_SET_MAILBOX, r_OPEN_MAILBOX;
 	
 	public District(int id){
 		this.id = id; JsonObject obj = StateUtil.getDistrictJson(id);
@@ -70,7 +71,10 @@ public class District implements ColorHolder, BuyableType, IconHolder, MailRecei
 		rules.add(r_SET_CHUNKTAX = new Rule("set.chunktax", null, true, Initiator.COUNCIL_ANY, Initiator.INCHARGE));
 		rules.add(r_ALLOW_EXPLOSIONS = new Rule("allow.explosions", false, true, Initiator.COUNCIL_VOTE, Initiator.HIGHERINCHARGE));
 		rules.add(r_SET_CHUNKRULES = new Rule("set.chunkrules", null, true, Initiator.COUNCIL_VOTE, Initiator.INCHARGE));
-		//rules.add(r_ALLOW_ENT_HOSTILE = new Rule("allow.entity_spawn.hostile", false, true, Initiator.COUNCIL_ANY, Initiator.INCHARGE));
+		rules.add(r_SET_CUSTOM_CHUNKTAX = new Rule("set.custom_chunktax", null, true, Initiator.COUNCIL_ANY, Initiator.INCHARGE));
+		rules.add(r_CLAIM_CHUNK = new Rule("claim.chunk", null, true, Initiator.COUNCIL_VOTE, Initiator.INCHARGE));
+		rules.add(r_SET_MAILBOX = new Rule("set.mailbox", null, true, Initiator.COUNCIL_VOTE, Initiator.HIGHERINCHARGE));
+		rules.add(r_OPEN_MAILBOX = new Rule("open.mailbox", null, true, Initiator.COUNCIL_VOTE, Initiator.COUNCIL_ANY));
 		if(obj.has("rules")){
 			JsonObject rls = obj.get("rules").getAsJsonObject();
 			for(Map.Entry<String, JsonElement> entry : rls.entrySet()){

@@ -1,5 +1,7 @@
 package net.fexcraft.mod.states.impl;
 
+import java.util.UUID;
+
 import net.fexcraft.lib.mc.capabilities.sign.SignCapability;
 import net.fexcraft.lib.mc.utils.Formatter;
 import net.fexcraft.lib.mc.utils.Print;
@@ -11,8 +13,8 @@ import net.fexcraft.mod.states.States;
 import net.fexcraft.mod.states.data.Chunk;
 import net.fexcraft.mod.states.data.capabilities.StatesCapabilities;
 import net.fexcraft.mod.states.events.PlayerEvents;
+import net.fexcraft.mod.states.util.Perms;
 import net.fexcraft.mod.states.util.StateUtil;
-import net.fexcraft.mod.states.util.StatesPermissions;
 import net.minecraft.block.BlockWallSign;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.player.EntityPlayer;
@@ -62,11 +64,11 @@ public class SignShop implements SignCapability.Listener {
 				if(te != null && te.hasCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, facing) && PlayerEvents.checkAccess(te.getWorld(), te.getPos(), te.getWorld().getBlockState(te.getPos()), event.getEntityPlayer())){
 					itemtype = te.getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, facing).getStackInSlot(0).copy();
 					if(!tileentity.signText[1].getUnformattedText().equals("")){
-						Chunk chunk = StateUtil.getChunk(te.getPos());
+						Chunk chunk = StateUtil.getChunk(te.getPos()); UUID uuid = event.getEntityPlayer().getGameProfile().getId();
 						switch(tileentity.signText[1].getUnformattedText().toLowerCase()){
 							case "district":
 							case "municipality":{
-								if(StatesPermissions.hasPermission(event.getEntityPlayer(), "shop.create.municipality", chunk)){
+								if(chunk.getMunicipality().isAuthorized(chunk.getMunicipality().r_CREATE_SIGN_SHOP.id, uuid)){
 									account = new ResourceLocation("municipality:" + chunk.getMunicipality().getId());
 								}
 								else{
@@ -76,7 +78,7 @@ public class SignShop implements SignCapability.Listener {
 								break;
 							}
 							case "state":{
-								if(StatesPermissions.hasPermission(event.getEntityPlayer(), "shop.create.state", chunk)){
+								if(chunk.getState().isAuthorized(chunk.getState().r_CREATE_SIGN_SHOP.id, uuid)){
 									account = new ResourceLocation("state:" + chunk.getMunicipality().getId());
 								}
 								else{
@@ -87,7 +89,7 @@ public class SignShop implements SignCapability.Listener {
 							}
 							case "admin":
 							case "server":{
-								if(StatesPermissions.hasPermission(event.getEntityPlayer(), "shop.create.server", chunk)){
+								if(Perms.CREATE_SERVER_SIGN_SHOPS.has(event.getEntityPlayer())){
 									account = States.SERVERACCOUNT.getAsResourceLocation();
 									server = true;
 								}

@@ -164,7 +164,7 @@ public class PlayerImpl implements PlayerCapability {
 
 	@Override
 	public boolean isStateLeaderOf(State state){
-		return state.getLeader() != null && state.getLeader().equals(getUUID());
+		return state.getHead() != null && state.getHead().equals(getUUID());
 	}
 
 	@Override

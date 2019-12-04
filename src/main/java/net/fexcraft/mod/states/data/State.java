@@ -2,9 +2,11 @@ package net.fexcraft.mod.states.data;
 
 import java.io.File;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 
 import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 
 import net.fexcraft.lib.common.json.JsonUtil;
@@ -18,11 +20,14 @@ import net.fexcraft.mod.states.data.root.AccountHolder;
 import net.fexcraft.mod.states.data.root.BuyableType;
 import net.fexcraft.mod.states.data.root.ColorHolder;
 import net.fexcraft.mod.states.data.root.IconHolder;
+import net.fexcraft.mod.states.data.root.Initiator;
 import net.fexcraft.mod.states.data.root.MailReceiver;
+import net.fexcraft.mod.states.data.root.Ruleable;
+import net.fexcraft.mod.states.util.RuleMap;
 import net.fexcraft.mod.states.util.StateUtil;
 import net.minecraft.util.math.BlockPos;
 
-public class State implements ColorHolder, BuyableType, IconHolder, AccountHolder, MailReceiver {
+public class State implements ColorHolder, BuyableType, IconHolder, AccountHolder, MailReceiver, Ruleable {
 
 	private int id, capital;
 	private String name, color, icon;
@@ -33,6 +38,13 @@ public class State implements ColorHolder, BuyableType, IconHolder, AccountHolde
 	private ArrayList<UUID> council;
 	private byte chunktaxpercent, citizentaxpercent;
 	private BlockPos mailbox;
+	//
+	private String ruleset;
+	private RuleMap rules = new RuleMap();
+	public final Rule r_CREATE_SIGN_SHOP, r_SET_MAILBOX, r_OPEN_MAILBOX, r_CREATE_MUNICIPALITY;
+	public final Rule r_SET_COLOR, r_SET_ICON, r_SET_NAME, r_SET_PRICE, r_SET_LEADER, r_SET_CHUNK_TAX_PERCENT;
+	public final Rule r_EDIT_BL, r_MUN_KICK, r_MUN_INVITE, r_COUNCIL_KICK, r_COUNCIL_INVITE, r_COUNCIL_VOTE;
+	public final Rule r_SET_CAPITAL, r_SET_CITIZEN_TAX_PERCENT;
 
 	public State(int value){
 		id = value;
@@ -54,6 +66,32 @@ public class State implements ColorHolder, BuyableType, IconHolder, AccountHolde
 		chunktaxpercent = JsonUtil.getIfExists(obj, "chunk_tax_percent", 0).byteValue();
 		citizentaxpercent = JsonUtil.getIfExists(obj, "citizen_tax_percent", 0).byteValue();
 		mailbox = obj.has("mailbox") ? BlockPos.fromLong(obj.get("mailbox").getAsLong()) : null;
+		ruleset = JsonUtil.getIfExists(obj, "ruleset", "Standard Ruleset");
+		rules.add(r_CREATE_SIGN_SHOP = new Rule("create.sign-shops", null, true, Initiator.INCHARGE, Initiator.COUNCIL_ANY));
+		rules.add(r_SET_MAILBOX = new Rule("set.mailbox", null, true, Initiator.COUNCIL_VOTE, Initiator.INCHARGE));
+		rules.add(r_OPEN_MAILBOX = new Rule("open.mailbox", null, true, Initiator.COUNCIL_VOTE, Initiator.COUNCIL_ANY));
+		rules.add(r_SET_NAME = new Rule("set.name", null, true, Initiator.COUNCIL_VOTE, Initiator.INCHARGE));
+		rules.add(r_SET_PRICE = new Rule("set.price", null, true, Initiator.COUNCIL_VOTE, Initiator.INCHARGE));
+		rules.add(r_SET_LEADER = new Rule("set.leader", null, true, Initiator.COUNCIL_VOTE, Initiator.INCHARGE));
+		rules.add(r_SET_COLOR = new Rule("set.color", null, true, Initiator.COUNCIL_VOTE, Initiator.INCHARGE));
+		rules.add(r_SET_ICON = new Rule("set.icon", null, true, Initiator.COUNCIL_VOTE, Initiator.INCHARGE));
+		rules.add(r_SET_CHUNK_TAX_PERCENT = new Rule("set.chunk-tax-percent", null, true, Initiator.COUNCIL_VOTE, Initiator.INCHARGE));
+		rules.add(r_SET_CITIZEN_TAX_PERCENT = new Rule("set.citizen-tax-percent", null, true, Initiator.COUNCIL_VOTE, Initiator.INCHARGE));
+		rules.add(r_EDIT_BL = new Rule("edit.blacklist", null, true, Initiator.COUNCIL_VOTE, Initiator.INCHARGE));
+		rules.add(r_MUN_KICK = new Rule("kick_municipality", null, true, Initiator.COUNCIL_VOTE, Initiator.COUNCIL_ANY));
+		rules.add(r_MUN_INVITE = new Rule("invite_municipality", null, true, Initiator.COUNCIL_VOTE, Initiator.COUNCIL_ANY));
+		rules.add(r_COUNCIL_KICK = new Rule("kick_council", null, true, Initiator.COUNCIL_VOTE, Initiator.COUNCIL_ANY));
+		rules.add(r_COUNCIL_INVITE = new Rule("invite_council", null, true, Initiator.COUNCIL_VOTE, Initiator.COUNCIL_ANY));
+		rules.add(r_COUNCIL_VOTE = new Rule("council_vote", null, true, Initiator.INCHARGE, Initiator.COUNCIL_ANY));
+		rules.add(r_CREATE_MUNICIPALITY = new Rule("create.municipality", null, true, Initiator.COUNCIL_VOTE, Initiator.COUNCIL_ANY));
+		rules.add(r_SET_CAPITAL = new Rule("set.capital", null, true, Initiator.COUNCIL_VOTE, Initiator.INCHARGE));
+		if(obj.has("rules")){
+			JsonObject rls = obj.get("rules").getAsJsonObject();
+			for(Map.Entry<String, JsonElement> entry : rls.entrySet()){
+				Rule rule = rules.get(entry.getKey());
+				if(rule != null) rule.load(entry.getValue().getAsString());
+			}
+		}
 	}
 
 	public JsonObject toJsonObject(){
@@ -80,6 +118,10 @@ public class State implements ColorHolder, BuyableType, IconHolder, AccountHolde
 			obj.addProperty("citizen_tax_percent", citizentaxpercent);
 		}
 		if(mailbox != null) obj.addProperty("mailbox", mailbox.toLong());
+		obj.addProperty("ruleset", ruleset);
+		JsonObject rells = new JsonObject();
+		for(Rule rule : rules.values()) rells.addProperty(rule.id, rule.save());
+		obj.add("rules", rells);
 		return obj;
 	}
 
@@ -146,14 +188,6 @@ public class State implements ColorHolder, BuyableType, IconHolder, AccountHolde
 	@Override
 	public Account getAccount(){
 		return account;
-	}
-
-	public UUID getLeader(){
-		return leader;
-	}
-
-	public void setLeader(UUID uuid){
-		leader = uuid;
 	}
 
 	public List<UUID> getCouncil(){
@@ -239,6 +273,31 @@ public class State implements ColorHolder, BuyableType, IconHolder, AccountHolde
 	@Override
 	public void setMailbox(BlockPos pos){
 		this.mailbox = pos;
+	}
+
+	@Override
+	public Map<String, Rule> getRules(){
+		return rules;
+	}
+
+	@Override
+	public String getRulesetTitle(){
+		return ruleset;
+	}
+
+	@Override
+	public UUID getHead(){
+		return leader;
+	}
+
+	@Override
+	public void setHead(UUID uuid){
+		leader = uuid;
+	}
+
+	@Override
+	public Ruleable getHigherInstance(){
+		return null;
 	}
 	
 }

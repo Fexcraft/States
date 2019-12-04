@@ -24,6 +24,7 @@ import net.fexcraft.mod.states.data.root.AnnounceLevel;
 import net.fexcraft.mod.states.data.root.Mailbox.MailType;
 import net.fexcraft.mod.states.data.root.Mailbox.RecipientType;
 import net.fexcraft.mod.states.util.MailUtil;
+import net.fexcraft.mod.states.util.Perms;
 import net.fexcraft.mod.states.util.StateLogger;
 import net.fexcraft.mod.states.util.StateUtil;
 import net.minecraft.command.CommandBase;
@@ -82,7 +83,7 @@ public class StateCmd extends CommandBase {
 				Print.chat(sender, "&e====-====-====-====-====-====&0[&2States&0]");
 				Print.chat(sender, "&6Info of State &7" + state.getName() + " (" + state.getId() + ")&2:");
 				Print.chat(sender, "&9Capital: &7" + StateUtil.getMunicipality(state.getCapitalId()).getName() + " (" + state.getCapitalId() + ")");
-				Print.chat(sender, "&9Leader: &7" + (state.getLeader() == null ? "no one" : Static.getPlayerNameByUUID(state.getLeader())));
+				Print.chat(sender, "&9Leader: &7" + (state.getHead() == null ? "no one" : Static.getPlayerNameByUUID(state.getHead())));
 				Print.chat(sender, "&9Price: &7" + (state.getPrice() > 0 ? ggas(state.getPrice()) : "not for sale"));
 				Print.chat(sender, "&6Color: &7" + state.getColor());
 				Print.chat(sender, "&8Citizen: &7" + getCitizens(state).size());
@@ -122,7 +123,7 @@ public class StateCmd extends CommandBase {
 				}
 				switch(args[1]){
 					case "leader":{
-						if(hasPerm("state.set.leader", player, state)){
+						if(state.isAuthorized(state.r_SET_LEADER.id, ply.getUUID())){
 							if(args.length < 3){
 								Print.chat(sender, "&9Missing Argument!");
 								break;
@@ -132,7 +133,7 @@ public class StateCmd extends CommandBase {
 								Print.chat(sender, "&cPlayer not found in Cache.");
 								break;
 							}
-							state.setLeader(gp.getId());
+							state.setHead(gp.getId());
 							state.setChanged(Time.getDate());
 							state.save();
 							Print.chat(sender, "&2Set &7" + gp.getName() + "&2 to new State Leader!");
@@ -144,7 +145,7 @@ public class StateCmd extends CommandBase {
 						break;
 					}
 					case "name":{
-						if(hasPerm("state.set.name", player, state)){
+						if(state.isAuthorized(state.r_SET_NAME.id, ply.getUUID())){
 							if(args.length < 3){
 								Print.chat(sender, "&9Missing Arguments!");
 								break;
@@ -171,7 +172,7 @@ public class StateCmd extends CommandBase {
 						break;
 					}
 					case "price":{
-						if(hasPerm("state.set.price", player, state)){
+						if(state.isAuthorized(state.r_SET_PRICE.id, ply.getUUID())){
 							if(args.length < 3){
 								Print.chat(sender, "&9Missing Argument!");
 								Print.chat(sender, "&7Setting the price to \"0\" makes the state not buyable.");
@@ -196,7 +197,7 @@ public class StateCmd extends CommandBase {
 						break;
 					}
 					case "color":{
-						if(hasPerm("state.set.color", player, state)){
+						if(state.isAuthorized(state.r_SET_COLOR.id, ply.getUUID())){
 							if(args.length < 3){
 								Print.chat(sender, "&9Missing Argument!");
 								break;
@@ -225,7 +226,7 @@ public class StateCmd extends CommandBase {
 						break;
 					}
 					case "capital":{
-						if(hasPerm("state.set.capital", player, state)){
+						if(state.isAuthorized(state.r_SET_CAPITAL.id, ply.getUUID())){
 							if(args.length < 3){
 								Print.chat(sender, "&9Missing Argument!");
 								break;
@@ -247,7 +248,7 @@ public class StateCmd extends CommandBase {
 						break;
 					}
 					case "icon":{
-						if(hasPerm("state.set.icon", player, state)){
+						if(state.isAuthorized(state.r_SET_ICON.id, ply.getUUID())){
 							if(args.length < 3){
 								Print.chat(sender, "&9Missing Argument!");
 								break;
@@ -269,7 +270,7 @@ public class StateCmd extends CommandBase {
 						break;
 					}
 					case "chunk-tax-percentage":{
-						if(hasPerm("state.set.chunk-tax-percentage", player, state)){
+						if(state.isAuthorized(state.r_SET_CHUNK_TAX_PERCENT.id, ply.getUUID())){
 							if(args[2].equals("reset") || args[2].equals("disable")){
 								state.setChunkTaxPercentage((byte)0); state.save();
 								Print.chat(sender, "&State's Chunk Tax Percentage was reset!");
@@ -287,7 +288,7 @@ public class StateCmd extends CommandBase {
 						break;
 					}
 					case "citizen-tax-percentage":{
-						if(hasPerm("state.set.citizen-tax-percentage", player, state)){
+						if(state.isAuthorized(state.r_SET_CITIZEN_TAX_PERCENT.id, ply.getUUID())){
 							if(args[2].equals("reset") || args[2].equals("disable")){
 								state.setCitizenTaxPercentage((byte)0); state.save();
 								Print.chat(sender, "&State's Citizen Tax Percentage was reset!");
@@ -318,14 +319,14 @@ public class StateCmd extends CommandBase {
 				switch(args[1]){
 					case "vote":{
 						Print.chat(sender, "Not available yet.");
-						if(!hasPerm("state.council.vote", player, state)){
+						if(!state.isAuthorized(state.r_COUNCIL_VOTE.id, ply.getUUID())){
 							Print.chat(sender, "&4No permission.");
 							return;
 						}
 						break;
 					}
 					case "kick":{
-						if(!hasPerm("state.council.kick", player, state)){
+						if(!state.isAuthorized(state.r_COUNCIL_KICK.id, ply.getUUID())){
 							Print.chat(sender, "&4No permission.");
 							return;
 						}
@@ -359,7 +360,7 @@ public class StateCmd extends CommandBase {
 						StateLogger.log(StateLogger.LoggerType.STATE, StateLogger.player(player) + " left the council of " + StateLogger.state(state) + ".");
 					}
 					case "invite":{
-						if(!hasPerm("state.council.invite", player, state)){
+						if(!state.isAuthorized(state.r_COUNCIL_INVITE.id, ply.getUUID())){
 							Print.chat(sender, "&4No permission.");
 							return;
 						}
@@ -424,7 +425,7 @@ public class StateCmd extends CommandBase {
 							Print.chat(sender, "Missing Municipality Id.");
 							return;
 						}
-						if(!hasPerm("state.municipality.invite", player, state)){
+						if(!state.isAuthorized(state.r_MUN_INVITE.id, ply.getUUID())){
 							Municipality mun = StateUtil.getMunicipality(Integer.parseInt(args[2]));
 							if(mun == null || mun.getId() <= 0){
 								Print.chat(sender, "&6Municipality not found.");
@@ -455,7 +456,7 @@ public class StateCmd extends CommandBase {
 							Print.chat(sender, "Missing Municipality Id.");
 							return;
 						}
-						if(!hasPerm("state.municipality.kick", player, state)){
+						if(!state.isAuthorized(state.r_MUN_KICK.id, ply.getUUID())){
 							Municipality mun = StateUtil.getMunicipality(Integer.parseInt(args[2]));
 							if(mun == null || mun.getId() <= 0){
 								Print.chat(sender, "&6Municipality not found.");
@@ -477,7 +478,7 @@ public class StateCmd extends CommandBase {
 			}
 			case "create":{
 				long price = net.fexcraft.mod.states.util.Config.STATE_CREATION_PRICE;
-				if(!hasPerm("state.create", player, chunk)){
+				if(!Perms.CREATE_STATE.has(player)){
 					Print.chat(sender, "&cNo permission.");
 					return;
 				}
@@ -514,7 +515,7 @@ public class StateCmd extends CommandBase {
 					else{
 						newstate.setCreator(ply.getUUID());
 						newstate.setName(name);
-						newstate.setLeader(ply.getUUID());
+						newstate.setHead(ply.getUUID());
 						newstate.setCapitalId(ply.getMunicipality().getId());
 						newstate.setPrice(0);
 						newstate.getCouncil().add(ply.getUUID());
@@ -574,10 +575,6 @@ public class StateCmd extends CommandBase {
 			list.addAll(mun.getCitizen());
 		}
 		return list;
-	}
-
-	public static final boolean hasPerm(String perm, EntityPlayer player, Object obj){
-		return ChunkCmd.hasPerm(perm, player, obj);
 	}
 	
 }

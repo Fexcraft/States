@@ -7,6 +7,7 @@ import net.fexcraft.lib.mc.utils.Print;
 import net.fexcraft.mod.states.data.capabilities.PlayerCapability;
 import net.fexcraft.mod.states.data.capabilities.StatesCapabilities;
 import net.fexcraft.mod.states.util.Config;
+import net.fexcraft.mod.states.util.Perms;
 import net.minecraft.command.CommandBase;
 import net.minecraft.command.CommandException;
 import net.minecraft.command.ICommandSender;
@@ -60,7 +61,7 @@ public class NickCmd extends CommandBase {
 		}
 		switch(args[0]){
 			case "name":{
-				if(!ChunkCmd.hasPerm("nickname.change.self", player, cap)){
+				if(!Perms.NICKNAME_CHANGE_SELF.has(player)){
 					Print.chat(sender, "&eNo Permission.");
 					return;
 				}
@@ -78,7 +79,7 @@ public class NickCmd extends CommandBase {
 				return;
 			}
 			case "color":{
-				if(!ChunkCmd.hasPerm("nickname.change.self", player, cap)){
+				if(!Perms.NICKNAME_CHANGE_SELF.has(player)){
 					Print.chat(sender, "&eNo Permission.");
 					return;
 				}
@@ -88,7 +89,7 @@ public class NickCmd extends CommandBase {
 			}
 			case "reset":{
 				if(args.length == 1){
-					if(!ChunkCmd.hasPerm("nickname.change.self", player, cap)){
+					if(!Perms.NICKNAME_CHANGE_SELF.has(player)){
 						Print.chat(sender, "&eNo Permission.");
 						return;
 					}
@@ -96,7 +97,7 @@ public class NickCmd extends CommandBase {
 					Print.chat(sender, "&7Nickname reset " + cap.getFormattedNickname() + "&7!");
 				}
 				else{
-					if(!ChunkCmd.hasPerm("nickname.change.others", player, cap)){
+					if(!Perms.NICKNAME_CHANGE_OTHERS.has(player)){
 						Print.chat(sender, "&cNo Permission.");
 						return;
 					}
@@ -110,7 +111,7 @@ public class NickCmd extends CommandBase {
 				return;
 			}
 			case "setname":{
-				if(!ChunkCmd.hasPerm("nickname.change.others", player, cap)){
+				if(!Perms.NICKNAME_CHANGE_OTHERS.has(player)){
 					Print.chat(sender, "&eNo Permission.");
 					return;
 				}
@@ -132,7 +133,7 @@ public class NickCmd extends CommandBase {
 				return;
 			}
 			case "setcolor":{
-				if(!ChunkCmd.hasPerm("nickname.change.others", player, cap)){
+				if(!Perms.NICKNAME_CHANGE_OTHERS.has(player)){
 					Print.chat(sender, "&eNo Permission.");
 					return;
 				}

@@ -94,7 +94,7 @@ public class SignTileEntityImplementation implements SignTileEntityCapability {
 			case "municipality":{
 				tileentity.signText[1] = new TextComponentString(Formatter.format("&9" + chunk.getDistrict().getMunicipality().getName()));
 				tileentity.signText[2] = new TextComponentString(Formatter.format("&6" + chunk.getDistrict().getMunicipality().getType().getTitle()));
-				tileentity.signText[3] = new TextComponentString(Formatter.format(chunk.getDistrict().getMunicipality().getHead() == null ? "&cno mayor" : "&2" + Static.getPlayerNameByUUID(chunk.getDistrict().getMunicipality().getHead())));
+				tileentity.signText[3] = new TextComponentString(Formatter.format(chunk.getMunicipality().getHead() == null ? "&cno mayor" : "&2" + Static.getPlayerNameByUUID(chunk.getMunicipality().getHead())));
 				//
 				tileentity.signText[0] = new TextComponentString(Formatter.format("&0[&9St&0]&2> &8Municipality"));
 				break;
@@ -102,7 +102,7 @@ public class SignTileEntityImplementation implements SignTileEntityCapability {
 			case "state":{
 				tileentity.signText[1] = new TextComponentString(Formatter.format("&9" + chunk.getDistrict().getMunicipality().getState().getName()));
 				tileentity.signText[2] = new TextComponentString(Formatter.format("&6 - - - "));
-				tileentity.signText[3] = new TextComponentString(Formatter.format(chunk.getDistrict().getMunicipality().getState().getLeader() == null ? "&cno mayor" : "&2" + Static.getPlayerNameByUUID(chunk.getDistrict().getMunicipality().getState().getLeader())));
+				tileentity.signText[3] = new TextComponentString(Formatter.format(chunk.getState().getHead() == null ? "&cno mayor" : "&2" + Static.getPlayerNameByUUID(chunk.getState().getHead())));
 				//
 				tileentity.signText[0] = new TextComponentString(Formatter.format("&0[&9States&0]&2> &8State"));
 				break;

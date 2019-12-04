@@ -44,8 +44,8 @@ import net.fexcraft.mod.states.util.ForcedChunksManager;
 import net.fexcraft.mod.states.util.ImageCache;
 import net.fexcraft.mod.states.util.ImageUtil;
 import net.fexcraft.mod.states.util.MessageSender;
+import net.fexcraft.mod.states.util.Perms;
 import net.fexcraft.mod.states.util.StateUtil;
-import net.fexcraft.mod.states.util.StatesPermissions;
 import net.fexcraft.mod.states.util.TaxSystem;
 import net.fexcraft.mod.states.util.UpdateHandler;
 import net.minecraft.world.World;
@@ -61,15 +61,13 @@ import net.minecraftforge.fml.common.event.FMLServerStartingEvent;
 import net.minecraftforge.fml.common.event.FMLServerStoppingEvent;
 import net.minecraftforge.fml.common.network.NetworkRegistry;
 import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.server.permission.DefaultPermissionLevel;
-import net.minecraftforge.server.permission.PermissionAPI;
 
 @Mod(modid = States.MODID, name = "States", version = States.VERSION, dependencies = "required-after:fcl", /*serverSideOnly = true,*/ guiFactory = "net.fexcraft.mod.states.util.GuiFactory", acceptedMinecraftVersions = "*", acceptableRemoteVersions = "*")
 public class States {
 	
 	public static final String VERSION = "@VERSION@";
 	public static final String MODID = "states";
-	public static final String ADMIN_PERM = "states.external.admin";
+	public static final String ADMIN_PERM = "states.admin";
 	public static final String PREFIX = "&0[&2States&0]";
 	//
 	public static final TreeMap<ChunkPos, Chunk> CHUNKS = new TreeMap<>();
@@ -90,8 +88,7 @@ public class States {
 	
 	@Mod.EventHandler
 	public void preInit(FMLPreInitializationEvent event){
-		Config.initialize(event);
-		StatesPermissions.init();
+		Config.initialize(event); 
 		SignCapabilitySerializer.addListener(SignShop.class);
 		SignCapabilitySerializer.addListener(SignMailbox.class);
 		CapabilityManager.INSTANCE.register(SignTileEntityCapability.class, new SignTileEntityCapabilityUtil.Storage(), new SignTileEntityCapabilityUtil.Callable());
@@ -115,8 +112,7 @@ public class States {
 		NBTTagCompoundPacketHandler.addListener(Side.SERVER, new Listener());
 		NBTTagCompoundPacketHandler.addListener(Side.CLIENT, new Receiver());
 		//
-		PermissionAPI.registerNode(ADMIN_PERM, DefaultPermissionLevel.OP, "States Admin Permission");
-		SERVERACCOUNT = DataManager.getAccount("server:states", false, true);
+		Perms.init(); SERVERACCOUNT = DataManager.getAccount("server:states", false, true);
 		//
 		PacketHandler.getInstance().registerMessage(ImagePacketHandler.Client.class, ImagePacket.class, 29910, Side.CLIENT);
 		PacketHandler.getInstance().registerMessage(ImagePacketHandler.Server.class, ImagePacket.class, 29911, Side.SERVER);

@@ -27,6 +27,7 @@ import net.fexcraft.mod.states.data.root.AnnounceLevel;
 import net.fexcraft.mod.states.data.root.Mailbox.MailType;
 import net.fexcraft.mod.states.data.root.Mailbox.RecipientType;
 import net.fexcraft.mod.states.util.MailUtil;
+import net.fexcraft.mod.states.util.Perms;
 import net.fexcraft.mod.states.util.StateLogger;
 import net.fexcraft.mod.states.util.StateUtil;
 import net.minecraft.command.CommandBase;
@@ -648,6 +649,14 @@ public class MunicipalityCmd extends CommandBase {
 			}
 			case "create":{
 				long price = net.fexcraft.mod.states.util.Config.MUNICIPALITY_CREATION_PRICE;
+				if(!Perms.CREATE_MUNICIPALITY.has(player)){
+					Print.chat(sender, "&cNo permission.");
+					return;
+				}
+				if(ply.getState().getId() > 0 && !ply.getState().isAuthorized(ply.getState().r_CREATE_MUNICIPALITY.id, ply.getUUID())){
+					Print.chat(sender, "&cYour State does not allow you to createa a new Municipality.");
+					return;
+				}
 				if(ply.getMunicipality().getId() >= 0){
 					Print.chat(sender, "&cYou must leave your current municipality to create a new one.");
 					return;

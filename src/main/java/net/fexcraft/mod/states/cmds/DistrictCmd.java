@@ -128,6 +128,7 @@ public class DistrictCmd extends CommandBase {
 					Print.chat(sender, "&7/dis set chunk-tax <amount/reset>");
 					Print.chat(sender, "&7/dis set unclaim-if-bankrupt <true/false>");
 					Print.chat(sender, "&7/dis set ruleset <new name>");
+					Print.chat(sender, "&7/dis set chunk-price <amount/reset>");
 					return;
 				}
 				switch(args[1]){
@@ -340,6 +341,23 @@ public class DistrictCmd extends CommandBase {
 							else if(NumberUtils.isCreatable(args[2])){
 								dis.setChunkTax(Long.parseLong(args[2])); dis.save();
 								Print.chat(sender, "&9District's Chunk Tax was set! (" + ggas(dis.getChunkTax()) + ")");
+							}
+							else{
+								Print.chat(sender, "Not a (valid) number.");
+							}
+						}
+						break;
+					}
+					case "chunk-price":{
+						if(dis.isAuthorized(dis.r_SET_CHUNKPRICE.id, ply.getUUID()) || StateUtil.bypass(player)){
+							if(args[2].equals("reset") || args[2].equals("disable")){
+								dis.setChunkPrice(0); dis.save();
+								Print.chat(sender, "&9District's Chunk Price was reset!");
+							}
+							else if(NumberUtils.isCreatable(args[2])){
+								dis.setChunkPrice(Long.parseLong(args[2])); dis.save();
+								Print.chat(sender, "&9District's Chunk Price was set! (" + ggas(dis.getChunkPrice()) + ")");
+								Print.chat(sender, "&7&oThis price is only valid for DISTRICT type chunks!");
 							}
 							else{
 								Print.chat(sender, "Not a (valid) number.");

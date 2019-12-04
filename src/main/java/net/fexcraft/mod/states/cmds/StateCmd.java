@@ -177,7 +177,7 @@ public class StateCmd extends CommandBase {
 						}
 						break;
 					}
-					case "rukeset":{
+					case "ruleset":{
 						if(state.isAuthorized(state.r_SET_RULESET.id, ply.getUUID())){
 							if(args.length < 3){
 								Print.chat(sender, "&9Missing Arguments!");

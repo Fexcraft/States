@@ -165,7 +165,11 @@ public class Chunk implements BuyableType, Taxable/*, RuleHolder*/ {
 
 	@Override
 	public long getPrice(){
-		return this.district.getId() == -1 ? Config.DEFAULT_CHUNK_PRICE : price;
+		if(this.getDistrict().getId() != -1){
+			if(type == ChunkType.DISTRICT){
+				return district.getChunkPrice();
+			} else return price;
+		} else return Config.DEFAULT_CHUNK_PRICE;
 	}
 
 	@Override

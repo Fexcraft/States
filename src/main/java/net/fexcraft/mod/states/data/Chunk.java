@@ -3,7 +3,6 @@ package net.fexcraft.mod.states.data;
 import java.io.File;
 import java.util.Collection;
 import java.util.List;
-import java.util.Map;
 import java.util.UUID;
 
 import com.google.gson.JsonArray;
@@ -15,19 +14,17 @@ import net.fexcraft.lib.common.lang.ArrayList;
 import net.fexcraft.lib.common.math.Time;
 import net.fexcraft.mod.states.States;
 import net.fexcraft.mod.states.data.root.BuyableType;
-import net.fexcraft.mod.states.data.root.RuleHolder;
 import net.fexcraft.mod.states.data.root.Taxable;
 import net.fexcraft.mod.states.impl.capabilities.SignTileEntityCapabilityUtil;
 import net.fexcraft.mod.states.util.Config;
 import net.fexcraft.mod.states.util.ImageCache;
-import net.fexcraft.mod.states.util.RuleMap;
 import net.fexcraft.mod.states.util.StateLogger;
 import net.fexcraft.mod.states.util.StateUtil;
 import net.fexcraft.mod.states.util.TaxSystem;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.world.World;
 
-public class Chunk implements BuyableType, Taxable, RuleHolder {
+public class Chunk implements BuyableType, Taxable/*, RuleHolder*/ {
 	
 	private District district;
 	private long price, created, changed, edited, lasttaxcheck, ctax;
@@ -39,7 +36,7 @@ public class Chunk implements BuyableType, Taxable, RuleHolder {
 	private String owner;
 	private List<UUID> wl_players = new ArrayList<>();
 	private List<Integer> wl_companies = new ArrayList<>();
-	private RuleMap rules = new RuleMap();
+	//private RuleMap rules = new RuleMap();
 	
 	public Chunk(World world, ChunkPos pos, boolean create){
 		this.x = pos.x; this.z = pos.z; this.pos = pos;
@@ -328,9 +325,9 @@ public class Chunk implements BuyableType, Taxable, RuleHolder {
 		}
 	}
 
-	@Override
+	/*@Override
 	public Map<String, Rule> getRules(){
 		return rules;
-	}
+	}*/
 
 }

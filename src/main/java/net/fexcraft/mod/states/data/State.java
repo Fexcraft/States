@@ -83,7 +83,7 @@ public class State implements ColorHolder, BuyableType, IconHolder, AccountHolde
 		rules.add(r_COUNCIL_KICK = new Rule("kick_council", null, true, Initiator.COUNCIL_VOTE, Initiator.COUNCIL_ANY));
 		rules.add(r_COUNCIL_INVITE = new Rule("invite_council", null, true, Initiator.COUNCIL_VOTE, Initiator.COUNCIL_ANY));
 		rules.add(r_COUNCIL_VOTE = new Rule("council_vote", null, true, Initiator.INCHARGE, Initiator.COUNCIL_ANY));
-		rules.add(r_CREATE_MUNICIPALITY = new Rule("create.municipality", null, true, Initiator.COUNCIL_VOTE, Initiator.COUNCIL_ANY));
+		rules.add(r_CREATE_MUNICIPALITY = new Rule("create.municipality", null, true, Initiator.COUNCIL_VOTE, Initiator.CITIZEN_ANY));
 		rules.add(r_SET_CAPITAL = new Rule("set.capital", null, true, Initiator.COUNCIL_VOTE, Initiator.INCHARGE));
 		if(obj.has("rules")){
 			JsonObject rls = obj.get("rules").getAsJsonObject();

@@ -44,6 +44,7 @@ public class MailUtil {
 			if(world == null){
 				printFailure(ics, 0, rectype, receiver, sender, message, type, expiry, compound, null, null); return false;
 			}
+			if(sender == null) sender = States.CONSOLE_UUID;
 			BlockPos mailbox = null; RecipientType rety = rectype; String rec = receiver.toString();
 			while(mailbox == null){
 				switch(rety){
@@ -52,7 +53,7 @@ public class MailUtil {
 						District dis = StateUtil.getDistrict(Integer.parseInt(rec));
 						if(dis.getMailbox() == null){
 							rety = RecipientType.MUNICIPALITY; rec = dis.getMunicipality().getId() + "";
-							Print.chat(ics, "&c&oDistrict &7&oMailbox not found, redirecting to &a&oMunicipality&7&o."); continue;
+							Print.chatnn(ics, "&c&oDistrict &7&oMailbox not found, redirecting to &a&oMunicipality&7&o."); continue;
 						} else mailbox = dis.getMailbox();
 						break;
 					}
@@ -60,7 +61,7 @@ public class MailUtil {
 						Municipality mun = StateUtil.getMunicipality(Integer.parseInt(rec));
 						if(mun.getMailbox() == null){
 							rety = RecipientType.STATE; rec = mun.getState().getId() + "";
-							Print.chat(ics, "&c&oMunicipality &7&oMailbox not found, redirecting to &a&oState&7&o."); continue;
+							Print.chatnn(ics, "&c&oMunicipality &7&oMailbox not found, redirecting to &a&oState&7&o."); continue;
 						} else mailbox = mun.getMailbox();
 						break;
 					}
@@ -69,7 +70,7 @@ public class MailUtil {
 						if(cap == null){ printFailure(ics, 1, rectype, receiver, sender, message, type, expiry, compound, rety, rec); return false; }
 						if(cap.getMailbox() == null){
 							rety = RecipientType.MUNICIPALITY; rec = cap.getMunicipality().getId() + "";
-							Print.chat(ics, "&c&oPlayer &7&oMailbox not found, redirecting to &a&oMunicipality&7&o."); continue;
+							Print.chatnn(ics, "&c&oPlayer &7&oMailbox not found, redirecting to &a&oMunicipality&7&o."); continue;
 						} else mailbox = cap.getMailbox();
 						break;
 					}
@@ -78,7 +79,7 @@ public class MailUtil {
 						if(state.getMailbox() == null){
 							if(state.getId() >= 0){
 								rety = RecipientType.STATE; rec = "-1";
-								Print.chat(ics, "&c&oState &7&oMailbox not found, redirecting to &a&oServer/Fallback&7&o."); continue;
+								Print.chatnn(ics, "&c&oState &7&oMailbox not found, redirecting to &a&oServer/Fallback&7&o."); continue;
 							}
 							else{
 								printFailure(ics, 1, rectype, receiver, sender, message, type, expiry, compound, rety, rec); return false;

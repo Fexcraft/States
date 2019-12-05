@@ -175,6 +175,7 @@ public class Vote {
 	}
 
 	public void summary(ICommandSender sender){
+		expired(null);//checking expiration
 		Print.chat(sender, "&9Created: &7" + timeformat(created));
 		Print.chat(sender, "&9Expiry: &7" + timeformat(expiry));
 		Print.chat(sender, "&6Authorized: &b" + (council ? "council vote" : "citizen vote"));
@@ -205,7 +206,7 @@ public class Vote {
 				default: break;
 			}
 		}
-		Print.chat(sender, "&6Status:"); expired(null);
+		Print.chat(sender, "&6Status:");
 		if(type.assignment()){
 			TreeMap<String, Integer> votes_for = new TreeMap<>();
 			for(Map.Entry<String, Object> vote : votes.entrySet()){
@@ -299,7 +300,7 @@ public class Vote {
 				target instanceof State ? ((State)target).getId() : ((Municipality)target).getId());
 
 			for(UUID member : council ? target.getCouncil() : ((Municipality)target).getCitizen()){
-				MailUtil.send(null, RecipientType.PLAYER, member, "SYSTEM-VOTE", "&7Head-Vote with ID &b" + id + "&7 ended!\n&7Detailed info via &e/st-vote status " + id, MailType.SYSTEM);
+				MailUtil.send(null, RecipientType.PLAYER, member, null, "&7Head-Vote with ID &b" + id + "&7 ended!\n&7Detailed info via &e/st-vote status " + id, MailType.SYSTEM);
 			}
 			return;
 		}
@@ -340,7 +341,7 @@ public class Vote {
 			}
 		}
 		for(UUID member : council ? target.getCouncil() : ((Municipality)target).getCitizen()){
-			MailUtil.send(null, RecipientType.PLAYER, member, "SYSTEM-VOTE", "&7Rule-Vote with ID &b" + id + "&7 ended!\n&7Detailed info via &e/st-vote status " + id, MailType.SYSTEM);
+			MailUtil.send(null, RecipientType.PLAYER, member, null, "&7Rule-Vote with ID &b" + id + "&7 ended!\n&7Detailed info via &e/st-vote status " + id, MailType.SYSTEM);
 		}
 		StateUtil.announce(Static.getServer(), level, text0, range);
 		StateUtil.announce(Static.getServer(), level, text1, range);

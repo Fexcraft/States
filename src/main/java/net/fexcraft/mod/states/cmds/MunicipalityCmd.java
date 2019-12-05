@@ -206,8 +206,8 @@ public class MunicipalityCmd extends CommandBase {
 								break;
 							}
 							if(args[2].equals("null") || args[2].equals("reset")){
-								if(!mun.isAuthorized(mun.r_RESET_MAYOR.id, ply.getUUID())|| StateUtil.bypass(player)){
-									Print.chat(sender, "&cNot Authorized to reset Mayor.");
+								if(!mun.isAuthorized(mun.r_RESET_MAYOR.id, ply.getUUID()) || !StateUtil.bypass(player)){
+									Print.chat(sender, "&cNot Authorized to reset Mayor."); return;
 								}
 								mun.setHead(null); mun.save();
 								Print.chat(sender, "&2Municipality mayor was &creset&2.");
@@ -425,7 +425,7 @@ public class MunicipalityCmd extends CommandBase {
 				}
 				switch(args[1]){
 					case "vote":{
-						if(!mun.isAuthorized(mun.r_VOTE_MAYOR.id, ply.getUUID()) || StateUtil.bypass(player)){
+						if(!mun.isAuthorized(mun.r_VOTE_MAYOR.id, ply.getUUID()) && !StateUtil.bypass(player)){
 							Print.chat(sender, "&4No permission.");
 							return;
 						}

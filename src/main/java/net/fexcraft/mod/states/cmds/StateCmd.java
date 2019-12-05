@@ -372,13 +372,18 @@ public class StateCmd extends CommandBase {
 							Print.chat(sender, "&aA vote for a new leader can be only started when there is no leader!");
 							return;
 						}
+						GameProfile gp = Static.getServer().getPlayerProfileCache().getGameProfileForUsername(args[2]);
+						if(gp == null || gp.getId() == null){
+							Print.chat(sender, "&cPlayer not found in Cache.");
+							break;
+						}
 						int newid = sender.getEntityWorld().getCapability(StatesCapabilities.WORLD, null).getNewVoteId();
 						Vote newvote = new Vote(newid, null, ply.getUUID(), Time.getDate(), Time.getDate() + (Time.DAY_MS * 7),
 							state, VoteType.ASSIGNMENT, true, null, null);
 						if(newvote.getVoteFile().exists()){
 							new Exception("Tried to create new Vote with ID '" + newvote.id + "', but savefile already exists."); return;
 						}
-						newvote.save(); States.VOTES.put(newvote.id, newvote);
+						newvote.save(); newvote.vote(sender, ply.getUUID(), gp.getId()); States.VOTES.put(newvote.id, newvote);
 						StateUtil.announce(null, AnnounceLevel.STATE_ALL, "A new vote to choose a State Leader started!", 0);
 						for(UUID member : state.getCouncil()){
 							MailUtil.send(null, RecipientType.PLAYER, member, null, "&7A new vote to choose a Head of State started!\n&7Detailed info via &e/st-vote status " + newvote.id, MailType.SYSTEM);

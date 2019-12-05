@@ -2,6 +2,8 @@ package net.fexcraft.mod.states.cmds;
 
 import java.util.UUID;
 
+import com.mojang.authlib.GameProfile;
+
 import net.fexcraft.lib.common.math.Time;
 import net.fexcraft.lib.mc.api.registry.fCommand;
 import net.fexcraft.lib.mc.utils.Formatter;
@@ -55,6 +57,7 @@ public class VoteCmd extends CommandBase {
 			Print.chat(sender, "&7/st-vote status <id>");
 			Print.chat(sender, "&7/st-vote vote <id> <yes/true/accept/confirm>");
 			Print.chat(sender, "&7/st-vote vote <id> <no/false/deny/cancel>");
+			Print.chat(sender, "&7/st-vote vote-for <id> <playername>");
 			Print.chat(sender, "&7/st-rule layers");
 			Print.chat(sender, "&7/st-rule types");
 			return;
@@ -114,11 +117,16 @@ public class VoteCmd extends CommandBase {
 				boolean canshow = vote.council ? vote.target.getCouncil().contains(ply.getUUID()) : ((Municipality)vote.target).getCitizen().contains(ply.getUUID());
 				if(canshow){
 					if(!vote.votes.containsKey(ply.getUUID().toString())){
-						TextComponentString text = new TextComponentString(Formatter.format("&a&l[ACCEPT] "));
-						text.getStyle().setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/st-vote vote " + vote.id + " true"));
-						TextComponentString text2 = new TextComponentString(Formatter.format(" &c&l[DENY]"));
-						text2.getStyle().setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/st-vote vote " + vote.id + " false"));
-						sender.sendMessage(text.appendSibling(text2));
+						if(!vote.type.assignment()){
+							TextComponentString text = new TextComponentString(Formatter.format("&a&l[ACCEPT] "));
+							text.getStyle().setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/st-vote vote " + vote.id + " true"));
+							TextComponentString text2 = new TextComponentString(Formatter.format(" &c&l[DENY]"));
+							text2.getStyle().setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/st-vote vote " + vote.id + " false"));
+							sender.sendMessage(text.appendSibling(text2));
+						}
+						else{
+							Print.chat(player, "&7Use &a'/st-vote vote-for " + vote.id + " <playername>' &7to vote!");
+						}
 					}
 					else{
 						if(vote.type.assignment()){
@@ -145,6 +153,11 @@ public class VoteCmd extends CommandBase {
 					Print.chat(sender, "Vote [" + args[1] + "] not found.");
 					return;
 				}
+				if(vote.type.assignment()){
+					Print.chat(sender, "&7This is not a rule change vote.");
+					Print.chat(sender, "&7Use &a/st-vote vote-for " + vote.id + " <playername> &7instead!");
+					return;
+				}
 				String[] agree = { "yes", "true", "accept", "confirm" };
 				String[] disagree = { "no", "false", "deny", "cancel" };
 				Boolean bool = null;
@@ -155,6 +168,33 @@ public class VoteCmd extends CommandBase {
 					Print.chat(sender, "Invalid Vote Response."); return;
 				}
 				vote.vote(sender, ply.getUUID(), bool);
+				return;
+			}
+			case "vote-for":{
+				if(args.length < 2){
+					Print.chat(player, "Please specify a vote ID!");
+					return;
+				}
+				if(args.length < 3){
+					Print.chat(player, "Please specify a vote response!");
+					return;
+				}
+				Vote vote = StateUtil.getVote(Integer.parseInt(args[1]));
+				if(vote == null){
+					Print.chat(sender, "Vote [" + args[1] + "] not found.");
+					return;
+				}
+				if(!vote.type.assignment()){
+					Print.chat(sender, "&7This is not an assignment vote.");
+					Print.chat(sender, "&7Use &a/st-vote vote " + vote.id + " <true/false> &7instead!");
+					return;
+				}
+				GameProfile gp = Static.getServer().getPlayerProfileCache().getGameProfileForUsername(args[2]);
+				if(gp == null || gp.getId() == null){
+					Print.chat(sender, "&cPlayer not found in Cache.");
+					return;
+				}
+				vote.vote(sender, ply.getUUID(), gp.getId());
 				return;
 			}
 			case "test":{

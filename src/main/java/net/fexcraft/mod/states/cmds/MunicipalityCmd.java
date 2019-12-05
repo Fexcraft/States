@@ -433,13 +433,18 @@ public class MunicipalityCmd extends CommandBase {
 							Print.chat(sender, "&aA vote for a new mayor can be only started when there is no mayor!");
 							return;
 						}
+						GameProfile gp = Static.getServer().getPlayerProfileCache().getGameProfileForUsername(args[2]);
+						if(gp == null || gp.getId() == null){
+							Print.chat(sender, "&cPlayer not found in Cache.");
+							break;
+						}
 						int newid = sender.getEntityWorld().getCapability(StatesCapabilities.WORLD, null).getNewVoteId();
 						Vote newvote = new Vote(newid, null, ply.getUUID(), Time.getDate(), Time.getDate() + (Time.DAY_MS * 7),
 							mun, VoteType.ASSIGNMENT, !mun.r_VOTE_MAYOR.setter.isCitizenVote(), null, null);
 						if(newvote.getVoteFile().exists()){
 							new Exception("Tried to create new Vote with ID '" + newvote.id + "', but savefile already exists."); return;
 						}
-						newvote.save(); States.VOTES.put(newvote.id, newvote);
+						newvote.save(); newvote.vote(sender, ply.getUUID(), gp.getId()); States.VOTES.put(newvote.id, newvote);
 						StateUtil.announce(null, AnnounceLevel.MUNICIPALITY_ALL, "A new vote to choose a Mayor started!", 0);
 						for(UUID member : newvote.council ? mun.getCouncil() : mun.getCitizen()){
 							MailUtil.send(null, RecipientType.PLAYER, member, null, "&7A new vote to choose a Mayor started!\n&7Detailed info via &e/st-vote status " + newvote.id, MailType.SYSTEM);

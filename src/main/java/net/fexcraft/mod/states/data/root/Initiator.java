@@ -19,5 +19,9 @@ public enum Initiator {
 	public boolean isValidAsSetter(){
 		return setter;
 	}
+
+	public boolean isCitizenVote(){
+		return this == CITIZEN_ANY || this == CITIZEN_VOTE;
+	}
 	
 }

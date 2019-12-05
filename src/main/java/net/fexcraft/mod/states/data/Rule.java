@@ -67,30 +67,56 @@ public class Rule {
 	}
 	
 	/** Call to see if this player can REVISE/MODIFY this rule. */
-	public boolean canRevise(Ruleable holder, UUID uuid){
-		switch(setter){
+	public Result canRevise(Ruleable holder, UUID uuid){
+		switch(reviser){
 			case CITIZEN_ANY:{
 				if(holder instanceof Municipality){
-					return ((Municipality)holder).getCitizen().contains(uuid);
-				} else return false;
+					return Result.bool(((Municipality)holder).getCitizen().contains(uuid));
+				} else return Result.FALSE;
 			}
 			case CITIZEN_VOTE:{
 				if(holder instanceof Municipality){
-					//TODO init vote
-					return false;
-				} else return false;
+					if(((Municipality)holder).getCitizen().contains(uuid)) return Result.VOTE;
+					return Result.FALSE;
+				} else return Result.FALSE;
 			}
-			case COUNCIL_ANY: return holder.getCouncil().contains(uuid);
+			case COUNCIL_ANY: return Result.bool(holder.getCouncil().contains(uuid));
 			case COUNCIL_VOTE:{
-				if(holder.getCouncil().size() == 1) return holder.getCouncil().get(0).equals(uuid);
-				//TODO init vote
-				return false;
+				if(holder.getCouncil().size() == 1) return Result.bool(holder.getCouncil().get(0).equals(uuid));
+				if(holder.getCouncil().contains(uuid)) return Result.VOTE;
+				return Result.FALSE;
 			}
-			case INCHARGE: return holder.isHead(uuid);
+			case INCHARGE: return Result.bool(holder.isHead(uuid));
 			case HIGHERINCHARGE:
-				return holder.hasHigherInstance() ? holder.getHigherInstance().isHead(uuid) : holder.isHead(uuid);
-			default: return false;
+				return Result.bool(holder.hasHigherInstance() ? holder.getHigherInstance().isHead(uuid) : holder.isHead(uuid));
+			default: return Result.FALSE;
 		}
+	}
+	
+	public static enum Result {
+		
+		TRUE, VOTE, FALSE;
+		
+		public static Result bool(boolean bool){
+			return bool ? TRUE : FALSE;
+		}
+		
+		/*public boolean bool(){
+			return this == TRUE;
+		}*/
+
+		public boolean isFalse(){
+			return this == FALSE;
+		}
+
+		public boolean isTrue(){
+			return this == TRUE;
+		}
+
+		public boolean isVote(){
+			return this == VOTE;
+		}
+		
 	}
 
 }

@@ -1,11 +1,15 @@
 package net.fexcraft.mod.states.cmds;
 
+import java.util.UUID;
+
 import net.fexcraft.lib.common.math.Time;
 import net.fexcraft.lib.mc.api.registry.fCommand;
+import net.fexcraft.lib.mc.utils.Formatter;
 import net.fexcraft.lib.mc.utils.Print;
 import net.fexcraft.lib.mc.utils.Static;
 import net.fexcraft.mod.states.States;
 import net.fexcraft.mod.states.data.Chunk;
+import net.fexcraft.mod.states.data.Municipality;
 import net.fexcraft.mod.states.data.Vote;
 import net.fexcraft.mod.states.data.Vote.VoteType;
 import net.fexcraft.mod.states.data.capabilities.PlayerCapability;
@@ -17,6 +21,8 @@ import net.minecraft.command.CommandException;
 import net.minecraft.command.ICommandSender;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.server.MinecraftServer;
+import net.minecraft.util.text.TextComponentString;
+import net.minecraft.util.text.event.ClickEvent;
 
 @fCommand
 public class VoteCmd extends CommandBase {
@@ -47,6 +53,8 @@ public class VoteCmd extends CommandBase {
 			Print.chat(sender, "&7/st-vote all");
 			Print.chat(sender, "&7/st-vote all <layer>");
 			Print.chat(sender, "&7/st-vote status <id>");
+			Print.chat(sender, "&7/st-vote vote <id> <yes/true/accept/confirm>");
+			Print.chat(sender, "&7/st-vote vote <id> <no/false/deny/cancel>");
 			Print.chat(sender, "&7/st-rule layers");
 			Print.chat(sender, "&7/st-rule types");
 			return;
@@ -102,7 +110,52 @@ public class VoteCmd extends CommandBase {
 					return;
 				}
 				Print.chat(sender, "&9Vote Target: &7" + vote.targetAsString());
-				vote.summary(sender); return;
+				vote.summary(sender);
+				boolean canshow = vote.council ? vote.target.getCouncil().contains(ply.getUUID()) : ((Municipality)vote.target).getCitizen().contains(ply.getUUID());
+				if(canshow){
+					if(!vote.votes.containsKey(ply.getUUID().toString())){
+						TextComponentString text = new TextComponentString(Formatter.format("&a&l[ACCEPT] "));
+						text.getStyle().setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/st-vote vote " + vote.id + " true"));
+						TextComponentString text2 = new TextComponentString(Formatter.format(" &c&l[DENY]"));
+						text2.getStyle().setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/st-vote vote " + vote.id + " false"));
+						sender.sendMessage(text.appendSibling(text2));
+					}
+					else{
+						if(vote.type.assignment()){
+							Print.chat(player, "&7You voted for: &a" + Static.getPlayerNameByUUID((UUID)vote.votes.get(ply.getUUID().toString())));
+						}
+						else{
+							Print.chat(player, "&7Your vote: &a" + vote.votes.get(ply.getUUID().toString()));
+						}
+					}
+				}
+				return;
+			}
+			case "vote":{
+				if(args.length < 2){
+					Print.chat(player, "Please specify a vote ID!");
+					return;
+				}
+				if(args.length < 3){
+					Print.chat(player, "Please specify a vote response!");
+					return;
+				}
+				Vote vote = StateUtil.getVote(Integer.parseInt(args[1]));
+				if(vote == null){
+					Print.chat(sender, "Vote [" + args[1] + "] not found.");
+					return;
+				}
+				String[] agree = { "yes", "true", "accept", "confirm" };
+				String[] disagree = { "no", "false", "deny", "cancel" };
+				Boolean bool = null;
+				String vot = args[2].toLowerCase();
+				for(String str : agree) if(vot.equals(str)) bool = true;
+				for(String str : disagree) if(vot.equals(str)) bool = false;
+				if(bool == null){
+					Print.chat(sender, "Invalid Vote Response."); return;
+				}
+				vote.vote(sender, ply.getUUID(), bool);
+				return;
 			}
 			case "test":{
 				if(!Static.dev()){ Print.chat(sender, "Only applicable in a developement workspace."); return; }

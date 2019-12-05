@@ -102,7 +102,7 @@ public class Vote {
 		else{
 			new Exception("Invalid or Unsupported RULEABLE for Voting.");
 		}
-		obj.addProperty("assignment", type.name());
+		obj.addProperty("type", type.name());
 		JsonObject votes = new JsonObject();
 		for(Map.Entry<String, Object> entry : this.votes.entrySet()){
 			if(type.assignment()) votes.addProperty(entry.getKey(), (boolean)entry.getValue());
@@ -142,6 +142,7 @@ public class Vote {
 			return false;
 		}
 		votes.put(from.toString(), vfor);
+		Print.chat(sender, "&7Use &9/st-vote status " + id + " &7to see the summary!");
 		return true;
 	}
 	
@@ -158,7 +159,6 @@ public class Vote {
 		if(expired(sender)) return false;
 		if(!isVoter(sender, uuid)) return false;
 		if(voted(sender, uuid)) return false;
-		Print.chat(sender, "&7Use &9/st-vote status " + id + " &7to see the summary!");
 		return true;
 	}
 	
@@ -212,7 +212,7 @@ public class Vote {
 			for(String str : votes_for.keySet()){
 				Print.chat(sender, "&a" + percent(votes_for.get(str), summary) + "% &7- &e" + Static.getPlayerNameByUUID(str));
 			}
-			Print.chat(sender, "&6" + votes.size() + " &7 votes received of &2" + (council ? target.getCouncil().size() : ((Municipality)target).getCitizen().size()) + " &7expected.");
+			Print.chat(sender, "&6" + votes.size() + " &7votes received of &2" + (council ? target.getCouncil().size() : ((Municipality)target).getCitizen().size()) + " &7expected.");
 		}
 		else{
 			int agree = 0, disagree = 0;
@@ -221,7 +221,7 @@ public class Vote {
 			}
 			Print.chat(sender, "&e" + percent(agree, votes.size()) + "% &7- &afor the change");
 			Print.chat(sender, "&e" + percent(disagree, votes.size()) + "% &7- &cagainst the change");
-			Print.chat(sender, "&6" + votes.size() + " &7 votes received of &2" + (council ? target.getCouncil().size() : ((Municipality)target).getCitizen().size()) + " &7expected.");
+			Print.chat(sender, "&6" + votes.size() + " &7votes received of &2" + (council ? target.getCouncil().size() : ((Municipality)target).getCitizen().size()) + " &7expected.");
 		}
 	}
 	

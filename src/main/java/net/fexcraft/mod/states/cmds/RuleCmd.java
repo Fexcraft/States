@@ -3,12 +3,20 @@ package net.fexcraft.mod.states.cmds;
 import java.util.HashMap;
 import java.util.Map;
 
+import net.fexcraft.lib.common.math.Time;
 import net.fexcraft.lib.mc.api.registry.fCommand;
 import net.fexcraft.lib.mc.utils.Print;
+import net.fexcraft.mod.states.States;
 import net.fexcraft.mod.states.data.Chunk;
 import net.fexcraft.mod.states.data.Rule;
+import net.fexcraft.mod.states.data.State;
+import net.fexcraft.mod.states.data.Vote;
+import net.fexcraft.mod.states.data.Vote.VoteType;
 import net.fexcraft.mod.states.data.capabilities.PlayerCapability;
 import net.fexcraft.mod.states.data.capabilities.StatesCapabilities;
+import net.fexcraft.mod.states.data.root.AnnounceLevel;
+import net.fexcraft.mod.states.data.root.Initiator;
+import net.fexcraft.mod.states.data.root.Ruleable;
 import net.fexcraft.mod.states.util.StateUtil;
 import net.minecraft.command.CommandBase;
 import net.minecraft.command.CommandException;
@@ -39,7 +47,7 @@ public class RuleCmd extends CommandBase {
         return 0;
     }
 
-	@SuppressWarnings("unused") @Override
+	@SuppressWarnings({ "incomplete-switch" }) @Override
 	public void execute(MinecraftServer server, ICommandSender sender, String[] args) throws CommandException {
 		if(args.length == 0){
 			Print.chat(sender, "&7/st-rule vote <layer> <rule> rev <type>");
@@ -60,8 +68,129 @@ public class RuleCmd extends CommandBase {
 		Chunk chunk = StateUtil.getChunk(player);
 		switch(args[0]){
 			case "vote":{
+				if(args.length < 5){
+					Print.chat(sender, "&7/st-rule vote <layer> <rule> <votetype> <value>");
+					Print.chat(sender, "&cMissing Arguments."); return;
+				}
+				Ruleable ruleable = null;
+				switch(args[1]){
+					case "mun": case "municipality":{
+						ruleable = chunk.getMunicipality(); break;
+					}
+					case "dis": case "district":{
+						ruleable = chunk.getDistrict(); break;
+					}
+					case "st": case "state":{
+						ruleable = chunk.getState(); break;
+					}
+					default:{
+						Print.chat(sender, "&cInvalid RuleHolder.");
+						Print.chat(sender, "&9Try: &7dis, mun, st&9!");
+						return;
+					}
+				}
+				Rule rule = ruleable.getRule(args[2]);
+				if(rule == null){
+					Print.chat(sender, "&cRule not found."); return;
+				}
+				VoteType type = args[3].equals("rev") ? VoteType.CHANGE_REVISER : args[3].equals("set") ? VoteType.CHANGE_SETTER : args[3].equals("value") ? VoteType.CHANGE_VALUE : null;
+				if(type == null){
+					Print.chat(sender, "&cInvalid Vote Type."); return;
+				}
+				Initiator to = null; boolean value = false; Rule.Result result = Rule.Result.FALSE;
+				switch(type){
+					case CHANGE_REVISER:
+					case CHANGE_SETTER:
+						result = ruleable.canRevise(rule.id, ply.getUUID());
+						if(result.isFalse()){
+							Print.chat(sender, "&cNot Authorized to revise this rule."); return;
+						}
+						try{
+							to = Initiator.valueOf(args[4]);
+						}
+						catch(Exception e){
+							Print.chat(sender, "&cInvalid Initiator Specified.");
+							Print.chat(sender, "&9See &7/st-rule types &9for available.");
+							return;
+						}
+						if(type == VoteType.CHANGE_SETTER && !to.isValidAsSetter()){
+							Print.chat(sender, "&b'VOTE' Initiator types are not valid as Setter."); return;
+						}
+						if(ruleable instanceof State && to.isCitizenVote()){
+							Print.chat(sender, "&b'CITIZEN' Initiator types are not valid for State level."); return;
+						}
+						break;
+					case CHANGE_VALUE:
+						if(!ruleable.isAuthorized(rule.id, ply.getUUID())){
+							Print.chat(sender, "&cNot Authorized to set the value of this."); return;
+						}
+						if(rule.get() == null){
+							Print.chat(sender, "&cThis is a value-less rule."); return;
+						}
+						value = Boolean.parseBoolean(args[4]);
+						break;
+				}
 				Print.chat(sender, "&e====-====-====-====-====-====&4[&bStates&4]");
-				//TOOD
+				if(result.isVote()){
+					int newid = sender.getEntityWorld().getCapability(StatesCapabilities.WORLD, null).getNewVoteId();
+					boolean council = false;
+					switch(type){
+						case CHANGE_REVISER:{ council = !rule.reviser.isCitizenVote(); break; }
+						case CHANGE_SETTER:{ council = !rule.setter.isCitizenVote(); break; }
+						case CHANGE_VALUE:{ council = !rule.setter.isCitizenVote(); break; }
+					}
+					Vote newvote = new Vote(newid, rule.id, ply.getUUID(), Time.getDate(), Time.getDate() + Time.DAY_MS + Time.DAY_MS,
+						ruleable, type, council, type == VoteType.CHANGE_VALUE ? null : type == VoteType.CHANGE_REVISER, type == VoteType.CHANGE_VALUE ? value : to);
+					if(newvote.getVoteFile().exists()){
+						new Exception("Tried to create new Vote with ID '" + newvote.id + "', but savefile already exists."); return;
+					}
+					Print.chat(sender, "&6&oNew Vote to apply your rule change was created.");
+					Print.chat(sender, "&9The ID is: &7" + newvote.id);
+					newvote.vote(sender, ply.getUUID(), true);
+					States.VOTES.put(newvote.id, newvote); String str = "";
+					switch(type){
+						case CHANGE_REVISER:{ str = "REVISER"; break; }
+						case CHANGE_SETTER:{ str = "SETTER";  break; }
+						case CHANGE_VALUE:{ str = "VALUE";  break; }
+					}
+					switch(args[1]){
+						case "mun": case "municipality":{
+							StateUtil.announce(server, AnnounceLevel.MUNICIPALITY, ply.getFormattedNickname() + "&7 started a vote to revise the rule (mun)&a'" + rule.id +"'&7and set " + str + " to &b" + to.name() + "&7!", 2);
+							return;
+						}
+						case "dis": case "district":{
+							StateUtil.announce(server, AnnounceLevel.DISTRICT, ply.getFormattedNickname() + "&7 started a vote to revise the rule (dis)&a'" + rule.id +"'&7and set " + str + " to &b" + to.name() + "&7!", 2);
+							return;
+						}
+						case "st": case "state":{
+							StateUtil.announce(server, AnnounceLevel.STATE, ply.getFormattedNickname() + "&7 started a vote to revise the rule (st)&a'" + rule.id +"'&7and set " + str + " to &b" + to.name() + "&7!", 2);
+							return;
+						}
+					} return;
+				}
+				else{
+					String str = "";
+					switch(type){
+						case CHANGE_REVISER:{ rule.reviser = to; str = "REVISER"; break; }
+						case CHANGE_SETTER:{ rule.setter = to; str = "SETTER";  break; }
+						case CHANGE_VALUE:{ rule.set(value); str = "VALUE";  break; }
+					}
+					Print.chat(sender, "&6&oYour rule change got applied.");
+					switch(args[1]){
+						case "mun": case "municipality":{
+							StateUtil.announce(server, AnnounceLevel.MUNICIPALITY, ply.getFormattedNickname() + "&7 revised the rule (mun)&a'" + rule.id +"'\n&7and set " + str + " to &b" + to.name() + "&7!", 2);
+							return;
+						}
+						case "dis": case "district":{
+							StateUtil.announce(server, AnnounceLevel.DISTRICT, ply.getFormattedNickname() + "&7 revised the rule (dis)&a'" + rule.id +"'\n&7and set " + str + " to &b" + to.name() + "&7!", 2);
+							return;
+						}
+						case "st": case "state":{
+							StateUtil.announce(server, AnnounceLevel.STATE, ply.getFormattedNickname() + "&7 revised the rule (st)&a'" + rule.id +"'\n&7and set " + str + " to &b" + to.name() + "&7!", 2);
+							return;
+						}
+					}
+				}
 				return;
 			}
 			case "types":{

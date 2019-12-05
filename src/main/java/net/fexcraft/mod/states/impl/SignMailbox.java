@@ -51,6 +51,7 @@ public class SignMailbox implements SignCapability.Listener {
 	@Override
 	public boolean onPlayerInteract(SignCapability cap, PlayerInteractEvent event, IBlockState state, TileEntitySign tileentity){
 		if(event.getWorld().isRemote){ return false; }
+		boolean admin = StateUtil.isAdmin(event.getEntityPlayer());
 		if(!active){
 			if(tileentity.signText[0].getUnformattedText().toLowerCase().equals("[st-mailbox]")){
 				BlockPos back = getPosAtBack(state, tileentity);
@@ -61,17 +62,17 @@ public class SignMailbox implements SignCapability.Listener {
 				String type = tileentity.signText[1].getUnformattedText().toLowerCase();
 				switch(type){
 					case "state":{
-						if(!chunk.getState().isAuthorized(chunk.getState().r_SET_MAILBOX.id, event.getEntityPlayer().getGameProfile().getId())){
+						if(!admin && !chunk.getState().isAuthorized(chunk.getState().r_SET_MAILBOX.id, event.getEntityPlayer().getGameProfile().getId())){
 							Print.chat(event.getEntityPlayer(), "No permission to set the State Mailbox."); return false;
 						} reci = type;
 					}
 					case "municipality":{
-						if(!chunk.getMunicipality().isAuthorized(chunk.getMunicipality().r_SET_MAILBOX.id, event.getEntityPlayer().getGameProfile().getId())){
+						if(!admin && !chunk.getMunicipality().isAuthorized(chunk.getMunicipality().r_SET_MAILBOX.id, event.getEntityPlayer().getGameProfile().getId())){
 							Print.chat(event.getEntityPlayer(), "No permission to set the Municipality Mailbox."); return false;
 						} reci = type;
 					}
 					case "district":{
-						if(!chunk.getDistrict().isAuthorized(chunk.getDistrict().r_SET_MAILBOX.id, event.getEntityPlayer().getGameProfile().getId())){
+						if(!admin && !chunk.getDistrict().isAuthorized(chunk.getDistrict().r_SET_MAILBOX.id, event.getEntityPlayer().getGameProfile().getId())){
 							Print.chat(event.getEntityPlayer(), "No permission to set the District Mailbox."); return false;
 						} reci = type;
 					}
@@ -83,7 +84,7 @@ public class SignMailbox implements SignCapability.Listener {
 							Print.chat(event.getEntityPlayer(), "Couldn't find player UUID in cache.");
 							return false;
 						}
-						if(prof.getId().equals(event.getEntityPlayer().getGameProfile().getId()) || StateUtil.isAdmin(event.getEntityPlayer())){
+						if(prof.getId().equals(event.getEntityPlayer().getGameProfile().getId()) || admin){
 							this.reci = prof.getId().toString();
 							tileentity.signText[1] = Formatter.newTextComponentString(prof.getName());
 							tileentity.signText[2] = Formatter.newTextComponentString("");
@@ -94,7 +95,7 @@ public class SignMailbox implements SignCapability.Listener {
 						break;
 					}
 					case "central": case "fallback":{
-						if(!StateUtil.isAdmin(event.getEntityPlayer())){
+						if(!admin){
 							Print.chat(event.getEntityPlayer(), "No permission to set the Central/Fallback Mailbox."); return false;
 						} reci = "-1";
 						break;
@@ -140,29 +141,29 @@ public class SignMailbox implements SignCapability.Listener {
 			Chunk chunk = StateUtil.getChunk(tileentity.getPos());
 			switch(type){
 				case "state":{
-					if(!chunk.getState().isAuthorized(chunk.getState().r_OPEN_MAILBOX.id, event.getEntityPlayer().getGameProfile().getId())){
+					if(!admin && !chunk.getState().isAuthorized(chunk.getState().r_OPEN_MAILBOX.id, event.getEntityPlayer().getGameProfile().getId())){
 						Print.chat(event.getEntityPlayer(), "No permission to open the State Mailbox."); return false;
 					}
 				}
 				case "municipality":{
-					if(!chunk.getMunicipality().isAuthorized(chunk.getMunicipality().r_OPEN_MAILBOX.id, event.getEntityPlayer().getGameProfile().getId())){
+					if(!admin && !chunk.getMunicipality().isAuthorized(chunk.getMunicipality().r_OPEN_MAILBOX.id, event.getEntityPlayer().getGameProfile().getId())){
 						Print.chat(event.getEntityPlayer(), "No permission to open the Municipality Mailbox."); return false;
 					}
 				}
 				case "district":{
-					if(!chunk.getDistrict().isAuthorized(chunk.getDistrict().r_OPEN_MAILBOX.id, event.getEntityPlayer().getGameProfile().getId())){
+					if(!admin && !chunk.getDistrict().isAuthorized(chunk.getDistrict().r_OPEN_MAILBOX.id, event.getEntityPlayer().getGameProfile().getId())){
 						Print.chat(event.getEntityPlayer(), "No permission to open the District Mailbox."); return false;
 					}
 				}
 				case "company": break;//TODO
 				case "player":{
-					if(!event.getEntityPlayer().getGameProfile().getId().toString().equals(reci)){
+					if(!admin && !event.getEntityPlayer().getGameProfile().getId().toString().equals(reci)){
 						Print.chat(event.getEntityPlayer(), "No permission to open mailbox of that player."); return false;
 					}
 					break;
 				}
 				case "central": case "fallback":{
-					if(!StateUtil.isAdmin(event.getEntityPlayer())){
+					if(!admin){
 						Print.chat(event.getEntityPlayer(), "No permission to set the Central/Fallback Mailbox."); return false;
 					}
 					break;

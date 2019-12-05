@@ -3,6 +3,8 @@ package net.fexcraft.mod.states.data.root;
 import java.util.List;
 import java.util.UUID;
 
+import net.fexcraft.mod.states.data.Rule.Result;
+
 public interface Ruleable extends RuleHolder {
 	
 	public String getRulesetTitle();
@@ -29,7 +31,7 @@ public interface Ruleable extends RuleHolder {
 		return getRule(rule).isAuthorized(this, uuid);
 	}
 	
-	public default boolean canRevise(String rule, UUID uuid){
+	public default Result canRevise(String rule, UUID uuid){
 		return getRule(rule).canRevise(this, uuid);
 	}
 

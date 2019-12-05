@@ -89,7 +89,8 @@ public class RulesUIC extends GenericContainer {
 					int i = packet.getInteger("rule"); boolean set = packet.getString("cargo").equals("set");
 					if(holder instanceof Ruleable){
 						Ruleable ruleable = (Ruleable)holder; UUID uuid = player.getGameProfile().getId();
-						if((set ? ruleable.isAuthorized(rules[i].id, uuid) : ruleable.canRevise(rules[i].id, uuid)) || StateUtil.isAdmin(player)){
+						boolean vote = set ? false : ruleable.canRevise(rules[i].id, uuid).isVote();
+						if((set ? ruleable.isAuthorized(rules[i].id, uuid) : ruleable.canRevise(rules[i].id, uuid).isTrue()) || StateUtil.isAdmin(player)){
 							try{
 								Initiator init = Initiator.valueOf(packet.getString("value").toUpperCase());
 								if(set && !init.isValidAsSetter()){
@@ -103,6 +104,9 @@ public class RulesUIC extends GenericContainer {
 							catch(Exception e){
 								sendStatus("&bError parsing Initiator.");
 							}
+						}
+						else if(vote){
+							sendStatus("&bThis needs a vote to change! &7/st-rule");
 						}
 						else{
 							sendStatus("&bNo permission to revise this.");

@@ -1,10 +1,13 @@
 package net.fexcraft.mod.states.cmds;
 
+import net.fexcraft.lib.common.math.Time;
 import net.fexcraft.lib.mc.api.registry.fCommand;
 import net.fexcraft.lib.mc.utils.Print;
+import net.fexcraft.lib.mc.utils.Static;
 import net.fexcraft.mod.states.States;
 import net.fexcraft.mod.states.data.Chunk;
 import net.fexcraft.mod.states.data.Vote;
+import net.fexcraft.mod.states.data.Vote.VoteType;
 import net.fexcraft.mod.states.data.capabilities.PlayerCapability;
 import net.fexcraft.mod.states.data.capabilities.StatesCapabilities;
 import net.fexcraft.mod.states.data.root.Ruleable;
@@ -83,7 +86,7 @@ public class VoteCmd extends CommandBase {
 				}
 				Print.chat(sender, "&6All current votes of\n" + of);
 				for(Vote vote : States.VOTES.values()){
-					if(vote.target != ruleable)
+					if(vote.target != ruleable) continue;
 					Print.chat(sender, "&7- &a" + vote.id + ", &e" + (vote.type.assignment() ? "assignment" : "rule change") + ", &bof " + vote.targetAsString());
 				}
 				return;
@@ -100,6 +103,16 @@ public class VoteCmd extends CommandBase {
 				}
 				Print.chat(sender, "&9Vote Target: &7" + vote.targetAsString());
 				vote.summary(sender); return;
+			}
+			case "test":{
+				if(!Static.dev()){ Print.chat(sender, "Only applicable in a developement workspace."); return; }
+				Vote newvote = new Vote(sender.getEntityWorld().getCapability(StatesCapabilities.WORLD, null).getNewVoteId(),
+					"allow.explosions", ply.getUUID(), Time.getDate(), Time.getDate() + Time.DAY_MS + Time.DAY_MS,
+					chunk.getDistrict(), VoteType.CHANGE_VALUE, true, null, true);
+				if(newvote.getVoteFile().exists()){
+					new Exception("Tried to create new Vote with ID '" + newvote.id + "', but savefile already exists."); return;
+				}
+				States.VOTES.put(newvote.id, newvote); Print.chat(sender, "Test Vote Added!"); return;
 			}
 			default:{
 				Print.chat(sender, "&cInvalid Argument.");

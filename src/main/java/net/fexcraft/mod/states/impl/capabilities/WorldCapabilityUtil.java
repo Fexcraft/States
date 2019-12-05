@@ -10,6 +10,7 @@ import net.fexcraft.mod.states.States;
 import net.fexcraft.mod.states.data.District;
 import net.fexcraft.mod.states.data.Municipality;
 import net.fexcraft.mod.states.data.State;
+import net.fexcraft.mod.states.data.Vote;
 import net.fexcraft.mod.states.data.capabilities.StatesCapabilities;
 import net.fexcraft.mod.states.data.capabilities.WorldCapability;
 import net.minecraft.nbt.NBTBase;
@@ -83,7 +84,7 @@ public class WorldCapabilityUtil implements ICapabilitySerializable<NBTBase>{
 	public static class Implementation implements WorldCapability {
 		
 		//private World world;
-		private int municipalities = -1, districts = -1, states = -1;
+		private int municipalities = -1, districts = -1, states = -1, votes = -1;
 
 		@Override
 		public void setWorld(World world){
@@ -214,6 +215,28 @@ public class WorldCapabilityUtil implements ICapabilitySerializable<NBTBase>{
 		@Override
 		public ImmutableMap<Integer, State> getStates(){
 			return ImmutableMap.copyOf(States.STATES);
+		}
+
+		@Override
+		public int getNewVoteId(){
+			checkVotesAmount();
+			return votes + 1;
+		}
+
+		private void checkVotesAmount(){
+			File folder = new File(States.getSaveDirectory(), "votes/");
+			if(!folder.exists()) folder.mkdirs();
+			int i = 0;
+			for(File file : folder.listFiles()){
+				if(FilenameUtils.isExtension(file.getName(), "json")){
+					i++;
+				}
+			} votes = i;
+		}
+
+		@Override
+		public ImmutableMap<Integer, Vote> getVotes(){
+			return ImmutableMap.copyOf(States.VOTES);
 		}
 		
 	}

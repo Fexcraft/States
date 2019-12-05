@@ -5,6 +5,7 @@ import com.google.common.collect.ImmutableMap;
 import net.fexcraft.mod.states.data.District;
 import net.fexcraft.mod.states.data.Municipality;
 import net.fexcraft.mod.states.data.State;
+import net.fexcraft.mod.states.data.Vote;
 import net.minecraft.nbt.NBTBase;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.world.World;
@@ -23,11 +24,15 @@ public interface WorldCapability {
 	public int getNewDistrictId() throws Exception;
 
 	public int getNewStateId() throws Exception;
+
+	public int getNewVoteId();
 	
 	public ImmutableMap<Integer, District> getDistricts();
 	
 	public ImmutableMap<Integer, Municipality> getMunicipalities();
 	
 	public ImmutableMap<Integer, State> getStates();
+	
+	public ImmutableMap<Integer, Vote> getVotes();
 
 }

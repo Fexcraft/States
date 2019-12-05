@@ -83,6 +83,7 @@ public class Vote {
 		return new File(States.getSaveDirectory(), "votes/" + voteid + ".json");
 	}
 	
+	/** For assignment-type votes. */
 	public boolean vote(ICommandSender sender, UUID from, UUID vfor){
 		if(!prevote(sender, from, true)) return false;
 		if(!target.getCouncil().contains(vfor)){
@@ -93,6 +94,7 @@ public class Vote {
 		return true;
 	}
 	
+	/** For rule-type votes. */
 	public boolean vote(ICommandSender sender, UUID from, boolean agree){
 		if(!prevote(sender, from, false)) return false;
 		votes.put(from.toString(), agree);
@@ -145,6 +147,22 @@ public class Vote {
 	public static enum VoteType {
 		ASSIGNMENT, CHANGE_REVISER, CHANGE_SETTER, CHANGE_VALUE;
 		public boolean assignment(){ return this == ASSIGNMENT; }
+	}
+
+	public String targetAsString(){
+		if(target instanceof District){
+			return "dis:" + ((District)target).getId();
+		}
+		else if(target instanceof Municipality){
+			return "mun:" + ((Municipality)target).getId();
+		}
+		else if(target instanceof State){
+			return "st:" + ((State)target).getId();
+		}
+		else{
+			new Exception("Invalid or Unsupported RULEABLE for Voting.");
+		}
+		return "invalid target";
 	}
 	
 }

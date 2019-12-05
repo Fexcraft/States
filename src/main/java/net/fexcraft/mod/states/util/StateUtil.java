@@ -133,6 +133,18 @@ public class StateUtil extends TimerTask {
 		}
 		else return bool ? States.STATES.get(-1) : null;
 	}
+	
+	public static Vote getVote(int value){
+		if(States.VOTES.containsKey(value)){
+			return States.VOTES.get(value);
+		}
+		else if(Vote.getVoteFile(value).exists()){
+			Vote vote = new Vote(value);
+			States.VOTES.put(value, vote);
+			return vote;
+		}
+		else return null;
+	}
 
 	public static boolean isUUID(String owner){
 		try{

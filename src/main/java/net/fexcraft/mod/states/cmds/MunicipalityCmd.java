@@ -433,6 +433,9 @@ public class MunicipalityCmd extends CommandBase {
 							Print.chat(sender, "&aA vote for a new mayor can be only started when there is no mayor!");
 							return;
 						}
+						if(args.length < 3){
+							Print.chat(sender, "&7/mun council vote &e>>playername<<"); return;
+						}
 						GameProfile gp = Static.getServer().getPlayerProfileCache().getGameProfileForUsername(args[2]);
 						if(gp == null || gp.getId() == null){
 							Print.chat(sender, "&cPlayer not found in Cache.");

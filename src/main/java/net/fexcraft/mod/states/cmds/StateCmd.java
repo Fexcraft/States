@@ -360,7 +360,7 @@ public class StateCmd extends CommandBase {
 					Print.chat(sender, "&7/st council kick <playername>");
 					Print.chat(sender, "&7/st council invite <playername>");
 					Print.chat(sender, "&7/st council leave");
-                                    return;
+                    return;
 				}
 				switch(args[1]){
 					case "vote":{
@@ -371,6 +371,9 @@ public class StateCmd extends CommandBase {
 						if(state.getHead() != null){
 							Print.chat(sender, "&aA vote for a new leader can be only started when there is no leader!");
 							return;
+						}
+						if(args.length < 3){
+							Print.chat(sender, "&7/st council vote &e>>playername<<"); return;
 						}
 						GameProfile gp = Static.getServer().getPlayerProfileCache().getGameProfileForUsername(args[2]);
 						if(gp == null || gp.getId() == null){

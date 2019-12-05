@@ -165,7 +165,7 @@ public class VoteCmd extends CommandBase {
 				if(newvote.getVoteFile().exists()){
 					new Exception("Tried to create new Vote with ID '" + newvote.id + "', but savefile already exists."); return;
 				}
-				States.VOTES.put(newvote.id, newvote); newvote.save(); Print.chat(sender, "Test Vote Added!"); return;
+				States.VOTES.put(newvote.id, newvote); newvote.save(); Print.chat(sender, "Test Vote Added! [" + newvote.id + "]"); return;
 			}
 			default:{
 				Print.chat(sender, "&cInvalid Argument.");

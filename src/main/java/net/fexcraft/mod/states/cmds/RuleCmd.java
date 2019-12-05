@@ -146,7 +146,7 @@ public class RuleCmd extends CommandBase {
 					}
 					Print.chat(sender, "&6&oNew Vote to apply your rule change was created.");
 					Print.chat(sender, "&9The ID is: &7" + newvote.id);
-					newvote.vote(sender, ply.getUUID(), true);
+					newvote.vote(sender, ply.getUUID(), true); newvote.save();
 					States.VOTES.put(newvote.id, newvote); String str = "";
 					switch(type){
 						case CHANGE_REVISER:{ str = "REVISER"; break; }
@@ -155,15 +155,15 @@ public class RuleCmd extends CommandBase {
 					}
 					switch(args[1]){
 						case "mun": case "municipality":{
-							StateUtil.announce(server, AnnounceLevel.MUNICIPALITY, ply.getFormattedNickname() + "&7 started a vote to revise the rule (mun)&a'" + rule.id +"'&7and set " + str + " to &b" + to.name() + "&7!", 2);
+							StateUtil.announce(server, AnnounceLevel.MUNICIPALITY, ply.getFormattedNickname() + "&7 started a vote to revise the rule (mun)&a'" + rule.id +"'&7and set " + str + " to &b" + to.name() + "&7!", chunk.getMunicipality().getId());
 							return;
 						}
 						case "dis": case "district":{
-							StateUtil.announce(server, AnnounceLevel.DISTRICT, ply.getFormattedNickname() + "&7 started a vote to revise the rule (dis)&a'" + rule.id +"'&7and set " + str + " to &b" + to.name() + "&7!", 2);
+							StateUtil.announce(server, AnnounceLevel.DISTRICT, ply.getFormattedNickname() + "&7 started a vote to revise the rule (dis)&a'" + rule.id +"'&7and set " + str + " to &b" + to.name() + "&7!", chunk.getDistrict().getId());
 							return;
 						}
 						case "st": case "state":{
-							StateUtil.announce(server, AnnounceLevel.STATE, ply.getFormattedNickname() + "&7 started a vote to revise the rule (st)&a'" + rule.id +"'&7and set " + str + " to &b" + to.name() + "&7!", 2);
+							StateUtil.announce(server, AnnounceLevel.STATE, ply.getFormattedNickname() + "&7 started a vote to revise the rule (st)&a'" + rule.id +"'&7and set " + str + " to &b" + to.name() + "&7!", chunk.getState().getId());
 							return;
 						}
 					} return;

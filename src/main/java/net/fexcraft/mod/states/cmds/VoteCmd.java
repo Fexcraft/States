@@ -47,7 +47,7 @@ public class VoteCmd extends CommandBase {
         return 0;
     }
 
-	@SuppressWarnings("unused") @Override
+	@Override
 	public void execute(MinecraftServer server, ICommandSender sender, String[] args) throws CommandException {
 		if(args.length == 0){
 			Print.chat(sender, "&7/st-vote all");
@@ -160,12 +160,12 @@ public class VoteCmd extends CommandBase {
 			case "test":{
 				if(!Static.dev()){ Print.chat(sender, "Only applicable in a developement workspace."); return; }
 				Vote newvote = new Vote(sender.getEntityWorld().getCapability(StatesCapabilities.WORLD, null).getNewVoteId(),
-					"allow.explosions", ply.getUUID(), Time.getDate(), Time.getDate() + Time.DAY_MS + Time.DAY_MS,
+					"allow.explosions", ply.getUUID(), Time.getDate(), Time.getDate() + (Time.MIN_MS / 2),
 					chunk.getDistrict(), VoteType.CHANGE_VALUE, true, null, true);
 				if(newvote.getVoteFile().exists()){
 					new Exception("Tried to create new Vote with ID '" + newvote.id + "', but savefile already exists."); return;
 				}
-				States.VOTES.put(newvote.id, newvote); Print.chat(sender, "Test Vote Added!"); return;
+				States.VOTES.put(newvote.id, newvote); newvote.save(); Print.chat(sender, "Test Vote Added!"); return;
 			}
 			default:{
 				Print.chat(sender, "&cInvalid Argument.");

@@ -91,7 +91,7 @@ public class District implements ColorHolder, BuyableType, IconHolder, MailRecei
 		if(obj.has("votes")){
 			ArrayList<Integer> list = JsonUtil.jsonArrayToIntegerArray(obj.get("votes").getAsJsonArray());
 			for(int i : list){
-				Vote vote = StateUtil.getVote(this, i); if(vote.expired(null)) continue; active_votes.add(vote);
+				Vote vote = StateUtil.getVote(this, i); if(vote == null || vote.expired(null)) continue; active_votes.add(vote);
 			}
 		}
 	}

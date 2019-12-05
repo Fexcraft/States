@@ -380,6 +380,10 @@ public class StateCmd extends CommandBase {
 							Print.chat(sender, "&cPlayer not found in Cache.");
 							break;
 						}
+						if(Vote.exists(state, VoteType.ASSIGNMENT, null)){
+							Print.chat(sender, "&bThere is already an assignment vote ongoing!");
+							return;
+						}
 						int newid = sender.getEntityWorld().getCapability(StatesCapabilities.WORLD, null).getNewVoteId();
 						Vote newvote = new Vote(newid, null, ply.getUUID(), Time.getDate(), Time.getDate() + (Time.DAY_MS * 7),
 							state, VoteType.ASSIGNMENT, true, null, null);

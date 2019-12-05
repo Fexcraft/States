@@ -139,6 +139,10 @@ public class RuleCmd extends CommandBase {
 						case CHANGE_SETTER:{ council = !rule.setter.isCitizenVote(); break; }
 						case CHANGE_VALUE:{ council = !rule.setter.isCitizenVote(); break; }
 					}
+					if(Vote.exists(ruleable, type, rule.id)){
+						Print.chat(sender, "&bThere is already a " + type.name() + " vote ongoing for this rule!");
+						return;
+					}
 					Vote newvote = new Vote(newid, rule.id, ply.getUUID(), Time.getDate(), Time.getDate() + Time.DAY_MS + Time.DAY_MS,
 						ruleable, type, council, type == VoteType.CHANGE_VALUE ? null : type == VoteType.CHANGE_REVISER, type == VoteType.CHANGE_VALUE ? value : to);
 					if(newvote.getVoteFile().exists()){

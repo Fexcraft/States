@@ -209,6 +209,7 @@ public class VoteCmd extends CommandBase {
 			}
 			case "test":{
 				if(!Static.dev()){ Print.chat(sender, "Only applicable in a developement workspace."); return; }
+				//since this is a dev. call for testing we don't need a duplication check, at least for now.
 				int dis = args.length > 1 ? Integer.parseInt(args[1]) : -1;
 				Vote newvote = new Vote(sender.getEntityWorld().getCapability(StatesCapabilities.WORLD, null).getNewVoteId(),
 					"allow.explosions", ply.getUUID(), Time.getDate(), Time.getDate() + (Time.MIN_MS / 2),

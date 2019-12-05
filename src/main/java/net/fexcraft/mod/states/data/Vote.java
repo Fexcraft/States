@@ -376,5 +376,14 @@ public class Vote {
 	public void unload(){
 		holder.getActiveVotes().remove(this);
 	}
+
+	public static boolean exists(Ruleable holder, VoteType type, String rule){
+		for(Vote vote : holder.getActiveVotes()){
+			if(vote.type == type){
+				if(type.assignment()) return true;
+				else if(vote.rule.equals(rule)) return true;
+			}
+		} return false;
+	}
 	
 }

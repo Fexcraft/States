@@ -441,6 +441,10 @@ public class MunicipalityCmd extends CommandBase {
 							Print.chat(sender, "&cPlayer not found in Cache.");
 							break;
 						}
+						if(Vote.exists(mun, VoteType.ASSIGNMENT, null)){
+							Print.chat(sender, "&bThere is already an assignment vote ongoing!");
+							return;
+						}
 						int newid = sender.getEntityWorld().getCapability(StatesCapabilities.WORLD, null).getNewVoteId();
 						Vote newvote = new Vote(newid, null, ply.getUUID(), Time.getDate(), Time.getDate() + (Time.DAY_MS * 7),
 							mun, VoteType.ASSIGNMENT, !mun.r_VOTE_MAYOR.setter.isCitizenVote(), null, null);

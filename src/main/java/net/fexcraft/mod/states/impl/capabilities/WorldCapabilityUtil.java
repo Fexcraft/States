@@ -84,7 +84,6 @@ public class WorldCapabilityUtil implements ICapabilitySerializable<NBTBase>{
 	public static class Implementation implements WorldCapability {
 		
 		//private World world;
-		private int municipalities = -1, districts = -1, states = -1, votes = -1;
 
 		@Override
 		public void setWorld(World world){
@@ -92,119 +91,61 @@ public class WorldCapabilityUtil implements ICapabilitySerializable<NBTBase>{
 		}
 
 		@Override
-		public int getNewMunicipalityId() throws Exception {
-			checkMunicipalityAmount();
-			return municipalities + 1;
-		}
-
-		private void checkMunicipalityAmount() throws Exception {
-			if(municipalities <= 2){
-				File folder = new File(States.getSaveDirectory(), "municipalitites/");
-				if(!folder.exists()){
-					//this bad...
-					throw new Exception("Missing Municipalities Save Location for this World.");
-				}
-				if(!folder.isDirectory()){
-					throw new Exception("Municipalities File is not Directory.");
-				}
-				int i = 0;
-				for(File file : folder.listFiles()){
-					if(FilenameUtils.isExtension(file.getName(), "json")){
-						i++;
-					}
-					else{
-						throw new Exception("Found file in Municipalities Directory which shouldn't be there.");
-					}
-				}
-				municipalities = i - 2;//recompensate for wilderness & "spawn"
-			}
-		}
-
-		@Override
 		public NBTBase writeToNBT(Capability<WorldCapability> capability, EnumFacing side){
-			NBTTagCompound compound = new NBTTagCompound();
-			return compound;
+			return new NBTTagCompound();
 		}
 
 		@Override
 		public void readFromNBT(Capability<WorldCapability> capability, EnumFacing side, NBTBase nbt){
-			if(nbt == null || nbt instanceof NBTTagCompound == false){
-				try{
-					checkStatesAmount();
-					checkMunicipalityAmount();
-					checkDistrictAmount();
-				}
-				catch(Exception e){
-					e.printStackTrace();
-				}
-			}
-			else{
-				NBTTagCompound compound = (NBTTagCompound) nbt;
-				municipalities = compound.getInteger("Municipalities");
-			}
-		}
-
-		private void checkStatesAmount() throws Exception {
-			if(states <= 2){
-				File folder = new File(States.getSaveDirectory(), "states/");
-				if(!folder.exists()){
-					//this bad...
-					throw new Exception("Missing States Save Location for this World.");
-				}
-				if(!folder.isDirectory()){
-					throw new Exception("States File is not Directory.");
-				}
-				int i = 0;
-				for(File file : folder.listFiles()){
-					if(FilenameUtils.isExtension(file.getName(), "json")){
-						i++;
-					}
-					else{
-						throw new Exception("Found file in States Directory which shouldn't be there.");
-					}
-				}
-				states = i - 2;//recompensate for neutral territory & "spawn"
-			}
+			//
 		}
 
 		@Override
-		public int getNewStateId() throws Exception {
-			checkStatesAmount();
-			return states + 1;
-		}
-
-		@Override
-		public int getNewDistrictId() throws Exception {
-			checkDistrictAmount();
-			return districts + 1;
-		}
-
-		private void checkDistrictAmount() throws Exception {
-			if(districts <= 2){
-				File folder = new File(States.getSaveDirectory(), "districts/");
-				if(!folder.exists()){
-					//this bad...
-					throw new Exception("Missing Districts Save Location for this World.");
-				}
-				if(!folder.isDirectory()){
-					throw new Exception("Districts File is not Directory.");
-				}
-				int i = 0;
-				for(File file : folder.listFiles()){
-					if(FilenameUtils.isExtension(file.getName(), "json")){
-						i++;
-					}
-					else{
-						throw new Exception("Found file in Districts Directory which shouldn't be there.");
-					}
-				}
-				districts = i - 3;//recompensate for wilderness, "spawn" & transit zone
+		public int getNewMunicipalityId() throws Exception {
+			File folder = new File(States.getSaveDirectory(), "municipalitites/");
+			if(!folder.exists()) folder.mkdirs();
+			int newid = -1;
+			for(File file : folder.listFiles()){
+				if(FilenameUtils.isExtension(file.getName(), "json")){ newid++; }
 			}
+			while(Municipality.getMunicipalityFile(newid).exists()) newid++;
+			return newid;
 		}
 
 		@Override
-		public ImmutableMap<Integer, District> getDistricts(){
-			return ImmutableMap.copyOf(States.DISTRICTS);
+		public int getNewDistrictId(){
+			File folder = new File(States.getSaveDirectory(), "districts/");
+			if(!folder.exists()) folder.mkdirs();
+			int newid = -2;
+			for(File file : folder.listFiles()){
+				if(FilenameUtils.isExtension(file.getName(), "json")){ newid++; }
+			}
+			while(District.getDistrictFile(newid).exists()) newid++;
+			return newid;
+		}
+
+		@Override
+		public int getNewStateId(){
+			File folder = new File(States.getSaveDirectory(), "states/");
+			if(!folder.exists()) folder.mkdirs();
+			int newid = -1;
+			for(File file : folder.listFiles()){
+				if(FilenameUtils.isExtension(file.getName(), "json")){ newid++; }
+			}
+			while(State.getStateFile(newid).exists()) newid++;
+			return newid;
+		}
+
+		@Override
+		public int getNewVoteId(){
+			File folder = new File(States.getSaveDirectory(), "votes/");
+			if(!folder.exists()) folder.mkdirs();
+			int newid = 0;
+			for(File file : folder.listFiles()){
+				if(FilenameUtils.isExtension(file.getName(), "json")){ newid++; }
+			}
+			while(Vote.getVoteFile(newid).exists()) newid++;
+			return newid;
 		}
 
 		@Override
@@ -213,25 +154,13 @@ public class WorldCapabilityUtil implements ICapabilitySerializable<NBTBase>{
 		}
 
 		@Override
-		public ImmutableMap<Integer, State> getStates(){
-			return ImmutableMap.copyOf(States.STATES);
+		public ImmutableMap<Integer, District> getDistricts(){
+			return ImmutableMap.copyOf(States.DISTRICTS);
 		}
 
 		@Override
-		public int getNewVoteId(){
-			checkVotesAmount();
-			return votes + 1;
-		}
-
-		private void checkVotesAmount(){
-			File folder = new File(States.getSaveDirectory(), "votes/");
-			if(!folder.exists()) folder.mkdirs();
-			int i = 0;
-			for(File file : folder.listFiles()){
-				if(FilenameUtils.isExtension(file.getName(), "json")){
-					i++;
-				}
-			} votes = i;
+		public ImmutableMap<Integer, State> getStates(){
+			return ImmutableMap.copyOf(States.STATES);
 		}
 
 		@Override

@@ -15,21 +15,21 @@ public interface WorldCapability {
 
 	public void setWorld(World world);
 
-	public int getNewMunicipalityId() throws Exception;
-
 	public NBTBase writeToNBT(Capability<WorldCapability> capability, EnumFacing side);
 
 	public void readFromNBT(Capability<WorldCapability> capability, EnumFacing side, NBTBase nbt);
 
-	public int getNewDistrictId() throws Exception;
+	public int getNewMunicipalityId() throws Exception;
 
-	public int getNewStateId() throws Exception;
+	public int getNewDistrictId();
+
+	public int getNewStateId();
 
 	public int getNewVoteId();
 	
-	public ImmutableMap<Integer, District> getDistricts();
-	
 	public ImmutableMap<Integer, Municipality> getMunicipalities();
+	
+	public ImmutableMap<Integer, District> getDistricts();
 	
 	public ImmutableMap<Integer, State> getStates();
 	

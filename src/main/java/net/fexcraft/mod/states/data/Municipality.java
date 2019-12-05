@@ -25,6 +25,7 @@ import net.fexcraft.mod.states.data.root.IconHolder;
 import net.fexcraft.mod.states.data.root.Initiator;
 import net.fexcraft.mod.states.data.root.MailReceiver;
 import net.fexcraft.mod.states.data.root.Ruleable;
+import net.fexcraft.mod.states.data.root.VoteHolder;
 import net.fexcraft.mod.states.util.Config;
 import net.fexcraft.mod.states.util.ForcedChunksManager;
 import net.fexcraft.mod.states.util.RuleMap;
@@ -32,7 +33,7 @@ import net.fexcraft.mod.states.util.StateUtil;
 import net.minecraft.command.ICommandSender;
 import net.minecraft.util.math.BlockPos;
 
-public class Municipality implements ColorHolder, BuyableType, IconHolder, AccountHolder, MailReceiver, Ruleable {
+public class Municipality implements ColorHolder, BuyableType, IconHolder, AccountHolder, MailReceiver, Ruleable, VoteHolder {
 	
 	private int id;
 	private String name, color, icon;
@@ -51,6 +52,7 @@ public class Municipality implements ColorHolder, BuyableType, IconHolder, Accou
 	public final Rule r_EDIT_BL, r_KICK, r_INVITE, r_COUNCIL_KICK, r_COUNCIL_INVITE, r_VOTE_MAYOR;
 	public final Rule r_CREATE_DISTRICT, r_SET_CHUNKRULES, r_CREATE_SIGN_SHOP, r_SET_MAILBOX, r_OPEN_MAILBOX;
 	public final Rule r_FORCE_LOAD_CHUNKS, r_SET_RULESET, r_RESET_MAYOR;
+	private ArrayList<Vote> active_votes = new ArrayList<>();
 	
 	public Municipality(int id){
 		this.id = id;
@@ -107,6 +109,13 @@ public class Municipality implements ColorHolder, BuyableType, IconHolder, Accou
 		//import old settings from old saves
 		if(obj.has("open")){ r_OPEN.set(obj.get("open").getAsBoolean()); }
 		if(obj.has("kick_if_bankrupt")){ r_KIB.set(obj.get("kick_if_bankrupt").getAsBoolean()); }
+		//
+		if(obj.has("votes")){
+			ArrayList<Integer> list = JsonUtil.jsonArrayToIntegerArray(obj.get("votes").getAsJsonArray());
+			for(int i : list){
+				Vote vote = StateUtil.getVote(this, i); if(vote.expired(null)) continue; active_votes.add(vote);
+			}
+		}
 	}
 
 	public JsonObject toJsonObject(){
@@ -134,6 +143,11 @@ public class Municipality implements ColorHolder, BuyableType, IconHolder, Accou
 		JsonObject rells = new JsonObject();
 		for(Rule rule : rules.values()) rells.addProperty(rule.id, rule.save());
 		obj.add("rules", rells);
+		if(!active_votes.isEmpty()){
+			JsonArray array = new JsonArray();
+			for(Vote vote : active_votes) array.add(vote.id);
+			obj.add("votes", array);
+		}
 		return obj;
 	}
 
@@ -377,6 +391,11 @@ public class Municipality implements ColorHolder, BuyableType, IconHolder, Accou
 	@Override
 	public void setRulesetTitle(String title){
 		ruleset_name = title;
+	}
+
+	@Override
+	public List<Vote> getActiveVotes(){
+		return active_votes;
 	}
 
 }

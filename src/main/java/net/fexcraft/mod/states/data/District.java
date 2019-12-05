@@ -29,7 +29,7 @@ public class District implements ColorHolder, BuyableType, IconHolder, MailRecei
 	
 	private int id, chunks;
 	private DistrictType type;
-	private long created, changed, price, chunktax, chunkprice;
+	private long created, changed, price, chunktax;
 	private UUID creator, manager;
 	private ArrayList<Integer> neighbors;
 	private String name, color, icon;
@@ -42,6 +42,7 @@ public class District implements ColorHolder, BuyableType, IconHolder, MailRecei
 	public final Rule r_SET_TYPE, r_SET_NAME, r_SET_PRICE, r_SET_COLOR, r_SET_ICON;
 	public final Rule r_ALLOW_EXPLOSIONS, r_SET_CHUNKRULES, r_SET_CUSTOM_CHUNKTAX;
 	public final Rule r_CLAIM_CHUNK, r_SET_MAILBOX, r_OPEN_MAILBOX, r_SET_RULESET;
+	private ArrayList<Vote> active_votes = new ArrayList<>();
 	
 	public District(int id){
 		this.id = id; JsonObject obj = StateUtil.getDistrictJson(id);
@@ -86,7 +87,13 @@ public class District implements ColorHolder, BuyableType, IconHolder, MailRecei
 		//import old settings from old saves
 		if(obj.has("can_foreigners_settle")) r_CFS.set(obj.get("can_foreigners_settle").getAsBoolean());
 		if(obj.has("unclaim_chunks_if_bankrupt")) r_ONBANKRUPT.set(obj.get("unclaim_chunks_if_bankrupt").getAsBoolean());
-		chunkprice = JsonUtil.getIfExists(obj, "chunkprice", 0).intValue();
+		//
+		if(obj.has("votes")){
+			ArrayList<Integer> list = JsonUtil.jsonArrayToIntegerArray(obj.get("votes").getAsJsonArray());
+			for(int i : list){
+				Vote vote = StateUtil.getVote(this, i); if(vote.expired(null)) continue; active_votes.add(vote);
+			}
+		}
 	}
 
 	public JsonObject toJsonObject(){
@@ -112,7 +119,11 @@ public class District implements ColorHolder, BuyableType, IconHolder, MailRecei
 		JsonObject rells = new JsonObject();
 		for(Rule rule : rules.values()) rells.addProperty(rule.id, rule.save());
 		obj.add("rules", rells);
-		obj.addProperty("chunkprice", chunkprice);
+		if(!active_votes.isEmpty()){
+			JsonArray array = new JsonArray();
+			for(Vote vote : active_votes) array.add(vote.id);
+			obj.add("votes", array);
+		}
 		return obj;
 	}
 
@@ -297,12 +308,9 @@ public class District implements ColorHolder, BuyableType, IconHolder, MailRecei
 		ruleset = title;
 	}
 
-	public long getChunkPrice(){
-		return chunkprice;
-	}
-	
-	public void setChunkPrice(long newprice){
-		chunkprice = newprice;
+	@Override
+	public List<Vote> getActiveVotes(){
+		return active_votes;
 	}
 
 }

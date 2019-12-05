@@ -1,6 +1,8 @@
 package net.fexcraft.mod.states.data;
 
+import java.util.List;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 import com.google.gson.JsonObject;
 
@@ -12,6 +14,7 @@ import net.fexcraft.mod.fsmm.api.Account;
 import net.fexcraft.mod.fsmm.api.Bank;
 import net.fexcraft.mod.fsmm.api.FSMMCapabilities;
 import net.fexcraft.mod.fsmm.util.DataManager;
+import net.fexcraft.mod.states.States;
 import net.fexcraft.mod.states.data.capabilities.PlayerCapability;
 import net.fexcraft.mod.states.util.StateUtil;
 import net.fexcraft.mod.states.util.TaxSystem;
@@ -305,6 +308,16 @@ public class PlayerImpl implements PlayerCapability {
 		this.current_chunk = player.current_chunk;
 		this.mailbox = player.mailbox;
 		this.municipality = player.municipality;
+	}
+
+	@Override
+	public boolean hasRelevantVotes(){
+		return States.VOTES.values().stream().filter(pre -> pre.isVoter(null, getUUID())).count() > 0;
+	}
+
+	@Override
+	public List<Vote> getRelevantVotes(){
+		return States.VOTES.values().stream().filter(pre -> pre.isVoter(null, getUUID())).collect(Collectors.toList());
 	}
 
 }

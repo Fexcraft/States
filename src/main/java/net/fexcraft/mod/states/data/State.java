@@ -45,6 +45,7 @@ public class State implements ColorHolder, BuyableType, IconHolder, AccountHolde
 	public final Rule r_SET_COLOR, r_SET_ICON, r_SET_NAME, r_SET_PRICE, r_SET_LEADER, r_SET_CHUNK_TAX_PERCENT;
 	public final Rule r_EDIT_BL, r_MUN_KICK, r_MUN_INVITE, r_COUNCIL_KICK, r_COUNCIL_INVITE, r_VOTE_LEADER;
 	public final Rule r_SET_CAPITAL, r_SET_CITIZEN_TAX_PERCENT, r_SET_RULESET, r_RESET_HEAD;
+	private ArrayList<Vote> active_votes = new ArrayList<>();
 
 	public State(int value){
 		id = value;
@@ -94,6 +95,13 @@ public class State implements ColorHolder, BuyableType, IconHolder, AccountHolde
 				if(rule != null) rule.load(entry.getValue().getAsString());
 			}
 		}
+		//
+		if(obj.has("votes")){
+			ArrayList<Integer> list = JsonUtil.jsonArrayToIntegerArray(obj.get("votes").getAsJsonArray());
+			for(int i : list){
+				Vote vote = StateUtil.getVote(this, i); if(vote.expired(null)) continue; active_votes.add(vote);
+			}
+		}
 	}
 
 	public JsonObject toJsonObject(){
@@ -124,6 +132,11 @@ public class State implements ColorHolder, BuyableType, IconHolder, AccountHolde
 		JsonObject rells = new JsonObject();
 		for(Rule rule : rules.values()) rells.addProperty(rule.id, rule.save());
 		obj.add("rules", rells);
+		if(!active_votes.isEmpty()){
+			JsonArray array = new JsonArray();
+			for(Vote vote : active_votes) array.add(vote.id);
+			obj.add("votes", array);
+		}
 		return obj;
 	}
 
@@ -305,6 +318,12 @@ public class State implements ColorHolder, BuyableType, IconHolder, AccountHolde
 	@Override
 	public void setRulesetTitle(String title){
 		ruleset = title;
+	}
+
+	@Override
+	public List<Vote> getActiveVotes(){
+		// TODO Auto-generated method stub
+		return null;
 	}
 	
 }

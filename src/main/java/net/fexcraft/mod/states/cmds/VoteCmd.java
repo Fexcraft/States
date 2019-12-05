@@ -60,6 +60,8 @@ public class VoteCmd extends CommandBase {
 			Print.chat(sender, "&7/st-vote vote-for <id> <playername>");
 			Print.chat(sender, "&7/st-rule layers");
 			Print.chat(sender, "&7/st-rule types");
+			Print.chat(sender, "&7/st-vote relevant");
+			Print.chat(sender, "&7/st-vote my-votes");
 			return;
 		}
 		EntityPlayer player = (EntityPlayer)sender.getCommandSenderEntity();
@@ -97,9 +99,17 @@ public class VoteCmd extends CommandBase {
 				}
 				Print.chat(sender, "&6All current votes of\n" + of);
 				for(Vote vote : States.VOTES.values()){
-					if(vote.target != ruleable) continue;
+					if(vote.holder != ruleable) continue;
 					Print.chat(sender, "&7- &a" + vote.id + ", &e" + (vote.type.assignment() ? "assignment" : "rule change") + ", &bof " + vote.targetAsString());
 				}
+				return;
+			}
+			case "relevant": case "my-votes":{
+				Print.chat(sender, "&7Welcome! &aYou are requisted to\n&aparttake in these votes:");
+				for(Vote vote : ply.getRelevantVotes()){
+					Print.chat(sender, "&7- &a" + vote.id + ", &e" + (vote.type.assignment() ? "assignment" : "rule change") + ", &bof " + vote.targetAsString());
+				}
+				Print.chat(sender, "&7Use &a/st-vote status <id> &7to see vote details.");
 				return;
 			}
 			case "status":{
@@ -107,14 +117,14 @@ public class VoteCmd extends CommandBase {
 					Print.chat(player, "Please specify a vote ID!");
 					return;
 				}
-				Vote vote = StateUtil.getVote(Integer.parseInt(args[1]));
+				Vote vote = StateUtil.getVote(null, Integer.parseInt(args[1]));
 				if(vote == null){
 					Print.chat(sender, "Vote [" + args[1] + "] not found.");
 					return;
 				}
 				Print.chat(sender, "&9Vote Target: &7" + vote.targetAsString());
 				vote.summary(sender);
-				boolean canshow = vote.council ? vote.target.getCouncil().contains(ply.getUUID()) : ((Municipality)vote.target).getCitizen().contains(ply.getUUID());
+				boolean canshow = vote.council ? vote.holder.getCouncil().contains(ply.getUUID()) : ((Municipality)vote.holder).getCitizen().contains(ply.getUUID());
 				if(canshow){
 					if(!vote.votes.containsKey(ply.getUUID().toString())){
 						if(!vote.type.assignment()){
@@ -148,7 +158,7 @@ public class VoteCmd extends CommandBase {
 					Print.chat(player, "Please specify a vote response!");
 					return;
 				}
-				Vote vote = StateUtil.getVote(Integer.parseInt(args[1]));
+				Vote vote = StateUtil.getVote(null, Integer.parseInt(args[1]));
 				if(vote == null){
 					Print.chat(sender, "Vote [" + args[1] + "] not found.");
 					return;
@@ -179,7 +189,7 @@ public class VoteCmd extends CommandBase {
 					Print.chat(player, "Please specify a vote response!");
 					return;
 				}
-				Vote vote = StateUtil.getVote(Integer.parseInt(args[1]));
+				Vote vote = StateUtil.getVote(null, Integer.parseInt(args[1]));
 				if(vote == null){
 					Print.chat(sender, "Vote [" + args[1] + "] not found.");
 					return;

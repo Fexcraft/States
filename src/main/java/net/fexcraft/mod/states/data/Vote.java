@@ -27,29 +27,31 @@ import net.minecraft.command.ICommandSender;
 
 public class Vote {
 	
+	public final Ruleable holder;
 	public VoteType type;
 	public boolean council, new_value, ended;
 	public TreeMap<String, Object> votes = new TreeMap<>();
 	public UUID beginner;
-	public Ruleable target;
 	public long created, expiry;
 	public final int id;
 	public Initiator to;
 	public String rule;
 	public Boolean rev;
 	
-	public Vote(int id){
+	public Vote(Ruleable holder, int id){
 		this.id = id; JsonObject obj = JsonUtil.get(getVoteFile(id));
 		beginner = UUID.fromString(obj.get("by").getAsString());
 		created = obj.get("created").getAsLong();
-		String[] arr = obj.get("at").getAsString().split(":");
-		int sid = Integer.parseInt(arr[1]);
-		switch(arr[0]){
-			case "dis": target = StateUtil.getDistrict(sid); break;
-			case "mun": target = StateUtil.getMunicipality(sid); break;
-			case "st": target = StateUtil.getState(sid); break;
-			default: new Exception("Invalid or Unsupported RULEABLE for Voting."); break;
-		}
+		if(holder == null){
+			String[] arr = obj.get("at").getAsString().split(":");
+			int sid = Integer.parseInt(arr[1]);
+			switch(arr[0]){
+				case "dis": this.holder = StateUtil.getDistrict(sid); break;
+				case "mun": this.holder = StateUtil.getMunicipality(sid); break;
+				case "st": this.holder = StateUtil.getState(sid); break;
+				default: this.holder = null; new Exception("Invalid or Unsupported RULEABLE for Voting."); break;
+			}
+		} else this.holder = holder;
 		type = VoteType.valueOf(obj.get("type").getAsString());
 		expiry = obj.get("expiry").getAsLong();
 		council = obj.get("council").getAsBoolean();
@@ -71,7 +73,7 @@ public class Vote {
 	
 	public Vote(int id, String rule, UUID beginner, long created, long expiry, Ruleable target, VoteType type, boolean council, Boolean rev, Object value){
 		this.id = id; this.beginner = beginner; this.rule = rule; this.created = created; this.expiry = expiry;
-		this.target = target; this.type = type; this.council = council; this.rev = rev;
+		this.holder = target; this.type = type; this.council = council; this.rev = rev; holder.getActiveVotes().add(this);
 		switch(type){
 			case ASSIGNMENT:{
 				new_value = false;
@@ -95,14 +97,14 @@ public class Vote {
 		obj.addProperty("id", id);
 		obj.addProperty("by", beginner.toString());
 		obj.addProperty("created", created);
-		if(target instanceof District){
-			obj.addProperty("at", "dis:" + ((District)target).getId());
+		if(holder instanceof District){
+			obj.addProperty("at", "dis:" + ((District)holder).getId());
 		}
-		else if(target instanceof Municipality){
-			obj.addProperty("at", "mun:" + ((Municipality)target).getId());
+		else if(holder instanceof Municipality){
+			obj.addProperty("at", "mun:" + ((Municipality)holder).getId());
 		}
-		else if(target instanceof State){
-			obj.addProperty("at", "st:" + ((State)target).getId());
+		else if(holder instanceof State){
+			obj.addProperty("at", "st:" + ((State)holder).getId());
 		}
 		else{
 			new Exception("Invalid or Unsupported RULEABLE for Voting.");
@@ -143,7 +145,7 @@ public class Vote {
 	/** For assignment-type votes. */
 	public boolean vote(ICommandSender sender, UUID from, UUID vfor){
 		if(!prevote(sender, from, true)) return false;
-		if(!target.getCouncil().contains(vfor)){
+		if(!holder.getCouncil().contains(vfor)){
 			Print.chat(sender, "You have to vote for someone in the Council.");
 			return false;
 		}
@@ -179,13 +181,13 @@ public class Vote {
 		Print.chat(sender, "&9Created: &7" + timeformat(created));
 		Print.chat(sender, "&9Expiry: &7" + timeformat(expiry));
 		Print.chat(sender, "&6Authorized: &b" + (council ? "council vote" : "citizen vote"));
-		if(target instanceof District){
+		if(holder instanceof District){
 			Print.chat(sender, "&9Type: &7" + (type.assignment() ? "Assignment of new Manager" : "Vote For Rule Change"));
 		}
-		else if(target instanceof Municipality){
+		else if(holder instanceof Municipality){
 			Print.chat(sender, "&9Type: &7" + (type.assignment() ? "Assignment of new Mayor" : "Vote For Rule Change"));
 		}
-		else if(target instanceof State){
+		else if(holder instanceof State){
 			Print.chat(sender, "&9Type: &7" + (type.assignment() ? "Assignment of new Head" : "Vote For Rule Change"));
 		}
 		else{
@@ -219,7 +221,7 @@ public class Vote {
 			for(String str : votes_for.keySet()){
 				Print.chat(sender, "&a" + percent(votes_for.get(str), summary) + "% &7- &e" + Static.getPlayerNameByUUID(str));
 			}
-			Print.chat(sender, "&6" + votes.size() + " &7votes received of &2" + (council ? target.getCouncil().size() : ((Municipality)target).getCitizen().size()) + " &7expected.");
+			Print.chat(sender, "&6" + votes.size() + " &7votes received of &2" + (council ? holder.getCouncil().size() : ((Municipality)holder).getCitizen().size()) + " &7expected.");
 		}
 		else{
 			int agree = 0, disagree = 0;
@@ -228,7 +230,7 @@ public class Vote {
 			}
 			Print.chat(sender, "&e" + percent(agree, votes.size()) + "% &7- &afor the change");
 			Print.chat(sender, "&e" + percent(disagree, votes.size()) + "% &7- &cagainst the change");
-			Print.chat(sender, "&6" + votes.size() + " &7votes received of &2" + (council ? target.getCouncil().size() : ((Municipality)target).getCitizen().size()) + " &7expected.");
+			Print.chat(sender, "&6" + votes.size() + " &7votes received of &2" + (council ? holder.getCouncil().size() : ((Municipality)holder).getCitizen().size()) + " &7expected.");
 		}
 		if(ended) Print.chat(sender, "&6&lVOTE ENDED");
 	}
@@ -243,17 +245,17 @@ public class Vote {
 		return summary == 0 ? 0 : (val * 100) / summary;
 	}
 
-	private boolean isVoter(ICommandSender sender, UUID uuid){
+	public boolean isVoter(ICommandSender sender, UUID uuid){
 		if(this.council){
-			if(!target.getCouncil().contains(uuid)){
-				Print.chat(sender, "&cYou need to be council member to vote on this!");
+			if(!holder.getCouncil().contains(uuid)){
+				if(sender != null) Print.chat(sender, "&cYou need to be council member to vote on this!");
 				return false;
 			}
 		}
 		else{
-			if(target instanceof Municipality == false) return false;
-			if(!((Municipality)target).getCitizen().contains(uuid)){
-				Print.chat(sender, "&cYou need to be a citizen to vote on this!");
+			if(holder instanceof Municipality == false) return false;
+			if(!((Municipality)holder).getCitizen().contains(uuid)){
+				if(sender != null) Print.chat(sender, "&cYou need to be a citizen to vote on this!");
 				return false;
 			}
 		}
@@ -268,7 +270,7 @@ public class Vote {
 	
 	private boolean shouldEnd(ICommandSender sender){
 		if(expired(sender)){ return true; }
-		if(votes.size() >= (council ? target.getCouncil().size() : ((Municipality)target).getCitizen().size())){
+		if(votes.size() >= (council ? holder.getCouncil().size() : ((Municipality)holder).getCitizen().size())){
 			this.end(); return true;
 		} return false;
 	}
@@ -277,9 +279,9 @@ public class Vote {
 	private void end(){
 		if(this.ended) return; ended = true; this.save();
 		if(type.assignment()){
-			if(votes.size() < (target.getCouncil().size() / 2) + (target.getCouncil().size() % 2 == 1 ? 1 : 0)){
+			if(votes.size() < (holder.getCouncil().size() / 2) + (holder.getCouncil().size() % 2 == 1 ? 1 : 0)){
 				String string = "&7Vote for new Head ended, due to missing votes it got &ccancelled&7.";
-				StateUtil.announce(Static.getServer(), target instanceof State ? AnnounceLevel.STATE_ALL : AnnounceLevel.MUNICIPALITY_ALL, string, target instanceof State ? ((State)target).getId() : ((Municipality)target).getId());
+				StateUtil.announce(Static.getServer(), holder instanceof State ? AnnounceLevel.STATE_ALL : AnnounceLevel.MUNICIPALITY_ALL, string, holder instanceof State ? ((State)holder).getId() : ((Municipality)holder).getId());
 			}
 			TreeMap<String, Integer> vots = new TreeMap<>();
 			for(Map.Entry<String, Object> vote : votes.entrySet()){
@@ -295,17 +297,17 @@ public class Vote {
 					mostv = entry.getValue(); most = UUID.fromString(entry.getKey());
 				}
 			}
-			StateUtil.announce(Static.getServer(), target instanceof State ? AnnounceLevel.STATE : AnnounceLevel.MUNICIPALITY,
+			StateUtil.announce(Static.getServer(), holder instanceof State ? AnnounceLevel.STATE : AnnounceLevel.MUNICIPALITY,
 				"&7Vote for new Head ended, &a" + Static.getPlayerNameByUUID(most) + " &7 was choosen. [" + percent(mostv, summary) + "%]",
-				target instanceof State ? ((State)target).getId() : ((Municipality)target).getId());
+				holder instanceof State ? ((State)holder).getId() : ((Municipality)holder).getId());
 
-			for(UUID member : council ? target.getCouncil() : ((Municipality)target).getCitizen()){
+			for(UUID member : council ? holder.getCouncil() : ((Municipality)holder).getCitizen()){
 				MailUtil.send(null, RecipientType.PLAYER, member, null, "&7Head-Vote with ID &b" + id + "&7 ended!\n&7Detailed info via &e/st-vote status " + id, MailType.SYSTEM);
 			}
 			return;
 		}
-		AnnounceLevel level = target instanceof District ? AnnounceLevel.DISTRICT : target instanceof State ? AnnounceLevel.STATE_ALL : AnnounceLevel.MUNICIPALITY_ALL;
-		int range = target instanceof District ? ((District)target).getId() : target instanceof State ? ((State)target).getId() : ((Municipality)target).getId();
+		AnnounceLevel level = holder instanceof District ? AnnounceLevel.DISTRICT : holder instanceof State ? AnnounceLevel.STATE_ALL : AnnounceLevel.MUNICIPALITY_ALL;
+		int range = holder instanceof District ? ((District)holder).getId() : holder instanceof State ? ((State)holder).getId() : ((Municipality)holder).getId();
 		int a = 0, d = 0; for(Object obj : votes.values()) if((boolean)obj) a++; else d++; String text0, text1, text2; boolean fail = false;
 		if(a == 0 && d == 0){
 			text0 = "&7Vote [&9" + id + "&7] for rule change ended without votes."; fail = true;
@@ -320,7 +322,7 @@ public class Vote {
 			text0 = "&7Vote [&9" + id + "&7] for rule change ended. &aChange Accepted.";
 		}
 		text1 = "&7Vote was to change &b" + (type.valueful() ? "value" : type == VoteType.CHANGE_REVISER ? "revider" : "setter") + " &7to &b" + (type.valueful() ? new_value : to.name()) + "&7.";
-		text2 = "&7Rule: &a" + rule; Rule RULE = target.getRule(rule);
+		text2 = "&7Rule: &a" + rule; Rule RULE = holder.getRule(rule);
 		if(RULE == null){
 			StateUtil.announce(Static.getServer(), level, "&7Vote [&9" + id + "&7] for rule change ended. &4RULE NOT FOUND", range); return;
 		}
@@ -340,7 +342,7 @@ public class Vote {
 				}
 			}
 		}
-		for(UUID member : council ? target.getCouncil() : ((Municipality)target).getCitizen()){
+		for(UUID member : council ? holder.getCouncil() : ((Municipality)holder).getCitizen()){
 			MailUtil.send(null, RecipientType.PLAYER, member, null, "&7Rule-Vote with ID &b" + id + "&7 ended!\n&7Detailed info via &e/st-vote status " + id, MailType.SYSTEM);
 		}
 		StateUtil.announce(Static.getServer(), level, text0, range);
@@ -356,19 +358,23 @@ public class Vote {
 	}
 
 	public String targetAsString(){
-		if(target instanceof District){
-			return "dis:" + ((District)target).getId();
+		if(holder instanceof District){
+			return "dis:" + ((District)holder).getId();
 		}
-		else if(target instanceof Municipality){
-			return "mun:" + ((Municipality)target).getId();
+		else if(holder instanceof Municipality){
+			return "mun:" + ((Municipality)holder).getId();
 		}
-		else if(target instanceof State){
-			return "st:" + ((State)target).getId();
+		else if(holder instanceof State){
+			return "st:" + ((State)holder).getId();
 		}
 		else{
 			new Exception("Invalid or Unsupported RULEABLE for Voting.");
 		}
 		return "invalid target";
+	}
+
+	public void unload(){
+		holder.getActiveVotes().remove(this);
 	}
 	
 }

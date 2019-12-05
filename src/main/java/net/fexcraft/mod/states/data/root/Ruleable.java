@@ -5,7 +5,7 @@ import java.util.UUID;
 
 import net.fexcraft.mod.states.data.Rule.Result;
 
-public interface Ruleable extends RuleHolder {
+public interface Ruleable extends RuleHolder, VoteHolder {
 	
 	public String getRulesetTitle();
 	

@@ -74,7 +74,8 @@ public class PlayerEvents {
 			Print.chat(event.player, "&2Which is part of the &6$1 &7$0&2.".replace("$0", chunk.getDistrict().getMunicipality().getName()).replace("$1", chunk.getDistrict().getMunicipality().getType().getTitle()));
 			Print.chat(event.player, "&2In the State of &7$0&2.".replace("$0", chunk.getDistrict().getMunicipality().getState().getName()));
 		}
-		if(player.getMailbox() == null) Print.chat(event.player, "&6You have &7no mailbox set&6!"); 
+		if(player.getMailbox() == null) Print.chat(event.player, "&6You have &7no mailbox set&6!");
+		if(player.hasRelevantVotes()) Print.chat(event.player, "&6You have &7 &6votes waiting! &7/st-vote my-votes"); 
 		Print.chat(event.player, "&e====-====-====-====-====-====" + States.PREFIX);
 		sendLocationUpdate(event.player, null, "&6Welcome back " + player.getFormattedNickname() + "&6!", "", "", 3);
 		if(UpdateHandler.STATE != null){

@@ -1,6 +1,7 @@
 package net.fexcraft.mod.states.data.capabilities;
 
 import java.io.File;
+import java.util.List;
 import java.util.UUID;
 
 import javax.annotation.Nullable;
@@ -12,6 +13,7 @@ import net.fexcraft.mod.states.data.Chunk;
 import net.fexcraft.mod.states.data.District;
 import net.fexcraft.mod.states.data.Municipality;
 import net.fexcraft.mod.states.data.State;
+import net.fexcraft.mod.states.data.Vote;
 import net.fexcraft.mod.states.data.root.AccountHolder;
 import net.fexcraft.mod.states.data.root.MailReceiver;
 import net.fexcraft.mod.states.data.root.Taxable;
@@ -110,5 +112,9 @@ public interface PlayerCapability extends ICommandSender, Taxable, AccountHolder
 	public boolean isLoaded();
 
 	public void copyFromOld(PlayerCapability capability);
+
+	public boolean hasRelevantVotes();
+	
+	public List<Vote> getRelevantVotes();
 
 }

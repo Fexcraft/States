@@ -30,6 +30,7 @@ import net.fexcraft.mod.states.data.Vote;
 import net.fexcraft.mod.states.data.capabilities.PlayerCapability;
 import net.fexcraft.mod.states.data.capabilities.StatesCapabilities;
 import net.fexcraft.mod.states.data.root.AnnounceLevel;
+import net.fexcraft.mod.states.data.root.Ruleable;
 import net.minecraft.command.ICommandSender;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
@@ -134,12 +135,12 @@ public class StateUtil extends TimerTask {
 		else return bool ? States.STATES.get(-1) : null;
 	}
 	
-	public static Vote getVote(int value){
+	public static Vote getVote(Ruleable holder, int value){
 		if(States.VOTES.containsKey(value)){
 			return States.VOTES.get(value);
 		}
 		else if(Vote.getVoteFile(value).exists()){
-			Vote vote = new Vote(value);
+			Vote vote = new Vote(holder, value);
 			States.VOTES.put(value, vote);
 			return vote;
 		}
@@ -368,7 +369,8 @@ public class StateUtil extends TimerTask {
 			ImmutableList<Vote> votes = ImmutableList.copyOf(States.VOTES.values());
 			for(Vote vote : votes){
 				if(vote.expired(null)){
-					States.VOTES.remove(vote.id); vote.save();
+					States.VOTES.remove(vote.id);
+					vote.save(); vote.unload();
 				}
 			}
 		}

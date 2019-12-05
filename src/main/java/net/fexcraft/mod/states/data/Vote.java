@@ -18,7 +18,10 @@ import net.fexcraft.lib.mc.utils.Static;
 import net.fexcraft.mod.states.States;
 import net.fexcraft.mod.states.data.root.AnnounceLevel;
 import net.fexcraft.mod.states.data.root.Initiator;
+import net.fexcraft.mod.states.data.root.Mailbox.MailType;
+import net.fexcraft.mod.states.data.root.Mailbox.RecipientType;
 import net.fexcraft.mod.states.data.root.Ruleable;
+import net.fexcraft.mod.states.util.MailUtil;
 import net.fexcraft.mod.states.util.StateUtil;
 import net.minecraft.command.ICommandSender;
 
@@ -202,7 +205,7 @@ public class Vote {
 				default: break;
 			}
 		}
-		Print.chat(sender, "&6Status:");
+		Print.chat(sender, "&6Status:"); expired(null);
 		if(type.assignment()){
 			TreeMap<String, Integer> votes_for = new TreeMap<>();
 			for(Map.Entry<String, Object> vote : votes.entrySet()){
@@ -243,12 +246,14 @@ public class Vote {
 		if(this.council){
 			if(!target.getCouncil().contains(uuid)){
 				Print.chat(sender, "&cYou need to be council member to vote on this!");
+				return false;
 			}
 		}
 		else{
 			if(target instanceof Municipality == false) return false;
 			if(!((Municipality)target).getCitizen().contains(uuid)){
 				Print.chat(sender, "&cYou need to be a citizen to vote on this!");
+				return false;
 			}
 		}
 		return true;
@@ -256,24 +261,24 @@ public class Vote {
 
 	public boolean expired(ICommandSender sender){
 		if(Time.getDate() >= expiry || ended){
-			if(sender != null) Print.chat(sender, "Vote expired already!"); this.end(sender); return true;
+			if(sender != null) Print.chat(sender, "Vote expired already!"); this.end(); return true;
 		} return false;
 	}
 	
 	private boolean shouldEnd(ICommandSender sender){
 		if(expired(sender)){ return true; }
 		if(votes.size() >= (council ? target.getCouncil().size() : ((Municipality)target).getCitizen().size())){
-			this.end(sender); return true;
+			this.end(); return true;
 		} return false;
 	}
 
 	@SuppressWarnings("incomplete-switch")
-	private void end(ICommandSender sender){
+	private void end(){
 		if(this.ended) return; ended = true; this.save();
 		if(type.assignment()){
 			if(votes.size() < (target.getCouncil().size() / 2) + (target.getCouncil().size() % 2 == 1 ? 1 : 0)){
 				String string = "&7Vote for new Head ended, due to missing votes it got &ccancelled&7.";
-				StateUtil.announce(Static.getServer(), target instanceof State ? AnnounceLevel.STATE : AnnounceLevel.MUNICIPALITY, string, target instanceof State ? ((State)target).getId() : ((Municipality)target).getId());
+				StateUtil.announce(Static.getServer(), target instanceof State ? AnnounceLevel.STATE_ALL : AnnounceLevel.MUNICIPALITY_ALL, string, target instanceof State ? ((State)target).getId() : ((Municipality)target).getId());
 			}
 			TreeMap<String, Integer> vots = new TreeMap<>();
 			for(Map.Entry<String, Object> vote : votes.entrySet()){
@@ -292,9 +297,13 @@ public class Vote {
 			StateUtil.announce(Static.getServer(), target instanceof State ? AnnounceLevel.STATE : AnnounceLevel.MUNICIPALITY,
 				"&7Vote for new Head ended, &a" + Static.getPlayerNameByUUID(most) + " &7 was choosen. [" + percent(mostv, summary) + "%]",
 				target instanceof State ? ((State)target).getId() : ((Municipality)target).getId());
+
+			for(UUID member : council ? target.getCouncil() : ((Municipality)target).getCitizen()){
+				MailUtil.send(null, RecipientType.PLAYER, member, "SYSTEM-VOTE", "&7Head-Vote with ID &b" + id + "&7 ended!\n&7Detailed info via &e/st-vote status " + id, MailType.SYSTEM);
+			}
 			return;
 		}
-		AnnounceLevel level = target instanceof District ? AnnounceLevel.DISTRICT : target instanceof State ? AnnounceLevel.STATE : AnnounceLevel.MUNICIPALITY;
+		AnnounceLevel level = target instanceof District ? AnnounceLevel.DISTRICT : target instanceof State ? AnnounceLevel.STATE_ALL : AnnounceLevel.MUNICIPALITY_ALL;
 		int range = target instanceof District ? ((District)target).getId() : target instanceof State ? ((State)target).getId() : ((Municipality)target).getId();
 		int a = 0, d = 0; for(Object obj : votes.values()) if((boolean)obj) a++; else d++; String text0, text1, text2; boolean fail = false;
 		if(a == 0 && d == 0){
@@ -329,6 +338,9 @@ public class Vote {
 					return;
 				}
 			}
+		}
+		for(UUID member : council ? target.getCouncil() : ((Municipality)target).getCitizen()){
+			MailUtil.send(null, RecipientType.PLAYER, member, "SYSTEM-VOTE", "&7Rule-Vote with ID &b" + id + "&7 ended!\n&7Detailed info via &e/st-vote status " + id, MailType.SYSTEM);
 		}
 		StateUtil.announce(Static.getServer(), level, text0, range);
 		StateUtil.announce(Static.getServer(), level, text1, range);

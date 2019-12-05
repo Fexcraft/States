@@ -159,9 +159,10 @@ public class VoteCmd extends CommandBase {
 			}
 			case "test":{
 				if(!Static.dev()){ Print.chat(sender, "Only applicable in a developement workspace."); return; }
+				int dis = args.length > 1 ? Integer.parseInt(args[1]) : -1;
 				Vote newvote = new Vote(sender.getEntityWorld().getCapability(StatesCapabilities.WORLD, null).getNewVoteId(),
 					"allow.explosions", ply.getUUID(), Time.getDate(), Time.getDate() + (Time.MIN_MS / 2),
-					chunk.getDistrict(), VoteType.CHANGE_VALUE, true, null, true);
+					StateUtil.getDistrict(dis), VoteType.CHANGE_VALUE, true, null, true);
 				if(newvote.getVoteFile().exists()){
 					new Exception("Tried to create new Vote with ID '" + newvote.id + "', but savefile already exists."); return;
 				}

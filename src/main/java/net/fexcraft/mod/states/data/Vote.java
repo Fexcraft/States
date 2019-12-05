@@ -142,15 +142,15 @@ public class Vote {
 			return false;
 		}
 		votes.put(from.toString(), vfor);
-		Print.chat(sender, "&7Use &9/st-vote status " + id + " &7to see the summary!");
+		if(!shouldEnd()) Print.chat(sender, "&7Use &9/st-vote status " + id + " &7to see the summary!");
 		return true;
 	}
-	
+
 	/** For rule-type votes. */
 	public boolean vote(ICommandSender sender, UUID from, boolean agree){
 		if(!prevote(sender, from, false)) return false;
 		votes.put(from.toString(), agree);
-		Print.chat(sender, "&7Use &9/st-vote status " + id + " &7to see the summary!");
+		if(!shouldEnd()) Print.chat(sender, "&7Use &9/st-vote status " + id + " &7to see the summary!");
 		return true;
 	}
 	
@@ -255,9 +255,44 @@ public class Vote {
 			this.end(); Print.chatnn(sender, "Vote expired already!"); return true;
 		} return false;
 	}
+	
+	private boolean shouldEnd(){
+		if(expired(null)){ this.end(); return true; }
+		if(votes.size() >= (council ? target.getCouncil().size() : ((Municipality)target).getCitizen().size())){
+			this.end(); return true;
+		} return false;
+	}
 
 	private void end(){
-		//TODO
+		expiry = Time.getDate();
+		switch(type){
+			case ASSIGNMENT:{
+				//UUID most = null;
+				if(target instanceof Municipality){
+					
+				}
+				if(target instanceof District){
+					
+				}
+				if(target instanceof State){
+					
+				}
+				return;
+			}
+			case CHANGE_REVISER:{
+				
+				return;
+			}
+			case CHANGE_SETTER:{
+				
+				return;
+			}
+			case CHANGE_VALUE:{
+				
+				return;
+			}
+		
+		}
 	}
 	
 	public static enum VoteType {

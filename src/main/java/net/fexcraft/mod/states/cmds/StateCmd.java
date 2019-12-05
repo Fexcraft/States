@@ -138,8 +138,8 @@ public class StateCmd extends CommandBase {
 								break;
 							}
 							if(args[2].equals("null") || args[2].equals("reset")){
-								if(!state.isAuthorized(state.r_RESET_HEAD.id, ply.getUUID())|| StateUtil.bypass(player)){
-									Print.chat(sender, "&cNot Authorized to reset State Leader.");
+								if(!state.isAuthorized(state.r_RESET_HEAD.id, ply.getUUID()) && !StateUtil.bypass(player)){
+									Print.chat(sender, "&cNot Authorized to reset State Leader."); return;
 								}
 								state.setHead(null); state.save();
 								Print.chat(sender, "&2State Leader was &creset&2.");
@@ -364,7 +364,7 @@ public class StateCmd extends CommandBase {
 				}
 				switch(args[1]){
 					case "vote":{
-						if(!state.isAuthorized(state.r_VOTE_LEADER.id, ply.getUUID()) || StateUtil.bypass(player)){
+						if(!state.isAuthorized(state.r_VOTE_LEADER.id, ply.getUUID()) && !StateUtil.bypass(player)){
 							Print.chat(sender, "&4No permission.");
 							return;
 						}

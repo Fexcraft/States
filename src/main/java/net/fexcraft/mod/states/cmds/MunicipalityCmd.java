@@ -2,6 +2,7 @@ package net.fexcraft.mod.states.cmds;
 
 import java.awt.Color;
 import java.util.Collection;
+import java.util.UUID;
 
 import org.apache.commons.lang3.math.NumberUtils;
 
@@ -21,6 +22,8 @@ import net.fexcraft.mod.states.data.DistrictType;
 import net.fexcraft.mod.states.data.Municipality;
 import net.fexcraft.mod.states.data.MunicipalityType;
 import net.fexcraft.mod.states.data.State;
+import net.fexcraft.mod.states.data.Vote;
+import net.fexcraft.mod.states.data.Vote.VoteType;
 import net.fexcraft.mod.states.data.capabilities.PlayerCapability;
 import net.fexcraft.mod.states.data.capabilities.StatesCapabilities;
 import net.fexcraft.mod.states.data.root.AnnounceLevel;
@@ -187,6 +190,7 @@ public class MunicipalityCmd extends CommandBase {
 					Print.chat(sender, "&7/mun set name <new name>");
 					Print.chat(sender, "&7/mun set price <price/0>");
 					Print.chat(sender, "&7/mun set mayor <playername>");
+					Print.chat(sender, "&7/mun set mayor <null/reset>");
 					Print.chat(sender, "&7/mun set color <hex>");
 					Print.chat(sender, "&7/mun set icon <url>");
 					Print.chat(sender, "&7/mun set citizen-tax <amount/reset>");
@@ -201,6 +205,16 @@ public class MunicipalityCmd extends CommandBase {
 								Print.chat(sender, "&9Missing Argument!");
 								break;
 							}
+							if(args[2].equals("null") || args[2].equals("reset")){
+								if(!mun.isAuthorized(mun.r_RESET_MAYOR.id, ply.getUUID())|| StateUtil.bypass(player)){
+									Print.chat(sender, "&cNot Authorized to reset Mayor.");
+								}
+								mun.setHead(null); mun.save();
+								Print.chat(sender, "&2Municipality mayor was &creset&2.");
+								StateUtil.announce(null, AnnounceLevel.MUNICIPALITY_ALL, "&2&oMunicipality mayor was &c&oreset&2&o.", mun.getId());
+								StateLogger.log(StateLogger.LoggerType.MUNICIPALITY, StateLogger.player(player) + " reset mayor of " + StateLogger.municipality(mun) + ".");
+								return;
+							}
 							GameProfile gp = Static.getServer().getPlayerProfileCache().getGameProfileForUsername(args[2]);
 							if(gp == null || gp.getId() == null){
 								Print.chat(sender, "&cPlayer not found in Cache.");
@@ -214,7 +228,7 @@ public class MunicipalityCmd extends CommandBase {
 							mun.setChanged(Time.getDate());
 							mun.save();
 							Print.chat(sender, "&2Set &7" + gp.getName() + "&2 to new Municipality Mayor!");
-							StateLogger.log(StateLogger.LoggerType.DISRICT, StateLogger.player(player) + " changed mayor of " + StateLogger.municipality(mun) + " to " + StateLogger.player(gp) + ".");
+							StateLogger.log(StateLogger.LoggerType.MUNICIPALITY, StateLogger.player(player) + " changed mayor of " + StateLogger.municipality(mun) + " to " + StateLogger.player(gp) + ".");
 						}
 						else{
 							Print.chat(sender, "&cNo permission.");
@@ -411,12 +425,26 @@ public class MunicipalityCmd extends CommandBase {
 				}
 				switch(args[1]){
 					case "vote":{
-						Print.chat(sender, "Not available yet.");
-						if(!mun.isAuthorized(mun.r_COUNCIL_VOTE.id, ply.getUUID())){
+						if(!mun.isAuthorized(mun.r_VOTE_MAYOR.id, ply.getUUID()) || StateUtil.bypass(player)){
 							Print.chat(sender, "&4No permission.");
 							return;
 						}
-						break;
+						if(mun.getHead() != null){
+							Print.chat(sender, "&aA vote for a new mayor can be only started when there is no mayor!");
+							return;
+						}
+						int newid = sender.getEntityWorld().getCapability(StatesCapabilities.WORLD, null).getNewVoteId();
+						Vote newvote = new Vote(newid, null, ply.getUUID(), Time.getDate(), Time.getDate() + (Time.DAY_MS * 7),
+							mun, VoteType.ASSIGNMENT, !mun.r_VOTE_MAYOR.setter.isCitizenVote(), null, null);
+						if(newvote.getVoteFile().exists()){
+							new Exception("Tried to create new Vote with ID '" + newvote.id + "', but savefile already exists."); return;
+						}
+						newvote.save(); States.VOTES.put(newvote.id, newvote);
+						StateUtil.announce(null, AnnounceLevel.MUNICIPALITY_ALL, "A new vote to choose a Mayor started!", 0);
+						for(UUID member : newvote.council ? mun.getCouncil() : mun.getCitizen()){
+							MailUtil.send(null, RecipientType.PLAYER, member, null, "&7A new vote to choose a Mayor started!\n&7Detailed info via &e/st-vote status " + newvote.id, MailType.SYSTEM);
+						}
+						return;
 					}
 					case "kick":{
 						if(!(mun.isAuthorized(mun.r_COUNCIL_KICK.id, ply.getUUID()) || StateUtil.bypass(player))){

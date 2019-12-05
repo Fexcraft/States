@@ -53,6 +53,7 @@ public class Rule {
 	/** Call to see if this player can SET/APPLY this rule. */
 	public boolean isAuthorized(Ruleable holder, UUID uuid){
 		switch(setter){
+			case NONE: return false;
 			case CITIZEN_ANY:{
 				if(holder instanceof Municipality){
 					return ((Municipality)holder).getCitizen().contains(uuid);
@@ -69,6 +70,7 @@ public class Rule {
 	/** Call to see if this player can REVISE/MODIFY this rule. */
 	public Result canRevise(Ruleable holder, UUID uuid){
 		switch(reviser){
+			case NONE: return Result.FALSE;
 			case CITIZEN_ANY:{
 				if(holder instanceof Municipality){
 					return Result.bool(((Municipality)holder).getCitizen().contains(uuid));

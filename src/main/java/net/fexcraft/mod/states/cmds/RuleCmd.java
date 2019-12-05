@@ -195,6 +195,7 @@ public class RuleCmd extends CommandBase {
 			}
 			case "types":{
 				Print.chat(sender, "&9Available types:");
+				Print.chat(sender, "&cNONE&7 - &aliterally no one, be wary of this one");
 				Print.chat(sender, "&eCITIZEN_ANY&7 - &aany citizen");
 				Print.chat(sender, "&eCITIZEN_VOTE&7 - &aa vote by all citizen or till expiry");
 				Print.chat(sender, "&bCOUNCIL_ANY&7 - &aany council member");

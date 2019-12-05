@@ -8,7 +8,8 @@ public enum Initiator {
 	COUNCIL_VOTE(false),
 	COUNCIL_ANY(true),
 	CITIZEN_VOTE(false),
-	CITIZEN_ANY(true);
+	CITIZEN_ANY(true),
+	NONE(true);
 	
 	private final boolean setter;
 	

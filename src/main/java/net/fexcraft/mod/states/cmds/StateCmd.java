@@ -18,6 +18,8 @@ import net.fexcraft.mod.states.States;
 import net.fexcraft.mod.states.data.Chunk;
 import net.fexcraft.mod.states.data.Municipality;
 import net.fexcraft.mod.states.data.State;
+import net.fexcraft.mod.states.data.Vote;
+import net.fexcraft.mod.states.data.Vote.VoteType;
 import net.fexcraft.mod.states.data.capabilities.PlayerCapability;
 import net.fexcraft.mod.states.data.capabilities.StatesCapabilities;
 import net.fexcraft.mod.states.data.root.AnnounceLevel;
@@ -120,6 +122,7 @@ public class StateCmd extends CommandBase {
 					Print.chat(sender, "&7/st set price <price/0>");
 					Print.chat(sender, "&7/st set color <hex>");
 					Print.chat(sender, "&7/st set leader <playername>");
+					Print.chat(sender, "&7/st set leader <null/reset>");
 					Print.chat(sender, "&7/st set capital <municipality id>");
 					Print.chat(sender, "&7/st set icon <url>");
 					Print.chat(sender, "&7/st set chunk-tax-percentage <0-100/reset>");
@@ -134,6 +137,16 @@ public class StateCmd extends CommandBase {
 								Print.chat(sender, "&9Missing Argument!");
 								break;
 							}
+							if(args[2].equals("null") || args[2].equals("reset")){
+								if(!state.isAuthorized(state.r_RESET_HEAD.id, ply.getUUID())|| StateUtil.bypass(player)){
+									Print.chat(sender, "&cNot Authorized to reset State Leader.");
+								}
+								state.setHead(null); state.save();
+								Print.chat(sender, "&2State Leader was &creset&2.");
+								StateUtil.announce(null, AnnounceLevel.MUNICIPALITY_ALL, "&2&oState Leader was &c&oreset&2&o.", state.getId());
+								StateLogger.log(StateLogger.LoggerType.STATE, StateLogger.player(player) + " reset head of " + StateLogger.state(state) + ".");
+								return;
+							}
 							GameProfile gp = Static.getServer().getPlayerProfileCache().getGameProfileForUsername(args[2]);
 							if(gp == null || gp.getId() == null){
 								Print.chat(sender, "&cPlayer not found in Cache.");
@@ -143,7 +156,7 @@ public class StateCmd extends CommandBase {
 							state.setChanged(Time.getDate());
 							state.save();
 							Print.chat(sender, "&2Set &7" + gp.getName() + "&2 to new State Leader!");
-							StateLogger.log(StateLogger.LoggerType.DISRICT, StateLogger.player(player) + " changed leader of " + StateLogger.state(state) + " to " + StateLogger.player(gp) + ".");
+							StateLogger.log(StateLogger.LoggerType.STATE, StateLogger.player(player) + " changed leader of " + StateLogger.state(state) + " to " + StateLogger.player(gp) + ".");
 						}
 						else{
 							Print.chat(sender, "&cNo permission.");
@@ -351,12 +364,26 @@ public class StateCmd extends CommandBase {
 				}
 				switch(args[1]){
 					case "vote":{
-						Print.chat(sender, "Not available yet.");
-						if(!state.isAuthorized(state.r_COUNCIL_VOTE.id, ply.getUUID())){
+						if(!state.isAuthorized(state.r_VOTE_LEADER.id, ply.getUUID()) || StateUtil.bypass(player)){
 							Print.chat(sender, "&4No permission.");
 							return;
 						}
-						break;
+						if(state.getHead() != null){
+							Print.chat(sender, "&aA vote for a new leader can be only started when there is no leader!");
+							return;
+						}
+						int newid = sender.getEntityWorld().getCapability(StatesCapabilities.WORLD, null).getNewVoteId();
+						Vote newvote = new Vote(newid, null, ply.getUUID(), Time.getDate(), Time.getDate() + (Time.DAY_MS * 7),
+							state, VoteType.ASSIGNMENT, true, null, null);
+						if(newvote.getVoteFile().exists()){
+							new Exception("Tried to create new Vote with ID '" + newvote.id + "', but savefile already exists."); return;
+						}
+						newvote.save(); States.VOTES.put(newvote.id, newvote);
+						StateUtil.announce(null, AnnounceLevel.STATE_ALL, "A new vote to choose a State Leader started!", 0);
+						for(UUID member : state.getCouncil()){
+							MailUtil.send(null, RecipientType.PLAYER, member, null, "&7A new vote to choose a Head of State started!\n&7Detailed info via &e/st-vote status " + newvote.id, MailType.SYSTEM);
+						}
+						return;
 					}
 					case "kick":{
 						if(!state.isAuthorized(state.r_COUNCIL_KICK.id, ply.getUUID())){

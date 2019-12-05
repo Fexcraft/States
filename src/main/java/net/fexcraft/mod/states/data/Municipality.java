@@ -48,9 +48,9 @@ public class Municipality implements ColorHolder, BuyableType, IconHolder, Accou
 	private RuleMap rules = new RuleMap();
 	private String ruleset_name;
 	public final Rule r_OPEN, r_COLOR, r_ICON, r_SET_NAME, r_SET_PRICE, r_SET_MAYOR, r_SET_CITIZENTAX, r_KIB;
-	public final Rule r_EDIT_BL, r_KICK, r_INVITE, r_COUNCIL_KICK, r_COUNCIL_INVITE, r_COUNCIL_VOTE;
+	public final Rule r_EDIT_BL, r_KICK, r_INVITE, r_COUNCIL_KICK, r_COUNCIL_INVITE, r_VOTE_MAYOR;
 	public final Rule r_CREATE_DISTRICT, r_SET_CHUNKRULES, r_CREATE_SIGN_SHOP, r_SET_MAILBOX, r_OPEN_MAILBOX;
-	public final Rule r_FORCE_LOAD_CHUNKS, r_SET_RULESET;
+	public final Rule r_FORCE_LOAD_CHUNKS, r_SET_RULESET, r_RESET_MAYOR;
 	
 	public Municipality(int id){
 		this.id = id;
@@ -88,7 +88,7 @@ public class Municipality implements ColorHolder, BuyableType, IconHolder, Accou
 		rules.add(r_INVITE = new Rule("invite_player", null, true, Initiator.COUNCIL_VOTE, Initiator.COUNCIL_ANY));
 		rules.add(r_COUNCIL_KICK = new Rule("kick_council", null, true, Initiator.COUNCIL_VOTE, Initiator.COUNCIL_ANY));
 		rules.add(r_COUNCIL_INVITE = new Rule("invite_council", null, true, Initiator.COUNCIL_VOTE, Initiator.COUNCIL_ANY));
-		rules.add(r_COUNCIL_VOTE = new Rule("council_vote", null, true, Initiator.INCHARGE, Initiator.COUNCIL_ANY));
+		rules.add(r_VOTE_MAYOR = new Rule("vote.mayor", null, true, Initiator.COUNCIL_VOTE, Initiator.COUNCIL_ANY));
 		rules.add(r_CREATE_DISTRICT = new Rule("create.district", null, true, Initiator.CITIZEN_VOTE, Initiator.COUNCIL_ANY));
 		rules.add(r_SET_CHUNKRULES = new Rule("set.chunkrules", null, true, Initiator.COUNCIL_VOTE, Initiator.INCHARGE));
 		rules.add(r_CREATE_SIGN_SHOP = new Rule("create.sign-shops", null, true, Initiator.INCHARGE, Initiator.COUNCIL_ANY));
@@ -96,6 +96,7 @@ public class Municipality implements ColorHolder, BuyableType, IconHolder, Accou
 		rules.add(r_OPEN_MAILBOX = new Rule("open.mailbox", null, true, Initiator.COUNCIL_VOTE, Initiator.COUNCIL_ANY));
 		rules.add(r_FORCE_LOAD_CHUNKS = new Rule("force-load.chunks", null, true, Initiator.COUNCIL_VOTE, Initiator.INCHARGE));
 		rules.add(r_SET_RULESET = new Rule("set.ruleset-name", null, true, Initiator.COUNCIL_VOTE, Initiator.INCHARGE));
+		rules.add(r_RESET_MAYOR = new Rule("set.mayor.none", null, true, Initiator.CITIZEN_VOTE, Initiator.HIGHERINCHARGE));
 		if(obj.has("rules")){
 			JsonObject rls = obj.get("rules").getAsJsonObject();
 			for(Map.Entry<String, JsonElement> entry : rls.entrySet()){

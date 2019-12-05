@@ -43,8 +43,8 @@ public class State implements ColorHolder, BuyableType, IconHolder, AccountHolde
 	private RuleMap rules = new RuleMap();
 	public final Rule r_CREATE_SIGN_SHOP, r_SET_MAILBOX, r_OPEN_MAILBOX, r_CREATE_MUNICIPALITY;
 	public final Rule r_SET_COLOR, r_SET_ICON, r_SET_NAME, r_SET_PRICE, r_SET_LEADER, r_SET_CHUNK_TAX_PERCENT;
-	public final Rule r_EDIT_BL, r_MUN_KICK, r_MUN_INVITE, r_COUNCIL_KICK, r_COUNCIL_INVITE, r_COUNCIL_VOTE;
-	public final Rule r_SET_CAPITAL, r_SET_CITIZEN_TAX_PERCENT, r_SET_RULESET;
+	public final Rule r_EDIT_BL, r_MUN_KICK, r_MUN_INVITE, r_COUNCIL_KICK, r_COUNCIL_INVITE, r_VOTE_LEADER;
+	public final Rule r_SET_CAPITAL, r_SET_CITIZEN_TAX_PERCENT, r_SET_RULESET, r_RESET_HEAD;
 
 	public State(int value){
 		id = value;
@@ -82,10 +82,11 @@ public class State implements ColorHolder, BuyableType, IconHolder, AccountHolde
 		rules.add(r_MUN_INVITE = new Rule("invite_municipality", null, true, Initiator.COUNCIL_VOTE, Initiator.COUNCIL_ANY));
 		rules.add(r_COUNCIL_KICK = new Rule("kick_council", null, true, Initiator.COUNCIL_VOTE, Initiator.COUNCIL_ANY));
 		rules.add(r_COUNCIL_INVITE = new Rule("invite_council", null, true, Initiator.COUNCIL_VOTE, Initiator.COUNCIL_ANY));
-		rules.add(r_COUNCIL_VOTE = new Rule("council_vote", null, true, Initiator.INCHARGE, Initiator.COUNCIL_ANY));
+		rules.add(r_VOTE_LEADER = new Rule("vote.leader", null, true, Initiator.INCHARGE, Initiator.COUNCIL_ANY));
 		rules.add(r_CREATE_MUNICIPALITY = new Rule("create.municipality", null, true, Initiator.COUNCIL_VOTE, Initiator.CITIZEN_ANY));
 		rules.add(r_SET_CAPITAL = new Rule("set.capital", null, true, Initiator.COUNCIL_VOTE, Initiator.INCHARGE));
 		rules.add(r_SET_RULESET = new Rule("set.ruleset-name", null, true, Initiator.COUNCIL_VOTE, Initiator.INCHARGE));
+		rules.add(r_RESET_HEAD = new Rule("set.leader.none", null, true, Initiator.COUNCIL_VOTE, Initiator.INCHARGE));
 		if(obj.has("rules")){
 			JsonObject rls = obj.get("rules").getAsJsonObject();
 			for(Map.Entry<String, JsonElement> entry : rls.entrySet()){

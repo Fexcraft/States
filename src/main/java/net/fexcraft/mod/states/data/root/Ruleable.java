@@ -24,7 +24,7 @@ public interface Ruleable extends RuleHolder {
 	}
 	
 	public default boolean isHead(UUID uuid){
-		return getHead().equals(uuid);
+		return getHead() != null && getHead().equals(uuid);
 	}
 	
 	public default boolean isAuthorized(String rule, UUID uuid){

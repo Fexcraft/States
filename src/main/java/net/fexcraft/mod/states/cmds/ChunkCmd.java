@@ -213,7 +213,7 @@ public class ChunkCmd extends CommandBase {
 						chunk.setType(ChunkType.NORMAL);
 						chunk.setPrice(net.fexcraft.mod.states.util.Config.DEFAULT_CHUNK_PRICE);
 						chunk.save();
-						ImageCache.update(player.world, player.world.getChunkFromChunkCoords(chunk.xCoord(), chunk.zCoord()));
+						ImageCache.update(player.world, player.world.getChunk(chunk.xCoord(), chunk.zCoord()));
 						Print.chat(sender, "&9Chunk unclaimed and resseted.");
 						StateLogger.log(StateLogger.LoggerType.CHUNK, StateLogger.player(player) + " unclaimed " + StateLogger.chunk(chunk) + ".");
 					}
@@ -235,7 +235,7 @@ public class ChunkCmd extends CommandBase {
 								ck.setPrice(net.fexcraft.mod.states.util.Config.DEFAULT_CHUNK_PRICE);
 								ck.save();
 								c++;
-								ImageCache.update(player.world, player.world.getChunkFromChunkCoords(x, z));
+								ImageCache.update(player.world, player.world.getChunk(x, z));
 							}
 						}
 						Print.chat(sender, "&2" + c + " &9chunks have been resseted.");

@@ -179,7 +179,7 @@ public class ImageCache extends TimerTask {
 				JsonObject object = elm.getAsJsonObject();
 				World world = Static.getServer().getWorld(object.get("dimension").getAsInt());
 				String[] ckarr = object.get("chunk").getAsString().split(":");
-				Chunk chunk = world.getChunkFromChunkCoords(Integer.parseInt(ckarr[0]), Integer.parseInt(ckarr[1]));
+				Chunk chunk = world.getChunk(Integer.parseInt(ckarr[0]), Integer.parseInt(ckarr[1]));
 				QUEUE.add(new QueueObj(world, chunk));
 			});
 		}

@@ -28,7 +28,7 @@ public class WelcomeGui extends GuiContainer {
 		super(new PlaceholderContainer());
 		xSize = 256; ySize = 200;
 		//
-		Chunk chunk = world.getChunkFromBlockCoords(new BlockPos(x, y, z));
+		Chunk chunk = world.getChunk(new BlockPos(x, y, z));
 		int i = 0;
 		for(int j = -3; j < 4; j++){
 			for(int k = -3; k < 4; k++){

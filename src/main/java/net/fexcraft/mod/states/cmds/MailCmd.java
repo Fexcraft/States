@@ -95,27 +95,27 @@ public class MailCmd extends CommandBase {
 					}
 					if(!StateUtil.isAdmin(player) && !Perms.MAIL_READ_ANY.has(player)){
 						ResourceLocation loc = new ResourceLocation(stack.getTagCompound().getString("Receiver"));
-						switch(loc.getResourceDomain()){
+						switch(loc.getNamespace()){
 							case "player":{
 								if(!stack.getTagCompound().getString("Receiver").replace("player:", "").equals(player.getGameProfile().getId().toString())){
 									Print.chat(player, "Receiver and your UUID do not match."); return;
 								} break;
 							}
 							case "district":{
-								if(!cap.isDistrictManagerOf(StateUtil.getDistrict(Integer.parseInt(loc.getResourcePath())))
-									&& !cap.isMayorOf(StateUtil.getDistrict(Integer.parseInt(loc.getResourcePath())).getMunicipality())){
+								if(!cap.isDistrictManagerOf(StateUtil.getDistrict(Integer.parseInt(loc.getPath())))
+									&& !cap.isMayorOf(StateUtil.getDistrict(Integer.parseInt(loc.getPath())).getMunicipality())){
 									Print.chat(player, "Your are not District Manager or Mayor to read this."); return;
 								} break;
 							}
 							case "municipality":{
-								if(!cap.isMayorOf(StateUtil.getMunicipality(Integer.parseInt(loc.getResourcePath())))
-									&& !StateUtil.getMunicipality(Integer.parseInt(loc.getResourcePath())).getCouncil().contains(player.getGameProfile().getId())){
+								if(!cap.isMayorOf(StateUtil.getMunicipality(Integer.parseInt(loc.getPath())))
+									&& !StateUtil.getMunicipality(Integer.parseInt(loc.getPath())).getCouncil().contains(player.getGameProfile().getId())){
 									Print.chat(player, "Your are not Mayor or Council Member to read this."); return;
 								} break;
 							}
 							case "state":{
-								if(!cap.isStateLeaderOf(StateUtil.getState(Integer.parseInt(loc.getResourcePath())))
-									&& !StateUtil.getState(Integer.parseInt(loc.getResourcePath())).getCouncil().contains(player.getGameProfile().getId())){
+								if(!cap.isStateLeaderOf(StateUtil.getState(Integer.parseInt(loc.getPath())))
+									&& !StateUtil.getState(Integer.parseInt(loc.getPath())).getCouncil().contains(player.getGameProfile().getId())){
 									Print.chat(player, "Your are not State Leader or Council Member to read this."); return;
 								} break;
 							}

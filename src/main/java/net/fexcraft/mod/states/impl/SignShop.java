@@ -60,7 +60,7 @@ public class SignShop implements SignCapability.Listener {
 				}
 				tileentity.signText[0] = Formatter.newTextComponentString("&0[&3St&8-&3Shop&0]");
 				TileEntity te = event.getWorld().getTileEntity(getPosAtBack(state, tileentity));
-				EnumFacing facing = state.getBlock() instanceof BlockWallSign ? EnumFacing.getFront(tileentity.getBlockMetadata()) : null;
+				EnumFacing facing = state.getBlock() instanceof BlockWallSign ? EnumFacing.byIndex(tileentity.getBlockMetadata()) : null;
 				if(te != null && te.hasCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, facing) && PlayerEvents.checkAccess(te.getWorld(), te.getPos(), te.getWorld().getBlockState(te.getPos()), event.getEntityPlayer())){
 					itemtype = te.getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, facing).getStackInSlot(0).copy();
 					if(!tileentity.signText[1].getUnformattedText().equals("")){
@@ -131,7 +131,7 @@ public class SignShop implements SignCapability.Listener {
 		}
 		else{
 			TileEntity te = event.getWorld().getTileEntity(getPosAtBack(state, tileentity));
-			EnumFacing facing = state.getBlock() instanceof BlockWallSign ? EnumFacing.getFront(tileentity.getBlockMetadata()) : null;
+			EnumFacing facing = state.getBlock() instanceof BlockWallSign ? EnumFacing.byIndex(tileentity.getBlockMetadata()) : null;
 			if(te != null && te.hasCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, facing)){
 				if(event.getEntityPlayer().getHeldItemMainhand().isEmpty()){
 					Account shop = DataManager.getAccount(account.toString(), true, false);

@@ -33,7 +33,7 @@ minecraft {
     replace "@VERSION@", version
     replaceIn "States.java"
     
-    mappings = "snapshot_20171003"
+    mappings = "stable_39"
 }
 
 repositories {

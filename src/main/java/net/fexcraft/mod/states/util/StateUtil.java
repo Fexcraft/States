@@ -82,8 +82,8 @@ public class StateUtil extends TimerTask {
     }
     
     public static Chunk getTempChunk(ResourceLocation ckpos){
-        int x = Integer.parseInt(ckpos.getResourceDomain());
-        int z = Integer.parseInt(ckpos.getResourcePath());
+        int x = Integer.parseInt(ckpos.getNamespace());
+        int z = Integer.parseInt(ckpos.getPath());
         return getTempChunk(x, z);
     }
 	

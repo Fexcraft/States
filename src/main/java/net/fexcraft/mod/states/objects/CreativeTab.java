@@ -11,7 +11,7 @@ public class CreativeTab extends CreativeTabs {
 	public CreativeTab(){ super("states"); }
 
 	@Override
-	public ItemStack getTabIconItem(){
+	public ItemStack createIcon(){
 		return new ItemStack(Items.PAPER);
 	}
 	

@@ -49,7 +49,7 @@ public class AreaView extends GuiContainer {
 		super(new PlaceholderContainer());
 		this.xSize = 244; this.ySize = 244;
 		//
-		Chunk chunk = world.getChunkFromBlockCoords(player.getPosition());
+		Chunk chunk = world.getChunk(player.getPosition());
 		int[] i = ImageCache.getRegion(chunk.x, chunk.z);
 		this.x = px = i[0]; this.z = pz = i[1];
 		this.pos = chunk.getPos();
@@ -60,7 +60,7 @@ public class AreaView extends GuiContainer {
 
 	@Override
 	protected void drawGuiContainerBackgroundLayer(float partialTicks, int mouseX, int mouseY){
-		try{ this.pos = mc.world.getChunkFromBlockCoords(mc.player.getPosition()).getPos(); } catch(Exception e){}
+		try{ this.pos = mc.world.getChunk(mc.player.getPosition()).getPos(); } catch(Exception e){}
 		//
 		this.mc.getTextureManager().bindTexture(texture);
 		this.drawTexturedModalRect(this.guiLeft, this.guiTop, 0, 0, xSize + 12, ySize);

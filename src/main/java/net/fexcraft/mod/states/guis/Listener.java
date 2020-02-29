@@ -133,12 +133,12 @@ public class Listener implements IPacketListener<PacketNBTTagCompound> {
 			case 10:{
 				switch(packet.nbt.getString("request")){
 					case "get_map":{
-						Chunk chunk = world.getChunkFromBlockCoords(pos).getCapability(StatesCapabilities.CHUNK, null).getStatesChunk();
+						Chunk chunk = world.getChunk(pos).getCapability(StatesCapabilities.CHUNK, null).getStatesChunk();
 						if(chunk == null){ return; }
 						NBTTagList list = new NBTTagList();
 						for(int i = -5; i < 6; i++){
 							for(int j = -5; j < 6; j++){
-								net.minecraft.world.chunk.Chunk ch = world.getChunkFromChunkCoords(chunk.xCoord() + i, chunk.zCoord() + j);
+								net.minecraft.world.chunk.Chunk ch = world.getChunk(chunk.xCoord() + i, chunk.zCoord() + j);
 								Chunk ck = ch == null ? null : ch.getCapability(StatesCapabilities.CHUNK, null).getStatesChunk();
 								Print.debug(ch, ck);
 								NBTTagCompound compound = new NBTTagCompound();
@@ -211,7 +211,7 @@ public class Listener implements IPacketListener<PacketNBTTagCompound> {
 			compound.setString("result", "Municipality reached the Chunk Limit.");
 			return compound;
 		}
-		net.minecraft.world.chunk.Chunk ch = world.getChunkFromChunkCoords(nbt.getIntArray("data")[1], nbt.getIntArray("data")[2]);
+		net.minecraft.world.chunk.Chunk ch = world.getChunk(nbt.getIntArray("data")[1], nbt.getIntArray("data")[2]);
 		if(ch == null){
 			compound.setString("result", "Chunk isn't loaded.");
 			return compound;
@@ -308,7 +308,7 @@ public class Listener implements IPacketListener<PacketNBTTagCompound> {
 						chunk.setClaimer(player.getGameProfile().getId());
 						chunk.setChanged(Time.getDate());
 						chunk.save();
-						ImageCache.update(world, world.getChunkFromChunkCoords(chunk.xCoord(), chunk.zCoord()));
+						ImageCache.update(world, world.getChunk(chunk.xCoord(), chunk.zCoord()));
 					}
 				}
 			}

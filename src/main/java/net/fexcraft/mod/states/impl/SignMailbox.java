@@ -194,7 +194,7 @@ public class SignMailbox implements SignCapability.Listener {
 			try{
 				File file = new File(States.getSaveDirectory(), "mailboxes/" + type + "_" + reci + ".nbt");
 				NBTTagCompound com = file.exists() ? CompressedStreamTools.read(file) : new NBTTagCompound();
-				if(com.hasNoTags()){
+				if(com.isEmpty()){
 					com.setString("type", type); com.setString("id", reci);
 				}
 				NBTTagList list = new NBTTagList();

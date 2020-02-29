@@ -103,7 +103,7 @@ public class MailUtil {
 			else{
 				File file = new File(States.getSaveDirectory(), "mailboxes/" + rety.name().toLowerCase() + "_" + rec + ".nbt");
 				NBTTagCompound com = file.exists() ? CompressedStreamTools.read(file) : new NBTTagCompound();
-				if(com.hasNoTags()){
+				if(com.isEmpty()){
 					com.setString("type", rety.name().toLowerCase());
 					com.setString("id", rec); com.setTag("mails", new NBTTagList());
 				}

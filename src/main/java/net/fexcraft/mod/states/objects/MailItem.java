@@ -85,11 +85,11 @@ public class MailItem extends Item {
     }
     
     @Override
-    public String getUnlocalizedName(ItemStack stack){
+    public String getTranslationKey(ItemStack stack){
     	int var = this.getClass().getAnnotation(fItem.class).variants();
     	if(stack.getMetadata() < var && stack.getMetadata() >= 0){
-    		return this.getUnlocalizedName() + "_" + this.getClass().getAnnotation(fItem.class).custom_variants()[stack.getMetadata()];
-    	} else return this.getUnlocalizedName();
+    		return this.getTranslationKey() + "_" + this.getClass().getAnnotation(fItem.class).custom_variants()[stack.getMetadata()];
+    	} else return this.getTranslationKey();
     }
 	
 }

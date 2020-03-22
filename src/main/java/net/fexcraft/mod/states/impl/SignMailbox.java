@@ -64,17 +64,17 @@ public class SignMailbox implements SignCapability.Listener {
 					case "state":{
 						if(!admin && !chunk.getState().isAuthorized(chunk.getState().r_SET_MAILBOX.id, event.getEntityPlayer().getGameProfile().getId())){
 							Print.chat(event.getEntityPlayer(), "No permission to set the State Mailbox."); return false;
-						} reci = type;
+						} reci = chunk.getState().getId() + "";
 					}
 					case "municipality":{
 						if(!admin && !chunk.getMunicipality().isAuthorized(chunk.getMunicipality().r_SET_MAILBOX.id, event.getEntityPlayer().getGameProfile().getId())){
 							Print.chat(event.getEntityPlayer(), "No permission to set the Municipality Mailbox."); return false;
-						} reci = type;
+						} reci = chunk.getMunicipality().getId() + "";
 					}
 					case "district":{
 						if(!admin && !chunk.getDistrict().isAuthorized(chunk.getDistrict().r_SET_MAILBOX.id, event.getEntityPlayer().getGameProfile().getId())){
 							Print.chat(event.getEntityPlayer(), "No permission to set the District Mailbox."); return false;
-						} reci = type;
+						} reci = chunk.getDistrict().getId() + "";
 					}
 					case "company": break;//TODO
 					case "player":{
@@ -268,6 +268,14 @@ public class SignMailbox implements SignCapability.Listener {
 
 	public NonNullList<ItemStack> getMails(){
 		return mails;
+	}
+	
+	public String getType(){
+		return type;
+	}
+	
+	public String getReceiver(){
+		return reci;
 	}
 	
 }

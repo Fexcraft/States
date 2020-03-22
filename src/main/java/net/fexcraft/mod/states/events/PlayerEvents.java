@@ -2,37 +2,35 @@ package net.fexcraft.mod.states.events;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.UUID;
 
 import net.fexcraft.lib.common.math.Time;
+import net.fexcraft.lib.mc.capabilities.FCLCapabilities;
+import net.fexcraft.lib.mc.capabilities.sign.SignCapability;
 import net.fexcraft.lib.mc.network.PacketHandler;
 import net.fexcraft.lib.mc.network.packet.PacketNBTTagCompound;
 import net.fexcraft.lib.mc.utils.Formatter;
 import net.fexcraft.lib.mc.utils.Print;
 import net.fexcraft.mod.states.States;
 import net.fexcraft.mod.states.data.Chunk;
+import net.fexcraft.mod.states.data.District;
+import net.fexcraft.mod.states.data.Municipality;
+import net.fexcraft.mod.states.data.State;
 import net.fexcraft.mod.states.data.capabilities.PlayerCapability;
 import net.fexcraft.mod.states.data.capabilities.SignTileEntityCapability;
 import net.fexcraft.mod.states.data.capabilities.StatesCapabilities;
+import net.fexcraft.mod.states.impl.SignMailbox;
 import net.fexcraft.mod.states.util.Config;
 import net.fexcraft.mod.states.util.MessageSender;
 import net.fexcraft.mod.states.util.StateUtil;
 import net.fexcraft.mod.states.util.TaxSystem;
 import net.fexcraft.mod.states.util.UpdateHandler;
-import net.minecraft.block.BlockButton;
-import net.minecraft.block.BlockChest;
-import net.minecraft.block.BlockDispenser;
-import net.minecraft.block.BlockDropper;
-import net.minecraft.block.BlockFurnace;
-import net.minecraft.block.BlockHopper;
-import net.minecraft.block.BlockLever;
-import net.minecraft.block.BlockPressurePlate;
-import net.minecraft.block.BlockRedstoneComparator;
-import net.minecraft.block.BlockRedstoneRepeater;
-import net.minecraft.block.BlockSign;
+import net.minecraft.block.*;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.tileentity.TileEntity;
 import net.minecraft.tileentity.TileEntitySign;
 import net.minecraft.util.EnumHand;
 import net.minecraft.util.math.BlockPos;
@@ -137,12 +135,70 @@ public class PlayerEvents {
 		else return;
 	}
 	
-	@SubscribeEvent
-	public static void onBlockBreak(BlockEvent.BreakEvent event){
+	@SubscribeEvent(priority = EventPriority.HIGHEST)
+	public static void onBlockBreak0(BlockEvent.BreakEvent event){
 		if(event.getPlayer().dimension != 0){ return; }
 		if(!checkAccess(event.getWorld(), event.getPos(), event.getState(), event.getPlayer())){
 			Print.bar(event.getPlayer(), "No permission to break blocks here.");
 			event.setCanceled(true);
+		}
+		return;
+	}
+	
+	@SubscribeEvent(priority = EventPriority.LOWEST)
+	public static void onBlockBreak1(BlockEvent.BreakEvent event){
+		if(event.getPlayer().dimension != 0){ return; }
+		if(event.getState().getBlock() instanceof BlockSign){
+			TileEntity tile = event.getWorld().getTileEntity(event.getPos());
+			if(tile == null) return;
+			SignCapability cap = tile.getCapability(FCLCapabilities.SIGN_CAPABILITY, null);
+			if(cap == null) return;
+			SignMailbox sign = cap.getListener(SignMailbox.class, SignMailbox.RESLOC);
+			Chunk chunk = StateUtil.getChunk(event.getPos());
+			try{
+				switch(sign.getType()){
+					case "state":{
+						State state = chunk.getState();
+						if(state.getMailbox() != null && state.getMailbox().equals(event.getPos())){
+							state.setMailbox(null); state.save();
+						}
+						return;
+					}
+					case "municipality":{
+						Municipality mun = chunk.getMunicipality();
+						if(mun.getMailbox() != null && mun.getMailbox().equals(event.getPos())){
+							mun.setMailbox(null); mun.save();
+						}
+						return;
+					}
+					case "district":{
+						District dis = chunk.getDistrict();
+						if(dis.getMailbox() != null && dis.getMailbox().equals(event.getPos())){
+							dis.setMailbox(null); dis.save();
+						}
+						return;
+					}
+					case "company": break;//TODO
+					case "player":{
+						UUID uuid = UUID.fromString(sign.getReceiver());
+						PlayerCapability playercap = StateUtil.getPlayer(uuid, true);
+						if(playercap.getMailbox() != null && playercap.getMailbox().equals(event.getPos())){
+							playercap.setMailbox(null); playercap.save();
+						}
+						return;
+					}
+					case "central": case "fallback":{
+						State state = StateUtil.getState(-1);
+						if(state.getMailbox() != null && state.getMailbox().equals(event.getPos())){
+							state.setMailbox(null); state.save();
+						}
+						return;
+					}
+				}
+			}
+			catch(Exception e){
+				e.printStackTrace();
+			}
 		}
 		return;
 	}

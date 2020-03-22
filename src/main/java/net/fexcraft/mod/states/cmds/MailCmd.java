@@ -1,9 +1,12 @@
 package net.fexcraft.mod.states.cmds;
 
+import java.util.List;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 import net.fexcraft.lib.common.math.Time;
 import net.fexcraft.lib.mc.api.registry.fCommand;
+import net.fexcraft.lib.mc.capabilities.FCLCapabilities;
 import net.fexcraft.lib.mc.utils.Formatter;
 import net.fexcraft.lib.mc.utils.Print;
 import net.fexcraft.lib.mc.utils.Static;
@@ -15,7 +18,9 @@ import net.fexcraft.mod.states.data.capabilities.StatesCapabilities;
 import net.fexcraft.mod.states.data.root.AnnounceLevel;
 import net.fexcraft.mod.states.data.root.Mailbox.MailType;
 import net.fexcraft.mod.states.data.root.Mailbox.RecipientType;
+import net.fexcraft.mod.states.impl.SignMailbox;
 import net.fexcraft.mod.states.objects.MailItem;
+import net.fexcraft.mod.states.util.Config;
 import net.fexcraft.mod.states.util.MailUtil;
 import net.fexcraft.mod.states.util.Perms;
 import net.fexcraft.mod.states.util.StateLogger;
@@ -23,11 +28,14 @@ import net.fexcraft.mod.states.util.StateUtil;
 import net.minecraft.command.CommandBase;
 import net.minecraft.command.CommandException;
 import net.minecraft.command.ICommandSender;
+import net.minecraft.entity.item.EntityItem;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.server.MinecraftServer;
+import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.ResourceLocation;
+import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.text.TextComponentString;
 import net.minecraft.util.text.event.ClickEvent;
 
@@ -60,6 +68,7 @@ public class MailCmd extends CommandBase {
 			Print.chat(sender, "&7/mail inbox");
 			Print.chat(sender, "&7/mail read");
 			Print.chat(sender, "&7/mail send <receiver> <msg...>");
+			Print.chat(sender, "&7/mail collect <box-type>");
 			//Print.chat(sender, "&7/mail accept <args...>");
 			//Print.chat(sender, "&7/mail deny <args...>");
 			return;
@@ -297,6 +306,77 @@ public class MailCmd extends CommandBase {
 				catch(Exception e){
 					e.printStackTrace();
 				}
+				return;
+			}
+			case "collect":{
+				if(!Config.ALLOW_MAILBOX_COLLECT){
+					Print.chat(sender, "&c&lFeature is disabled on this server.");
+				}
+				if(args.length < 2){
+					Print.chat(sender, "&9Missing argument, try the following:");
+					Print.chat(sender, "&7fallback/central, &6state, &5municipality");
+					return;
+				}
+				BlockPos mailbox = null;
+				switch(args[1]){
+					case "fallback":
+					case "central":
+					case "state":{
+						State state = args[1].equals("state") ? cap.getState() : StateUtil.getState(-1);
+						if(state.getMailbox() == null){
+							if(args[1].equals("state")){
+								Print.chat(player, "&c&oState has no Mailbox set!");
+							}
+							else{
+								Print.chat(player, "&c&oServer has no Fallback/Central Mailbox set!");
+							}
+							return;
+						}
+						mailbox = state.getMailbox();
+						break;
+					}
+					case "municipality":{
+						if(cap.getMunicipality().getMailbox() == null){
+							Print.chat(player, "&c&oMunicipality has no Mailbox set!");
+							return;
+						}
+						mailbox = cap.getMunicipality().getMailbox();
+						break;
+					}
+					default:{
+						Print.chat(player, "&7Invalid argument.");
+						return;
+					}
+				}
+				if(!player.world.isBlockLoaded(mailbox)){
+					Print.chat(player, "&bSelected Mailbox's Chunk is not loaded.");
+				}
+				TileEntity tile = player.world.getTileEntity(mailbox);
+				SignMailbox sign = tile.getCapability(FCLCapabilities.SIGN_CAPABILITY, null).getListener(SignMailbox.class, SignMailbox.RESLOC);
+				if(sign.getMails().isEmpty()){
+					Print.chat(player, "&bSelected Mailbox is empty.");
+				}
+				List<ItemStack> mails = sign.getMails().stream().filter(stack -> {
+					if(!stack.hasTagCompound()) return false;
+					ResourceLocation loc = new ResourceLocation(stack.getTagCompound().getString("Receiver"));
+					if(!loc.getNamespace().equals("player")) return false;
+					if(!loc.getPath().equals(player.getGameProfile().getId().toString().toLowerCase())) return false;
+					return true;
+				}).collect(Collectors.toList());
+				if(mails.isEmpty()){
+					Print.chat(player, "&bYou got no new mail in the selected Mailbox.");
+				}
+				else{
+					sign.getMails().removeAll(mails);
+					sign.updateSize(tile, true);
+				}
+				for(ItemStack stack : mails){
+					if(!player.inventory.addItemStackToInventory(stack)){
+						EntityItem item = new EntityItem(player.world, player.posX, player.posY + 1, player.posZ, stack);
+						player.world.spawnEntity(item);
+					}
+				}
+				Print.chat(player, "&b&oMail collected.");
 				return;
 			}
 		}

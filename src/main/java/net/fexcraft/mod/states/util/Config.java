@@ -20,7 +20,7 @@ public class Config {
 	public static File CONFIG_PATH;
 	public static long DEFAULT_CHUNK_PRICE, MUNICIPALITY_CREATION_PRICE, STATE_CREATION_PRICE, DISTRICT_CREATION_PRICE, TAX_INTERVAL, LOADED_CHUNKS_TAX;
 	public static int MAP_UPDATES_PER_SECOND, BOT_PORT, TRANSIT_ZONE_BOTTOM_LIMIT, TRANSIT_ZONE_TOP_LIMIT, CHUNK_PER_CITIZEN, NICKNAME_LENGTH, LOADED_CHUNKS_PER_MUNICIPALITY;
-	public static boolean ALLOW_WILDERNESS_ACCESS, ALLOW_TRANSIT_ZONES, TAX_OFFLINE_PLAYERS, SHOW_MINIMAP, STATES_CHAT;
+	public static boolean ALLOW_WILDERNESS_ACCESS, ALLOW_TRANSIT_ZONES, TAX_OFFLINE_PLAYERS, SHOW_MINIMAP, STATES_CHAT, ALLOW_MAILBOX_COLLECT;
 	public static String WEBHOOK, BOT_KEY, WEBHOOK_ICON, WEBHOOK_BROADCASTER_NAME;
 	//
 	public static final String DEFAULT_CAT = "Default Settings";
@@ -82,6 +82,7 @@ public class Config {
 		SHOW_MINIMAP = config.getBoolean("show_minimap", CLIENT_CAT, true, "If the States Minimap should be shown.");
 		STATES_CHAT = config.getBoolean("states_chat", DEFAULT_CAT, true, "States chat override.");
 		PROTLVL = ProtectionLevel.fromString(config.getString("protection_level", DEFAULT_CAT, "basic", "Available: " + ProtectionLevel.allToString()));
+		ALLOW_MAILBOX_COLLECT = config.getBoolean("allow_mailbox_collect", DEFAULT_CAT, true, "Should players be allowed to use '/mail collect <box-type>'? Allows to collect player mail from non-player mailboxes without being directly nearby or needing permission for the mailbox.");
 		updateWebHook();
 	}
 

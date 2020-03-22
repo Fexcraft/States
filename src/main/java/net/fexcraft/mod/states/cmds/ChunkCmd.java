@@ -75,7 +75,6 @@ public class ChunkCmd extends CommandBase {
 			Print.chat(sender, "&7/ck update <option:range> [admin-only]");
 			Print.chat(sender, "&7/ck queue");
 			Print.chat(sender, "&7/ck types");
-			Print.chat(sender, "&7/ck force-load <true/false>");
 			return;
 		}
 		if(sender.getCommandSenderEntity() instanceof EntityPlayer == false){

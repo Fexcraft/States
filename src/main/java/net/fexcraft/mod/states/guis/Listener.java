@@ -16,6 +16,7 @@ import net.fexcraft.mod.states.States;
 import net.fexcraft.mod.states.data.Chunk;
 import net.fexcraft.mod.states.data.District;
 import net.fexcraft.mod.states.data.MunicipalityType;
+import net.fexcraft.mod.states.data.capabilities.PlayerCapability;
 import net.fexcraft.mod.states.data.capabilities.StatesCapabilities;
 import net.fexcraft.mod.states.packets.ImagePacket;
 import net.fexcraft.mod.states.util.ImageCache;
@@ -207,7 +208,7 @@ public class Listener implements IPacketListener<PacketNBTTagCompound> {
 			compound.setString("result", "Transit Zones (-2) are disabled.");
 			return compound;
 		}
-		if(dis.getMunicipality().getClaimedChunks() + 1 > MunicipalityType.getChunkLimitFor(dis.getMunicipality())){
+		if(dis.getId() != -2 && dis.getMunicipality().getClaimedChunks() + 1 > MunicipalityType.getChunkLimitFor(dis.getMunicipality())){
 			compound.setString("result", "Municipality reached the Chunk Limit.");
 			return compound;
 		}
@@ -219,6 +220,11 @@ public class Listener implements IPacketListener<PacketNBTTagCompound> {
 		Chunk ck = ch.getCapability(StatesCapabilities.CHUNK, null).getStatesChunk();
 		if(ck == null){
 			compound.setString("result", "Chunk data not found.");
+			return compound;
+		}
+		PlayerCapability cap = player.getCapability(StatesCapabilities.PLAYER, null);
+		if(cap == null || cap.getMunicipality().getId() < 0){
+			compound.setString("result", "No permission. (" + (cap == null ? "-1" : "-2") + ")");
 			return compound;
 		}
 		if(dis.getId() != -2 && !dis.isAuthorized(dis.r_CLAIM_CHUNK.id, player.getGameProfile().getId())){

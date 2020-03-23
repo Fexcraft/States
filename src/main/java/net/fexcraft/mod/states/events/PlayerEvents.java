@@ -227,10 +227,9 @@ public class PlayerEvents {
 			else if(chunk.getDistrict().getId() == -2){
 				if(chunk.getChanged() + Time.DAY_MS < Time.getDate()){
 					chunk.setDistrict(StateUtil.getDistrict(-1));
-					//TODO log
 					chunk.save();
 					Print.chat(player, "Updating chunk...");
-						return false;
+					return false;
 				}
 				if(pos.getY() > Config.TRANSIT_ZONE_BOTTOM_LIMIT && pos.getY() < Config.TRANSIT_ZONE_TOP_LIMIT){
 					chunk.setEdited(Time.getDate());

@@ -4,6 +4,7 @@ import java.io.File;
 
 import net.fexcraft.lib.common.json.JsonUtil;
 import net.fexcraft.lib.mc.utils.Print;
+import net.fexcraft.mod.fsmm.FSMM;
 import net.fexcraft.mod.states.States;
 import net.fexcraft.mod.states.data.Chunk;
 import net.fexcraft.mod.states.data.ChunkPos;
@@ -29,8 +30,11 @@ public class ChunkEvents {
     @SubscribeEvent
     public static void onLoad(ChunkEvent.Load event){
 		if(!LOADED){
+			if(!FSMM.isDataManagerLoaded()){
+				FSMM.loadDataManager();
+			}
 			States.updateSaveDirectory(event.getWorld());
-			Print.log("all", "Loading World...");
+			Print.log("Loading World...");
 			for(int i : def_st){
 				if(!States.STATES.containsKey(i)){
 					States.STATES.put(i, new State(i));

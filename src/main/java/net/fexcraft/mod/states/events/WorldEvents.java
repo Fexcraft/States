@@ -19,14 +19,13 @@ import net.minecraftforge.event.AttachCapabilitiesEvent;
 import net.minecraftforge.event.world.ExplosionEvent;
 import net.minecraftforge.event.world.WorldEvent;
 import net.minecraftforge.fml.common.Mod;
+import net.minecraftforge.fml.common.eventhandler.EventPriority;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 
 @Mod.EventBusSubscriber
 public class WorldEvents {
 	
-
-	
-	@SubscribeEvent
+	@SubscribeEvent(priority = EventPriority.HIGH)
 	public static void onWorldLoad(WorldEvent.Load event){
 		if(event != null && (event.getWorld().provider.getDimension() != 0 || event.getWorld().isRemote)) return;
 		ImageCache.loadQueue();
@@ -34,12 +33,12 @@ public class WorldEvents {
 		//event.getWorld().addEventListener(new TestListener());
 	}
 	
-	@SubscribeEvent
+	@SubscribeEvent(priority = EventPriority.LOW)
 	public static void onWorldUnload(WorldEvent.Unload event){
 		if(event.getWorld().provider.getDimension() != 0 || event.getWorld().isRemote) return;
 		StateUtil.unloadAll(); StateUtil.clearAll(); ChunkEvents.LOADED = false;
 		ImageCache.saveQueue();
-		Print.log("all", "Unloading World...");
+		Print.log("Unloading World...");
 		ForcedChunksManager.unload();
 	}
 	

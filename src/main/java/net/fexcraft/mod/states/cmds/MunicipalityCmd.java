@@ -78,7 +78,10 @@ public class MunicipalityCmd extends CommandBase {
 			Print.chat(sender, "&7/mun leave");
 			Print.chat(sender, "&7/mun kick <player>");
 			Print.chat(sender, "&7/mun invite <player>");
+			Print.chat(sender, "&8- &6- &8- - - - - -");
 			Print.chat(sender, "&7/mun create <name...>");
+			Print.chat(sender, "&7/mun abandon");
+			Print.chat(sender, "&7/mun claim");
 			return;
 		}
 		EntityPlayer player = (EntityPlayer)sender.getCommandSenderEntity();
@@ -121,6 +124,12 @@ public class MunicipalityCmd extends CommandBase {
 					Print.chat(sender, "&4Force-Loaded Chunks: " + coll.size());
 				}
 				Print.chat(sender, "&6Mailbox: &7" + (mun.getMailbox() == null ? "No mailbox set." : mun.getMailbox().toString()));
+				if(mun.isAbandoned()){
+					Print.chat(sender, "&e====-====-====-====-====-====&0[&2States&0]");
+					Print.chat(sender, "&6&lThis Municipality is abandoned!");
+					Print.chat(sender, "&7&lSince: &8" + (mun.getAbandonedSince() == 0 ? "unknown" : Time.getAsString(mun.getAbandonedSince())));
+					Print.chat(sender, "&7&lBy: &2" + (mun.getAbandonedBy() == null ? "unknown" : Static.getPlayerNameByUUID(mun.getAbandonedBy())));
+				}
 				return;
 			}
 			case "rules":{
@@ -810,6 +819,19 @@ public class MunicipalityCmd extends CommandBase {
 					Print.chat(sender, e);
 					Print.debug(e);
 				}
+				return;
+			}
+			case "abandon":{
+				if(mun.isAuthorized(mun.r_SET_NAME.id, ply.getUUID()) || StateUtil.bypass(player)){
+					
+				}
+				else{
+					
+				}
+				return;
+			}
+			case "claim":{
+				
 				return;
 			}
 			default:{

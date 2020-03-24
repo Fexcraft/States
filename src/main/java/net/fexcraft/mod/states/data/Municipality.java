@@ -18,14 +18,7 @@ import net.fexcraft.mod.fsmm.api.Account;
 import net.fexcraft.mod.fsmm.api.Bank;
 import net.fexcraft.mod.fsmm.util.DataManager;
 import net.fexcraft.mod.states.States;
-import net.fexcraft.mod.states.data.root.AccountHolder;
-import net.fexcraft.mod.states.data.root.BuyableType;
-import net.fexcraft.mod.states.data.root.ColorHolder;
-import net.fexcraft.mod.states.data.root.IconHolder;
-import net.fexcraft.mod.states.data.root.Initiator;
-import net.fexcraft.mod.states.data.root.MailReceiver;
-import net.fexcraft.mod.states.data.root.Ruleable;
-import net.fexcraft.mod.states.data.root.VoteHolder;
+import net.fexcraft.mod.states.data.root.*;
 import net.fexcraft.mod.states.util.Config;
 import net.fexcraft.mod.states.util.ForcedChunksManager;
 import net.fexcraft.mod.states.util.RuleMap;
@@ -33,12 +26,13 @@ import net.fexcraft.mod.states.util.StateUtil;
 import net.minecraft.command.ICommandSender;
 import net.minecraft.util.math.BlockPos;
 
-public class Municipality implements ColorHolder, BuyableType, IconHolder, AccountHolder, MailReceiver, Ruleable, VoteHolder {
+public class Municipality implements ColorHolder, BuyableType, IconHolder, AccountHolder, MailReceiver, Ruleable, VoteHolder, Abandonable {
 	
 	private int id;
 	private String name, color, icon;
-	private long created, changed, price, citizentax;
-	private UUID creator, mayor;
+	private long created, changed, price, citizentax, abandonedat;
+	private UUID creator, mayor, abandonedby;
+	private boolean abandoned;
 	private Account account;
 	private ArrayList<Integer> neighbors, districts, com_blacklist;
 	private ArrayList<UUID> citizen, council, pl_blacklist;
@@ -51,7 +45,7 @@ public class Municipality implements ColorHolder, BuyableType, IconHolder, Accou
 	public final Rule r_OPEN, r_COLOR, r_ICON, r_SET_NAME, r_SET_PRICE, r_SET_MAYOR, r_SET_CITIZENTAX, r_KIB;
 	public final Rule r_EDIT_BL, r_KICK, r_INVITE, r_COUNCIL_KICK, r_COUNCIL_INVITE, r_VOTE_MAYOR;
 	public final Rule r_CREATE_DISTRICT, r_SET_CHUNKRULES, r_CREATE_SIGN_SHOP, r_SET_MAILBOX, r_OPEN_MAILBOX;
-	public final Rule r_FORCE_LOAD_CHUNKS, r_SET_RULESET, r_RESET_MAYOR;
+	public final Rule r_FORCE_LOAD_CHUNKS, r_SET_RULESET, r_RESET_MAYOR, r_ABANDON;
 	private ArrayList<Vote> active_votes = new ArrayList<>();
 	
 	public Municipality(int id){
@@ -76,6 +70,9 @@ public class Municipality implements ColorHolder, BuyableType, IconHolder, Accou
 		icon = JsonUtil.getIfExists(obj, "icon", States.DEFAULT_ICON);
 		citizentax = JsonUtil.getIfExists(obj, "citizen_tax", 0).longValue();
 		mailbox = obj.has("mailbox") ? BlockPos.fromLong(obj.get("mailbox").getAsLong()) : null;
+		abandoned = JsonUtil.getIfExists(obj, "abandoned", false);
+		abandonedby = obj.has("abandoned_by") ? UUID.fromString(obj.get("abandoned_by").getAsString()) : null;
+		abandonedat = JsonUtil.getIfExists(obj, "abandoned_at", 0).longValue();
 		ruleset_name = JsonUtil.getIfExists(obj, "ruleset", "Standard Ruleset");
 		rules.add(r_SET_NAME = new Rule("set.name", null, true, Initiator.COUNCIL_VOTE, Initiator.INCHARGE));
 		rules.add(r_SET_PRICE = new Rule("set.price", null, true, Initiator.COUNCIL_VOTE, Initiator.INCHARGE));
@@ -99,6 +96,7 @@ public class Municipality implements ColorHolder, BuyableType, IconHolder, Accou
 		rules.add(r_FORCE_LOAD_CHUNKS = new Rule("force-load.chunks", null, true, Initiator.COUNCIL_VOTE, Initiator.INCHARGE));
 		rules.add(r_SET_RULESET = new Rule("set.ruleset-name", null, true, Initiator.COUNCIL_VOTE, Initiator.INCHARGE));
 		rules.add(r_RESET_MAYOR = new Rule("set.mayor.none", null, true, Initiator.CITIZEN_VOTE, Initiator.HIGHERINCHARGE));
+		rules.add(r_ABANDON = new Rule("abandon", null, true, Initiator.INCHARGE, Initiator.INCHARGE));
 		if(obj.has("rules")){
 			JsonObject rls = obj.get("rules").getAsJsonObject();
 			for(Map.Entry<String, JsonElement> entry : rls.entrySet()){
@@ -125,7 +123,7 @@ public class Municipality implements ColorHolder, BuyableType, IconHolder, Accou
 		obj.addProperty("created", created);
 		obj.addProperty("creator", creator.toString());
 		obj.addProperty("changed", changed);
-		if(!(mayor == null)){ obj.addProperty("mayor", mayor.toString()); }
+		if(mayor != null) obj.addProperty("mayor", mayor.toString());
 		obj.add("neighbors", JsonUtil.getArrayFromIntegerList(neighbors));
 		obj.add("districts", JsonUtil.getArrayFromIntegerList(districts));
 		obj.add("citizen", JsonUtil.getArrayFromUUIDList(citizen));
@@ -139,6 +137,9 @@ public class Municipality implements ColorHolder, BuyableType, IconHolder, Accou
 		//obj.addProperty("kick_if_bankrupt", kib);
 		obj.addProperty("citizen_tax", citizentax);
 		if(mailbox != null) obj.addProperty("mailbox", mailbox.toLong());
+		obj.addProperty("abandoned", abandoned);
+		if(abandonedby != null) obj.addProperty("abandoned_by", abandonedby.toString());
+		if(abandonedat != 0) obj.addProperty("abandoned_", abandonedat);
 		obj.addProperty("ruleset", ruleset_name);
 		JsonObject rells = new JsonObject();
 		for(Rule rule : rules.values()) rells.addProperty(rule.id, rule.save());
@@ -396,6 +397,42 @@ public class Municipality implements ColorHolder, BuyableType, IconHolder, Accou
 	@Override
 	public List<Vote> getActiveVotes(){
 		return active_votes;
+	}
+
+	@Override
+	public boolean isAbandoned(){
+		return abandoned;
+	}
+
+	@Override
+	public void setAbandoned(UUID by){
+		abandonedby = by;
+		abandonedat = Time.getDate();
+		abandoned = true;
+		council.clear();
+		mayor = null;
+		save();
+	}
+
+	@Override
+	public long getAbandonedSince(){
+		return abandonedat;
+	}
+
+	@Override
+	public UUID getAbandonedBy(){
+		return abandonedby;
+	}
+
+	@Override
+	public void getAbandoned(UUID by){
+		abandonedby = null;
+		abandonedat = Time.getDate();
+		abandoned = false;
+		council.clear();
+		council.add(by);
+		mayor = by;
+		save();
 	}
 
 }

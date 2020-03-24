@@ -172,14 +172,18 @@ public class PlayerImpl implements PlayerCapability {
 
 	@Override
 	public boolean canLeave(ICommandSender sender){
-		if(this.municipality == null){ return true; }
-		if(this.municipality.getHead().equals(getUUID())){
+		if(municipality == null){ return true; }
+		if(municipality.getHead().equals(getUUID())){
 			Print.chat(sender, "&eYou must assign a new Mayor first, or remove youself as one, before you can leave the Municipality.");
 			return false;
 		}
-		if(this.municipality.getCouncil().size() < 2 && municipality.getCouncil().contains(getUUID())){
+		if(municipality.getCouncil().size() < 2 && municipality.getCouncil().contains(getUUID())){
 			Print.chat(sender, "&eYou cannot leave the Municipality as last Council member.");
 			return false;
+		}
+		if(municipality.getId() > 0 && municipality.getCitizen().size() == 1){
+			Print.chat(sender, "&eYou cannot leave the Municipality as last citizen!");
+			Print.chat(sender, "&eUse &7/mun abandon &einstead or &7/mun claim &eto become Mayor!");
 		}
 		return true;
 	}

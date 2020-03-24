@@ -30,7 +30,7 @@ public class ChunkEvents {
     public static void onLoad(ChunkEvent.Load event){
 		if(!LOADED){
 			States.updateSaveDirectory(event.getWorld());
-			StateLogger.log("all", "Loading World...");
+			Print.log("all", "Loading World...");
 			for(int i : def_st){
 				if(!States.STATES.containsKey(i)){
 					States.STATES.put(i, new State(i));

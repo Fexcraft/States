@@ -146,7 +146,7 @@ public class DistrictCmd extends CommandBase {
 									dis.save();
 								}
 								Print.chat(sender, "&9District type set to &7" + type.name().toLowerCase() + "&9!");
-								StateLogger.log(StateLogger.LoggerType.DISRICT, StateLogger.player(player) + " changed type of " + StateLogger.district(dis) + " to " + dis.getType() + ".");
+								Print.log(StateLogger.player(player) + " changed type of " + StateLogger.district(dis) + " to " + dis.getType() + ".");
 							}
 							catch(Exception e){
 								Print.chat(sender, "&9Error: &7" + e.getMessage());
@@ -177,7 +177,7 @@ public class DistrictCmd extends CommandBase {
 							dis.setChanged(Time.getDate());
 							dis.save();
 							Print.chat(sender, "&6Name set to: &7" + dis.getName());
-							StateLogger.log(StateLogger.LoggerType.DISRICT, StateLogger.player(player) + " changed name of " + StateLogger.district(dis) + " to " + dis.getName() + ".");
+							Print.log(StateLogger.player(player) + " changed name of " + StateLogger.district(dis) + " to " + dis.getName() + ".");
 						}
 						else{
 							Print.chat(sender, "&cNo permission.");
@@ -204,7 +204,7 @@ public class DistrictCmd extends CommandBase {
 							dis.setChanged(Time.getDate());
 							dis.save();
 							Print.chat(sender, "&6Ruleset Name set to: &7" + dis.getName());
-							StateLogger.log(StateLogger.LoggerType.DISRICT, StateLogger.player(player) + " changed ruleset name of " + StateLogger.district(dis) + " to " + dis.getName() + ".");
+							Print.log(StateLogger.player(player) + " changed ruleset name of " + StateLogger.district(dis) + " to " + dis.getName() + ".");
 						}
 						else{
 							Print.chat(sender, "&cNo permission.");
@@ -225,7 +225,7 @@ public class DistrictCmd extends CommandBase {
 								dis.setChanged(Time.getDate());
 								dis.save();
 								Print.chat(sender, "&2Price set to: &7" + Config.getWorthAsString(dis.getPrice()));
-								StateLogger.log(StateLogger.LoggerType.DISRICT, StateLogger.player(player) + " changed price of " + StateLogger.district(dis) + " to " + dis.getPrice() + ".");
+								Print.log(StateLogger.player(player) + " changed price of " + StateLogger.district(dis) + " to " + dis.getPrice() + ".");
 							}
 							catch(Exception e){
 								Print.chat(sender, "&cError: &7" + e.getMessage());
@@ -251,7 +251,7 @@ public class DistrictCmd extends CommandBase {
 							dis.setChanged(Time.getDate());
 							dis.save();
 							Print.chat(sender, "&2Set &7" + gp.getName() + "&2 to new District Manager!");
-							StateLogger.log(StateLogger.LoggerType.DISRICT, StateLogger.player(player) + " changed manager of " + StateLogger.district(dis) + " to " + StateLogger.player(gp) + ".");
+							Print.log(StateLogger.player(player) + " changed manager of " + StateLogger.district(dis) + " to " + StateLogger.player(gp) + ".");
 						}
 						else{
 							Print.chat(sender, "&cNo permission.");
@@ -276,7 +276,7 @@ public class DistrictCmd extends CommandBase {
 								dis.setChanged(Time.getDate());
 								dis.save();
 								Print.chat(sender, "&6Color set to &7" + str + "&6! (" + color.getRed() + ", " + color.getGreen() + ", " + color.getBlue() + ");");
-								StateLogger.log(StateLogger.LoggerType.DISRICT, StateLogger.player(player) + " changed color of " + StateLogger.district(dis) + " to " + dis.getColor() + ".");
+								Print.log(StateLogger.player(player) + " changed color of " + StateLogger.district(dis) + " to " + dis.getColor() + ".");
 							}
 							catch(Exception e){
 								Print.chat(sender, "&2Error: &7" + e.getMessage());
@@ -298,7 +298,7 @@ public class DistrictCmd extends CommandBase {
 							dis.save();
 							Print.chat(sender, "&2FCS: &7" + dis.r_CFS.get());
 
-							StateLogger.log(StateLogger.LoggerType.DISRICT, StateLogger.player(player) + " changed 'can-foreigners-settle' of " + StateLogger.district(dis) + " to " + dis.r_CFS.get() + ".");
+							Print.log(StateLogger.player(player) + " changed 'can-foreigners-settle' of " + StateLogger.district(dis) + " to " + dis.r_CFS.get() + ".");
 						}
 						else{
 							Print.chat(sender, "&cNo permission.");
@@ -320,7 +320,7 @@ public class DistrictCmd extends CommandBase {
 								dis.setChanged(Time.getDate());
 								dis.save();
 								Print.chat(sender, "&6Icon set to &7" + args[2] + "&6!");
-								StateLogger.log(StateLogger.LoggerType.DISRICT, StateLogger.player(player) + " changed icon of " + StateLogger.district(dis) + " to " + dis.getIcon() + ".");
+								Print.log(StateLogger.player(player) + " changed icon of " + StateLogger.district(dis) + " to " + dis.getIcon() + ".");
 							}
 							catch(Exception e){
 								Print.chat(sender, "&2Error: &7" + e.getMessage());
@@ -353,7 +353,7 @@ public class DistrictCmd extends CommandBase {
 							dis.r_ONBANKRUPT.set(Boolean.parseBoolean(args[2]));
 							dis.setChanged(Time.getDate()); dis.save();
 							Print.chat(sender, "&2UIB: &7" + dis.r_ONBANKRUPT.get());
-							StateLogger.log(StateLogger.LoggerType.DISRICT, StateLogger.player(player) + " changed 'unclaim-if-brankrupt' of " + StateLogger.district(dis) + " to " + dis.r_ONBANKRUPT.get() + ".");
+							Print.log(StateLogger.player(player) + " changed 'unclaim-if-brankrupt' of " + StateLogger.district(dis) + " to " + dis.r_ONBANKRUPT.get() + ".");
 						}
 						break;
 					}
@@ -423,7 +423,7 @@ public class DistrictCmd extends CommandBase {
 								StateUtil.announce(server, "&9New District was created!");
 								StateUtil.announce(server, "&9Created by " + ply.getFormattedNickname());
 								StateUtil.announce(server, "&9Name&0: &7" + newdis.getName());
-								StateLogger.log(StateLogger.LoggerType.DISRICT, StateLogger.player(player) + " created " + StateLogger.district(newdis) + " at " + StateLogger.chunk(chunk) + ".");
+								Print.log(StateLogger.player(player) + " created " + StateLogger.district(newdis) + " at " + StateLogger.chunk(chunk) + ".");
 								return;
 							}
 						}

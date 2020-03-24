@@ -165,7 +165,7 @@ public class ChunkCmd extends CommandBase {
 					if(range <= 0){
 						ImageCache.update(player.world, player.world.getChunkFromChunkCoords(chunk.xCoord(), chunk.zCoord()));
 						Print.chat(sender, "&9Queued for map update.");
-						StateLogger.log(StateLogger.LoggerType.CHUNK, StateLogger.player(player) + " queued " + StateLogger.chunk(chunk) + " for map update.");
+						Print.log(Print.loggerType.CHUNK, StateLogger.player(player) + " queued " + StateLogger.chunk(chunk) + " for map update.");
 					}
 					else{
 						if(range > 3 && !hasPerm("admin", player, chunk)){
@@ -188,7 +188,7 @@ public class ChunkCmd extends CommandBase {
 						}
 						Print.chat(sender, "&2" + c + " &9chunks queued for map update.");
 						Print.chat(sender, "&9There is &21 &9map mode activated.");
-						StateLogger.log(StateLogger.LoggerType.CHUNK, StateLogger.player(player) + " queued " + c + " chunks for map update, with the center being " + StateLogger.chunk(chunk) + ".");
+						Print.log(Print.loggerType.CHUNK, StateLogger.player(player) + " queued " + c + " chunks for map update, with the center being " + StateLogger.chunk(chunk) + ".");
 					}
 				}
 				else{
@@ -214,7 +214,7 @@ public class ChunkCmd extends CommandBase {
 						chunk.save();
 						ImageCache.update(player.world, player.world.getChunk(chunk.xCoord(), chunk.zCoord()));
 						Print.chat(sender, "&9Chunk unclaimed and resseted.");
-						StateLogger.log(StateLogger.LoggerType.CHUNK, StateLogger.player(player) + " unclaimed " + StateLogger.chunk(chunk) + ".");
+						Print.log(StateLogger.player(player) + " unclaimed " + StateLogger.chunk(chunk) + ".");
 					}
 					else{
 						int r = (range * 2) + 1;
@@ -238,7 +238,7 @@ public class ChunkCmd extends CommandBase {
 							}
 						}
 						Print.chat(sender, "&2" + c + " &9chunks have been resseted.");
-						StateLogger.log(StateLogger.LoggerType.CHUNK, StateLogger.player(player) + " unclaimed " + c + " chunks, with the center being " + StateLogger.chunk(chunk) + ".");
+						Print.log(StateLogger.player(player) + " unclaimed " + c + " chunks, with the center being " + StateLogger.chunk(chunk) + ".");
 					}
 				}
 				return;
@@ -332,7 +332,7 @@ public class ChunkCmd extends CommandBase {
 					chunk.setChanged(time);
 					chunk.save();
 					Print.chat(sender, "&aChunk bought!");
-					StateLogger.log(StateLogger.LoggerType.CHUNK, StateLogger.player(player) + " bought the " + StateLogger.chunk(chunk) + "!");
+					Print.log(StateLogger.player(player) + " bought the " + StateLogger.chunk(chunk) + "!");
 					if(chunk.getLinkedChunks().size() > 0){
 						for(ResourceLocation ckpos : chunk.getLinkedChunks()){
 							Chunk ck = StateUtil.getTempChunk(ckpos);
@@ -341,7 +341,7 @@ public class ChunkCmd extends CommandBase {
 							ck.setType(ChunkType.PRIVATE);
 							ck.setChanged(time);
 							ck.save();
-							StateLogger.log(StateLogger.LoggerType.CHUNK, StateLogger.player(player) + " received the " + StateLogger.chunk(ck) + " which was linked to " + StateLogger.chunk(chunk) + "!");
+							Print.log(StateLogger.player(player) + " received the " + StateLogger.chunk(ck) + " which was linked to " + StateLogger.chunk(chunk) + "!");
 						}
 						Print.chat(sender, "&7" + chunk.getLinkedChunks().size() + "&a linked chunks bought!");
 					}
@@ -366,7 +366,7 @@ public class ChunkCmd extends CommandBase {
 						chunk.setChanged(Time.getDate());
 						chunk.save();
 						Print.chat(sender, "&9Price set to &7" + Config.getWorthAsString(price));
-						StateLogger.log(StateLogger.LoggerType.CHUNK, StateLogger.player(player) + " set the price of the " + StateLogger.chunk(chunk) + " to " + chunk.getPrice() + ".");
+						Print.log(StateLogger.player(player) + " set the price of the " + StateLogger.chunk(chunk) + " to " + chunk.getPrice() + ".");
 					}
 					catch(Exception e){
 						Print.chat(sender, "&9Error: &7" + e.getMessage());
@@ -387,7 +387,7 @@ public class ChunkCmd extends CommandBase {
 								try{
 									chunk.setDistrict(StateUtil.getDistrict(Integer.parseInt(args[2])));
 									Print.chat(sender, "&2District set to: " + chunk.getDistrict().getName() + " (" + chunk.getDistrict().getId() + ");");
-									StateLogger.log(StateLogger.LoggerType.CHUNK, StateLogger.player(player) + " set the district of " + StateLogger.chunk(chunk) + " to " + StateLogger.district(chunk.getDistrict()) + ".");
+									Print.log(StateLogger.player(player) + " set the district of " + StateLogger.chunk(chunk) + " to " + StateLogger.district(chunk.getDistrict()) + ".");
 								}
 								catch(Exception e){
 									Print.chat(sender, "&9Error: &7" + e.getMessage());
@@ -439,11 +439,11 @@ public class ChunkCmd extends CommandBase {
 											ck.setPrice(0);
 											ck.setChanged(time);
 											ck.save();
-											StateLogger.log(StateLogger.LoggerType.CHUNK, StateLogger.player(player) + " gave the linked " + StateLogger.chunk(ck) + " to the " + to + ".");
+											Print.log(StateLogger.player(player) + " gave the linked " + StateLogger.chunk(ck) + " to the " + to + ".");
 										});
 										chunk.save();
 										Print.chat(sender, "&9Chunk given to the &2" + to + "&9!");
-										StateLogger.log(StateLogger.LoggerType.CHUNK, StateLogger.player(player) + " gave the  " + StateLogger.chunk(chunk) + " to the " + to + ".");
+										Print.log(StateLogger.player(player) + " gave the  " + StateLogger.chunk(chunk) + " to the " + to + ".");
 										break;
 									}
 									case PRIVATE:{
@@ -458,12 +458,12 @@ public class ChunkCmd extends CommandBase {
 											ck.setType(type);
 											ck.setChanged(time);
 											ck.save();
-											StateLogger.log(StateLogger.LoggerType.CHUNK, StateLogger.player(player) + " set the type of linked " + StateLogger.chunk(ck) + " to PUBLIC.");
+											Print.log(StateLogger.player(player) + " set the type of linked " + StateLogger.chunk(ck) + " to PUBLIC.");
 										});
 										chunk.save();
 										Print.chat(sender, "&2Chunk set to &cPUBLIC&2!");
 										Print.chat(sender, "&2It is still yours, but anyone can edit blocks.");
-										StateLogger.log(StateLogger.LoggerType.CHUNK, StateLogger.player(player) + " set the type of " + StateLogger.chunk(chunk) + " to PUBLIC.");
+										Print.log(StateLogger.player(player) + " set the type of " + StateLogger.chunk(chunk) + " to PUBLIC.");
 										break;
 									}
 									default:{
@@ -498,7 +498,7 @@ public class ChunkCmd extends CommandBase {
 								}
 								boolean bool = Boolean.parseBoolean(args[2]);
 								chunk.getMunicipality().modifyForceloadedChunk(player, chunk.getChunkPos(), bool);
-								StateLogger.log(StateLogger.LoggerType.MUNICIPALITY, StateLogger.player(player) + " " + (bool ? "enabled" : "disabled") + " chunk force-loading at " + StateLogger.chunk(chunk) + ", in the District of " + StateLogger.district(chunk.getDistrict()) + ", which is in " + StateLogger.municipality(chunk.getMunicipality()) + ".");
+								Print.log(StateLogger.player(player) + " " + (bool ? "enabled" : "disabled") + " chunk force-loading at " + StateLogger.chunk(chunk) + ", in the District of " + StateLogger.district(chunk.getDistrict()) + ", which is in " + StateLogger.municipality(chunk.getMunicipality()) + ".");
 								//
 								Bank bank = chunk.getMunicipality().getBank();
 								bank.processAction(Bank.Action.TRANSFER, Static.getServer(), chunk.getMunicipality().getAccount(), net.fexcraft.mod.states.util.Config.LOADED_CHUNKS_TAX, States.SERVERACCOUNT);
@@ -550,7 +550,7 @@ public class ChunkCmd extends CommandBase {
 					if(args[1].equals("reset")){
 						chunk.setLink(null);
 						Print.chat(sender, "&6Chunk unlinked.");
-						StateLogger.log(StateLogger.LoggerType.CHUNK, StateLogger.player(player) + " unliked the " + StateLogger.chunk(chunk) + ".");
+						Print.log(StateLogger.player(player) + " unliked the " + StateLogger.chunk(chunk) + ".");
 					}
 					else{
 						try{
@@ -563,7 +563,7 @@ public class ChunkCmd extends CommandBase {
 							}
 							chunk.setLink(new ChunkPos(x, z));
 							Print.chat(sender, "&6Chunk linked. ( " + x + " | " + z + " );");
-							StateLogger.log(StateLogger.LoggerType.CHUNK, StateLogger.player(player) + " linked " + StateLogger.chunk(chunk) + " to (" + x + ", " + z + ").");
+							Print.log(StateLogger.player(player) + " linked " + StateLogger.chunk(chunk) + " to (" + x + ", " + z + ").");
 						}
 						catch(Exception e){
 							Print.chat(sender, "&9Error: &c" + e.getMessage());
@@ -609,13 +609,13 @@ public class ChunkCmd extends CommandBase {
 									chunk.getPlayerWhitelist().add(gp.getId());
 									chunk.save();
 									Print.chat(sender, "&aPlayer added to whitelist.");
-									StateLogger.log(StateLogger.LoggerType.CHUNK, StateLogger.player(player) + " added " + StateLogger.player(gp) + " to the whitelist of " + StateLogger.chunk(chunk) + ".");
+									Print.log(StateLogger.player(player) + " added " + StateLogger.player(gp) + " to the whitelist of " + StateLogger.chunk(chunk) + ".");
 								}
 								else if(args[1].equals("rem")){
 									chunk.getPlayerWhitelist().remove(gp.getId());
 									chunk.save();
 									Print.chat(sender, "&aPlayer removed from whitelist.");
-									StateLogger.log(StateLogger.LoggerType.CHUNK, StateLogger.player(player) + " removed " + StateLogger.player(gp) + " from the whitelist of " + StateLogger.chunk(chunk) + ".");
+									Print.log(StateLogger.player(player) + " removed " + StateLogger.player(gp) + " from the whitelist of " + StateLogger.chunk(chunk) + ".");
 								}
 								else{
 									Print.chat(sender, "&c&oHow could this happen?! Report this issue immediatelly.");
@@ -628,7 +628,7 @@ public class ChunkCmd extends CommandBase {
 							chunk.getCompanyWhitelist().clear();
 							chunk.save();
 							Print.chat(sender, "Whitelist cleared.");
-							StateLogger.log(StateLogger.LoggerType.CHUNK, StateLogger.player(player) + " cleared the whitelist of " + StateLogger.chunk(chunk) + ".");
+							Print.log(StateLogger.player(player) + " cleared the whitelist of " + StateLogger.chunk(chunk) + ".");
 							return;
 						}
 						case "view":{

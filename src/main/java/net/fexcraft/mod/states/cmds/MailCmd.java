@@ -240,11 +240,11 @@ public class MailCmd extends CommandBase {
 									return;
 								}
 								StateUtil.announce(server, AnnounceLevel.MUNICIPALITY, "&o" + cap.getFormattedNickname() + " &e&oleft the Municipality!", cap.getMunicipality().getId());
-								StateLogger.log(StateLogger.LoggerType.MUNICIPALITY, StateLogger.player(player) + " left " + StateLogger.municipality(cap.getMunicipality()) + ".");
+								Print.log(StateLogger.player(player) + " left " + StateLogger.municipality(cap.getMunicipality()) + ".");
 								cap.setMunicipality(mun);
 								cap.save(); mun.save();
 								StateUtil.announce(server, AnnounceLevel.MUNICIPALITY, "&o" + cap.getFormattedNickname() + " &2&ojoined the Municipality!", cap.getMunicipality().getId());
-								StateLogger.log(StateLogger.LoggerType.MUNICIPALITY, StateLogger.player(player) + " joined " + StateLogger.municipality(cap.getMunicipality()) + ".");
+								Print.log(StateLogger.player(player) + " joined " + StateLogger.municipality(cap.getMunicipality()) + ".");
 								break;
 							}
 							case "municipality_council":{
@@ -260,7 +260,7 @@ public class MailCmd extends CommandBase {
 								mun.getCouncil().add(cap.getUUID());
 								mun.save();
 								StateUtil.announce(server, AnnounceLevel.MUNICIPALITY, cap.getFormattedNickname() + " joined the Coucil of our Municipality!", mun.getId());
-								StateLogger.log(StateLogger.LoggerType.MUNICIPALITY, StateLogger.player(player) + " joined to the council of " + StateLogger.municipality(mun) + ".");
+								Print.log(StateLogger.player(player) + " joined to the council of " + StateLogger.municipality(mun) + ".");
 								break;
 							}
 							case "state_council":{
@@ -276,7 +276,7 @@ public class MailCmd extends CommandBase {
 								state.getCouncil().add(cap.getUUID());
 								state.save();
 								StateUtil.announce(server, AnnounceLevel.STATE, cap.getFormattedNickname() + " joined the Coucil of our State!", state.getId());
-								StateLogger.log(StateLogger.LoggerType.STATE, StateLogger.player(player) + " joined to the council of " + StateLogger.state(state) + ".");
+								Print.log(StateLogger.player(player) + " joined to the council of " + StateLogger.state(state) + ".");
 								break;
 							}
 							case "state_municipality":{
@@ -295,7 +295,7 @@ public class MailCmd extends CommandBase {
 								}
 								cap.getMunicipality().setState(state);
 								StateUtil.announce(server, AnnounceLevel.STATE, "Municipality of " + cap.getMunicipality().getName() + " joined our State!", state.getId());
-								StateLogger.log(StateLogger.LoggerType.STATE, StateLogger.player(player) + " >>> " + StateLogger.municipality(cap.getMunicipality()) + " joined the State of " + StateLogger.state(state));
+								Print.log(StateLogger.player(player) + " >>> " + StateLogger.municipality(cap.getMunicipality()) + " joined the State of " + StateLogger.state(state));
 								break;
 							}
 						}

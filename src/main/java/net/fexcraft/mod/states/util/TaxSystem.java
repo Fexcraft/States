@@ -49,22 +49,22 @@ public class TaxSystem extends TimerTask {
 				return;
 			}
 			MessageSender.as(null, "Starting regular tax collection.");
-			StateLogger.log(StateLogger.LoggerType.CHUNK, "Collecting tax from loaded chunks...");
+			Print.log("Collecting tax from loaded chunks...");
 			ImmutableMap<ChunkPos, Chunk> map = ImmutableMap.copyOf(States.CHUNKS);
 			for(Chunk chunk  : map.values()){
 				TaxSystem.processChunkTax(date, chunk);
 			}
-			StateLogger.log(StateLogger.LoggerType.PLAYER, "Collecting tax from online players...");
+			Print.log("Collecting tax from online players...");
 			ImmutableList<EntityPlayerMP> players = ImmutableList.copyOf(Static.getServer().getPlayerList().getPlayers());
 			for(EntityPlayerMP player : players){
 				TaxSystem.processPlayerTax(date, player.getCapability(StatesCapabilities.PLAYER, null));
 			}
 			if(Config.TAX_OFFLINE_PLAYERS){
-				StateLogger.log(StateLogger.LoggerType.PLAYER, "Collecting tax from offline players...");
+				Print.log("Collecting tax from offline players...");
 				TaxSystem.processOfflinePlayerTax(date);
 			}
 			//
-			StateLogger.log(StateLogger.LoggerType.MUNICIPALITY, "Collecting tax from force-loaded chunks...");
+			Print.log("Collecting tax from force-loaded chunks...");
 			ImmutableMap<Integer, List<ChunkPos>> maplc = ImmutableMap.copyOf(States.LOADED_CHUNKS);
 			for(Entry<Integer, List<ChunkPos>> entry : maplc.entrySet()){
 				TaxSystem.processLoadedChunkTax(date, entry.getKey(), entry.getValue());
@@ -74,9 +74,7 @@ public class TaxSystem extends TimerTask {
 		}
 		catch(Exception e){
 			MessageSender.as(null, "TAX COLLECTION ERRORED!");
-			Print.log("Error while collecting Tax!");
-			StateLogger.log("chunk", "An error occured while collecting tax, further collection is halted for this interval.");
-			StateLogger.log("player", "An error occured while collecting tax, further collection is halted for this interval.");
+			Print.log("An error occured while collecting tax, further collection is halted for this interval.");
 			e.printStackTrace();
 		}
 	}
@@ -92,8 +90,7 @@ public class TaxSystem extends TimerTask {
 				if(mun.getAccount().getBalance() < conf){
 					ChunkPos pos = States.LOADED_CHUNKS.get(key).remove(i);
 					MailUtil.send(null, RecipientType.MUNICIPALITY, getMayor(mun), COLLECTOR, "Municipality didn't have enough money to pay the tax for force-loading the " + StateLogger.chunk(pos) + "! As such, force-loading got disabled.", SYSTEMMAIL);
-					StateLogger.log(StateLogger.LoggerType.MUNICIPALITY,
-						"Municipality didn't have enough money to pay the tax for force-loading the " + StateLogger.chunk(pos) + "! As such, force-loading got disabled.");
+					Print.log("Municipality didn't have enough money to pay the tax for force-loading the " + StateLogger.chunk(pos) + "! As such, force-loading got disabled.");
 					ForcedChunksManager.requestUnload(pos);
 				}
 				else{
@@ -161,11 +158,11 @@ public class TaxSystem extends TimerTask {
 					cap.onTaxCollected(date);
 				}
 				if(bank.isNull()){
-					StateLogger.log(StateLogger.LoggerType.CHUNK, "Tax collection for " + StateLogger.player(cap) + " could not be completed as the player's bank is NULL, additionally, the player didn't have enough money to pay the tax.");
+					Print.log("Tax collection for " + StateLogger.player(cap) + " could not be completed as the player's bank is NULL, additionally, the player didn't have enough money to pay the tax.");
 				}
 			}
 			if(bank.isNull()){
-				StateLogger.log(StateLogger.LoggerType.PLAYER, "Tax collection for " + StateLogger.player(cap.getEntityPlayer()) + " could not be completed as the player's bank is NULL.");
+				Print.log("Tax collection for " + StateLogger.player(cap.getEntityPlayer()) + " could not be completed as the player's bank is NULL.");
 			}
 			long statetax = tax > 1000 ? getPercentage(tax, cap.getState().getCitizenTaxPercentage()) : 0;
 			long muntax = tax > 1000 ? tax - statetax : tax;
@@ -241,12 +238,12 @@ public class TaxSystem extends TimerTask {
 					value.onTaxCollected(date);
 				}
 				if(bank.isNull()){
-					StateLogger.log(StateLogger.LoggerType.CHUNK, "Tax collection for " + StateLogger.chunk(value) + " could not be completed as the owner's bank is NULL, additionally, the owner didn't have enough money to pay the tax.");
+					Print.log("Tax collection for " + StateLogger.chunk(value) + " could not be completed as the owner's bank is NULL, additionally, the owner didn't have enough money to pay the tax.");
 				}
 				return;
 			}
 			if(bank.isNull()){
-				StateLogger.log(StateLogger.LoggerType.CHUNK, "Tax collection for " + StateLogger.chunk(value) + " could not be completed as the owner's bank is NULL.");
+				Print.log("Tax collection for " + StateLogger.chunk(value) + " could not be completed as the owner's bank is NULL.");
 				return;
 			}
 			long statetax = tax > 1000 ? getPercentage(tax, value.getState().getChunkTaxPercentage()) : 0;

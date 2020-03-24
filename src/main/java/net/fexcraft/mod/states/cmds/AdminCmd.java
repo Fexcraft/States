@@ -76,7 +76,7 @@ public class AdminCmd extends CommandBase {
 					chunk.setPrice(0); chunk.save();
 					Print.chat(sender, String.format("&2&lChunk Claimed. [ %s, %s ]", chunk.xCoord(), chunk.zCoord()));
 					Listener.updateNeighbors(chunk);
-					StateLogger.log(StateLogger.LoggerType.CHUNK, StateLogger.player(player) + " (force-)claimed " + StateLogger.chunk(chunk) + ", it is now part of " + StateLogger.district(dis) + ".");
+					Print.log(StateLogger.player(player) + " (force-)claimed " + StateLogger.chunk(chunk) + ", it is now part of " + StateLogger.district(dis) + ".");
 					ImageCache.update(player.world, player.world.getChunk(chunk.xCoord(), chunk.zCoord()));
 				}
 				return;

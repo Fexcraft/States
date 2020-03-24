@@ -2,6 +2,7 @@ package net.fexcraft.mod.states.events;
 
 import java.util.ArrayList;
 
+import net.fexcraft.lib.mc.utils.Print;
 import net.fexcraft.mod.states.data.Chunk;
 import net.fexcraft.mod.states.impl.capabilities.ChunkCapabilityUtil;
 import net.fexcraft.mod.states.impl.capabilities.PlayerCapabilityUtil;
@@ -9,7 +10,6 @@ import net.fexcraft.mod.states.impl.capabilities.SignTileEntityCapabilityUtil;
 import net.fexcraft.mod.states.impl.capabilities.WorldCapabilityUtil;
 import net.fexcraft.mod.states.util.ForcedChunksManager;
 import net.fexcraft.mod.states.util.ImageCache;
-import net.fexcraft.mod.states.util.StateLogger;
 import net.fexcraft.mod.states.util.StateUtil;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.tileentity.TileEntitySign;
@@ -39,7 +39,7 @@ public class WorldEvents {
 		if(event.getWorld().provider.getDimension() != 0 || event.getWorld().isRemote) return;
 		StateUtil.unloadAll(); StateUtil.clearAll(); ChunkEvents.LOADED = false;
 		ImageCache.saveQueue();
-		StateLogger.log("all", "Unloading World...");
+		Print.log("all", "Unloading World...");
 		ForcedChunksManager.unload();
 	}
 	

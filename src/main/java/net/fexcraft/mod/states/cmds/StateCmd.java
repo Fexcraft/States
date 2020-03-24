@@ -144,7 +144,7 @@ public class StateCmd extends CommandBase {
 								state.setHead(null); state.save();
 								Print.chat(sender, "&2State Leader was &creset&2.");
 								StateUtil.announce(null, AnnounceLevel.MUNICIPALITY_ALL, "&2&oState Leader was &c&oreset&2&o.", state.getId());
-								StateLogger.log(StateLogger.LoggerType.STATE, StateLogger.player(player) + " reset head of " + StateLogger.state(state) + ".");
+								Print.log(StateLogger.player(player) + " reset head of " + StateLogger.state(state) + ".");
 								return;
 							}
 							GameProfile gp = Static.getServer().getPlayerProfileCache().getGameProfileForUsername(args[2]);
@@ -156,7 +156,7 @@ public class StateCmd extends CommandBase {
 							state.setChanged(Time.getDate());
 							state.save();
 							Print.chat(sender, "&2Set &7" + gp.getName() + "&2 to new State Leader!");
-							StateLogger.log(StateLogger.LoggerType.STATE, StateLogger.player(player) + " changed leader of " + StateLogger.state(state) + " to " + StateLogger.player(gp) + ".");
+							Print.log(StateLogger.player(player) + " changed leader of " + StateLogger.state(state) + " to " + StateLogger.player(gp) + ".");
 						}
 						else{
 							Print.chat(sender, "&cNo permission.");
@@ -183,7 +183,7 @@ public class StateCmd extends CommandBase {
 							state.setChanged(Time.getDate());
 							state.save();
 							Print.chat(sender, "&6Name set to: &7" + state.getName());
-							StateLogger.log(StateLogger.LoggerType.STATE, StateLogger.player(player) + " set the name of " + StateLogger.state(state) + " to " + state.getName());
+							Print.log(StateLogger.player(player) + " set the name of " + StateLogger.state(state) + " to " + state.getName());
 						}
 						else{
 							Print.chat(sender, "&cNo permission.");
@@ -210,7 +210,7 @@ public class StateCmd extends CommandBase {
 							state.setChanged(Time.getDate());
 							state.save();
 							Print.chat(sender, "&6Ruleset Name set to: &7" + state.getName());
-							StateLogger.log(StateLogger.LoggerType.STATE, StateLogger.player(player) + " set the ruleset name of " + StateLogger.state(state) + " to " + state.getName());
+							Print.log(StateLogger.player(player) + " set the ruleset name of " + StateLogger.state(state) + " to " + state.getName());
 						}
 						else{
 							Print.chat(sender, "&cNo permission.");
@@ -231,7 +231,7 @@ public class StateCmd extends CommandBase {
 								state.setChanged(Time.getDate());
 								state.save();
 								Print.chat(sender, "&2Price set to: &7" + Config.getWorthAsString(state.getPrice()));
-								StateLogger.log(StateLogger.LoggerType.STATE, StateLogger.player(player) + " set the price of " + StateLogger.state(state) + " to " + state.getPrice());
+								Print.log(StateLogger.player(player) + " set the price of " + StateLogger.state(state) + " to " + state.getPrice());
 							}
 							catch(Exception e){
 								Print.chat(sender, "&cError: &7" + e.getMessage());
@@ -260,7 +260,7 @@ public class StateCmd extends CommandBase {
 								state.setChanged(Time.getDate());
 								state.save();
 								Print.chat(sender, "&6Color set to &7" + str + "&6! (" + color.getRed() + ", " + color.getGreen() + ", " + color.getBlue() + ");");
-								StateLogger.log(StateLogger.LoggerType.STATE, StateLogger.player(player) + " set the color of " + StateLogger.state(state) + " to " + state.getColor());
+								Print.log(StateLogger.player(player) + " set the color of " + StateLogger.state(state) + " to " + state.getColor());
 							}
 							catch(Exception e){
 								Print.chat(sender, "&2Error: &7" + e.getMessage());
@@ -285,7 +285,7 @@ public class StateCmd extends CommandBase {
 							state.setCapitalId(mun.getId());
 							state.setChanged(Time.getDate());
 							StateUtil.announce(server, AnnounceLevel.STATE_ALL, "&6" + mun.getName() + " &9 is now the new Capital!", state.getId());
-							StateLogger.log(StateLogger.LoggerType.STATE, StateLogger.player(player) + " set the capital of " + StateLogger.state(state) + " to " + StateLogger.municipality(mun));
+							Print.log(StateLogger.player(player) + " set the capital of " + StateLogger.state(state) + " to " + StateLogger.municipality(mun));
 							return;
 						}
 						else{
@@ -304,7 +304,7 @@ public class StateCmd extends CommandBase {
 								state.setChanged(Time.getDate());
 								state.save();
 								Print.chat(sender, "&6Icon set to &7" + args[2] + "&6!");
-								StateLogger.log(StateLogger.LoggerType.STATE, StateLogger.player(player) + " set the icon of " + StateLogger.state(state) + " to " + state.getIcon());
+								Print.log(StateLogger.player(player) + " set the icon of " + StateLogger.state(state) + " to " + state.getIcon());
 							}
 							catch(Exception e){
 								Print.chat(sender, "&2Error: &7" + e.getMessage());
@@ -418,7 +418,7 @@ public class StateCmd extends CommandBase {
 						state.getCouncil().remove(gp.getId());
 						state.save();
 						StateUtil.announce(server, AnnounceLevel.MUNICIPALITY, gp.getName() + " &9was removed from the State Council!", state.getId());
-						StateLogger.log(StateLogger.LoggerType.STATE, StateLogger.player(player) + " removed " + StateLogger.player(gp) + " from the council of " + StateLogger.state(state) + ".");
+						Print.log(StateLogger.player(player) + " removed " + StateLogger.player(gp) + " from the council of " + StateLogger.state(state) + ".");
 						break;
 					}
 					case "leave":{
@@ -429,7 +429,7 @@ public class StateCmd extends CommandBase {
 						state.getCouncil().remove(ply.getUUID());
 						state.save();
 						StateUtil.announce(server, AnnounceLevel.MUNICIPALITY, ply.getFormattedNickname() + " &9left the State Council!", state.getId());
-						StateLogger.log(StateLogger.LoggerType.STATE, StateLogger.player(player) + " left the council of " + StateLogger.state(state) + ".");
+						Print.log(StateLogger.player(player) + " left the council of " + StateLogger.state(state) + ".");
 					}
 					case "invite":{
 						if(!state.isAuthorized(state.r_COUNCIL_INVITE.id, ply.getUUID())){
@@ -466,7 +466,7 @@ public class StateCmd extends CommandBase {
 						compound.setLong("at", Time.getDate());
 						MailUtil.send(sender, RecipientType.PLAYER, gp.getId().toString(), player.getGameProfile().getId().toString(), invmsg, MailType.INVITE, Time.DAY_MS * 5, compound);
 						Print.chat(sender, "&7&oInvite sent! (Will be valid for 5 days.)");
-						StateLogger.log(StateLogger.LoggerType.STATE, StateLogger.player(player) + " invited " + StateLogger.player(gp) + " to the council of " + StateLogger.state(state) + ".");
+						Print.log(StateLogger.player(player) + " invited " + StateLogger.player(gp) + " to the council of " + StateLogger.state(state) + ".");
 						return;
 					}
 				}
@@ -515,7 +515,7 @@ public class StateCmd extends CommandBase {
 							compound.setLong("at", Time.getDate());
 							MailUtil.send(sender, RecipientType.MUNICIPALITY, mun.getId(), player.getGameProfile().getId().toString(), invmsg, MailType.INVITE, Time.DAY_MS * 12, compound);
 							Print.chat(sender, "&7&oInvite sent! (Will be valid for 12 days.)");
-							StateLogger.log(StateLogger.LoggerType.MUNICIPALITY, StateLogger.player(player) + " invited " + StateLogger.municipality(mun) + " to join the State of " + StateLogger.state(state));
+							Print.log(StateLogger.player(player) + " invited " + StateLogger.municipality(mun) + " to join the State of " + StateLogger.state(state));
 							return;
 						}
 						else{
@@ -538,7 +538,7 @@ public class StateCmd extends CommandBase {
 							mun.setChanged(Time.getDate());
 							mun.save();
 							StateUtil.announce(server, AnnounceLevel.STATE, "Municipality of " + mun.getName() + " was removed from our State!", state.getId());
-							StateLogger.log(StateLogger.LoggerType.MUNICIPALITY, StateLogger.player(player) + " kicked " + StateLogger.municipality(mun) + " from the State of " + StateLogger.state(state));
+							Print.log(StateLogger.player(player) + " kicked " + StateLogger.municipality(mun) + " from the State of " + StateLogger.state(state));
 						}
 						else{
 							Print.chat(sender, "&6No Permission.");
@@ -604,7 +604,7 @@ public class StateCmd extends CommandBase {
 							StateUtil.announce(server, "&9New State was created!");
 							StateUtil.announce(server, "&9Created by " + ply.getFormattedNickname());
 							StateUtil.announce(server, "&9Name&0: &7" + newstate.getName());
-							StateLogger.log(StateLogger.LoggerType.STATE, StateLogger.player(player) + " created " + StateLogger.state(newstate) + ".");
+							Print.log(StateLogger.player(player) + " created " + StateLogger.state(newstate) + ".");
 						}
 					}
 				}

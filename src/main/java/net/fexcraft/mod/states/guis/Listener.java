@@ -270,7 +270,7 @@ public class Listener implements IPacketListener<PacketNBTTagCompound> {
 					ck.save();
 					updateNeighbors(ck);
 					//
-					StateLogger.log(StateLogger.LoggerType.CHUNK, StateLogger.player(player) + " claimed " + StateLogger.chunk(ck) + ", it is now part of " + StateLogger.district(dis) + ".");
+					Print.log(StateLogger.player(player) + " claimed " + StateLogger.chunk(ck) + ", it is now part of " + StateLogger.district(dis) + ".");
 					ImageCache.update(world, ch);
 					compound.setString("result", "Chunk Claimed. (" + dis.getId() + ");");
 					compound.setBoolean("claimed", true);
@@ -304,7 +304,7 @@ public class Listener implements IPacketListener<PacketNBTTagCompound> {
 			ck.setClaimer(player.getGameProfile().getId());
 			ck.setChanged(Time.getDate());
 			ck.save();
-			StateLogger.log(StateLogger.LoggerType.CHUNK, StateLogger.player(player) + " re-claimed " + StateLogger.chunk(ck) + ", it is now part of " + StateLogger.district(dis) + ".");
+			Print.log(StateLogger.player(player) + " re-claimed " + StateLogger.chunk(ck) + ", it is now part of " + StateLogger.district(dis) + ".");
 			ImageCache.update(world, ch);
 			if(ck.getLinkedChunks().size() > 0){
 				for(ResourceLocation loc : ck.getLinkedChunks()){
@@ -347,34 +347,34 @@ public class Listener implements IPacketListener<PacketNBTTagCompound> {
 				if(!ck.getDistrict().getNeighbors().contains(chunk.getDistrict().getId())){
 					ck.getDistrict().getNeighbors().add(chunk.getDistrict().getId());
 					ck.getDistrict().save();
-					StateLogger.log(StateLogger.LoggerType.DISRICT, "Added " + StateLogger.district(chunk.getDistrict()) + " to NeighborList of " + StateLogger.district(ck.getDistrict()) + ".");
+					Print.log("Added " + StateLogger.district(chunk.getDistrict()) + " to NeighborList of " + StateLogger.district(ck.getDistrict()) + ".");
 				}
 				if(!chunk.getDistrict().getNeighbors().contains(ck.getDistrict().getId())){
 					chunk.getDistrict().getNeighbors().add(ck.getDistrict().getId());
 					chunk.getDistrict().save();
-					StateLogger.log(StateLogger.LoggerType.DISRICT, "Added " + StateLogger.district(ck.getDistrict()) + " to NeighborList of " + StateLogger.district(chunk.getDistrict()) + ".");
+					Print.log("Added " + StateLogger.district(ck.getDistrict()) + " to NeighborList of " + StateLogger.district(chunk.getDistrict()) + ".");
 				}
 				if(chunk.getMunicipality().getId() >= 0 && chunk.getMunicipality().getId() != ck.getMunicipality().getId()){
 					if(!ck.getMunicipality().getNeighbors().contains(chunk.getMunicipality().getId())){
 						ck.getMunicipality().getNeighbors().add(chunk.getMunicipality().getId());
 						ck.getMunicipality().save();
-						StateLogger.log(StateLogger.LoggerType.MUNICIPALITY, "Added " + StateLogger.municipality(chunk.getMunicipality()) + " to NeighborList of " + StateLogger.municipality(ck.getMunicipality()) + ".");
+						Print.log("Added " + StateLogger.municipality(chunk.getMunicipality()) + " to NeighborList of " + StateLogger.municipality(ck.getMunicipality()) + ".");
 					}
 					if(!chunk.getMunicipality().getNeighbors().contains(ck.getMunicipality().getId())){
 						chunk.getMunicipality().getNeighbors().add(ck.getMunicipality().getId());
 						chunk.getMunicipality().save();
-						StateLogger.log(StateLogger.LoggerType.MUNICIPALITY, "Added " + StateLogger.municipality(ck.getMunicipality()) + " to NeighborList of " + StateLogger.municipality(chunk.getMunicipality()) + ".");
+						Print.log("Added " + StateLogger.municipality(ck.getMunicipality()) + " to NeighborList of " + StateLogger.municipality(chunk.getMunicipality()) + ".");
 					}
 					if(chunk.getDistrict().getMunicipality().getState().getId() >= 0 && chunk.getDistrict().getMunicipality().getState().getId() != ck.getDistrict().getMunicipality().getState().getId()){
 						if(!ck.getState().getNeighbors().contains(chunk.getState().getId())){
 							ck.getState().getNeighbors().add(chunk.getState().getId());
 							ck.getState().save();
-							StateLogger.log(StateLogger.LoggerType.STATE, "Added " + StateLogger.state(chunk.getState()) + " to NeighborList of " + StateLogger.state(ck.getState()) + ".");
+							Print.log("Added " + StateLogger.state(chunk.getState()) + " to NeighborList of " + StateLogger.state(ck.getState()) + ".");
 						}
 						if(!chunk.getState().getNeighbors().contains(ck.getState().getId())){
 							chunk.getState().getNeighbors().add(ck.getState().getId());
 							chunk.getState().save();
-							StateLogger.log(StateLogger.LoggerType.STATE, "Added " + StateLogger.state(ck.getState()) + " to NeighborList of " + StateLogger.state(chunk.getState()) + ".");
+							Print.log("Added " + StateLogger.state(ck.getState()) + " to NeighborList of " + StateLogger.state(chunk.getState()) + ".");
 						}
 					}
 				}

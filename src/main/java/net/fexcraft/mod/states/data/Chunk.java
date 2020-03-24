@@ -12,6 +12,7 @@ import com.google.gson.JsonObject;
 import net.fexcraft.lib.common.json.JsonUtil;
 import net.fexcraft.lib.common.lang.ArrayList;
 import net.fexcraft.lib.common.math.Time;
+import net.fexcraft.lib.mc.utils.Print;
 import net.fexcraft.mod.states.States;
 import net.fexcraft.mod.states.data.root.BuyableType;
 import net.fexcraft.mod.states.data.root.Taxable;
@@ -56,7 +57,7 @@ public class Chunk implements BuyableType, Taxable/*, RuleHolder*/ {
 			ImageCache.update(world, world.getChunkProvider().getLoadedChunk(x, z));
 		}
 		if(district != null && this.district.getId() == -2 && changed + Time.DAY_MS < Time.getDate()){
-			StateLogger.log(StateLogger.LoggerType.CHUNK, StateLogger.district(-2) + " time of " + StateLogger.chunk(this) + " expired! Setting back to " + StateLogger.district(-1) + "!");
+			Print.log(StateLogger.district(-2) + " time of " + StateLogger.chunk(this) + " expired! Setting back to " + StateLogger.district(-1) + "!");
 			this.setDistrict(StateUtil.getDistrict(-1));
 			save();
 		}

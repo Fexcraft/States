@@ -29,7 +29,7 @@ public class ForcedChunksManager implements LoadingCallback {
 	private static ArrayList<Ticket> tickets = new ArrayList<>();
 	
 	public static void check(){
-		if(Config.LOADED_CHUNKS_PER_MUNICIPALITY <= 0){ return; }
+		if(StConfig.LOADED_CHUNKS_PER_MUNICIPALITY <= 0){ return; }
 		//if(tickets.isEmpty()){ return; }
 		States.LOADED_CHUNKS.entrySet().forEach(entry -> {
 			entry.getValue().forEach(pos -> {
@@ -61,7 +61,7 @@ public class ForcedChunksManager implements LoadingCallback {
 	}
 
 	public static void load(){
-		if(Config.LOADED_CHUNKS_PER_MUNICIPALITY <= 0){ return; }
+		if(StConfig.LOADED_CHUNKS_PER_MUNICIPALITY <= 0){ return; }
 		JsonObject obj = JsonUtil.get(new File(States.getSaveDirectory(), "forced_chunks.json"));
 		if(obj == null || obj.entrySet().isEmpty()){
 			States.LOADED_CHUNKS.clear();
@@ -87,7 +87,7 @@ public class ForcedChunksManager implements LoadingCallback {
 	}
 
 	public static void unload(){
-		if(Config.LOADED_CHUNKS_PER_MUNICIPALITY <= 0){ return; }
+		if(StConfig.LOADED_CHUNKS_PER_MUNICIPALITY <= 0){ return; }
 		//if(States.LOADED_CHUNKS.size() <= 0){ return; }
 		JsonObject obj = new JsonObject();
 		for(Entry<Integer, List<ChunkPos>> entry : States.LOADED_CHUNKS.entrySet()){

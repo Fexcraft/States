@@ -40,7 +40,7 @@ import net.fexcraft.mod.states.impl.capabilities.SignTileEntityCapabilityUtil;
 import net.fexcraft.mod.states.impl.capabilities.WorldCapabilityUtil;
 import net.fexcraft.mod.states.packets.ImagePacket;
 import net.fexcraft.mod.states.packets.ImagePacketHandler;
-import net.fexcraft.mod.states.util.Config;
+import net.fexcraft.mod.states.util.StConfig;
 import net.fexcraft.mod.states.util.ForcedChunksManager;
 import net.fexcraft.mod.states.util.ImageCache;
 import net.fexcraft.mod.states.util.ImageUtil;
@@ -90,7 +90,7 @@ public class States {
 	
 	@Mod.EventHandler
 	public void preInit(FMLPreInitializationEvent event){
-		Config.initialize(event); 
+		StConfig.initialize(event); 
 		SignCapabilitySerializer.addListener(SignShop.class);
 		SignCapabilitySerializer.addListener(SignMailbox.class);
 		CapabilityManager.INSTANCE.register(SignTileEntityCapability.class, new SignTileEntityCapabilityUtil.Storage(), new SignTileEntityCapabilityUtil.Callable());
@@ -133,7 +133,7 @@ public class States {
 	
 	@Mod.EventHandler
 	public void serverStarting(FMLServerStartingEvent event){
-		if(MessageSender.RECEIVER == null) Config.updateWebHook();
+		if(MessageSender.RECEIVER == null) StConfig.updateWebHook();
 	}
 	
 	@Mod.EventHandler
@@ -142,9 +142,9 @@ public class States {
 		//
 		LocalDateTime midnight = LocalDateTime.of(LocalDate.now(ZoneOffset.systemDefault()), LocalTime.MIDNIGHT);
 		long mid = midnight.toInstant(ZoneOffset.UTC).toEpochMilli(); long date = Time.getDate();
-		while((mid += Config.TAX_INTERVAL) < date);
+		while((mid += StConfig.TAX_INTERVAL) < date);
 		if(TAX_TIMER == null){
-			(TAX_TIMER = new Timer()).schedule(new TaxSystem(), new Date(mid), Config.TAX_INTERVAL);
+			(TAX_TIMER = new Timer()).schedule(new TaxSystem(), new Date(mid), StConfig.TAX_INTERVAL);
 		}
 		if(DATA_MANAGER == null){
 			(DATA_MANAGER = new Timer()).schedule(new StateUtil(), new Date(mid), Static.dev() ? 60000 : Time.MIN_MS * 15);

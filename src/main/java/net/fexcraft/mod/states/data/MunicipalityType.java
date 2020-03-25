@@ -5,7 +5,7 @@ import java.util.TreeSet;
 import com.google.gson.JsonObject;
 
 import net.fexcraft.lib.common.json.JsonUtil;
-import net.fexcraft.mod.states.util.Config;
+import net.fexcraft.mod.states.util.StConfig;
 
 public class MunicipalityType implements Comparable<MunicipalityType>{
 	
@@ -95,7 +95,7 @@ public class MunicipalityType implements Comparable<MunicipalityType>{
 	}
 	
 	public static final int getChunkLimitFor(Municipality mun){
-		return Config.CHUNK_PER_CITIZEN * mun.getCitizen().size();
+		return StConfig.CHUNK_PER_CITIZEN * mun.getCitizen().size();
 	}
 	
 }

@@ -36,14 +36,14 @@ public class ImageCache extends TimerTask {
 	public void run(){
 		try{
 			if(QUEUE.size() == 0){ return; }
-			for(int i = 0; i < Config.MAP_UPDATES_PER_SECOND; i++){
+			for(int i = 0; i < StConfig.MAP_UPDATES_PER_SECOND; i++){
 				QueueObj obj = QUEUE.poll();
 				if(obj != null){
 					updateImage(obj.world, obj.chunk);
 				}
 			}
 			if(LOADED_CACHE.size() == 0){ return; }
-			for(int i = 0; i < Config.MAP_UPDATES_PER_SECOND; i++){
+			for(int i = 0; i < StConfig.MAP_UPDATES_PER_SECOND; i++){
 				Entry<String, TempImg> entry = LOADED_CACHE.firstEntry();
 				if(entry != null){
 					if(entry.getValue().last_access + (Time.MIN_MS) >= Time.getDate()){
@@ -59,7 +59,7 @@ public class ImageCache extends TimerTask {
 	}
 	
 	public static void update(World world, Chunk chunk){
-		if(Config.MAP_UPDATES_PER_SECOND == 0 || chunk == null){
+		if(StConfig.MAP_UPDATES_PER_SECOND == 0 || chunk == null){
 			return;
 		}
 		QUEUE.add(new QueueObj(world, chunk));

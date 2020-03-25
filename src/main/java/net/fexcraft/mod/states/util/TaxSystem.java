@@ -43,9 +43,9 @@ public class TaxSystem extends TimerTask {
 		try{
 			load();
 			long date = Time.getDate();
-			if(last_interval + Config.TAX_INTERVAL > date){
+			if(last_interval + StConfig.TAX_INTERVAL > date){
 				Print.log("Tried to process TAX data, but it is not time for that yet.");
-				Print.log("LTAX: " + last_interval + " + INTERVAL: " + Config.TAX_INTERVAL + " > NOW: " + date);
+				Print.log("LTAX: " + last_interval + " + INTERVAL: " + StConfig.TAX_INTERVAL + " > NOW: " + date);
 				return;
 			}
 			MessageSender.as(null, "Starting regular tax collection.");
@@ -59,7 +59,7 @@ public class TaxSystem extends TimerTask {
 			for(EntityPlayerMP player : players){
 				TaxSystem.processPlayerTax(date, player.getCapability(StatesCapabilities.PLAYER, null));
 			}
-			if(Config.TAX_OFFLINE_PLAYERS){
+			if(StConfig.TAX_OFFLINE_PLAYERS){
 				Print.log("Collecting tax from offline players...");
 				TaxSystem.processOfflinePlayerTax(date);
 			}
@@ -82,7 +82,7 @@ public class TaxSystem extends TimerTask {
 	public static void processLoadedChunkTax(long date, Integer key, List<ChunkPos> value){
 		if(!loaded){ return; }
 		//if(value.lastTaxCollection() + Config.TAX_INTERVAL > date){ return; }
-		long conf = Config.LOADED_CHUNKS_TAX;
+		long conf = StConfig.LOADED_CHUNKS_TAX;
 		if(conf > 0){
 			Municipality mun = StateUtil.getMunicipality(key, false);
 			if(mun == null){ return; }//TODO maybe remove the collection?
@@ -128,7 +128,7 @@ public class TaxSystem extends TimerTask {
 
 	public static void processPlayerTax(long date, PlayerCapability cap){
 		if(!loaded || cap == null){ return; }
-		if(cap.lastTaxCollection() + Config.TAX_INTERVAL > date){ return; }
+		if(cap.lastTaxCollection() + StConfig.TAX_INTERVAL > date){ return; }
 		//if(cap.getMunicipality().getId() <= -1){ return; }
 		long tax = cap.getCustomTax() > 0 ? cap.getCustomTax() : cap.getMunicipality().getCitizenTax();
 		if(tax > 0){
@@ -180,7 +180,7 @@ public class TaxSystem extends TimerTask {
 
 	public static void processChunkTax(long date, Chunk value){
 		if(!loaded){ return; }
-		if(value.lastTaxCollection() + Config.TAX_INTERVAL > date){ return; }
+		if(value.lastTaxCollection() + StConfig.TAX_INTERVAL > date){ return; }
 		if(value.getLink() != null){
 			Chunk chunk = StateUtil.getChunk(value.getLink());
 			if(chunk == null ? (chunk = StateUtil.getTempChunk(value.getLink())) != null : true){

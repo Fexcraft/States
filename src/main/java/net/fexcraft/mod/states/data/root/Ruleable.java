@@ -27,7 +27,7 @@ public interface Ruleable extends RuleHolder, VoteHolder {
 		return getHead() != null && getHead().equals(uuid);
 	}
 	
-	public default boolean isAuthorized(String rule, UUID uuid){
+	public default Result isAuthorized(String rule, UUID uuid){
 		return getRule(rule).isAuthorized(this, uuid);
 	}
 	

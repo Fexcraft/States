@@ -113,7 +113,7 @@ public class RuleCmd extends CommandBase {
 							Print.chat(sender, "&9See &7/st-rule types &9for available.");
 							return;
 						}
-						if(type == VoteType.CHANGE_SETTER && !to.isValidAsSetter()){
+						if(type == VoteType.CHANGE_SETTER && !to.isValidAsSetter(rule.isVotable())){
 							Print.chat(sender, "&b'VOTE' Initiator types are not valid as Setter."); return;
 						}
 						if(ruleable instanceof State && to.isCitizenVote()){
@@ -121,7 +121,8 @@ public class RuleCmd extends CommandBase {
 						}
 						break;
 					case CHANGE_VALUE:
-						if(!ruleable.isAuthorized(rule.id, ply.getUUID())){
+						result = ruleable.isAuthorized(rule.id, ply.getUUID());
+						if(result.isFalse()){
 							Print.chat(sender, "&cNot Authorized to set the value of this."); return;
 						}
 						if(rule.get() == null){

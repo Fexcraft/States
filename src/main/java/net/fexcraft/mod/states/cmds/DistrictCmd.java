@@ -132,7 +132,7 @@ public class DistrictCmd extends CommandBase {
 				}
 				switch(args[1]){
 					case "type":{
-						if(dis.isAuthorized(dis.r_SET_TYPE.id, ply.getUUID()) || StateUtil.bypass(player)){
+						if(dis.isAuthorized(dis.r_SET_TYPE.id, ply.getUUID()).isTrue() || StateUtil.bypass(player)){
 							if(args.length < 3){
 								Print.chat(sender, "&9Missing Argument!");
 								Print.chat(sender, "&2You can see available types using &7/dis types&2!");
@@ -158,7 +158,7 @@ public class DistrictCmd extends CommandBase {
 						break;
 					}
 					case "name":{
-						if(dis.isAuthorized(dis.r_SET_NAME.id, ply.getUUID()) || StateUtil.bypass(player)){
+						if(dis.isAuthorized(dis.r_SET_NAME.id, ply.getUUID()).isTrue() || StateUtil.bypass(player)){
 							if(args.length < 3){
 								Print.chat(sender, "&9Missing Arguments!");
 								break;
@@ -185,7 +185,7 @@ public class DistrictCmd extends CommandBase {
 						break;
 					}
 					case "ruleset":{
-						if(dis.isAuthorized(dis.r_SET_RULESET.id, ply.getUUID()) || StateUtil.bypass(player)){
+						if(dis.isAuthorized(dis.r_SET_RULESET.id, ply.getUUID()).isTrue() || StateUtil.bypass(player)){
 							if(args.length < 3){
 								Print.chat(sender, "&9Missing Arguments!");
 								break;
@@ -212,7 +212,7 @@ public class DistrictCmd extends CommandBase {
 						break;
 					}
 					case "price":{
-						if(dis.isAuthorized(dis.r_SET_PRICE.id, ply.getUUID()) || StateUtil.bypass(player)){
+						if(dis.isAuthorized(dis.r_SET_PRICE.id, ply.getUUID()).isTrue() || StateUtil.bypass(player)){
 							if(args.length < 3){
 								Print.chat(sender, "&9Missing Argument!");
 								Print.chat(sender, "&7Setting the price to \"0\" makes the district not buyable.");
@@ -237,7 +237,7 @@ public class DistrictCmd extends CommandBase {
 						break;
 					}
 					case "manager":{
-						if(dis.isAuthorized(dis.r_SET_MANAGER.id, ply.getUUID()) || StateUtil.bypass(player)){
+						if(dis.isAuthorized(dis.r_SET_MANAGER.id, ply.getUUID()).isTrue() || StateUtil.bypass(player)){
 							if(args.length < 3){
 								Print.chat(sender, "&9Missing Argument!");
 								break;
@@ -259,7 +259,7 @@ public class DistrictCmd extends CommandBase {
 						break;
 					}
 					case "color":{
-						if(dis.isAuthorized(dis.r_SET_COLOR.id, ply.getUUID()) || StateUtil.bypass(player)){
+						if(dis.isAuthorized(dis.r_SET_COLOR.id, ply.getUUID()).isTrue() || StateUtil.bypass(player)){
 							if(args.length < 3){
 								Print.chat(sender, "&9Missing Argument!");
 								break;
@@ -288,7 +288,7 @@ public class DistrictCmd extends CommandBase {
 						break;
 					}
 					case "can-foreigners-settle":{
-						if(dis.isAuthorized(dis.r_CFS.id, ply.getUUID()) || StateUtil.bypass(player)){
+						if(dis.isAuthorized(dis.r_CFS.id, ply.getUUID()).isTrue() || StateUtil.bypass(player)){
 							if(args.length < 3){
 								Print.chat(sender, "&9Missing Argument!");
 								break;
@@ -310,7 +310,7 @@ public class DistrictCmd extends CommandBase {
 						break;
 					}
 					case "icon":{
-						if(dis.isAuthorized(dis.r_SET_ICON.id, ply.getUUID()) || StateUtil.bypass(player)){
+						if(dis.isAuthorized(dis.r_SET_ICON.id, ply.getUUID()).isTrue() || StateUtil.bypass(player)){
 							if(args.length < 3){
 								Print.chat(sender, "&9Missing Argument!");
 								break;
@@ -332,7 +332,7 @@ public class DistrictCmd extends CommandBase {
 						break;
 					}
 					case "chunk-tax":{
-						if(dis.isAuthorized(dis.r_SET_CHUNKTAX.id, ply.getUUID()) || StateUtil.bypass(player)){
+						if(dis.isAuthorized(dis.r_SET_CHUNKTAX.id, ply.getUUID()).isTrue() || StateUtil.bypass(player)){
 							if(args[2].equals("reset") || args[2].equals("disable")){
 								dis.setChunkTax(0); dis.save();
 								Print.chat(sender, "&9District's Chunk Tax was reset!");
@@ -348,7 +348,7 @@ public class DistrictCmd extends CommandBase {
 						break;
 					}
 					case "unclaim-if-brankrupt":{
-						if(dis.isAuthorized(dis.r_ONBANKRUPT.id, ply.getUUID()) || StateUtil.bypass(player)){
+						if(dis.isAuthorized(dis.r_ONBANKRUPT.id, ply.getUUID()).isTrue() || StateUtil.bypass(player)){
 							if(args.length < 3){ Print.chat(sender, "&9Missing Argument!"); break; }
 							dis.r_ONBANKRUPT.set(Boolean.parseBoolean(args[2]));
 							dis.setChanged(Time.getDate()); dis.save();
@@ -361,7 +361,7 @@ public class DistrictCmd extends CommandBase {
 				return;
 			}
 			case "create":{
-				if(ply.getMunicipality().isAuthorized(ply.getMunicipality().r_CREATE_DISTRICT.id, ply.getUUID()) || StateUtil.bypass(player)){
+				if(ply.getMunicipality().isAuthorized(ply.getMunicipality().r_CREATE_DISTRICT.id, ply.getUUID()).isTrue() || StateUtil.bypass(player)){
 					if(ply.getMunicipality().getDistricts().size() + 1 > MunicipalityType.getType(ply.getMunicipality()).getDistrictLimit()){
 						Print.chat(sender, "&aYour Municipality reached the limit of possible Districts.");
 						return;
@@ -374,7 +374,7 @@ public class DistrictCmd extends CommandBase {
 						Print.chat(sender, "No nearby/connected chunks are of the same Municipality.");
 						return;
 					}
-					long price = net.fexcraft.mod.states.util.Config.DISTRICT_CREATION_PRICE;
+					long price = net.fexcraft.mod.states.util.StConfig.DISTRICT_CREATION_PRICE;
 					if(price > ply.getMunicipality().getAccount().getBalance()){
 						Print.chat(sender, "&9Not enough money on Municipality Account.");
 						return;

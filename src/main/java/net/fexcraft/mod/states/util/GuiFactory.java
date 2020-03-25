@@ -26,11 +26,11 @@ public class GuiFactory implements IModGuiFactory {
 
 		public ConfigGui(GuiScreen parent){
 			super(parent, getList(), States.MODID, true, true, "State Settings");
-			titleLine2 = Config.getConfig().getConfigFile().getAbsolutePath();
+			titleLine2 = StConfig.getConfig().getConfigFile().getAbsolutePath();
 		}
 		
 		public static List<IConfigElement> getList(){
-			return Config.getList();
+			return StConfig.getList();
 		}
 		
 	}

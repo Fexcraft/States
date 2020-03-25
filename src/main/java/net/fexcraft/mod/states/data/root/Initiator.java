@@ -17,8 +17,8 @@ public enum Initiator {
 		this.setter = setter;
 	}
 	
-	public boolean isValidAsSetter(){
-		return setter;
+	public boolean isValidAsSetter(boolean votablerule){
+		return setter ? true : votablerule;
 	}
 
 	public boolean isCitizenVote(){

@@ -73,9 +73,22 @@ public class RulesUIC extends GenericContainer {
 						return;
 					}
 					boolean passed = false; UUID uuid = player.getGameProfile().getId();
-					if(StateUtil.isAdmin(player)){ passed = true; }
-					else if(holder instanceof Ruleable && ((Ruleable)holder).isAuthorized(rules[i].id, uuid)){ passed = true; }
-					else{ passed = ((Chunk)holder).isRuleAuthorized(uuid); }
+					if(StateUtil.isAdmin(player)){
+						passed = true;
+					}
+					else{
+						if(holder instanceof Ruleable){
+							Rule.Result res = ((Ruleable)holder).isAuthorized(rules[i].id, uuid);
+							if(res.isVote()){
+								sendStatus("&bThis needs a vote to change! &7/st-rule");
+								passed = false;
+							}
+							else passed = res.isTrue();
+						}
+						else{
+							passed = ((Chunk)holder).isRuleAuthorized(uuid);
+						}
+					}
 					if(!passed){
 						sendStatus("&bNo permission to set this rule.");
 					}
@@ -89,11 +102,20 @@ public class RulesUIC extends GenericContainer {
 					int i = packet.getInteger("rule"); boolean set = packet.getString("cargo").equals("set");
 					if(holder instanceof Ruleable){
 						Ruleable ruleable = (Ruleable)holder; UUID uuid = player.getGameProfile().getId();
-						boolean vote = set ? false : ruleable.canRevise(rules[i].id, uuid).isVote();
-						if((set ? ruleable.isAuthorized(rules[i].id, uuid) : ruleable.canRevise(rules[i].id, uuid).isTrue()) || StateUtil.isAdmin(player)){
+						boolean vote, pass;
+						Rule.Result res;
+						if(set){
+							res = ruleable.isAuthorized(rules[i].id, uuid);
+						}
+						else{
+							res = ruleable.canRevise(rules[i].id, uuid);
+						}
+						vote = res.isVote();
+						pass = res.isTrue();
+						if(pass || StateUtil.isAdmin(player)){
 							try{
 								Initiator init = Initiator.valueOf(packet.getString("value").toUpperCase());
-								if(set && !init.isValidAsSetter()){
+								if(set && !init.isValidAsSetter(rules[i].isVotable())){
 									sendStatus("&bInvalid Initiator.");
 								}
 								else{

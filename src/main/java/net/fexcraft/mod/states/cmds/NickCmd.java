@@ -6,7 +6,7 @@ import net.fexcraft.lib.mc.api.registry.fCommand;
 import net.fexcraft.lib.mc.utils.Print;
 import net.fexcraft.mod.states.data.capabilities.PlayerCapability;
 import net.fexcraft.mod.states.data.capabilities.StatesCapabilities;
-import net.fexcraft.mod.states.util.Config;
+import net.fexcraft.mod.states.util.StConfig;
 import net.fexcraft.mod.states.util.Perms;
 import net.minecraft.command.CommandBase;
 import net.minecraft.command.CommandException;
@@ -69,7 +69,7 @@ public class NickCmd extends CommandBase {
 				for(int i = 2; i < args.length; i++){
 					name += " " + args[i];
 				}
-				if(name.length() > Config.NICKNAME_LENGTH){
+				if(name.length() > StConfig.NICKNAME_LENGTH){
 					Print.chat(sender, "Nickname is too long.");
 				}
 				else{
@@ -121,7 +121,7 @@ public class NickCmd extends CommandBase {
 					for(int i = 3; i < args.length; i++){
 						name += " " + args[i];
 					}
-					if(name.length() > Config.NICKNAME_LENGTH){
+					if(name.length() > StConfig.NICKNAME_LENGTH){
 						Print.chat(sender, "Nickname is too long.");
 					}
 					else{

@@ -17,8 +17,8 @@ import net.fexcraft.mod.states.States;
 import net.fexcraft.mod.states.data.root.BuyableType;
 import net.fexcraft.mod.states.data.root.Taxable;
 import net.fexcraft.mod.states.impl.capabilities.SignTileEntityCapabilityUtil;
-import net.fexcraft.mod.states.util.Config;
 import net.fexcraft.mod.states.util.ImageCache;
+import net.fexcraft.mod.states.util.StConfig;
 import net.fexcraft.mod.states.util.StateLogger;
 import net.fexcraft.mod.states.util.StateUtil;
 import net.fexcraft.mod.states.util.TaxSystem;
@@ -69,7 +69,7 @@ public class Chunk implements BuyableType, Taxable/*, RuleHolder*/ {
 	}
 	
 	protected void parseJson(JsonObject obj){
-		price = JsonUtil.getIfExists(obj, "price", Config.DEFAULT_CHUNK_PRICE).longValue();
+		price = JsonUtil.getIfExists(obj, "price", StConfig.DEFAULT_CHUNK_PRICE).longValue();
 		district = StateUtil.getDistrict(JsonUtil.getIfExists(obj, "district", -1).intValue());
 		created = JsonUtil.getIfExists(obj, "created", Time.getDate()).longValue();
 		creator = UUID.fromString(obj.has("creator") ? obj.get("creator").getAsString() : States.CONSOLE_UUID);
@@ -166,7 +166,7 @@ public class Chunk implements BuyableType, Taxable/*, RuleHolder*/ {
 
 	@Override
 	public long getPrice(){
-		return this.getDistrict().getId() == -1 ? Config.DEFAULT_CHUNK_PRICE : price;
+		return this.getDistrict().getId() == -1 ? StConfig.DEFAULT_CHUNK_PRICE : price;
 	}
 
 	@Override
@@ -311,10 +311,10 @@ public class Chunk implements BuyableType, Taxable/*, RuleHolder*/ {
 				return false;//TODO
 			}
 			case DISTRICT:{
-				return district.r_SET_CHUNKRULES.isAuthorized(district, uuid);
+				return district.r_SET_CHUNKRULES.isAuthorized(district, uuid).isTrue();
 			}
 			case MUNICIPAL: case NORMAL: case PUBLIC:{
-				return getMunicipality().r_SET_CHUNKRULES.isAuthorized(district, uuid);
+				return getMunicipality().r_SET_CHUNKRULES.isAuthorized(district, uuid).isTrue();
 			}
 			case PRIVATE:{
 				return owner != null && owner.equals(uuid.toString());

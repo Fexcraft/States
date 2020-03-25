@@ -2,6 +2,7 @@ package net.fexcraft.mod.states.data;
 
 import java.util.UUID;
 
+import net.fexcraft.lib.mc.utils.Print;
 import net.fexcraft.mod.states.data.root.Initiator;
 import net.fexcraft.mod.states.data.root.Ruleable;
 
@@ -9,13 +10,13 @@ public class Rule {
 	
 	public final String id, name;
 	private Boolean value;
-	private boolean votable;
+	private boolean votable_set;
 	public Initiator reviser;
 	public Initiator setter;
 	
 	public Rule(String id, Boolean def, boolean votable, Initiator rev, Initiator setter, String name){
-		this.id = id; value = def; reviser = rev; this.setter = setter; this.votable = votable; this.name = name;
-		if(!setter.isValidAsSetter()){
+		this.id = id; value = def; reviser = rev; this.setter = setter; this.votable_set = votable; this.name = name;
+		if(!setter.isValidAsSetter(votable)){
 			if(setter == Initiator.CITIZEN_VOTE) setter = Initiator.COUNCIL_ANY;
 			else if(setter == Initiator.COUNCIL_VOTE) setter = Initiator.INCHARGE;
 		}
@@ -47,23 +48,50 @@ public class Rule {
 	}
 	
 	public Rule copy(){
-		return new Rule(id, value, votable, reviser, setter, name);
+		return new Rule(id, value, votable_set, reviser, setter, name);
 	}
 
 	/** Call to see if this player can SET/APPLY this rule. */
-	public boolean isAuthorized(Ruleable holder, UUID uuid){
+	public Result isAuthorized(Ruleable holder, UUID uuid){
 		switch(setter){
-			case NONE: return false;
+			case NONE: return Result.FALSE;
 			case CITIZEN_ANY:{
 				if(holder instanceof Municipality){
-					return ((Municipality)holder).getCitizen().contains(uuid);
-				} else return false;//it shouldn't get this far
+					return Result.bool(((Municipality)holder).getCitizen().contains(uuid));
+				}
+				else return Result.FALSE;//it shouldn't get this far
 			}
-			case COUNCIL_ANY: return holder.getCouncil().contains(uuid);
-			case INCHARGE: return holder.isHead(uuid);
+			case CITIZEN_VOTE:{
+				if(votable_set){
+					if(holder instanceof Municipality){
+						if(((Municipality)holder).getCitizen().contains(uuid)) return Result.VOTE;
+						return Result.FALSE;
+					}
+					else return Result.FALSE;//it shouldn't get this far
+				}
+				else{
+					Print.log("INVALID STATE OF RULE " + id + " FROM " + holder);
+					Print.log("SETTER IS VOTE TYPE BUT RULE IS NOT A VOTE TYPE");
+					return Result.FALSE;
+				}
+			}
+			case COUNCIL_ANY: return Result.bool(holder.getCouncil().contains(uuid));
+			case COUNCIL_VOTE:{
+				if(votable_set){
+					if(holder.getCouncil().size() == 1) return Result.bool(holder.getCouncil().get(0).equals(uuid));
+					if(holder.getCouncil().contains(uuid)) return Result.VOTE;
+					return Result.FALSE;
+				}
+				else{
+					Print.log("INVALID STATE OF RULE " + id + " FROM " + holder);
+					Print.log("SETTER IS VOTE TYPE BUT RULE IS NOT A VOTE TYPE");
+					return Result.FALSE;
+				}
+			}
+			case INCHARGE: return Result.bool(holder.isHead(uuid));
 			case HIGHERINCHARGE:
-				return holder.hasHigherInstance() ? holder.getHigherInstance().isHead(uuid) : holder.isHead(uuid);
-			default: return false;
+				return Result.bool(holder.hasHigherInstance() ? holder.getHigherInstance().isHead(uuid) : holder.isHead(uuid));
+			default: return Result.FALSE;
 		}
 	}
 	
@@ -74,13 +102,15 @@ public class Rule {
 			case CITIZEN_ANY:{
 				if(holder instanceof Municipality){
 					return Result.bool(((Municipality)holder).getCitizen().contains(uuid));
-				} else return Result.FALSE;
+				}
+				else return Result.FALSE;
 			}
 			case CITIZEN_VOTE:{
 				if(holder instanceof Municipality){
 					if(((Municipality)holder).getCitizen().contains(uuid)) return Result.VOTE;
 					return Result.FALSE;
-				} else return Result.FALSE;
+				}
+				else return Result.FALSE;
 			}
 			case COUNCIL_ANY: return Result.bool(holder.getCouncil().contains(uuid));
 			case COUNCIL_VOTE:{
@@ -99,7 +129,7 @@ public class Rule {
 		
 		TRUE, VOTE, FALSE;
 		
-		public static Result bool(boolean bool){
+		public static final Result bool(boolean bool){
 			return bool ? TRUE : FALSE;
 		}
 		
@@ -119,6 +149,10 @@ public class Rule {
 			return this == VOTE;
 		}
 		
+	}
+	
+	public boolean isVotable(){
+		return votable_set;
 	}
 
 }

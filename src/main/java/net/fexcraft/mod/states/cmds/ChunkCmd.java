@@ -199,7 +199,7 @@ public class ChunkCmd extends CommandBase {
 			}
 			case "queue":{
 				Print.chat(sender, "&9There are &2" + ImageCache.getQueue().size() + "&9 chunk map updates queued.");
-				Print.chat(sender, "&9Current Config allows for &3" + net.fexcraft.mod.states.util.Config.MAP_UPDATES_PER_SECOND + "&9 map updates per second.");
+				Print.chat(sender, "&9Current Config allows for &3" + net.fexcraft.mod.states.util.StConfig.MAP_UPDATES_PER_SECOND + "&9 map updates per second.");
 				return;
 			}
 			case "unclaim":{
@@ -210,7 +210,7 @@ public class ChunkCmd extends CommandBase {
 						chunk.setDistrict(StateUtil.getDistrict(-1));
 						chunk.setChanged(Time.getDate());
 						chunk.setType(ChunkType.NORMAL);
-						chunk.setPrice(net.fexcraft.mod.states.util.Config.DEFAULT_CHUNK_PRICE);
+						chunk.setPrice(net.fexcraft.mod.states.util.StConfig.DEFAULT_CHUNK_PRICE);
 						chunk.save();
 						ImageCache.update(player.world, player.world.getChunk(chunk.xCoord(), chunk.zCoord()));
 						Print.chat(sender, "&9Chunk unclaimed and resseted.");
@@ -231,7 +231,7 @@ public class ChunkCmd extends CommandBase {
 								ck.setDistrict(StateUtil.getDistrict(-1));
 								ck.setChanged(Time.getDate());
 								ck.setType(ChunkType.NORMAL);
-								ck.setPrice(net.fexcraft.mod.states.util.Config.DEFAULT_CHUNK_PRICE);
+								ck.setPrice(net.fexcraft.mod.states.util.StConfig.DEFAULT_CHUNK_PRICE);
 								ck.save();
 								c++;
 								ImageCache.update(player.world, player.world.getChunk(x, z));
@@ -491,8 +491,8 @@ public class ChunkCmd extends CommandBase {
 								Print.chat(sender, "&7/ck set force-loaded false");
 								return;
 							}
-							if(chunk.getMunicipality().r_FORCE_LOAD_CHUNKS.isAuthorized(chunk.getMunicipality(), playerdata.getUUID())){
-								if(chunk.getMunicipality().getAccount().getBalance() < net.fexcraft.mod.states.util.Config.LOADED_CHUNKS_TAX){
+							if(chunk.getMunicipality().r_FORCE_LOAD_CHUNKS.isAuthorized(chunk.getMunicipality(), playerdata.getUUID()).isTrue()){
+								if(chunk.getMunicipality().getAccount().getBalance() < net.fexcraft.mod.states.util.StConfig.LOADED_CHUNKS_TAX){
 									Print.chat(sender, "Not enough money to pay the tax.");
 									return;
 								}
@@ -501,7 +501,7 @@ public class ChunkCmd extends CommandBase {
 								Print.log(StateLogger.player(player) + " " + (bool ? "enabled" : "disabled") + " chunk force-loading at " + StateLogger.chunk(chunk) + ", in the District of " + StateLogger.district(chunk.getDistrict()) + ", which is in " + StateLogger.municipality(chunk.getMunicipality()) + ".");
 								//
 								Bank bank = chunk.getMunicipality().getBank();
-								bank.processAction(Bank.Action.TRANSFER, Static.getServer(), chunk.getMunicipality().getAccount(), net.fexcraft.mod.states.util.Config.LOADED_CHUNKS_TAX, States.SERVERACCOUNT);
+								bank.processAction(Bank.Action.TRANSFER, Static.getServer(), chunk.getMunicipality().getAccount(), net.fexcraft.mod.states.util.StConfig.LOADED_CHUNKS_TAX, States.SERVERACCOUNT);
 								return;
 							}
 							break;
@@ -513,7 +513,7 @@ public class ChunkCmd extends CommandBase {
 								Print.chat(sender, "&7/ck set custom-tax reset/disable");
 								return;
 							}
-							if(chunk.getDistrict().isAuthorized(chunk.getDistrict().r_SET_CUSTOM_CHUNKTAX.id, playerdata.getUUID())){
+							if(chunk.getDistrict().isAuthorized(chunk.getDistrict().r_SET_CUSTOM_CHUNKTAX.id, playerdata.getUUID()).isTrue()){
 								if(args[2].equals("reset") || args[2].equals("disable")){
 									chunk.setCustomTax(0); chunk.save();
 									Print.chat(sender, "&9Chunk's Custom Tax was reset!");

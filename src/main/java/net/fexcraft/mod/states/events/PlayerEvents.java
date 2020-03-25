@@ -20,7 +20,7 @@ import net.fexcraft.mod.states.data.capabilities.PlayerCapability;
 import net.fexcraft.mod.states.data.capabilities.SignTileEntityCapability;
 import net.fexcraft.mod.states.data.capabilities.StatesCapabilities;
 import net.fexcraft.mod.states.impl.SignMailbox;
-import net.fexcraft.mod.states.util.Config;
+import net.fexcraft.mod.states.util.StConfig;
 import net.fexcraft.mod.states.util.MessageSender;
 import net.fexcraft.mod.states.util.StateUtil;
 import net.fexcraft.mod.states.util.TaxSystem;
@@ -218,7 +218,7 @@ public class PlayerEvents {
 		Chunk chunk = StateUtil.getChunk(pos);
 		if(chunk.getDistrict().getId() < 0){
 			if(chunk.getDistrict().getId() == -1){
-				if(Config.ALLOW_WILDERNESS_ACCESS){
+				if(StConfig.ALLOW_WILDERNESS_ACCESS){
 					chunk.setEdited(Time.getDate());
 					return true;
 				}
@@ -231,7 +231,7 @@ public class PlayerEvents {
 					Print.chat(player, "Updating chunk...");
 					return false;
 				}
-				if(pos.getY() > Config.TRANSIT_ZONE_BOTTOM_LIMIT && pos.getY() < Config.TRANSIT_ZONE_TOP_LIMIT){
+				if(pos.getY() > StConfig.TRANSIT_ZONE_BOTTOM_LIMIT && pos.getY() < StConfig.TRANSIT_ZONE_TOP_LIMIT){
 					chunk.setEdited(Time.getDate());
 					return true;
 				}
@@ -285,7 +285,7 @@ public class PlayerEvents {
 
 	@SubscribeEvent(priority = EventPriority.LOWEST)
 	public static void onMessage(ServerChatEvent event){
-		if(!Config.STATES_CHAT){
+		if(!StConfig.STATES_CHAT){
 			MessageSender.toWebhook(event.getPlayer().getCapability(StatesCapabilities.PLAYER, null), event.getMessage());
 			return;
 		}

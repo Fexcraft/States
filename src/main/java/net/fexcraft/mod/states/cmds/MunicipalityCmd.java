@@ -12,17 +12,11 @@ import net.fexcraft.lib.common.math.Time;
 import net.fexcraft.lib.mc.api.registry.fCommand;
 import net.fexcraft.lib.mc.utils.Print;
 import net.fexcraft.lib.mc.utils.Static;
+import net.fexcraft.mod.fsmm.api.Account;
 import net.fexcraft.mod.fsmm.api.Bank;
 import net.fexcraft.mod.fsmm.util.Config;
 import net.fexcraft.mod.states.States;
-import net.fexcraft.mod.states.data.Chunk;
-import net.fexcraft.mod.states.data.ChunkType;
-import net.fexcraft.mod.states.data.District;
-import net.fexcraft.mod.states.data.DistrictType;
-import net.fexcraft.mod.states.data.Municipality;
-import net.fexcraft.mod.states.data.MunicipalityType;
-import net.fexcraft.mod.states.data.State;
-import net.fexcraft.mod.states.data.Vote;
+import net.fexcraft.mod.states.data.*;
 import net.fexcraft.mod.states.data.Vote.VoteType;
 import net.fexcraft.mod.states.data.capabilities.PlayerCapability;
 import net.fexcraft.mod.states.data.capabilities.StatesCapabilities;
@@ -31,6 +25,7 @@ import net.fexcraft.mod.states.data.root.Mailbox.MailType;
 import net.fexcraft.mod.states.data.root.Mailbox.RecipientType;
 import net.fexcraft.mod.states.util.MailUtil;
 import net.fexcraft.mod.states.util.Perms;
+import net.fexcraft.mod.states.util.StConfig;
 import net.fexcraft.mod.states.util.StateLogger;
 import net.fexcraft.mod.states.util.StateUtil;
 import net.minecraft.command.CommandBase;
@@ -209,13 +204,13 @@ public class MunicipalityCmd extends CommandBase {
 				}
 				switch(args[1]){
 					case "mayor":{
-						if(mun.isAuthorized(mun.r_SET_MAYOR.id, ply.getUUID()) || StateUtil.bypass(player)){
+						if(mun.isAuthorized(mun.r_SET_MAYOR.id, ply.getUUID()).isTrue() || StateUtil.bypass(player)){
 							if(args.length < 3){
 								Print.chat(sender, "&9Missing Argument!");
 								break;
 							}
 							if(args[2].equals("null") || args[2].equals("reset")){
-								if(!mun.isAuthorized(mun.r_RESET_MAYOR.id, ply.getUUID()) || !StateUtil.bypass(player)){
+								if(mun.isAuthorized(mun.r_RESET_MAYOR.id, ply.getUUID()).isFalse() || !StateUtil.bypass(player)){
 									Print.chat(sender, "&cNot Authorized to reset Mayor."); return;
 								}
 								mun.setHead(null); mun.save();
@@ -245,7 +240,7 @@ public class MunicipalityCmd extends CommandBase {
 						break;
 					}
 					case "name":{
-						if(mun.isAuthorized(mun.r_SET_NAME.id, ply.getUUID()) || StateUtil.bypass(player)){
+						if(mun.isAuthorized(mun.r_SET_NAME.id, ply.getUUID()).isTrue() || StateUtil.bypass(player)){
 							if(args.length < 3){
 								Print.chat(sender, "&9Missing Arguments!");
 								break;
@@ -272,7 +267,7 @@ public class MunicipalityCmd extends CommandBase {
 						break;
 					}
 					case "ruleset":{
-						if(mun.isAuthorized(mun.r_SET_RULESET.id, ply.getUUID()) || StateUtil.bypass(player)){
+						if(mun.isAuthorized(mun.r_SET_RULESET.id, ply.getUUID()).isTrue() || StateUtil.bypass(player)){
 							if(args.length < 3){
 								Print.chat(sender, "&9Missing Arguments!");
 								break;
@@ -299,7 +294,7 @@ public class MunicipalityCmd extends CommandBase {
 						break;
 					}
 					case "price":{
-						if(mun.isAuthorized(mun.r_SET_PRICE.id, ply.getUUID()) || StateUtil.bypass(player)){
+						if(mun.isAuthorized(mun.r_SET_PRICE.id, ply.getUUID()).isTrue() || StateUtil.bypass(player)){
 							if(args.length < 3){
 								Print.chat(sender, "&9Missing Argument!");
 								Print.chat(sender, "&7Setting the price to \"0\" makes the municipality not buyable.");
@@ -324,7 +319,7 @@ public class MunicipalityCmd extends CommandBase {
 						break;
 					}
 					case "color":{
-						if(mun.isAuthorized(mun.r_COLOR.id, ply.getUUID()) || StateUtil.bypass(player)){
+						if(mun.isAuthorized(mun.r_COLOR.id, ply.getUUID()).isTrue() || StateUtil.bypass(player)){
 							if(args.length < 3){
 								Print.chat(sender, "&9Missing Argument!");
 								break;
@@ -353,7 +348,7 @@ public class MunicipalityCmd extends CommandBase {
 						break;
 					}
 					case "open":{
-						if(mun.isAuthorized(mun.r_OPEN.id, ply.getUUID()) || StateUtil.bypass(player)){
+						if(mun.isAuthorized(mun.r_OPEN.id, ply.getUUID()).isTrue() || StateUtil.bypass(player)){
 							if(args.length < 3){
 								Print.chat(sender, "&9Missing Argument!");
 								break;
@@ -370,7 +365,7 @@ public class MunicipalityCmd extends CommandBase {
 						break;
 					}
 					case "icon":{
-						if(mun.isAuthorized(mun.r_ICON.id, ply.getUUID()) || StateUtil.bypass(player)){
+						if(mun.isAuthorized(mun.r_ICON.id, ply.getUUID()).isTrue() || StateUtil.bypass(player)){
 							if(args.length < 3){
 								Print.chat(sender, "&9Missing Argument!");
 								break;
@@ -392,7 +387,7 @@ public class MunicipalityCmd extends CommandBase {
 						break;
 					}
 					case "citizen-tax":{
-						if(mun.isAuthorized(mun.r_SET_CITIZENTAX.id, ply.getUUID()) || StateUtil.bypass(player)){
+						if(mun.isAuthorized(mun.r_SET_CITIZENTAX.id, ply.getUUID()).isTrue() || StateUtil.bypass(player)){
 							if(args[2].equals("reset") || args[2].equals("disable")){
 								mun.setCitizenTax(0); mun.save();
 								Print.chat(sender, "&9Municipality's Citizen Tax was reset!");
@@ -408,7 +403,7 @@ public class MunicipalityCmd extends CommandBase {
 						break;
 					}
 					case "kick-if-bankrupt":{
-						if(mun.isAuthorized(mun.r_KIB.id, ply.getUUID()) || StateUtil.bypass(player)){
+						if(mun.isAuthorized(mun.r_KIB.id, ply.getUUID()).isTrue() || StateUtil.bypass(player)){
 							if(args.length < 3){ Print.chat(sender, "&9Missing Argument!"); break; }
 							mun.r_KIB.set(Boolean.parseBoolean(args[2]));
 							mun.setChanged(Time.getDate()); mun.save();
@@ -434,7 +429,7 @@ public class MunicipalityCmd extends CommandBase {
 				}
 				switch(args[1]){
 					case "vote":{
-						if(!mun.isAuthorized(mun.r_VOTE_MAYOR.id, ply.getUUID()) && !StateUtil.bypass(player)){
+						if(!mun.isAuthorized(mun.r_VOTE_MAYOR.id, ply.getUUID()).isTrue() && !StateUtil.bypass(player)){
 							Print.chat(sender, "&4No permission.");
 							return;
 						}
@@ -468,7 +463,7 @@ public class MunicipalityCmd extends CommandBase {
 						return;
 					}
 					case "kick":{
-						if(!(mun.isAuthorized(mun.r_COUNCIL_KICK.id, ply.getUUID()) || StateUtil.bypass(player))){
+						if(!(mun.isAuthorized(mun.r_COUNCIL_KICK.id, ply.getUUID()).isTrue() || StateUtil.bypass(player))){
 							Print.chat(sender, "&4No permission.");
 							return;
 						}
@@ -502,7 +497,7 @@ public class MunicipalityCmd extends CommandBase {
 						Print.log(StateLogger.player(player) + " left of the council of " + StateLogger.municipality(mun) + ".");
 					}
 					case "invite":{
-						if(!(mun.isAuthorized(mun.r_COUNCIL_INVITE.id, ply.getUUID()) || StateUtil.bypass(player))){
+						if(!(mun.isAuthorized(mun.r_COUNCIL_INVITE.id, ply.getUUID()).isTrue() || StateUtil.bypass(player))){
 							Print.chat(sender, "&4No permission.");
 							return;
 						}
@@ -560,7 +555,7 @@ public class MunicipalityCmd extends CommandBase {
 					});//TODO
 					return;
 				}
-				if(!(mun.isAuthorized(mun.r_EDIT_BL.id, ply.getUUID()) || StateUtil.bypass(player))){
+				if(!(mun.isAuthorized(mun.r_EDIT_BL.id, ply.getUUID()).isTrue() || StateUtil.bypass(player))){
 					Print.chat(sender, "&cNo permission!");
 					return;
 				}
@@ -606,7 +601,7 @@ public class MunicipalityCmd extends CommandBase {
 				return;
 			}
 			case "kick":{
-				if(!(mun.isAuthorized(mun.r_KICK.id, ply.getUUID()) || StateUtil.bypass(player))){
+				if(!(mun.isAuthorized(mun.r_KICK.id, ply.getUUID()).isTrue() || StateUtil.bypass(player))){
 					Print.chat(sender, "&cNo permission!");
 					return;
 				}
@@ -687,7 +682,7 @@ public class MunicipalityCmd extends CommandBase {
 				return;
 			}
 			case "invite":{
-				if(!(mun.isAuthorized(mun.r_INVITE.id, ply.getUUID()) || StateUtil.bypass(player))){
+				if(!(mun.isAuthorized(mun.r_INVITE.id, ply.getUUID()).isTrue() || StateUtil.bypass(player))){
 					Print.chat(sender, "&cNo permission!");
 					return;
 				}
@@ -725,12 +720,12 @@ public class MunicipalityCmd extends CommandBase {
 				return;
 			}
 			case "create":{
-				long price = net.fexcraft.mod.states.util.Config.MUNICIPALITY_CREATION_PRICE;
+				long price = StConfig.MUNICIPALITY_CREATION_PRICE;
 				if(!Perms.CREATE_MUNICIPALITY.has(player)){
 					Print.chat(sender, "&cNo permission.");
 					return;
 				}
-				if(ply.getState().getId() > 0 && !ply.getState().isAuthorized(ply.getState().r_CREATE_MUNICIPALITY.id, ply.getUUID())){
+				if(ply.getState().getId() > 0 && !ply.getState().isAuthorized(ply.getState().r_CREATE_MUNICIPALITY.id, ply.getUUID()).isTrue()){
 					Print.chat(sender, "&cYour State does not allow you to createa a new Municipality.");
 					return;
 				}
@@ -822,11 +817,39 @@ public class MunicipalityCmd extends CommandBase {
 				return;
 			}
 			case "abandon":{
-				if(mun.isAuthorized(mun.r_ABANDON.id, ply.getUUID()) || StateUtil.bypass(player)){
-					
+				if(mun.getId() < 1){
+					Print.chat(player, "&cYou cannot abandon system municipalities.");
+					return;
+				}
+				Rule.Result res = mun.isAuthorized(mun.r_ABANDON.id, ply.getUUID());
+				boolean pass = StateUtil.bypass(player) || isLastCitizen(mun, ply);
+				if(!res.isFalse() || pass){
+					Account munacc = mun.getAccount();
+					if(munacc.getBalance() < StConfig.MUNICIPALITY_ABANDONMENT_PRICE){
+						Print.chat(player, "&cMunicipality does not have enought money to pay the abandonement server fee.");
+					}
+					if(mun.isCapital()){
+						Print.chat(player, "&cYou cannot abandon the capital!");
+						Print.chat(player, "&7Try instead:");
+						Print.chat(player, "&3-> setting a new state capital");
+						Print.chat(player, "&3-> abandoning the state");
+					}
+					if(!pass && mun.isAuthorized(mun.r_ABANDON.id, ply.getUUID()).isVote()){
+						
+					}
+					else{
+						mun.setAbandoned(player.getGameProfile().getId());
+						StateUtil.announce(server, "&9A Municipality became abandoned!");
+						StateUtil.announce(server, "&9Name&0: &7" + mun.getName() + " &3(&6" + mun.getId() + "&3)");
+						StateUtil.announce(server, "&9By " + ply.getFormattedNickname());
+					}
 				}
 				else{
-					
+					Print.chat(player, "&cNo permission to abandon this municipality.");
+					Print.chat(player, "&7Conditions: (at least one must apply)");
+					Print.chat(player, "&3-> authorized to execute rule 'abandon'");
+					Print.chat(player, "&3-> has admin permission / operator");
+					Print.chat(player, "&3-> is last citizen in the municipality");
 				}
 				return;
 			}
@@ -839,6 +862,10 @@ public class MunicipalityCmd extends CommandBase {
 				return;
 			}
 		}
+	}
+
+	private boolean isLastCitizen(Municipality mun, PlayerCapability ply){
+		return mun.getCitizen().size() == 1 && mun.getCitizen().contains(ply.getUUID());
 	}
 
 	private String ggas(long citizenTax){

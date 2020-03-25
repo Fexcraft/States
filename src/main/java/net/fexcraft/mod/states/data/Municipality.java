@@ -18,10 +18,11 @@ import net.fexcraft.mod.fsmm.api.Account;
 import net.fexcraft.mod.fsmm.api.Bank;
 import net.fexcraft.mod.fsmm.util.DataManager;
 import net.fexcraft.mod.states.States;
+import net.fexcraft.mod.states.data.capabilities.PlayerCapability;
 import net.fexcraft.mod.states.data.root.*;
-import net.fexcraft.mod.states.util.Config;
 import net.fexcraft.mod.states.util.ForcedChunksManager;
 import net.fexcraft.mod.states.util.RuleMap;
+import net.fexcraft.mod.states.util.StConfig;
 import net.fexcraft.mod.states.util.StateUtil;
 import net.minecraft.command.ICommandSender;
 import net.minecraft.util.math.BlockPos;
@@ -74,28 +75,28 @@ public class Municipality implements ColorHolder, BuyableType, IconHolder, Accou
 		abandonedby = obj.has("abandoned_by") ? UUID.fromString(obj.get("abandoned_by").getAsString()) : null;
 		abandonedat = JsonUtil.getIfExists(obj, "abandoned_at", 0).longValue();
 		ruleset_name = JsonUtil.getIfExists(obj, "ruleset", "Standard Ruleset");
-		rules.add(r_SET_NAME = new Rule("set.name", null, true, Initiator.COUNCIL_VOTE, Initiator.INCHARGE));
-		rules.add(r_SET_PRICE = new Rule("set.price", null, true, Initiator.COUNCIL_VOTE, Initiator.INCHARGE));
+		rules.add(r_SET_NAME = new Rule("set.name", null, false, Initiator.COUNCIL_VOTE, Initiator.INCHARGE));
+		rules.add(r_SET_PRICE = new Rule("set.price", null, false, Initiator.COUNCIL_VOTE, Initiator.INCHARGE));
 		rules.add(r_SET_MAYOR = new Rule("set.mayor", null, true, Initiator.COUNCIL_VOTE, Initiator.INCHARGE));
-		rules.add(r_OPEN = new Rule("open_to_join", false, true, Initiator.COUNCIL_VOTE, Initiator.INCHARGE));
-		rules.add(r_COLOR = new Rule("set.color", null, true, Initiator.COUNCIL_VOTE, Initiator.INCHARGE));
-		rules.add(r_ICON = new Rule("set.icon", null, true, Initiator.COUNCIL_VOTE, Initiator.INCHARGE));
-		rules.add(r_SET_CITIZENTAX = new Rule("set.citizentax", null, true, Initiator.COUNCIL_VOTE, Initiator.INCHARGE));
-		rules.add(r_KIB = new Rule("kick_if_bankrupt", false, true, Initiator.COUNCIL_VOTE, Initiator.INCHARGE));
-		rules.add(r_EDIT_BL = new Rule("edit.blacklist", null, true, Initiator.COUNCIL_VOTE, Initiator.INCHARGE));
-		rules.add(r_KICK = new Rule("kick_player", null, true, Initiator.COUNCIL_VOTE, Initiator.COUNCIL_ANY));
-		rules.add(r_INVITE = new Rule("invite_player", null, true, Initiator.COUNCIL_VOTE, Initiator.COUNCIL_ANY));
-		rules.add(r_COUNCIL_KICK = new Rule("kick_council", null, true, Initiator.COUNCIL_VOTE, Initiator.COUNCIL_ANY));
-		rules.add(r_COUNCIL_INVITE = new Rule("invite_council", null, true, Initiator.COUNCIL_VOTE, Initiator.COUNCIL_ANY));
+		rules.add(r_OPEN = new Rule("open_to_join", false, false, Initiator.COUNCIL_VOTE, Initiator.INCHARGE));
+		rules.add(r_COLOR = new Rule("set.color", null, false, Initiator.COUNCIL_VOTE, Initiator.INCHARGE));
+		rules.add(r_ICON = new Rule("set.icon", null, false, Initiator.COUNCIL_VOTE, Initiator.INCHARGE));
+		rules.add(r_SET_CITIZENTAX = new Rule("set.citizentax", null, false, Initiator.COUNCIL_VOTE, Initiator.INCHARGE));
+		rules.add(r_KIB = new Rule("kick_if_bankrupt", false, false, Initiator.COUNCIL_VOTE, Initiator.INCHARGE));
+		rules.add(r_EDIT_BL = new Rule("edit.blacklist", null, false, Initiator.COUNCIL_VOTE, Initiator.INCHARGE));
+		rules.add(r_KICK = new Rule("kick_player", null, false, Initiator.COUNCIL_VOTE, Initiator.COUNCIL_ANY));
+		rules.add(r_INVITE = new Rule("invite_player", null, false, Initiator.COUNCIL_VOTE, Initiator.COUNCIL_ANY));
+		rules.add(r_COUNCIL_KICK = new Rule("kick_council", null, false, Initiator.COUNCIL_VOTE, Initiator.COUNCIL_ANY));
+		rules.add(r_COUNCIL_INVITE = new Rule("invite_council", null, false, Initiator.COUNCIL_VOTE, Initiator.COUNCIL_ANY));
 		rules.add(r_VOTE_MAYOR = new Rule("vote.mayor", null, true, Initiator.COUNCIL_VOTE, Initiator.COUNCIL_ANY));
-		rules.add(r_CREATE_DISTRICT = new Rule("create.district", null, true, Initiator.CITIZEN_VOTE, Initiator.COUNCIL_ANY));
-		rules.add(r_SET_CHUNKRULES = new Rule("set.chunkrules", null, true, Initiator.COUNCIL_VOTE, Initiator.INCHARGE));
-		rules.add(r_CREATE_SIGN_SHOP = new Rule("create.sign-shops", null, true, Initiator.INCHARGE, Initiator.COUNCIL_ANY));
-		rules.add(r_SET_MAILBOX = new Rule("set.mailbox", null, true, Initiator.COUNCIL_VOTE, Initiator.INCHARGE));
-		rules.add(r_OPEN_MAILBOX = new Rule("open.mailbox", null, true, Initiator.COUNCIL_VOTE, Initiator.COUNCIL_ANY));
-		rules.add(r_FORCE_LOAD_CHUNKS = new Rule("force-load.chunks", null, true, Initiator.COUNCIL_VOTE, Initiator.INCHARGE));
-		rules.add(r_SET_RULESET = new Rule("set.ruleset-name", null, true, Initiator.COUNCIL_VOTE, Initiator.INCHARGE));
-		rules.add(r_RESET_MAYOR = new Rule("set.mayor.none", null, true, Initiator.CITIZEN_VOTE, Initiator.HIGHERINCHARGE));
+		rules.add(r_CREATE_DISTRICT = new Rule("create.district", null, false, Initiator.CITIZEN_VOTE, Initiator.COUNCIL_ANY));
+		rules.add(r_SET_CHUNKRULES = new Rule("set.chunkrules", null, false, Initiator.COUNCIL_VOTE, Initiator.INCHARGE));
+		rules.add(r_CREATE_SIGN_SHOP = new Rule("create.sign-shops", null, false, Initiator.INCHARGE, Initiator.COUNCIL_ANY));
+		rules.add(r_SET_MAILBOX = new Rule("set.mailbox", null, false, Initiator.COUNCIL_VOTE, Initiator.INCHARGE));
+		rules.add(r_OPEN_MAILBOX = new Rule("open.mailbox", null, false, Initiator.COUNCIL_VOTE, Initiator.COUNCIL_ANY));
+		rules.add(r_FORCE_LOAD_CHUNKS = new Rule("force-load.chunks", null, false, Initiator.COUNCIL_VOTE, Initiator.INCHARGE));
+		rules.add(r_SET_RULESET = new Rule("set.ruleset-name", null, false, Initiator.COUNCIL_VOTE, Initiator.INCHARGE));
+		rules.add(r_RESET_MAYOR = new Rule("set.mayor.none", null, false, Initiator.CITIZEN_VOTE, Initiator.HIGHERINCHARGE));
 		rules.add(r_ABANDON = new Rule("abandon", null, true, Initiator.INCHARGE, Initiator.INCHARGE));
 		if(obj.has("rules")){
 			JsonObject rls = obj.get("rules").getAsJsonObject();
@@ -311,7 +312,7 @@ public class Municipality implements ColorHolder, BuyableType, IconHolder, Accou
 
 	public boolean modifyForceloadedChunk(ICommandSender sender, ChunkPos pos, boolean add_rem){
 		if(add_rem){
-			if(this.getForceLoadedChunks() != null && this.getForceLoadedChunks().size() + 1 > Config.LOADED_CHUNKS_PER_MUNICIPALITY){
+			if(this.getForceLoadedChunks() != null && this.getForceLoadedChunks().size() + 1 > StConfig.LOADED_CHUNKS_PER_MUNICIPALITY){
 				Print.chat(sender, "&9Municipality reached the Server's Limit for Forced-Chunks-per-Municipality.");
 				return false;
 			}
@@ -404,12 +405,20 @@ public class Municipality implements ColorHolder, BuyableType, IconHolder, Accou
 		return abandoned;
 	}
 
+	@SuppressWarnings("unchecked")
 	@Override
 	public void setAbandoned(UUID by){
 		abandonedby = by;
 		abandonedat = Time.getDate();
 		abandoned = true;
 		council.clear();
+		ArrayList<UUID> list = (ArrayList<UUID>)citizen.clone();
+		list.forEach(citizen -> {
+			PlayerCapability cap = StateUtil.getPlayer(citizen, true);
+			cap.setMunicipality(StateUtil.getMunicipality(-1));
+			cap.save();
+		});
+		citizen.clear();
 		mayor = null;
 		save();
 	}
@@ -425,13 +434,16 @@ public class Municipality implements ColorHolder, BuyableType, IconHolder, Accou
 	}
 
 	@Override
-	public void getAbandoned(UUID by){
+	public void getAbandoned(PlayerCapability by){
 		abandonedby = null;
 		abandonedat = Time.getDate();
 		abandoned = false;
 		council.clear();
-		council.add(by);
-		mayor = by;
+		council.add(by.getUUID());
+		citizen.clear();
+		citizen.add(by.getUUID());
+		by.setMunicipality(this);
+		mayor = by.getUUID();
 		save();
 	}
 

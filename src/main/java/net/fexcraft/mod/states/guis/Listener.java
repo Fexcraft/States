@@ -204,7 +204,7 @@ public class Listener implements IPacketListener<PacketNBTTagCompound> {
 			compound.setString("result", "District not found.");
 			return compound;
 		}
-		if(dis.getId() == -2 && !net.fexcraft.mod.states.util.Config.ALLOW_TRANSIT_ZONES){
+		if(dis.getId() == -2 && !net.fexcraft.mod.states.util.StConfig.ALLOW_TRANSIT_ZONES){
 			compound.setString("result", "Transit Zones (-2) are disabled.");
 			return compound;
 		}
@@ -227,11 +227,11 @@ public class Listener implements IPacketListener<PacketNBTTagCompound> {
 			compound.setString("result", "No permission. (" + (cap == null ? "-1" : "-2") + ")");
 			return compound;
 		}
-		if(dis.getId() != -2 && !dis.isAuthorized(dis.r_CLAIM_CHUNK.id, player.getGameProfile().getId())){
+		if(dis.getId() != -2 && !dis.isAuthorized(dis.r_CLAIM_CHUNK.id, player.getGameProfile().getId()).isTrue()){
 			compound.setString("result", "No permission. (0)");
 			return compound;
 		}
-		if(mode == 1 && !ck.getDistrict().isAuthorized(ck.getDistrict().r_CLAIM_CHUNK.id, player.getGameProfile().getId())){
+		if(mode == 1 && !ck.getDistrict().isAuthorized(ck.getDistrict().r_CLAIM_CHUNK.id, player.getGameProfile().getId()).isTrue()){
 			compound.setString("result", "No permission. (1)");
 			return compound;
 		}

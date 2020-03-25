@@ -38,7 +38,7 @@ public class MessageSender {
     
     public static void as(EntityPlayer sender, String message, boolean webhook){
     	PlayerCapability cap = null;
-    	String name = sender == null ? "&9#&8] &2" + Config.WEBHOOK_BROADCASTER_NAME :
+    	String name = sender == null ? "&9#&8] &2" + StConfig.WEBHOOK_BROADCASTER_NAME :
     		"&" + (StateUtil.isAdmin(sender) ? "4" : "6") + "#&8] " + sender.getCapability(StatesCapabilities.PLAYER, null).getFormattedNickname(); 
         Static.getServer().getPlayerList().sendMessage(new TextComponentString(Formatter.format(name + "&0: &7" + message)));
         if(webhook) toWebhook(cap, message);
@@ -60,7 +60,7 @@ public class MessageSender {
     public static void toWebhook(PlayerCapability sender, String message){
         if(RECEIVER == null){ return; }
         try{
-            URL url = new URL(Config.WEBHOOK);
+            URL url = new URL(StConfig.WEBHOOK);
             HttpURLConnection connection = (HttpURLConnection) url.openConnection();
             connection.setRequestMethod("POST");
             connection.setRequestProperty("User-Agent", "Mozilla/5.0");
@@ -69,13 +69,13 @@ public class MessageSender {
             connection.setDoOutput(true);
             //
             JsonObject obj = new JsonObject();
-            obj.addProperty("username", sender == null ? Config.WEBHOOK_BROADCASTER_NAME : sender.getWebhookNickname());
+            obj.addProperty("username", sender == null ? StConfig.WEBHOOK_BROADCASTER_NAME : sender.getWebhookNickname());
             obj.addProperty("content", Formatter.clear(message));
             if(sender != null){
                 obj.addProperty("avatar_url", "https://crafatar.com/avatars/" + sender.getEntityPlayer().getGameProfile().getId().toString());
             }
             else{
-                obj.addProperty("avatar_url", Config.WEBHOOK_ICON);
+                obj.addProperty("avatar_url", StConfig.WEBHOOK_ICON);
             }
             //
             //OutputStreamWriter wr = new OutputStreamWriter(connection.getOutputStream(), "utf-8");
@@ -114,10 +114,10 @@ public class MessageSender {
         
         @Override
         public void run(){
-            Print.log("[States-Webhook] Starting Message Listener on port " + Config.BOT_PORT);
+            Print.log("[States-Webhook] Starting Message Listener on port " + StConfig.BOT_PORT);
             toWebhook(null, "Starting Server Message Receiver...");
             try{
-                ServerSocket socket = new ServerSocket(Config.BOT_PORT);
+                ServerSocket socket = new ServerSocket(StConfig.BOT_PORT);
                 while(running){
                     try{
                         Socket client = socket.accept();
@@ -144,12 +144,12 @@ public class MessageSender {
             catch(IOException e){
                 e.printStackTrace();
             }
-            Print.log("[States-Webhook] Stopping Message Listener on port " + Config.BOT_PORT);
+            Print.log("[States-Webhook] Stopping Message Listener on port " + StConfig.BOT_PORT);
             toWebhook(null, "Server Message Receiver stopped.");
         }
         
         private boolean valid(JsonElement obj){
-            return obj.isJsonObject() && obj.getAsJsonObject().has("token") && obj.getAsJsonObject().get("token").getAsString().equals(Config.BOT_KEY);
+            return obj.isJsonObject() && obj.getAsJsonObject().has("token") && obj.getAsJsonObject().get("token").getAsString().equals(StConfig.BOT_KEY);
         }
         
         public void halt(){

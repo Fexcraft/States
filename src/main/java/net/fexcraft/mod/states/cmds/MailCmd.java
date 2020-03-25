@@ -20,7 +20,7 @@ import net.fexcraft.mod.states.data.root.Mailbox.MailType;
 import net.fexcraft.mod.states.data.root.Mailbox.RecipientType;
 import net.fexcraft.mod.states.impl.SignMailbox;
 import net.fexcraft.mod.states.objects.MailItem;
-import net.fexcraft.mod.states.util.Config;
+import net.fexcraft.mod.states.util.StConfig;
 import net.fexcraft.mod.states.util.MailUtil;
 import net.fexcraft.mod.states.util.Perms;
 import net.fexcraft.mod.states.util.StateLogger;
@@ -309,7 +309,7 @@ public class MailCmd extends CommandBase {
 				return;
 			}
 			case "collect":{
-				if(!Config.ALLOW_MAILBOX_COLLECT){
+				if(!StConfig.ALLOW_MAILBOX_COLLECT){
 					Print.chat(sender, "&c&lFeature is disabled on this server.");
 				}
 				if(args.length < 2){

@@ -30,7 +30,7 @@ public class ChunkEvents {
     @SubscribeEvent
     public static void onLoad(ChunkEvent.Load event){
 		if(!LOADED){
-			if(!FSMM.isDataManagerLoaded()){
+			if(!event.getWorld().isRemote && !FSMM.isDataManagerLoaded()){
 				FSMM.loadDataManager();
 			}
 			States.updateSaveDirectory(event.getWorld());

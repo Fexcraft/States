@@ -40,11 +40,7 @@ public class ImageUtil extends TimerTask {
 	public void run(){
 		try{
 			long time = Time.getDate();
-			for(long key : ImageUtil.TEMP_IMAGES.keySet()){
-				if((key + Time.MIN_MS) < time){
-					ImageUtil.TEMP_IMAGES.remove(key);
-				}
-			}
+			ImageUtil.TEMP_IMAGES.keySet().removeIf(key -> (key + Time.MIN_MS) < time);
 		}
 		catch(Exception e){
 			e.printStackTrace();

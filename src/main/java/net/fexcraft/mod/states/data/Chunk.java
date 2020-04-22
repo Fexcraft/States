@@ -49,6 +49,7 @@ public class Chunk implements BuyableType, Taxable/*, RuleHolder*/ {
 		if(!getChunkFile().exists() && create){
 			save();
 			//ImageCache.update(world, world.getChunkFromChunkCoords(x, z));
+			if(world == null) world = Static.getServer().getWorld(0);
 			if(world != null) ImageCache.update(world, world.getChunkProvider().getLoadedChunk(x, z));
 		}
 		if(Time.getDate() - JsonUtil.getIfExists(obj, "last_save", 0).longValue() > Time.DAY_MS){

@@ -40,15 +40,7 @@ import net.fexcraft.mod.states.impl.capabilities.SignTileEntityCapabilityUtil;
 import net.fexcraft.mod.states.impl.capabilities.WorldCapabilityUtil;
 import net.fexcraft.mod.states.packets.ImagePacket;
 import net.fexcraft.mod.states.packets.ImagePacketHandler;
-import net.fexcraft.mod.states.util.StConfig;
-import net.fexcraft.mod.states.util.ForcedChunksManager;
-import net.fexcraft.mod.states.util.ImageCache;
-import net.fexcraft.mod.states.util.ImageUtil;
-import net.fexcraft.mod.states.util.MessageSender;
-import net.fexcraft.mod.states.util.Perms;
-import net.fexcraft.mod.states.util.StateUtil;
-import net.fexcraft.mod.states.util.TaxSystem;
-import net.fexcraft.mod.states.util.UpdateHandler;
+import net.fexcraft.mod.states.util.*;
 import net.minecraft.world.World;
 import net.minecraftforge.common.ForgeChunkManager;
 import net.minecraftforge.common.MinecraftForge;
@@ -86,7 +78,7 @@ public class States {
 	//
 	@Mod.Instance(MODID)
 	public static States INSTANCE;
-	public static Timer TAX_TIMER, DATA_MANAGER, IMG_TIMER;
+	private static Timer TAX_TIMER, DATA_MANAGER, IMG_TIMER;
 	
 	@Mod.EventHandler
 	public void preInit(FMLPreInitializationEvent event){
@@ -143,7 +135,7 @@ public class States {
 		LocalDateTime midnight = LocalDateTime.of(LocalDate.now(ZoneOffset.systemDefault()), LocalTime.MIDNIGHT);
 		long mid = midnight.toInstant(ZoneOffset.UTC).toEpochMilli(); long date = Time.getDate();
 		while((mid += StConfig.TAX_INTERVAL) < date);
-		if(TAX_TIMER == null){
+		if(TAX_TIMER == null && StConfig.TAX_ENABLED){
 			(TAX_TIMER = new Timer()).schedule(new TaxSystem(), new Date(mid), StConfig.TAX_INTERVAL);
 		}
 		if(DATA_MANAGER == null){

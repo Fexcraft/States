@@ -21,7 +21,7 @@ public class StConfig {
 	public static long DEFAULT_CHUNK_PRICE, MUNICIPALITY_CREATION_PRICE, STATE_CREATION_PRICE, DISTRICT_CREATION_PRICE, TAX_INTERVAL, LOADED_CHUNKS_TAX;
 	public static long MUNICIPALITY_ABANDONMENT_PRICE, MUNICIPALITY_CLAIM_PRICE;
 	public static int MAP_UPDATES_PER_SECOND, BOT_PORT, TRANSIT_ZONE_BOTTOM_LIMIT, TRANSIT_ZONE_TOP_LIMIT, CHUNK_PER_CITIZEN, NICKNAME_LENGTH, LOADED_CHUNKS_PER_MUNICIPALITY;
-	public static boolean ALLOW_WILDERNESS_ACCESS, ALLOW_TRANSIT_ZONES, TAX_OFFLINE_PLAYERS, SHOW_MINIMAP, STATES_CHAT, ALLOW_MAILBOX_COLLECT;
+	public static boolean ALLOW_WILDERNESS_ACCESS, ALLOW_TRANSIT_ZONES, TAX_OFFLINE_PLAYERS, SHOW_MINIMAP, STATES_CHAT, ALLOW_MAILBOX_COLLECT, TAX_ENABLED;
 	public static String WEBHOOK, BOT_KEY, WEBHOOK_ICON, WEBHOOK_BROADCASTER_NAME;
 	//
 	public static final String DEFAULT_CAT = "Default Settings";
@@ -80,6 +80,7 @@ public class StConfig {
 		WEBHOOK_BROADCASTER_NAME = config.getString("discord_webhook_broadcaster_name", DEFAULT_CAT, "States Broadcaster", "The \"Server's\" name when sending messages to the webhook which aren't from a player, e.g. on server start/stop.");
 		LOADED_CHUNKS_PER_MUNICIPALITY = config.getInt("loaded_chunks_per_municipality", DEFAULT_CAT, 0, 0, 128, "Amount of max (force) loaded chunks a Municipality can have.");
 		TAX_INTERVAL = config.getInt("tax_interval", DEFAULT_CAT, (int)Time.DAY_MS, 1000, Integer.MAX_VALUE, "Intervals between tax collection cycles, 1000 = 1 second.");
+		TAX_ENABLED = config.getBoolean("tax_enabled", DEFAULT_CAT, true, "If the Tax System should be enabled.");
 		LOADED_CHUNKS_TAX = config.getInt("loaded_chunks_tax", DEFAULT_CAT, 25000, 0, Integer.MAX_VALUE, "Tax a Municipality has to pay the Server for having force-loaded chunks.");
 		TAX_OFFLINE_PLAYERS = config.getBoolean("tax_offline_players", DEFAULT_CAT, false, "If offline (inactive since more than one interval) players should be taxed as well.");
 		SHOW_MINIMAP = config.getBoolean("show_minimap", CLIENT_CAT, true, "If the States Minimap should be shown.");

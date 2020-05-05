@@ -20,8 +20,8 @@ import net.fexcraft.mod.states.data.capabilities.PlayerCapability;
 import net.fexcraft.mod.states.data.capabilities.SignTileEntityCapability;
 import net.fexcraft.mod.states.data.capabilities.StatesCapabilities;
 import net.fexcraft.mod.states.impl.SignMailbox;
-import net.fexcraft.mod.states.util.StConfig;
 import net.fexcraft.mod.states.util.MessageSender;
+import net.fexcraft.mod.states.util.StConfig;
 import net.fexcraft.mod.states.util.StateUtil;
 import net.fexcraft.mod.states.util.TaxSystem;
 import net.fexcraft.mod.states.util.UpdateHandler;
@@ -251,10 +251,8 @@ public class PlayerEvents {
 	
 	private static boolean hp(Chunk chunk, EntityPlayer player){
 		PlayerCapability cap = player.getCapability(StatesCapabilities.PLAYER, null);
-		if(cap == null){
-			if((cap = StateUtil.getPlayer(player.getUniqueID(), true)) == null){
-				return false;
-			}
+		if(cap == null && (cap = StateUtil.getPlayer(player.getUniqueID(), true)) == null){
+			return false;
 		}
 		else if(cap.getUUID() == null || cap.getMunicipality() == null){
 			return false;

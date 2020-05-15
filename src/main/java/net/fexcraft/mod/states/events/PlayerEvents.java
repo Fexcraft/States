@@ -137,7 +137,7 @@ public class PlayerEvents {
 	
 	@SubscribeEvent(priority = EventPriority.HIGHEST)
 	public static void onBlockBreak0(BlockEvent.BreakEvent event){
-		if(event.getPlayer().dimension != 0){ return; }
+		if(event.getWorld().isRemote || event.getPlayer().dimension != 0){ return; }
 		if(!checkAccess(event.getWorld(), event.getPos(), event.getState(), event.getPlayer())){
 			Print.bar(event.getPlayer(), "No permission to break blocks here.");
 			event.setCanceled(true);
@@ -147,7 +147,7 @@ public class PlayerEvents {
 	
 	@SubscribeEvent(priority = EventPriority.LOWEST)
 	public static void onBlockBreak1(BlockEvent.BreakEvent event){
-		if(event.getPlayer().dimension != 0){ return; }
+		if(event.getWorld().isRemote || event.getPlayer().dimension != 0){ return; }
 		if(event.getState().getBlock() instanceof BlockSign){
 			TileEntity tile = event.getWorld().getTileEntity(event.getPos());
 			if(tile == null) return;
@@ -205,7 +205,7 @@ public class PlayerEvents {
 
 	@SubscribeEvent
 	public static void onBlockPlace(BlockEvent.PlaceEvent event){
-		if(event.getPlayer().dimension != 0){ return; }
+		if(event.getWorld().isRemote || event.getPlayer().dimension != 0){ return; }
 		if(!checkAccess(event.getWorld(), event.getPos(), event.getState(), event.getPlayer())){
 			Print.bar(event.getPlayer(), "No permission to place blocks here.");
 			event.setCanceled(true);

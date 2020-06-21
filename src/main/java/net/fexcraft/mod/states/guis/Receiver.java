@@ -5,6 +5,7 @@ import net.fexcraft.lib.mc.api.packet.IPacketListener;
 import net.fexcraft.lib.mc.capabilities.FCLCapabilities;
 import net.fexcraft.lib.mc.network.packet.PacketNBTTagCompound;
 import net.fexcraft.lib.mc.render.ExternalTextureHelper;
+import net.fexcraft.lib.mc.utils.Formatter;
 import net.fexcraft.lib.mc.utils.Print;
 import net.fexcraft.mod.states.impl.SignMailbox;
 import net.minecraft.entity.player.EntityPlayer;
@@ -33,9 +34,9 @@ public class Receiver implements IPacketListener<PacketNBTTagCompound> {
 				int t = packet.nbt.hasKey("time") ? packet.nbt.getInteger("time") : 5;
 				LocationUpdate.till = Time.getDate() + (t * 2000);
 				//
-				LocationUpdate.lines[0] = packet.nbt.getString("line0");
-				LocationUpdate.lines[1] = packet.nbt.getString("line1");
-				LocationUpdate.lines[2] = packet.nbt.getString("line2");
+				LocationUpdate.lines[0] = Formatter.format(packet.nbt.getString("line0"));
+				LocationUpdate.lines[1] = Formatter.format(packet.nbt.getString("line1"));
+				LocationUpdate.lines[2] = Formatter.format(packet.nbt.getString("line2"));
 				for(int i = 0; i < 3; i++){
 					LocationUpdate.icon[i] = packet.nbt.hasKey("icon_" + i) ? ExternalTextureHelper.get(packet.nbt.getString("icon_" + i)) : null;
 					LocationUpdate.x[i] = packet.nbt.hasKey("x_" + i) ? packet.nbt.getInteger("x_" + i) : 0;

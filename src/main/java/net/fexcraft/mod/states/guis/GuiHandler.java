@@ -1,8 +1,11 @@
 package net.fexcraft.mod.states.guis;
 
+import static net.fexcraft.mod.states.States.INSTANCE;
+
 import net.fexcraft.mod.states.guis.mail.MailboxUI;
 import net.fexcraft.mod.states.guis.mail.MailboxUIC;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import net.minecraftforge.fml.common.network.IGuiHandler;
 
@@ -22,6 +25,8 @@ public class GuiHandler implements IGuiHandler{
 	 * 10 Chunk claiming.
 	 * 20 Mailbox
 	 * */
+	
+	public static final int WELCOME = 0;
 
 	@Override
 	public Object getServerGuiElement(int ID, EntityPlayer player, World world, int x, int y, int z){
@@ -32,9 +37,7 @@ public class GuiHandler implements IGuiHandler{
 	public Object getClientGuiElement(int ID, EntityPlayer player, World world, int x, int y, int z){
 		//return new GeneralGui(ID, player, world, x, y, z);
 		switch(ID){
-			case 0:{
-				return new WelcomeGui(player, world, x, y, z);
-			}
+			case WELCOME: return new WelcomeGui(player, world, x, y, z);
 			case 1:{
 				return new AreaView(player, world, x, y, z);
 			}
@@ -50,6 +53,14 @@ public class GuiHandler implements IGuiHandler{
 			}
 		}
 		return null;
+	}
+
+	public static final void openGui(EntityPlayer player, int guiid, BlockPos position){
+		player.openGui(INSTANCE, guiid, player.world, position.getX(), position.getY(), position.getZ());
+	}
+
+	public static final void openGui(EntityPlayer player, int guiid, int x, int y, int z){
+		player.openGui(INSTANCE, guiid, player.world, x, y, z);
 	}
 
 }

@@ -1,5 +1,8 @@
 package net.fexcraft.mod.states.cmds;
 
+import static net.fexcraft.mod.states.guis.GuiHandler.RULE_EDITOR;
+import static net.fexcraft.mod.states.guis.GuiHandler.openGui;
+
 import java.awt.Color;
 import java.util.ArrayList;
 import java.util.UUID;
@@ -113,7 +116,7 @@ public class StateCmd extends CommandBase {
 				return;
 			}
 			case "rules":{
-				player.openGui(States.INSTANCE, 9, sender.getEntityWorld(), 3, 0, 0);
+				openGui(player, RULE_EDITOR, 3, 0, 0);
 				return;
 			}
 			case "set":{

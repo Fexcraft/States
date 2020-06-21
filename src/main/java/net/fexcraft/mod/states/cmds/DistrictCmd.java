@@ -1,5 +1,8 @@
 package net.fexcraft.mod.states.cmds;
 
+import static net.fexcraft.mod.states.guis.GuiHandler.RULE_EDITOR;
+import static net.fexcraft.mod.states.guis.GuiHandler.openGui;
+
 import java.awt.Color;
 
 import org.apache.commons.lang3.math.NumberUtils;
@@ -96,7 +99,7 @@ public class DistrictCmd extends CommandBase {
 				return;
 			}
 			case "rules":{
-				player.openGui(States.INSTANCE, 9, sender.getEntityWorld(), 1, 0, 0);
+				openGui(player, RULE_EDITOR, 1, 0, 0);
 				return;
 			}
 			case "types":{

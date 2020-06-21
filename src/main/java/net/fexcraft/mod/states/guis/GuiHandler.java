@@ -13,12 +13,12 @@ public class GuiHandler implements IGuiHandler{
 	
 	/**
 	 * 0 Welcome Screen
-	 * 1 Chunk View
+	 * 1 Chunk/Area View
 	 * 2 Districts
 	 * 3 Municipalities
 	 * 4 States
 	 * 5 Unions
-	 * 6 empty
+	 * 6 Chunk Manager
 	 * 7 Companies
 	 * 8 Player Data
 	 * 9 Rules
@@ -27,6 +27,10 @@ public class GuiHandler implements IGuiHandler{
 	 * */
 	
 	public static final int WELCOME = 0;
+	public static final int REGION_VIEW = 1;
+	public static final int RULE_EDITOR = 9;
+	public static final int CLAIM_MAP = 10;
+	public static final int MAILBOX = 20;
 
 	@Override
 	public Object getServerGuiElement(int ID, EntityPlayer player, World world, int x, int y, int z){
@@ -38,19 +42,11 @@ public class GuiHandler implements IGuiHandler{
 		//return new GeneralGui(ID, player, world, x, y, z);
 		switch(ID){
 			case WELCOME: return new WelcomeGui(player, world, x, y, z);
-			case 1:{
-				return new AreaView(player, world, x, y, z);
-			}
-			case 9:{
-				return new RulesUI(player, world, x, y, z);
-			}
+			case REGION_VIEW: return new AreaView(player, world, x, y, z);
+			case RULE_EDITOR: return new RulesUI(player, world, x, y, z);
 			//
-			case 10:{
-				return new ClaimMap(player, world, x, y, z);
-			}
-			case 20:{
-				return new MailboxUI(player, world, x, y, z);
-			}
+			case CLAIM_MAP: return new ClaimMap(player, world, x, y, z);
+			case MAILBOX: return new MailboxUI(player, world, x, y, z);
 		}
 		return null;
 	}
@@ -61,6 +57,10 @@ public class GuiHandler implements IGuiHandler{
 
 	public static final void openGui(EntityPlayer player, int guiid, int x, int y, int z){
 		player.openGui(INSTANCE, guiid, player.world, x, y, z);
+	}
+
+	public static final void openGui(EntityPlayer player, int guiid, int[] array){
+		player.openGui(INSTANCE, guiid, player.world, array[0], array[1], array[2]);
 	}
 
 }

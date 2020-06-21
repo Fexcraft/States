@@ -1,5 +1,8 @@
 package net.fexcraft.mod.states.cmds;
 
+import static net.fexcraft.mod.states.guis.GuiHandler.RULE_EDITOR;
+import static net.fexcraft.mod.states.guis.GuiHandler.openGui;
+
 import java.awt.Color;
 import java.util.Collection;
 import java.util.UUID;
@@ -128,7 +131,7 @@ public class MunicipalityCmd extends CommandBase {
 				return;
 			}
 			case "rules":{
-				player.openGui(States.INSTANCE, 9, sender.getEntityWorld(), 2, 0, 0);
+				openGui(player, RULE_EDITOR, 2, 0, 0);
 				return;
 			}
 			case "types":{

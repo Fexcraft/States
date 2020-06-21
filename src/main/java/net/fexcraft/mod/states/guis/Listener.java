@@ -1,5 +1,7 @@
 package net.fexcraft.mod.states.guis;
 
+import static net.fexcraft.mod.states.guis.GuiHandler.openGui;
+
 import java.awt.Color;
 import java.awt.image.BufferedImage;
 
@@ -46,7 +48,7 @@ public class Listener implements IPacketListener<PacketNBTTagCompound> {
 		BlockPos pos = player.getPosition();
 		switch(packet.nbt.getInteger("from")){
 			case 0:{
-				player.openGui(States.INSTANCE, packet.nbt.getInteger("button") + 1, world, pos.getX(), pos.getY(), pos.getZ());
+				openGui(player, packet.nbt.getInteger("button") + 1, 0, 0, 0);
 				return;
 			}
 			case 1:{

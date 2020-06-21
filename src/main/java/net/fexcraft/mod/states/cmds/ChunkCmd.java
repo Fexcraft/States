@@ -1,5 +1,8 @@
 package net.fexcraft.mod.states.cmds;
 
+import static net.fexcraft.mod.states.guis.GuiHandler.CLAIM_MAP;
+import static net.fexcraft.mod.states.guis.GuiHandler.openGui;
+
 import java.util.UUID;
 
 import org.apache.commons.lang3.math.NumberUtils;
@@ -94,11 +97,11 @@ public class ChunkCmd extends CommandBase {
 					Print.chat(sender, "&7Please enter the numerical district ID as second argument!");
 					return;
 				}
-				player.openGui(States.INSTANCE, 10, player.world, Integer.parseInt(args[1]), args[0].equals("claim") ? 0 : 1, 0);
+				openGui(player, CLAIM_MAP, Integer.parseInt(args[1]), args[0].equals("claim") ? 0 : 1, 0);
 				return;
 			}
 			case "tempclaim":{
-				player.openGui(States.INSTANCE, 10, player.world, -2, 0, 0);
+				openGui(player, CLAIM_MAP, -2, 0, 0);
 				return;
 			}
 			case "map":{
@@ -125,7 +128,7 @@ public class ChunkCmd extends CommandBase {
 					Print.chat(sender, str + "&0]");
 				}
 				Print.chat(sender, "&4#&7 - null &8| &9#&7 - claimed &8| &2#&7 - not claimed &8| &7+ your position.");
-				//player.openGui(States.INSTANCE, 1, player.world, 0, 0, 0);
+				//openGui(player, REGION_VIEW, 0, 0, 0);
 				return;
 			}
 			case "info":{

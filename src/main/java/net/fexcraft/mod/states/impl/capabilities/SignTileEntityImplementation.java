@@ -1,12 +1,14 @@
 package net.fexcraft.mod.states.impl.capabilities;
 
+import static net.fexcraft.mod.states.guis.GuiHandler.REGION_VIEW;
+import static net.fexcraft.mod.states.guis.GuiHandler.openGui;
+
 import java.util.UUID;
 
 import net.fexcraft.lib.mc.utils.Formatter;
 import net.fexcraft.lib.mc.utils.Print;
 import net.fexcraft.lib.mc.utils.Static;
 import net.fexcraft.mod.fsmm.util.Config;
-import net.fexcraft.mod.states.States;
 import net.fexcraft.mod.states.data.Chunk;
 import net.fexcraft.mod.states.data.ChunkType;
 import net.fexcraft.mod.states.data.capabilities.SignTileEntityCapability;
@@ -202,7 +204,7 @@ public class SignTileEntityImplementation implements SignTileEntityCapability {
 					}
 				}
 				if(j < 0){ j = 0; }
-				player.openGui(States.INSTANCE, 1, player.world, j, 0, 0);
+				openGui(player, REGION_VIEW, j, 0, 0);
 				break;
 			}
 			default:{

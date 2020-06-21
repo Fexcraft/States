@@ -1,12 +1,13 @@
 package net.fexcraft.mod.states.guis;
 
+import static net.fexcraft.mod.states.guis.GuiHandler.RULE_EDITOR;
+
 import java.util.UUID;
 
 import net.fexcraft.lib.mc.gui.GenericContainer;
 import net.fexcraft.lib.mc.gui.GenericGui;
 import net.fexcraft.lib.mc.utils.Formatter;
 import net.fexcraft.lib.mc.utils.Print;
-import net.fexcraft.mod.states.States;
 import net.fexcraft.mod.states.data.Chunk;
 import net.fexcraft.mod.states.data.Rule;
 import net.fexcraft.mod.states.data.root.Initiator;
@@ -52,8 +53,7 @@ public class RulesUIC extends GenericContainer {
 		if(side.isServer()){
 			switch(packet.getString("cargo")){
 				case "open": {
-					int[] arr = packet.getIntArray("arr");
-					player.openGui(States.MODID, 9, player.world, arr[0], arr[1], arr[2]);
+					GuiHandler.openGui(player, RULE_EDITOR, packet.getIntArray("arr"));
 					return;
 				}
 				case "init": {

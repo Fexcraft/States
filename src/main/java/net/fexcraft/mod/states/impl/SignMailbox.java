@@ -1,5 +1,8 @@
 package net.fexcraft.mod.states.impl;
 
+import static net.fexcraft.mod.states.guis.GuiHandler.MAILBOX;
+import static net.fexcraft.mod.states.guis.GuiHandler.openGui;
+
 import java.io.File;
 
 import net.fexcraft.lib.common.math.Time;
@@ -177,7 +180,7 @@ public class SignMailbox implements SignCapability.Listener {
 				Print.chat(event.getEntity(), "&aThere is no new mail!"); 
 				return true;
 			}
-			event.getEntityPlayer().openGui(States.INSTANCE, 20, event.getWorld(), tileentity.getPos().getX(), tileentity.getPos().getY(), tileentity.getPos().getZ());
+			openGui(event.getEntityPlayer(), MAILBOX, tileentity.getPos());
 			//Print.chat(event.getEntityPlayer(), "&k!000-000!000-000!");
         	Print.chat(event.getEntity(), "&7&oOpening Mailbox UI."); return true;
 		}

@@ -24,7 +24,8 @@ public class RulesUI extends GenericGui<RulesUIC> {
 
 	@Override
 	protected void init(){
-		NBTTagCompound compound = new NBTTagCompound(); compound.setString("cargo", "init");
+		NBTTagCompound compound = new NBTTagCompound();
+		compound.setString("cargo", "init");
 		container.send(Side.SERVER, compound);
 		texts.put("title", title = new BasicText(guiLeft + 10, guiTop + 8, 216, MapColor.SNOW.colorValue, "waiting for server response..."));
 		texts.put("status", status = new BasicText(guiLeft + 10, guiTop + 225, 236, MapColor.SNOW.colorValue, "waiting for server response..."));

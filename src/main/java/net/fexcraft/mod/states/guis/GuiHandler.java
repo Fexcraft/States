@@ -18,23 +18,29 @@ public class GuiHandler implements IGuiHandler{
 	 * 3 Municipalities
 	 * 4 States
 	 * 5 Unions
-	 * 6 Chunk Manager
-	 * 7 Companies
-	 * 8 Player Data
-	 * 9 Rules
+	 * 6 Companies
+	 * 7 Player Data
+	 * 8 Chunk Manager
+	 * 9 Property Manager
 	 * 10 Chunk claiming.
 	 * 20 Mailbox
+	 * 30 Rules
 	 * */
 	
 	public static final int WELCOME = 0;
 	public static final int REGION_VIEW = 1;
-	public static final int RULE_EDITOR = 9;
+	public static final int RULE_EDITOR = 30;
 	public static final int CLAIM_MAP = 10;
 	public static final int MAILBOX = 20;
 
 	@Override
 	public Object getServerGuiElement(int ID, EntityPlayer player, World world, int x, int y, int z){
-		return ID == 9 ? new RulesUIC(player, world, x, y, z) : ID == 20 ? new MailboxUIC(player, world, x, y, z) : new PlaceholderContainer();
+		switch(ID){
+			case RULE_EDITOR: return new RulesUIC(player, world, x, y, z);
+			case MAILBOX: return new MailboxUIC(player, world, x, y, z);
+			//
+			default: return new PlaceholderContainer();
+		}
 	}
 
 	@Override

@@ -25,6 +25,7 @@ public class GuiHandler implements IGuiHandler{
 	 * 10 Chunk claiming.
 	 * 20 Mailbox
 	 * 30 Rules
+	 * 40 Vote
 	 * */
 	
 	public static final int WELCOME = 0;
@@ -35,6 +36,7 @@ public class GuiHandler implements IGuiHandler{
 
 	@Override
 	public Object getServerGuiElement(int ID, EntityPlayer player, World world, int x, int y, int z){
+		if(ID > 1 && ID < 10) return new ManagerContainer(player, ID - 1, x, y, z);
 		switch(ID){
 			case RULE_EDITOR: return new RulesUIC(player, world, x, y, z);
 			case MAILBOX: return new MailboxUIC(player, world, x, y, z);
@@ -46,6 +48,7 @@ public class GuiHandler implements IGuiHandler{
 	@Override
 	public Object getClientGuiElement(int ID, EntityPlayer player, World world, int x, int y, int z){
 		//return new GeneralGui(ID, player, world, x, y, z);
+		if(ID > 1 && ID < 10) return new ManagerGui(player, ID - 1, x, y, z);
 		switch(ID){
 			case WELCOME: return new WelcomeGui(player, world, x, y, z);
 			case REGION_VIEW: return new AreaView(player, world, x, y, z);

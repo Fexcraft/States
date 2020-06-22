@@ -83,10 +83,10 @@ public class WelcomeGui extends GuiContainer {
 		buttons[2].displayString = "Municipalities";
 		buttons[3].displayString = "States";
 		buttons[4].displayString = "Unions";
-		//buttons[5].displayString = "";
-		buttons[6].displayString = "Companies";
-		buttons[7].displayString = "Player Settings";
-		//buttons[8].displayString = "";
+		buttons[5].displayString = "Companies";
+		buttons[6].displayString = "Player Settings";
+		buttons[7].displayString = "Chunk Manager";
+		buttons[8].displayString = "Properties";
 	}
 	
 	@Override

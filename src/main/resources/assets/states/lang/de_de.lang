@@ -1,0 +1,24 @@
+# Chat override
+states.chat.text=%s %s
+
+# Creative Tab
+itemGroup.states=States Mod
+
+# Items
+item.states:mail.name=Ungültiger Brief
+item.states:mail_empty.name=Leerer Brief
+item.states:mail_expired.name=Expired Mail
+item.states:mail_private.name=Abgelaufener Brief
+item.states:mail_invite.name=Einladugs Brief
+item.states:mail_system.name=System Brief
+
+# Welcome GUI
+states.welcome_gui.area_view=Bereichsansicht
+states.welcome_gui.district=Bezirk
+states.welcome_gui.municipality=Stadt/Gemeinde
+states.welcome_gui.state=Staat
+states.welcome_gui.union=Union
+states.welcome_gui.company=Gewerbe
+states.welcome_gui.player_data=Spieler Daten
+states.welcome_gui.chunk_manager=Chunk Manager
+states.welcome_gui.properties=Immobilien

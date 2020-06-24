@@ -48,7 +48,7 @@ public class Listener implements IPacketListener<PacketNBTTagCompound> {
 		BlockPos pos = player.getPosition();
 		switch(packet.nbt.getInteger("from")){
 			case 0:{
-				openGui(player, packet.nbt.getInteger("button") + 1, 1, 0, 0);
+				openGui(player, packet.nbt.getInteger("button") + 1, 0, 0, 0);
 				return;
 			}
 			case 1:{

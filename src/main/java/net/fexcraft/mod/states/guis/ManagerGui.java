@@ -28,7 +28,6 @@ public class ManagerGui extends GenericGui<ManagerContainer> {
 				ySize = 200;
 				texloc = LIST;
 				break;
-			case NONE:
 			default:
 				xSize = 0;
 				ySize = 0;
@@ -41,7 +40,15 @@ public class ManagerGui extends GenericGui<ManagerContainer> {
         texts.clear();
         fields.clear();
         //
-        
+        switch(container.mode){
+			case EDIT:
+				break;
+			case INFO:
+				break;
+			case LIST:
+				break;
+			default: return;
+        }
 	}
 
 	@Override

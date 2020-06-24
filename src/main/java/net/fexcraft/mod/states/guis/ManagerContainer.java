@@ -10,11 +10,27 @@ public class ManagerContainer extends GenericContainer {
 	private ManagerGui gui;
 	protected Mode mode;
 	protected Layer layer;
+	//
+	protected String[] listtext;
+	protected int listpage;
 
 	public ManagerContainer(EntityPlayer player, int layerid, int x, int y, int z){
 		super(player);
 		mode = Mode.values()[x];
 		layer = Layer.values()[layerid];
+		if(!player.world.isRemote){
+			switch(mode){
+				case EDIT:
+					break;
+				case INFO:
+					break;
+				case LIST:
+					int amount = 0;//
+					break;
+				default:
+					break;
+			}
+		}
 	}
 
 	@Override
@@ -28,7 +44,6 @@ public class ManagerContainer extends GenericContainer {
 	
 	public static enum Mode {
 		
-		NONE,
 		LIST,
 		INFO,
 		EDIT

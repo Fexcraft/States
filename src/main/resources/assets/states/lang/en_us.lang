@@ -14,11 +14,11 @@ item.states:mail_system.name=System Mail
 
 # Welcome GUI
 states.welcome_gui.area_view=Area View
-states.welcome_gui.districts=Districts
-states.welcome_gui.municipalities=Municipalities
-states.welcome_gui.states=States
-states.welcome_gui.unions=Unions
-states.welcome_gui.companies=Companies
+states.welcome_gui.district=District
+states.welcome_gui.municipality=Municipality
+states.welcome_gui.state=State
+states.welcome_gui.union=Union
+states.welcome_gui.company=Company
 states.welcome_gui.player_data=Player Settings
 states.welcome_gui.chunk_manager=Chunk Manager
 states.welcome_gui.properties=Properties

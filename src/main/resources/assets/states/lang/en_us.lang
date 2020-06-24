@@ -11,3 +11,14 @@ item.states:mail_expired.name=Expired Mail
 item.states:mail_private.name=Private Mail
 item.states:mail_invite.name=Invite Mail
 item.states:mail_system.name=System Mail
+
+# Welcome GUI
+states.welcome_gui.area_view=Area View
+states.welcome_gui.districts=Districts
+states.welcome_gui.municipalities=Municipalities
+states.welcome_gui.states=States
+states.welcome_gui.unions=Unions
+states.welcome_gui.companies=Companies
+states.welcome_gui.player_data=Player Settings
+states.welcome_gui.chunk_manager=Chunk Manager
+states.welcome_gui.properties=Properties

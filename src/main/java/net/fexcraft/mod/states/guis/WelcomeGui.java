@@ -11,6 +11,7 @@ import net.minecraft.client.renderer.BufferBuilder;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
+import net.minecraft.client.resources.I18n;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.ResourceLocation;
@@ -78,15 +79,15 @@ public class WelcomeGui extends GuiContainer {
 			buttonList.add(buttons[i] = new Button(i, this.guiLeft + 9, this.guiTop + 48 + (i * 16), 100, 14, " - - - - - "));
 			buttons[i].enabled = buttons[i].visible = true;
 		}
-		buttons[0].displayString = "Area View";
-		buttons[1].displayString = "Districts";
-		buttons[2].displayString = "Municipalities";
-		buttons[3].displayString = "States";
-		buttons[4].displayString = "Unions";
-		buttons[5].displayString = "Companies";
-		buttons[6].displayString = "Player Settings";
-		buttons[7].displayString = "Chunk Manager";
-		buttons[8].displayString = "Properties";
+		buttons[0].displayString = I18n.format("states.welcome_gui.area_view");
+		buttons[1].displayString = I18n.format("states.welcome_gui.districts");
+		buttons[2].displayString = I18n.format("states.welcome_gui.municipalities");
+		buttons[3].displayString = I18n.format("states.welcome_gui.states");
+		buttons[4].displayString = I18n.format("states.welcome_gui.unions");
+		buttons[5].displayString = I18n.format("states.welcome_gui.companies");
+		buttons[6].displayString = I18n.format("states.welcome_gui.player_data");
+		buttons[7].displayString = I18n.format("states.welcome_gui.chunk_manager");
+		buttons[8].displayString = I18n.format("states.welcome_gui.properties");
 	}
 	
 	@Override

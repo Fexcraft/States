@@ -31,3 +31,32 @@ states.welcome_msg.municipality=&2Which is part of the &6$1 &7$0&2.
 states.welcome_msg.state=&2In the State of &7$0&2.
 states.welcome_msg.no_mailbox=&6You have &7no mailbox set&6!
 states.welcome_msg.pending_votes=&6You have &7$0 &6votes waiting! &7/st-vote my-votes
+
+# Manager GUI
+states.manager_gui.title_district=District: %s
+states.manager_gui.title_municipality=Municipality: %s
+states.manager_gui.title_state=State: %s
+//
+states.manager_gui.view.no_one=no one
+states.manager_gui.view.no_tax=no tax
+states.manager_gui.view.no_mailbox=NO MAILBOX
+states.manager_gui.view.not_for_sale=not for sale
+//
+states.manager_gui.view_district.id=District ID
+states.manager_gui.view_district.name=Name
+states.manager_gui.view_district.municipality=Municipality
+states.manager_gui.view_district.manager=Manager
+states.manager_gui.view_district.price=Price
+states.manager_gui.view_district.type=Type
+states.manager_gui.view_district.color=Color
+states.manager_gui.view_district.icon=Icon/Logo
+states.manager_gui.view_district.chunk_tax=Chunk Tax
+states.manager_gui.view_district.last_edited=Last Edit
+states.manager_gui.view_district.neighbors=Neighbors
+states.manager_gui.view_district.chunks=Chunks
+states.manager_gui.view_district.canforsettle=Foreign Settlers
+states.manager_gui.view_district.unifbank=Unclaim Bankrupt
+states.manager_gui.view_district.creator=Creator
+states.manager_gui.view_district.created=Created
+states.manager_gui.view_district.ruleset=Ruleset
+states.manager_gui.view_district.mailbox=Mailbox

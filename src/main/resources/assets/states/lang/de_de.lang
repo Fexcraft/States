@@ -22,3 +22,12 @@ states.welcome_gui.company=Gewerbe
 states.welcome_gui.player_data=Spieler Daten
 states.welcome_gui.chunk_manager=Chunk Manager
 states.welcome_gui.properties=Immobilien
+
+# Welcome Message
+states.welcome_msg.welcome_back=&aWillkommen zurück $0&a!
+states.welcome_msg.other_dim=&2Du bist grad in &7DIM($0)&0.
+states.welcome_msg.district=&2Du bist im Bezirk &7$0&2.
+states.welcome_msg.municipality=&2Welcher teil von &6$1 &7$0 &2ist.
+states.welcome_msg.state=&2Im Staat von &7$0&2.
+states.welcome_msg.no_mailbox=&6Du hast noch keinen &7Briefkasten&6!
+states.welcome_msg.pending_votes=&6Es warten &7$0 &6umfragen/votes.! &7/st-vote my-votes

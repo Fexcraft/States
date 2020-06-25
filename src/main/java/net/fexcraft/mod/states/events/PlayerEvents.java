@@ -62,20 +62,20 @@ public class PlayerEvents {
 		if(!player.isLoaded()){ player.load(); }
 		States.PLAYERS.put(event.player.getGameProfile().getId(), player);
 		Print.chat(event.player, "&e====-====-====-====-====-====" + States.PREFIX);
-		Print.chat(event.player, "&6Welcome back " + player.getFormattedNickname() + "&6!");//TODO replace with nick
+		Print.chat(event.player, StateUtil.translate("states.welcome_msg.welcome_back", player.getFormattedNickname()));
 		if(event.player.dimension != 0){
-			Print.chat(event.player, "&2You are currently in &7DIM($0)&0.".replace("$0", event.player.dimension + ""));
+			Print.chat(event.player, StateUtil.translate("states.welcome_msg.other_dim", event.player.dimension));
 		}
 		else{
 			Chunk chunk = StateUtil.getChunk(event.player);
-			Print.chat(event.player, "&2You are currently in a district called &7$0&2.".replace("$0", chunk.getDistrict().getName()));
-			Print.chat(event.player, "&2Which is part of the &6$1 &7$0&2.".replace("$0", chunk.getDistrict().getMunicipality().getName()).replace("$1", chunk.getDistrict().getMunicipality().getType().getTitle()));
-			Print.chat(event.player, "&2In the State of &7$0&2.".replace("$0", chunk.getDistrict().getMunicipality().getState().getName()));
+			Print.chat(event.player, StateUtil.translate("states.welcome_msg.district", chunk.getDistrict().getName()));
+			Print.chat(event.player, StateUtil.translate("states.welcome_msg.municipality", chunk.getMunicipality().getName(), chunk.getMunicipality().getType().getTitle()));
+			Print.chat(event.player, StateUtil.translate("states.welcome_msg.state", chunk.getState().getName()));
 		}
-		if(player.getMailbox() == null) Print.chat(event.player, "&6You have &7no mailbox set&6!");
-		if(player.hasRelevantVotes()) Print.chat(event.player, "&6You have &7" + player.getRelevantVotes().size() + " &6votes waiting! &7/st-vote my-votes"); 
+		if(player.getMailbox() == null) Print.chat(event.player, StateUtil.translate("states.welcome_msg.no_mailbox"));
+		if(player.hasRelevantVotes()) Print.chat(event.player, StateUtil.translate("states.welcome_msg.pending_votes", player.getRelevantVotes().size())); 
 		Print.chat(event.player, "&e====-====-====-====-====-====" + States.PREFIX);
-		sendLocationUpdate(event.player, null, "&6Welcome back " + player.getFormattedNickname() + "&6!", "", "", 3);
+		sendLocationUpdate(event.player, null, StateUtil.translate("states.welcome_msg.welcome_back", player.getFormattedNickname()), "", "", 3);
 		if(UpdateHandler.STATE != null){
 			Print.chat(event.player, UpdateHandler.STATE);
 		}

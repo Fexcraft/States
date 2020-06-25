@@ -390,5 +390,18 @@ public class StateUtil extends TimerTask {
 	public static void clearAll(){
 		States.DISTRICTS.clear(); States.MUNICIPALITIES.clear(); States.STATES.clear();
 	}
+	
+	@SuppressWarnings("deprecation")
+	public static String translate(String key){
+		return net.minecraft.util.text.translation.I18n.translateToLocal(key);
+	}
+	
+	public static String translate(String key, Object... format){
+		String str = translate(key);
+		for(int i = 0; i < format.length; i++){
+			str = str.replace("$" + i, format[i].toString());
+		}
+		return str;
+	}
 
 }

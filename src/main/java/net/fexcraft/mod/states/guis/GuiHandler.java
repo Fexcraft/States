@@ -35,6 +35,12 @@ public class GuiHandler implements IGuiHandler{
 	public static final int MAILBOX = 20;
 	//
 	public static final int MANAGER_DISTRICT = 2;
+	public static final int MANAGER_MUNICIPALITY = 3;
+	public static final int MANAGER_STATE = 4;
+	public static final int MANAGER_COMPANY = 6;
+	public static final int MANAGER_PLAYERDATA = 7;
+	public static final int MANAGER_CHUNK = 8;
+	public static final int MANAGER_PROPERTY = 9;
 
 	@Override
 	public Object getServerGuiElement(int ID, EntityPlayer player, World world, int x, int y, int z){

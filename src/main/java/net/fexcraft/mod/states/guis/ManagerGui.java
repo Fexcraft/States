@@ -20,7 +20,7 @@ public class ManagerGui extends GenericGui<ManagerContainer> {
 
 	public ManagerGui(EntityPlayer player, int layer, int x, int y, int z){
 		super(STONE, new ManagerContainer(player, layer, x, y, z), player);
-		this.defbackground = false;
+		//this.defbackground = false;
 		this.deftexrect = true;
 		container.set(this);
 	}
@@ -125,6 +125,7 @@ public class ManagerGui extends GenericGui<ManagerContainer> {
 		setTitle("states.manager_gui.title_" + layerid);
 		for(int j = 0; j < container.mode.entries(); j++){
 			int i = j + scroll;
+			if(i >= container.keys.length) break;
 			texts.get("key" + j).string = I18n.format("states.manager_gui.view_" + layerid + "." + container.keys[i]);
 			if(container.mode == Mode.INFO){
 				TextField field = fields.get("field" + j);

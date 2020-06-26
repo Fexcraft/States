@@ -1,20 +1,13 @@
 package net.fexcraft.mod.states.cmds;
 
+import static net.fexcraft.mod.states.guis.GuiHandler.MANAGER_DISTRICT;
 import static net.fexcraft.mod.states.guis.GuiHandler.RULE_EDITOR;
 import static net.fexcraft.mod.states.guis.GuiHandler.openGui;
-
-import java.awt.Color;
-
-import org.apache.commons.lang3.math.NumberUtils;
-
-import com.mojang.authlib.GameProfile;
 
 import net.fexcraft.lib.common.math.Time;
 import net.fexcraft.lib.mc.api.registry.fCommand;
 import net.fexcraft.lib.mc.utils.Print;
-import net.fexcraft.lib.mc.utils.Static;
 import net.fexcraft.mod.fsmm.api.Bank;
-import net.fexcraft.mod.fsmm.util.Config;
 import net.fexcraft.mod.states.States;
 import net.fexcraft.mod.states.data.Chunk;
 import net.fexcraft.mod.states.data.District;
@@ -25,6 +18,7 @@ import net.fexcraft.mod.states.data.MunicipalityType;
 import net.fexcraft.mod.states.data.capabilities.PlayerCapability;
 import net.fexcraft.mod.states.data.capabilities.StatesCapabilities;
 import net.fexcraft.mod.states.guis.Listener;
+import net.fexcraft.mod.states.guis.ManagerContainer;
 import net.fexcraft.mod.states.util.StateLogger;
 import net.fexcraft.mod.states.util.StateUtil;
 import net.minecraft.command.CommandBase;
@@ -64,7 +58,6 @@ public class DistrictCmd extends CommandBase {
 			Print.chat(sender, "&7/dis types");
 			Print.chat(sender, "&7/dis create");
 			Print.chat(sender, "&7/dis attributes");
-			Print.chat(sender, "&7/dis set <option> <value>");
 			return;
 		}
 		EntityPlayer player = (EntityPlayer)sender.getCommandSenderEntity();
@@ -77,25 +70,7 @@ public class DistrictCmd extends CommandBase {
 		District dis = chunk.getDistrict();
 		switch(args[0]){
 			case "info":{
-				Print.chat(sender, "&e====-====-====-====-====-====&0[&2States&0]");
-				Print.chat(sender, "&6Info of district &7" + dis.getName() + " (" + dis.getId() + ")&2:");
-				Print.chat(sender, "&9Municipality: &7" + dis.getMunicipality().getName() + " (" + dis.getMunicipality().getId() + ")");
-				Print.chat(sender, "&9Manager: &7" + (dis.getHead() == null ? "no one" : Static.getPlayerNameByUUID(dis.getHead())));
-				Print.chat(sender, "&9Price: &7" + (dis.getPrice() > 0 ? Config.getWorthAsString(dis.getPrice()) : "not for sale"));
-				Print.chat(sender, "&9Type: &7" + dis.getType().name().toLowerCase());
-				Print.chat(sender, "&9Color: &7" + dis.getColor());
-				Print.chat(sender, "&9Chunk Tax: &7" + (dis.getChunkTax() > 0 ? ggas(dis.getChunkTax()) : "none"));
-				Print.chat(sender, "&9Last change: &7" + Time.getAsString(dis.getChanged()));
-				Print.chat(sender, "&9Neighbors: &7" + dis.getNeighbors().size());
-				dis.getNeighbors().forEach(var -> {
-					District district = StateUtil.getDistrict(var);
-					Print.chat(sender, "&c-> &9" + district.getName() + " &7(" + district.getId() + ");");
-				});
-				Print.chat(sender, "&9Chunks: &7" + dis.getClaimedChunks());
-				Print.chat(sender, "&7Can Foreigners Settle: " + dis.r_CFS.get());
-				Print.chat(sender, "&8Unclaim if Bankrupt: " + dis.r_ONBANKRUPT.get());
-				Print.chat(sender, "&2Created by &7" + Static.getPlayerNameByUUID(dis.getCreator()) + "&2 at &8" + Time.getAsString(dis.getCreated()));
-				Print.chat(sender, "&6Mailbox: &7" + (dis.getMailbox() == null ? "No mailbox set." : dis.getMailbox().toString()));
+				openGui(player, MANAGER_DISTRICT, ManagerContainer.Mode.INFO.ordinal(), dis.getId(), 0);
 				return;
 			}
 			case "rules":{
@@ -117,223 +92,6 @@ public class DistrictCmd extends CommandBase {
 					Print.chat(sender, "&2-> &3 " + type.name().toLowerCase());
 				}
 				Print.chat(sender, "&9Each district type may have a different set of attributes.");
-				return;
-			}
-			case "set":{
-				if(args.length < 2){
-					Print.chat(sender, "&7/dis set type <type>");
-					Print.chat(sender, "&7/dis set name <new name>");
-					Print.chat(sender, "&7/dis set price <price/0>");
-					Print.chat(sender, "&7/dis set manager <playername>");
-					Print.chat(sender, "&7/dis set color <hex>");
-					Print.chat(sender, "&7/dis set can-foreigners-settle <true/false>");
-					Print.chat(sender, "&7/dis set icon <url>");
-					Print.chat(sender, "&7/dis set chunk-tax <amount/reset>");
-					Print.chat(sender, "&7/dis set unclaim-if-bankrupt <true/false>");
-					Print.chat(sender, "&7/dis set ruleset <new name>");
-					return;
-				}
-				switch(args[1]){
-					case "type":{
-						if(dis.isAuthorized(dis.r_SET_TYPE.id, ply.getUUID()).isTrue() || StateUtil.bypass(player)){
-							if(args.length < 3){
-								Print.chat(sender, "&9Missing Argument!");
-								Print.chat(sender, "&2You can see available types using &7/dis types&2!");
-								break;
-							}
-							try{
-								DistrictType type = DistrictType.valueOf(args[2].toUpperCase());
-								if(type != null){
-									dis.setType(type);
-									dis.setChanged(Time.getDate());
-									dis.save();
-								}
-								Print.chat(sender, "&9District type set to &7" + type.name().toLowerCase() + "&9!");
-								Print.log(StateLogger.player(player) + " changed type of " + StateLogger.district(dis) + " to " + dis.getType() + ".");
-							}
-							catch(Exception e){
-								Print.chat(sender, "&9Error: &7" + e.getMessage());
-							}
-						}
-						else{
-							Print.chat(sender, "&cNo permission.");
-						}
-						break;
-					}
-					case "ruleset":{
-						if(dis.isAuthorized(dis.r_SET_RULESET.id, ply.getUUID()).isTrue() || StateUtil.bypass(player)){
-							if(args.length < 3){
-								Print.chat(sender, "&9Missing Arguments!");
-								break;
-							}
-							String str = args[2];
-							if(args.length > 3){
-								for(int i = 3; i < args.length; i++){
-									str += " " + args[i];
-								}
-							}
-							if(str.replace(" ", "").length() < 3){
-								Print.chat(sender, "&cName is too short!");
-								break;
-							}
-							dis.setRulesetTitle(str);
-							dis.setChanged(Time.getDate());
-							dis.save();
-							Print.chat(sender, "&6Ruleset Name set to: &7" + dis.getName());
-							Print.log(StateLogger.player(player) + " changed ruleset name of " + StateLogger.district(dis) + " to " + dis.getName() + ".");
-						}
-						else{
-							Print.chat(sender, "&cNo permission.");
-						}
-						break;
-					}
-					case "price":{
-						if(dis.isAuthorized(dis.r_SET_PRICE.id, ply.getUUID()).isTrue() || StateUtil.bypass(player)){
-							if(args.length < 3){
-								Print.chat(sender, "&9Missing Argument!");
-								Print.chat(sender, "&7Setting the price to \"0\" makes the district not buyable.");
-								break;
-							}
-							try{
-								Long price = Long.parseLong(args[2]);
-								if(price < 0){ price = 0l; }
-								dis.setPrice(price);
-								dis.setChanged(Time.getDate());
-								dis.save();
-								Print.chat(sender, "&2Price set to: &7" + Config.getWorthAsString(dis.getPrice()));
-								Print.log(StateLogger.player(player) + " changed price of " + StateLogger.district(dis) + " to " + dis.getPrice() + ".");
-							}
-							catch(Exception e){
-								Print.chat(sender, "&cError: &7" + e.getMessage());
-							}
-						}
-						else{
-							Print.chat(sender, "&cNo permission.");
-						}
-						break;
-					}
-					case "manager":{
-						if(dis.isAuthorized(dis.r_SET_MANAGER.id, ply.getUUID()).isTrue() || StateUtil.bypass(player)){
-							if(args.length < 3){
-								Print.chat(sender, "&9Missing Argument!");
-								break;
-							}
-							GameProfile gp = Static.getServer().getPlayerProfileCache().getGameProfileForUsername(args[2]);
-							if(gp == null || gp.getId() == null){
-								Print.chat(sender, "&cPlayer not found in Cache.");
-								break;
-							}
-							dis.setHead(gp.getId());
-							dis.setChanged(Time.getDate());
-							dis.save();
-							Print.chat(sender, "&2Set &7" + gp.getName() + "&2 to new District Manager!");
-							Print.log(StateLogger.player(player) + " changed manager of " + StateLogger.district(dis) + " to " + StateLogger.player(gp) + ".");
-						}
-						else{
-							Print.chat(sender, "&cNo permission.");
-						}
-						break;
-					}
-					case "color":{
-						if(dis.isAuthorized(dis.r_SET_COLOR.id, ply.getUUID()).isTrue() || StateUtil.bypass(player)){
-							if(args.length < 3){
-								Print.chat(sender, "&9Missing Argument!");
-								break;
-							}
-							try{
-								String str = args[2];
-								if(str.replace("#", "").length() != 6){
-									Print.chat(sender, "&cInvalid HEX String.");
-									break;
-								}
-								str = str.startsWith("#") ? str : "#" + str;
-								Color color = Color.decode(str);
-								dis.setColor(str);
-								dis.setChanged(Time.getDate());
-								dis.save();
-								Print.chat(sender, "&6Color set to &7" + str + "&6! (" + color.getRed() + ", " + color.getGreen() + ", " + color.getBlue() + ");");
-								Print.log(StateLogger.player(player) + " changed color of " + StateLogger.district(dis) + " to " + dis.getColor() + ".");
-							}
-							catch(Exception e){
-								Print.chat(sender, "&2Error: &7" + e.getMessage());
-							}
-						}
-						else{
-							Print.chat(sender, "&cNo permission.");
-						}
-						break;
-					}
-					case "can-foreigners-settle":{
-						if(dis.isAuthorized(dis.r_CFS.id, ply.getUUID()).isTrue() || StateUtil.bypass(player)){
-							if(args.length < 3){
-								Print.chat(sender, "&9Missing Argument!");
-								break;
-							}
-							dis.r_CFS.set(Boolean.parseBoolean(args[2]));
-							dis.setChanged(Time.getDate());
-							dis.save();
-							Print.chat(sender, "&2FCS: &7" + dis.r_CFS.get());
-
-							Print.log(StateLogger.player(player) + " changed 'can-foreigners-settle' of " + StateLogger.district(dis) + " to " + dis.r_CFS.get() + ".");
-						}
-						else{
-							Print.chat(sender, "&cNo permission.");
-						}
-						break;
-					}
-					default:{
-						Print.chat(sender, "&9Invalid Argument.");
-						break;
-					}
-					case "icon":{
-						if(dis.isAuthorized(dis.r_SET_ICON.id, ply.getUUID()).isTrue() || StateUtil.bypass(player)){
-							if(args.length < 3){
-								Print.chat(sender, "&9Missing Argument!");
-								break;
-							}
-							try{
-								dis.setIcon(args[2]);
-								dis.setChanged(Time.getDate());
-								dis.save();
-								Print.chat(sender, "&6Icon set to &7" + args[2] + "&6!");
-								Print.log(StateLogger.player(player) + " changed icon of " + StateLogger.district(dis) + " to " + dis.getIcon() + ".");
-							}
-							catch(Exception e){
-								Print.chat(sender, "&2Error: &7" + e.getMessage());
-							}
-						}
-						else{
-							Print.chat(sender, "&cNo permission.");
-						}
-						break;
-					}
-					case "chunk-tax":{
-						if(dis.isAuthorized(dis.r_SET_CHUNKTAX.id, ply.getUUID()).isTrue() || StateUtil.bypass(player)){
-							if(args[2].equals("reset") || args[2].equals("disable")){
-								dis.setChunkTax(0); dis.save();
-								Print.chat(sender, "&9District's Chunk Tax was reset!");
-							}
-							else if(NumberUtils.isCreatable(args[2])){
-								dis.setChunkTax(Long.parseLong(args[2])); dis.save();
-								Print.chat(sender, "&9District's Chunk Tax was set! (" + ggas(dis.getChunkTax()) + ")");
-							}
-							else{
-								Print.chat(sender, "Not a (valid) number.");
-							}
-						}
-						break;
-					}
-					case "unclaim-if-brankrupt":{
-						if(dis.isAuthorized(dis.r_ONBANKRUPT.id, ply.getUUID()).isTrue() || StateUtil.bypass(player)){
-							if(args.length < 3){ Print.chat(sender, "&9Missing Argument!"); break; }
-							dis.r_ONBANKRUPT.set(Boolean.parseBoolean(args[2]));
-							dis.setChanged(Time.getDate()); dis.save();
-							Print.chat(sender, "&2UIB: &7" + dis.r_ONBANKRUPT.get());
-							Print.log(StateLogger.player(player) + " changed 'unclaim-if-brankrupt' of " + StateLogger.district(dis) + " to " + dis.r_ONBANKRUPT.get() + ".");
-						}
-						break;
-					}
-				}
 				return;
 			}
 			case "create":{
@@ -422,10 +180,6 @@ public class DistrictCmd extends CommandBase {
 				return;
 			}
 		}
-	}
-	
-	private String ggas(long tax){
-		return ChunkCmd.ggas(tax);
 	}
 
 	private boolean nearbySameMunicipality(Chunk ck, Municipality mun){

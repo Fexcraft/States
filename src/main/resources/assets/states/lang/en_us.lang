@@ -42,6 +42,10 @@ states.manager_gui.view.no_tax=no tax
 states.manager_gui.view.no_mailbox=NO MAILBOX
 states.manager_gui.view.not_for_sale=not for sale
 states.manager_gui.view.no_perm=&cNo Permission
+states.manager_gui.view.player_not_found_cache=&cPlayer not found in Cache.
+states.manager_gui.view.invalid_hex=&cInvalid HEX String.
+states.manager_gui.view.not_number=&cNot a (valid) number.
+states.manager_gui.view.name_short=&cName is too short!
 //
 states.manager_gui.view_district.id=District ID
 states.manager_gui.view_district.name=Name

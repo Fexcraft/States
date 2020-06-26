@@ -33,6 +33,8 @@ public class GuiHandler implements IGuiHandler{
 	public static final int RULE_EDITOR = 30;
 	public static final int CLAIM_MAP = 10;
 	public static final int MAILBOX = 20;
+	//
+	public static final int MANAGER_DISTRICT = 2;
 
 	@Override
 	public Object getServerGuiElement(int ID, EntityPlayer player, World world, int x, int y, int z){

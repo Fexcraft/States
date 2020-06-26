@@ -1,5 +1,13 @@
 package net.fexcraft.mod.states.guis;
 
+import static net.fexcraft.mod.states.util.StateUtil.bypass;
+
+import java.awt.Color;
+
+import org.apache.commons.lang3.math.NumberUtils;
+
+import com.mojang.authlib.GameProfile;
+
 import net.fexcraft.lib.common.math.Time;
 import net.fexcraft.lib.mc.gui.GenericContainer;
 import net.fexcraft.lib.mc.utils.Print;
@@ -7,6 +15,7 @@ import net.fexcraft.lib.mc.utils.Static;
 import net.fexcraft.mod.fsmm.util.Config;
 import net.fexcraft.mod.states.data.Chunk;
 import net.fexcraft.mod.states.data.District;
+import net.fexcraft.mod.states.data.DistrictType;
 import net.fexcraft.mod.states.data.Municipality;
 import net.fexcraft.mod.states.data.State;
 import net.fexcraft.mod.states.data.capabilities.PlayerCapability;
@@ -97,8 +106,8 @@ public class ManagerContainer extends GenericContainer {
 				addKey(list, "last_edited", time(dis.getChanged()), ViewMode.NONE);
 				addKey(list, "neighbors", dis.getNeighbors().size(), ViewMode.LIST);
 				addKey(list, "chunks", dis.getClaimedChunks(), ViewMode.NONE);
-				addKey(list, "canforsettle", dis.r_CFS.get(), ViewMode.NONE);
-				addKey(list, "unifbank", dis.r_ONBANKRUPT.get(), ViewMode.NONE);
+				addKey(list, "canforsettle", dis.r_CFS.get(), ViewMode.BOOL);
+				addKey(list, "unifbank", dis.r_ONBANKRUPT.get(), ViewMode.BOOL);
 				addKey(list, "creator", Static.getPlayerNameByUUID(dis.getCreator()), ViewMode.NONE);
 				addKey(list, "created", time(dis.getCreated()), ViewMode.NONE);
 				addKey(list, "ruleset", dis.getRulesetTitle(), ViewMode.GOTO);
@@ -170,7 +179,7 @@ public class ManagerContainer extends GenericContainer {
 				}
 				case "view_mode_click":{
 					if(mode != Mode.INFO) return;
-					boolean bypass = StateUtil.bypass(player);
+					String value = packet.hasKey("value") ? packet.getString("value") : null;
 					switch(layer){
 						case CHUNK:
 							break;
@@ -179,8 +188,13 @@ public class ManagerContainer extends GenericContainer {
 						case DISTRICT:
 							switch(keys[packet.getInteger("button")]){
 								case "name":
-									if(bypass || dis.isAuthorized(dis.r_SET_NAME.id, cap.getUUID()).isTrue()){
-										dis.setName(packet.getString("value"));
+									if(dis.isAuthorized(dis.r_SET_NAME.id, cap.getUUID()).isTrue() || bypass(player)){
+										value = value.trim();
+										if(value.replace(" ", "").length() < 3){
+											sendStatus("states.manager_gui.view.name_short");
+											break;
+										}
+										dis.setName(value);
 										dis.setChanged(Time.getDate());
 										dis.save();
 										sendViewData();
@@ -188,6 +202,170 @@ public class ManagerContainer extends GenericContainer {
 									}
 									else sendStatus(null);
 									break;
+								case "municipality":{
+									openGui(Layer.MUNICIPALITY, Mode.INFO, dis.getMunicipality().getId());
+									break;
+								}
+								case "manager":{
+									if(dis.isAuthorized(dis.r_SET_MANAGER.id, cap.getUUID()).isTrue() || bypass(player)){
+										GameProfile gp = Static.getServer().getPlayerProfileCache().getGameProfileForUsername(value);
+										if(gp == null || gp.getId() == null){
+											sendStatus("states.manager_gui.view.player_not_found_cache");
+											break;
+										}
+										dis.setHead(gp.getId());
+										dis.setChanged(Time.getDate());
+										dis.save();
+										sendViewData();
+										Print.log(StateLogger.player(player) + " changed manager of " + StateLogger.district(dis) + " to " + StateLogger.player(gp) + ".");
+									}
+									else sendStatus(null);
+									break;
+								}
+								case "price":{
+									if(dis.isAuthorized(dis.r_SET_PRICE.id, cap.getUUID()).isTrue() || bypass(player)){
+										try{
+											Long price = Long.parseLong(value);
+											if(price < 0){ price = 0l; }
+											dis.setPrice(price);
+											dis.setChanged(Time.getDate());
+											dis.save();
+											sendViewData();
+											Print.log(StateLogger.player(player) + " changed price of " + StateLogger.district(dis) + " to " + dis.getPrice() + ".");
+										}
+										catch(Exception e){
+											sendStatus("&cError: &7" + e.getMessage());
+										}
+									}
+									else sendStatus(null);
+									break;
+								}
+								case "type":{
+									if(dis.isAuthorized(dis.r_SET_TYPE.id, cap.getUUID()).isTrue() || bypass(player)){
+										try{
+											DistrictType type = DistrictType.valueOf(value.toUpperCase());
+											if(type != null){
+												dis.setType(type);
+												dis.setChanged(Time.getDate());
+												dis.save();
+											}
+											sendViewData();
+											Print.log(StateLogger.player(player) + " changed type of " + StateLogger.district(dis) + " to " + dis.getType() + ".");
+										}
+										catch(Exception e){
+											sendStatus("&9Error: &7" + e.getMessage());
+										}
+									}
+									else sendStatus(null);
+									break;
+								}
+								case "color":{
+									if(dis.isAuthorized(dis.r_SET_COLOR.id, cap.getUUID()).isTrue() || bypass(player)){
+										try{
+											String str = value;
+											if(str.replace("#", "").length() != 6){
+												sendStatus("states.manager_gui.view.invalid_hex");
+												break;
+											}
+											str = str.startsWith("#") ? str : "#" + str;
+											Color.decode(str);
+											dis.setColor(str);
+											dis.setChanged(Time.getDate());
+											dis.save();
+											sendViewData();
+											Print.log(StateLogger.player(player) + " changed color of " + StateLogger.district(dis) + " to " + dis.getColor() + ".");
+										}
+										catch(Exception e){
+											sendStatus("&2Error: &7" + e.getMessage());
+										}
+									}
+									else sendStatus(null);
+									break;
+								}
+								case "chunk_tax":{
+									if(dis.isAuthorized(dis.r_SET_CHUNKTAX.id, cap.getUUID()).isTrue() || bypass(player)){
+										if(value.equals("reset") || value.equals("disable")){
+											dis.setChunkTax(0);
+											dis.save();
+											sendViewData();
+										}
+										else if(NumberUtils.isCreatable(value)){
+											dis.setChunkTax(Long.parseLong(value));
+											dis.save();
+											sendViewData();
+										}
+										else{
+											sendStatus("states.manager_gui.view.not_number");
+										}
+									}
+									else sendStatus(null);
+									break;
+								}
+								case "canforsettle":{
+									if(dis.isAuthorized(dis.r_CFS.id, cap.getUUID()).isTrue() || bypass(player)){
+										dis.r_CFS.set(!dis.r_CFS.get());
+										dis.setChanged(Time.getDate());
+										dis.save();
+										this.sendViewData();
+										Print.log(StateLogger.player(player) + " changed 'can-foreigners-settle' of " + StateLogger.district(dis) + " to " + dis.r_CFS.get() + ".");
+									}
+									else sendStatus(null);
+									break;
+								}
+								case "unifbank":{
+									if(dis.isAuthorized(dis.r_ONBANKRUPT.id, cap.getUUID()).isTrue() || bypass(player)){
+										dis.r_ONBANKRUPT.set(!dis.r_ONBANKRUPT.get());
+										dis.setChanged(Time.getDate()); dis.save();
+										this.sendViewData();
+										Print.log(StateLogger.player(player) + " changed 'unclaim-if-brankrupt' of " + StateLogger.district(dis) + " to " + dis.r_ONBANKRUPT.get() + ".");
+									}
+									else sendStatus(null);
+									break;
+								}
+								case "ruleset":{
+									if(dis.isAuthorized(dis.r_SET_RULESET.id, cap.getUUID()).isTrue() || bypass(player)){
+										value = value.trim();
+										if(value.replace(" ", "").length() < 3){
+											sendStatus("states.manager_gui.view.name_short");
+											break;
+										}
+										dis.setRulesetTitle(value);
+										dis.setChanged(Time.getDate());
+										dis.save();
+										sendViewData();
+										Print.log(StateLogger.player(player) + " changed ruleset name of " + StateLogger.district(dis) + " to " + dis.getName() + ".");
+									}
+									else sendStatus(null);
+									break;
+								}
+								case "mailbox":{
+									if(dis.isAuthorized(dis.r_SET_MAILBOX.id, cap.getUUID()).isTrue() || bypass(player)){
+										dis.setMailbox(null);
+										dis.setChanged(Time.getDate());
+										dis.save();
+										sendViewData();
+										Print.log(StateLogger.player(player) + " reset mailbox location of" + StateLogger.district(dis) + ".");
+									}
+									else sendStatus(null);
+									break;
+								}
+								case "icon":{
+									if(dis.isAuthorized(dis.r_SET_ICON.id, cap.getUUID()).isTrue() || bypass(player)){
+										try{
+											dis.setIcon(value);
+											dis.setChanged(Time.getDate());
+											dis.save();
+											sendViewData();
+											Print.log(StateLogger.player(player) + " changed icon of " + StateLogger.district(dis) + " to " + dis.getIcon() + ".");
+										}
+										catch(Exception e){
+											sendStatus("&2Error: &7" + e.getMessage());
+										}
+									}
+									else sendStatus(null);
+									break;
+								}
+								default: return;
 							}
 							break;
 						case MUNICIPALITY:
@@ -207,6 +385,10 @@ public class ManagerContainer extends GenericContainer {
 				}
 			}
 		}
+	}
+
+	private void openGui(Layer municipality, Mode info, int id){
+		GuiHandler.openGui(player, layer.ordinal() + 3, mode.ordinal(), id, 0);
 	}
 
 	private void sendStatus(String reason){

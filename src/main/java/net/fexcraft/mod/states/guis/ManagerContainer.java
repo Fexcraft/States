@@ -110,7 +110,7 @@ public class ManagerContainer extends GenericContainer {
 				addKey(list, "unifbank", dis.r_ONBANKRUPT.get(), ViewMode.BOOL);
 				addKey(list, "creator", Static.getPlayerNameByUUID(dis.getCreator()), ViewMode.NONE);
 				addKey(list, "created", time(dis.getCreated()), ViewMode.NONE);
-				addKey(list, "ruleset", dis.getRulesetTitle(), ViewMode.GOTO);
+				addKey(list, "ruleset", dis.getRulesetTitle(), ViewMode.EDIT);
 				addKey(list, "mailbox", dis.getMailbox() == null ? NOMAILBOX : dis.getMailbox().toString(), ViewMode.RESET);
 				addKey(list, "icon", dis.getIcon(), ViewMode.EDIT);
 				break;

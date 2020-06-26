@@ -17,6 +17,7 @@ import net.fexcraft.mod.states.data.Chunk;
 import net.fexcraft.mod.states.data.District;
 import net.fexcraft.mod.states.data.DistrictType;
 import net.fexcraft.mod.states.data.Municipality;
+import net.fexcraft.mod.states.data.MunicipalityType;
 import net.fexcraft.mod.states.data.State;
 import net.fexcraft.mod.states.data.capabilities.PlayerCapability;
 import net.fexcraft.mod.states.data.capabilities.StatesCapabilities;
@@ -34,6 +35,8 @@ public class ManagerContainer extends GenericContainer {
 	protected static final String NOMAILBOX = "no_mailbox";
 	protected static final String NOONE = "no_one";
 	protected static final String NOTFORSALE = "not_for_sale";
+	protected static final String NONE = "none";
+	protected static final String UNKNOWN = "unknown";
 	//
 	private ManagerGui gui;
 	protected Mode mode;
@@ -115,6 +118,36 @@ public class ManagerContainer extends GenericContainer {
 				addKey(list, "icon", dis.getIcon(), ViewMode.EDIT);
 				break;
 			case MUNICIPALITY:
+				addKey(list, "id", mun.getId(), ViewMode.NONE);
+				addKey(list, "name", mun.getName(), ViewMode.EDIT);
+				if(mun.isAbandoned()){
+					addKey(list, "abandoned", mun.isAbandoned(), ViewMode.NONE);
+					addKey(list, "abandoned_since", mun.getAbandonedSince() == 0 ? UNKNOWN : time(mun.getAbandonedSince()), ViewMode.NONE);
+					addKey(list, "abandoned_by", mun.getAbandonedBy() == null ? UNKNOWN : Static.getPlayerNameByUUID(mun.getAbandonedBy()), ViewMode.NONE);
+				}
+				addKey(list, "state", mun.getState().getName() + " (" + mun.getState().getId() + ")", ViewMode.GOTO);
+				addKey(list, "mayor", mun.getHead() == null ? NOONE : Static.getPlayerNameByUUID(mun.getHead()), ViewMode.EDIT);
+				addKey(list, "price", mun.getPrice() == 0 ? NOTFORSALE : ggas(mun.getPrice()), ViewMode.EDIT);
+				addKey(list, "type", mun.getType().getTitle(), ViewMode.NONE);
+				addKey(list, "color", mun.getColor(), ViewMode.EDIT);
+				addKey(list, "citizen", mun.getCitizen().size(), ViewMode.LIST);
+				addKey(list, "balance", ggas(mun.getAccount().getBalance()), ViewMode.GOTO);
+				addKey(list, "citizen_tax", mun.getCitizenTax() > 0 ? ggas(mun.getCitizenTax()) : NOTAX, ViewMode.EDIT);
+				addKey(list, "last_edited", time(mun.getChanged()), ViewMode.NONE);
+				addKey(list, "council", mun.getCouncil().size(), ViewMode.LIST);
+				addKey(list, "districts", mun.getDistricts().size(), ViewMode.LIST);
+				addKey(list, "neighbors", mun.getNeighbors().size(), ViewMode.LIST);
+				addKey(list, "opentojoin", mun.r_OPEN.get(), ViewMode.BOOL);
+				addKey(list, "kickbankrupt", mun.r_KIB.get(), ViewMode.BOOL);
+				addKey(list, "chunks", mun.getClaimedChunks() + "/" + MunicipalityType.getChunkLimitFor(mun), ViewMode.NONE);
+				addKey(list, "creator", Static.getPlayerNameByUUID(mun.getCreator()), ViewMode.NONE);
+				addKey(list, "created", time(mun.getCreated()), ViewMode.NONE);
+				addKey(list, "forcechunks", mun.getForceLoadedChunks() == null ? NONE : mun.getForceLoadedChunks().size(), ViewMode.NONE);
+				addKey(list, "mailbox", mun.getMailbox() == null ? NOMAILBOX : mun.getMailbox().toString(), ViewMode.RESET);
+				addKey(list, "icon", mun.getIcon(), ViewMode.EDIT);
+				if(!mun.isAbandoned()){
+					addKey(list, "abandoned", mun.isAbandoned(), ViewMode.NONE);
+				}
 				break;
 			case PLAYERDATA:
 				break;

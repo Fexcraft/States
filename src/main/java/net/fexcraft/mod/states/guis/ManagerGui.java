@@ -147,6 +147,14 @@ public class ManagerGui extends GenericGui<ManagerContainer> {
 						field.setText(I18n.format("states.manager_gui.view.not_for_sale"));
 						break;
 					}
+					case ManagerContainer.NONE:{
+						field.setText(I18n.format("states.manager_gui.view.none"));
+						break;
+					}
+					case ManagerContainer.UNKNOWN:{
+						field.setText(I18n.format("states.manager_gui.view.unknown"));
+						break;
+					}
 					default:{
 						field.setText(container.view_values[i]);
 						break;

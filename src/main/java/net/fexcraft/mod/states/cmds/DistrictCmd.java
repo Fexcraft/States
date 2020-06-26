@@ -160,33 +160,6 @@ public class DistrictCmd extends CommandBase {
 						}
 						break;
 					}
-					case "name":{
-						if(dis.isAuthorized(dis.r_SET_NAME.id, ply.getUUID()).isTrue() || StateUtil.bypass(player)){
-							if(args.length < 3){
-								Print.chat(sender, "&9Missing Arguments!");
-								break;
-							}
-							String str = args[2];
-							if(args.length > 3){
-								for(int i = 3; i < args.length; i++){
-									str += " " + args[i];
-								}
-							}
-							if(str.replace(" ", "").length() < 3){
-								Print.chat(sender, "&cName is too short!");
-								break;
-							}
-							dis.setName(str);
-							dis.setChanged(Time.getDate());
-							dis.save();
-							Print.chat(sender, "&6Name set to: &7" + dis.getName());
-							Print.log(StateLogger.player(player) + " changed name of " + StateLogger.district(dis) + " to " + dis.getName() + ".");
-						}
-						else{
-							Print.chat(sender, "&cNo permission.");
-						}
-						break;
-					}
 					case "ruleset":{
 						if(dis.isAuthorized(dis.r_SET_RULESET.id, ply.getUUID()).isTrue() || StateUtil.bypass(player)){
 							if(args.length < 3){

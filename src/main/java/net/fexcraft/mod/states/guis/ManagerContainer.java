@@ -11,6 +11,7 @@ import net.fexcraft.mod.states.data.Municipality;
 import net.fexcraft.mod.states.data.State;
 import net.fexcraft.mod.states.data.capabilities.PlayerCapability;
 import net.fexcraft.mod.states.data.capabilities.StatesCapabilities;
+import net.fexcraft.mod.states.util.StateLogger;
 import net.fexcraft.mod.states.util.StateUtil;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.nbt.NBTTagCompound;
@@ -118,6 +119,7 @@ public class ManagerContainer extends GenericContainer {
 				break;
 			
 		}
+		readInit(list);
 		packet.setTag("keys", list);
 		this.send(Side.CLIENT, packet);
 	}
@@ -138,24 +140,22 @@ public class ManagerContainer extends GenericContainer {
 	protected void packet(Side side, NBTTagCompound packet, EntityPlayer player){
 		Print.debug(side + " " + packet);
 		if(side.isClient()){
-			if(packet.getString("cargo").equals("init")){
-				layer_title = packet.getString("layer_title");
-				NBTTagList list = (NBTTagList)packet.getTag("keys");
-				keys = new String[list.tagCount()];
-				view_values = new String[list.tagCount()];
-				view_modes = new ViewMode[list.tagCount()];
-				for(int i = 0; i < list.tagCount(); i++){
-					String[] arr = list.getStringTagAt(i).split(";");
-					keys[i] = arr[0];
-					view_values[i] = arr[1];
-					view_modes[i] = ViewMode.values()[Integer.parseInt(arr[2])];
+			switch(packet.getString("cargo")){
+				case "init":{
+					layer_title = packet.getString("layer_title");
+					readInit((NBTTagList)packet.getTag("keys"));
+					gui.refreshKeys();
+					break;
 				}
-				gui.refreshKeys();
+				case "status_msg":{
+					gui.setTitle(packet.getString("msg"));
+					break;
+				}
 			}
 		}
 		else{
-			if(packet.getString("cargo").equals("init")){
-				if(!player.world.isRemote){
+			switch(packet.getString("cargo")){
+				case "init":{
 					switch(mode){
 						case INFO:
 							sendViewData();
@@ -166,7 +166,68 @@ public class ManagerContainer extends GenericContainer {
 						default:
 							break;
 					}
+					break;
 				}
+				case "view_mode_click":{
+					if(mode != Mode.INFO) return;
+					boolean bypass = StateUtil.bypass(player);
+					switch(layer){
+						case CHUNK:
+							break;
+						case COMPANY:
+							break;
+						case DISTRICT:
+							switch(keys[packet.getInteger("button")]){
+								case "name":
+									if(bypass || dis.isAuthorized(dis.r_SET_NAME.id, cap.getUUID()).isTrue()){
+										dis.setName(packet.getString("value"));
+										dis.setChanged(Time.getDate());
+										dis.save();
+										sendViewData();
+										Print.log(StateLogger.player(player) + " changed name of " + StateLogger.district(dis) + " to " + dis.getName() + ".");
+									}
+									else sendStatus(null);
+									break;
+							}
+							break;
+						case MUNICIPALITY:
+							break;
+						case PLAYERDATA:
+							break;
+						case PROPERTY:
+							break;
+						case STATE:
+							break;
+						case UNION:
+							break;
+						default:
+							break;
+					}
+					break;
+				}
+			}
+		}
+	}
+
+	private void sendStatus(String reason){
+		NBTTagCompound packet = new NBTTagCompound();
+		packet.setString("cargo", "status_msg");
+		packet.setString("msg", reason == null ? "states.manager_gui.view.no_perm" : reason);
+		this.send(Side.CLIENT, packet);
+	}
+
+	private void readInit(NBTTagList list){
+		keys = new String[list.tagCount()];
+		if(mode == Mode.INFO){
+			view_values = new String[list.tagCount()];
+			view_modes = new ViewMode[list.tagCount()];
+		}
+		for(int i = 0; i < list.tagCount(); i++){
+			String[] arr = list.getStringTagAt(i).split(";");
+			keys[i] = arr[0];
+			if(mode == Mode.INFO){
+				view_values[i] = arr[1];
+				view_modes[i] = ViewMode.values()[Integer.parseInt(arr[2])];
 			}
 		}
 	}

@@ -88,6 +88,16 @@ public class ManagerGui extends GenericGui<ManagerContainer> {
 
 	@Override
 	protected boolean buttonClicked(int mouseX, int mouseY, int mouseButton, String key, BasicButton button){
+		if(key.startsWith("mode")){
+			NBTTagCompound packet = new NBTTagCompound();
+			packet.setString("cargo", "view_mode_click");
+			int buttonid = Integer.parseInt(key.replace("mode", ""));
+			packet.setInteger("button", buttonid);
+			if(container.view_modes[buttonid] == ViewMode.EDIT){
+				packet.setString("value", fields.get("field" + buttonid).getText());
+			}
+			container.send(Side.SERVER, packet);
+		}
 		switch(key){
 			case "su": scroll(+1); break;
 			case "sd": scroll(-1); break;
@@ -112,7 +122,7 @@ public class ManagerGui extends GenericGui<ManagerContainer> {
 
 	protected void refreshKeys(){
 		String layerid = container.layer.name().toLowerCase();
-		texts.get("title").string = I18n.format("states.manager_gui.title_" + layerid, container.layer_title);
+		setTitle("states.manager_gui.title_" + layerid);
 		for(int j = 0; j < container.mode.entries(); j++){
 			int i = j + scroll;
 			texts.get("key" + j).string = I18n.format("states.manager_gui.view_" + layerid + "." + container.keys[i]);
@@ -147,6 +157,10 @@ public class ManagerGui extends GenericGui<ManagerContainer> {
 				button.enabled = container.view_modes[i] != ViewMode.NONE;
 			}
 		}
+	}
+
+	protected void setTitle(String string){
+		texts.get("title").string = I18n.format(string, container.layer_title);
 	}
 
 }

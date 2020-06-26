@@ -1,6 +1,7 @@
 package net.fexcraft.mod.states.guis;
 
 import net.fexcraft.lib.mc.gui.GenericGui;
+import net.fexcraft.lib.mc.utils.Formatter;
 import net.fexcraft.mod.states.guis.ManagerContainer.Mode;
 import net.fexcraft.mod.states.guis.ManagerContainer.ViewMode;
 import net.minecraft.block.material.MapColor;
@@ -92,8 +93,8 @@ public class ManagerGui extends GenericGui<ManagerContainer> {
 			NBTTagCompound packet = new NBTTagCompound();
 			packet.setString("cargo", "view_mode_click");
 			int buttonid = Integer.parseInt(key.replace("mode", ""));
-			packet.setInteger("button", buttonid);
-			if(container.view_modes[buttonid] == ViewMode.EDIT){
+			packet.setInteger("button", scroll + buttonid);
+			if(container.view_modes[scroll + buttonid] == ViewMode.EDIT){
 				packet.setString("value", fields.get("field" + buttonid).getText());
 			}
 			container.send(Side.SERVER, packet);
@@ -161,7 +162,7 @@ public class ManagerGui extends GenericGui<ManagerContainer> {
 	}
 
 	protected void setTitle(String string){
-		texts.get("title").string = I18n.format(string, container.layer_title);
+		texts.get("title").string = Formatter.format(I18n.format(string, container.layer_title));
 	}
 
 }

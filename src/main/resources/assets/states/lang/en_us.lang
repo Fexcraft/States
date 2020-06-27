@@ -32,6 +32,9 @@ states.welcome_msg.state=&2In the State of &7$0&2.
 states.welcome_msg.no_mailbox=&6You have &7no mailbox set&6!
 states.welcome_msg.pending_votes=&6You have &7$0 &6votes waiting! &7/st-vote my-votes
 
+# Announcements
+states.announce.municipality.mayor_reset=&2&oMunicipality mayor was &c&oreset&2&o.
+
 # Manager GUI
 states.manager_gui.title_district=District: %s
 states.manager_gui.title_municipality=Municipality: %s
@@ -48,6 +51,7 @@ states.manager_gui.view.player_not_found_cache=&cPlayer not found in Cache.
 states.manager_gui.view.invalid_hex=&cInvalid HEX String.
 states.manager_gui.view.not_number=&cNot a (valid) number.
 states.manager_gui.view.name_short=&cName is too short!
+states.manager_gui.view.player_not_council_or_citizen=&cPlayer not found in Council or Citizens.
 //
 states.manager_gui.view_district.id=District ID
 states.manager_gui.view_district.name=Name
@@ -87,7 +91,8 @@ states.manager_gui.view_municipality.kickbankrupt=Kick Bankrupt
 states.manager_gui.view_municipality.chunks=Chunk Totals
 states.manager_gui.view_municipality.creator=Creator
 states.manager_gui.view_municipality.created=Created
-states.manager_gui.view_municipality.forcechunks=F.L. Chunks
+states.manager_gui.view_municipality.forcechunks=ForceLoaded Chunks
+states.manager_gui.view_municipality.ruleset=Ruleset
 states.manager_gui.view_municipality.mailbox=Mailbox
 states.manager_gui.view_municipality.icon=Icon/Logo
 states.manager_gui.view_municipality.abandoned=Abandoned

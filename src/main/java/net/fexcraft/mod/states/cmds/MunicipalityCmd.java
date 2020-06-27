@@ -1,13 +1,10 @@
 package net.fexcraft.mod.states.cmds;
 
+import static net.fexcraft.mod.states.guis.GuiHandler.MANAGER_MUNICIPALITY;
 import static net.fexcraft.mod.states.guis.GuiHandler.RULE_EDITOR;
 import static net.fexcraft.mod.states.guis.GuiHandler.openGui;
 
-import java.awt.Color;
-import java.util.Collection;
 import java.util.UUID;
-
-import org.apache.commons.lang3.math.NumberUtils;
 
 import com.mojang.authlib.GameProfile;
 
@@ -26,6 +23,7 @@ import net.fexcraft.mod.states.data.capabilities.StatesCapabilities;
 import net.fexcraft.mod.states.data.root.AnnounceLevel;
 import net.fexcraft.mod.states.data.root.Mailbox.MailType;
 import net.fexcraft.mod.states.data.root.Mailbox.RecipientType;
+import net.fexcraft.mod.states.guis.ManagerContainer;
 import net.fexcraft.mod.states.util.MailUtil;
 import net.fexcraft.mod.states.util.Perms;
 import net.fexcraft.mod.states.util.StConfig;
@@ -67,7 +65,6 @@ public class MunicipalityCmd extends CommandBase {
 			Print.chat(sender, "&7/mun info");
 			Print.chat(sender, "&7/mun rules");
 			Print.chat(sender, "&7/mun types");
-			Print.chat(sender, "&7/mun set <option> <value>");
 			Print.chat(sender, "&7/mun buy");
 			Print.chat(sender, "&7/mun council <args...>");
 			Print.chat(sender, "&7/mun blacklist <args...>");
@@ -92,42 +89,7 @@ public class MunicipalityCmd extends CommandBase {
 		Municipality mun = chunk.getDistrict().getMunicipality();
 		switch(args[0]){
 			case "info":{
-				Print.chat(sender, "&e====-====-====-====-====-====&0[&2States&0]");
-				Print.chat(sender, "&6Info of Municipality &7" + mun.getName() + " (" + mun.getId() + ")&2:");
-				Print.chat(sender, "&9State: &7" + mun.getState().getName() + " (" + mun.getState().getId() + ")");
-				Print.chat(sender, "&9Mayor: &7" + (mun.getHead() == null ? "no one" : Static.getPlayerNameByUUID(mun.getHead())));
-				Print.chat(sender, "&9Price: &7" + (mun.getPrice() > 0 ? Config.getWorthAsString(mun.getPrice()) : "not for sale"));
-				Print.chat(sender, "&9Type: &7" + mun.getType().getTitle());
-				Print.chat(sender, "&6Color: &7" + mun.getColor());
-				Print.chat(sender, "&8Citizen: &7" + mun.getCitizen().size());
-				Print.chat(sender, "&9Balance: &7" + Config.getWorthAsString(mun.getAccount().getBalance()));
-				Print.chat(sender, "&9Citizen Tax: &7" + (mun.getCitizenTax() > 0 ? ggas(mun.getCitizenTax()) : "none"));
-				Print.chat(sender, "&9Last change: &7" + Time.getAsString(mun.getChanged()));
-				Print.chat(sender, "&9Council Members: &7" + mun.getCouncil().size());
-				mun.getCouncil().forEach(uuid -> {
-					Print.chat(sender, "&c-> &9" + Static.getPlayerNameByUUID(uuid));
-				});
-				Print.chat(sender, "&9Districts: &7" + mun.getDistricts().size());
-				Print.chat(sender, "&9Neighbors: &7" + mun.getNeighbors().size());
-				mun.getNeighbors().forEach(var -> {
-					Municipality municipality = StateUtil.getMunicipality(var);
-					Print.chat(sender, "&c-> &9" + municipality.getName() + " &7(" + municipality.getId() + ");");
-				});
-				Print.chat(sender, "&3Open to join: " + mun.r_OPEN.get());
-				Print.chat(sender, "&8Kick if Bankrupt: " + mun.r_KIB.get());
-				Print.chat(sender, "&6Chunks: &7" + mun.getClaimedChunks() + "&8/&9" + MunicipalityType.getChunkLimitFor(mun));
-				Print.chat(sender, "&2Created by &7" + Static.getPlayerNameByUUID(mun.getCreator()) + "&2 at &8" + Time.getAsString(mun.getCreated()));
-				Collection<?> coll = mun.getForceLoadedChunks();
-				if(coll != null && coll.size() > 0){
-					Print.chat(sender, "&4Force-Loaded Chunks: " + coll.size());
-				}
-				Print.chat(sender, "&6Mailbox: &7" + (mun.getMailbox() == null ? "No mailbox set." : mun.getMailbox().toString()));
-				if(mun.isAbandoned()){
-					Print.chat(sender, "&e====-====-====-====-====-====&0[&2States&0]");
-					Print.chat(sender, "&6&lThis Municipality is abandoned!");
-					Print.chat(sender, "&7&lSince: &8" + (mun.getAbandonedSince() == 0 ? "unknown" : Time.getAsString(mun.getAbandonedSince())));
-					Print.chat(sender, "&7&lBy: &2" + (mun.getAbandonedBy() == null ? "unknown" : Static.getPlayerNameByUUID(mun.getAbandonedBy())));
-				}
+				openGui(player, MANAGER_MUNICIPALITY, ManagerContainer.Mode.INFO.ordinal(), mun.getId(), 0);
 				return;
 			}
 			case "rules":{
@@ -188,237 +150,6 @@ public class MunicipalityCmd extends CommandBase {
 				}
 				else{
 					Print.chat(sender, "&6No permission.");
-				}
-				return;
-			}
-			case "set":{
-				if(args.length < 2){
-					Print.chat(sender, "&7/mun set open <true/false>");
-					Print.chat(sender, "&7/mun set name <new name>");
-					Print.chat(sender, "&7/mun set price <price/0>");
-					Print.chat(sender, "&7/mun set mayor <playername>");
-					Print.chat(sender, "&7/mun set mayor <null/reset>");
-					Print.chat(sender, "&7/mun set color <hex>");
-					Print.chat(sender, "&7/mun set icon <url>");
-					Print.chat(sender, "&7/mun set citizen-tax <amount/reset>");
-					Print.chat(sender, "&7/mun set kick-if-bankrupt <true/false>");
-					Print.chat(sender, "&7/mun set ruleset <new name>");
-					return;
-				}
-				switch(args[1]){
-					case "mayor":{
-						if(mun.isAuthorized(mun.r_SET_MAYOR.id, ply.getUUID()).isTrue() || StateUtil.bypass(player)){
-							if(args.length < 3){
-								Print.chat(sender, "&9Missing Argument!");
-								break;
-							}
-							if(args[2].equals("null") || args[2].equals("reset")){
-								if(mun.isAuthorized(mun.r_RESET_MAYOR.id, ply.getUUID()).isFalse() || !StateUtil.bypass(player)){
-									Print.chat(sender, "&cNot Authorized to reset Mayor."); return;
-								}
-								mun.setHead(null); mun.save();
-								Print.chat(sender, "&2Municipality mayor was &creset&2.");
-								StateUtil.announce(null, AnnounceLevel.MUNICIPALITY_ALL, "&2&oMunicipality mayor was &c&oreset&2&o.", mun.getId());
-								Print.log(StateLogger.player(player) + " reset mayor of " + StateLogger.municipality(mun) + ".");
-								return;
-							}
-							GameProfile gp = Static.getServer().getPlayerProfileCache().getGameProfileForUsername(args[2]);
-							if(gp == null || gp.getId() == null){
-								Print.chat(sender, "&cPlayer not found in Cache.");
-								break;
-							}
-							if(!mun.getCouncil().contains(gp.getId()) && !mun.getCitizen().contains(gp.getId())){
-								Print.chat(sender, "&cPlayer not found in Council or Citizens.");
-								break;
-							}
-							mun.setHead(gp.getId());
-							mun.setChanged(Time.getDate());
-							mun.save();
-							Print.chat(sender, "&2Set &7" + gp.getName() + "&2 to new Municipality Mayor!");
-							Print.log(StateLogger.player(player) + " changed mayor of " + StateLogger.municipality(mun) + " to " + StateLogger.player(gp) + ".");
-						}
-						else{
-							Print.chat(sender, "&cNo permission.");
-						}
-						break;
-					}
-					case "name":{
-						if(mun.isAuthorized(mun.r_SET_NAME.id, ply.getUUID()).isTrue() || StateUtil.bypass(player)){
-							if(args.length < 3){
-								Print.chat(sender, "&9Missing Arguments!");
-								break;
-							}
-							String str = args[2];
-							if(args.length > 3){
-								for(int i = 3; i < args.length; i++){
-									str += " " + args[i];
-								}
-							}
-							if(str.replace(" ", "").length() < 3){
-								Print.chat(sender, "&cName is too short!");
-								break;
-							}
-							mun.setName(str);
-							mun.setChanged(Time.getDate());
-							mun.save();
-							Print.chat(sender, "&6Name set to: &7" + mun.getName());
-							Print.log(StateLogger.player(player) + " changed name of " + StateLogger.municipality(mun) + " to " + mun.getName() + ".");
-						}
-						else{
-							Print.chat(sender, "&cNo permission.");
-						}
-						break;
-					}
-					case "ruleset":{
-						if(mun.isAuthorized(mun.r_SET_RULESET.id, ply.getUUID()).isTrue() || StateUtil.bypass(player)){
-							if(args.length < 3){
-								Print.chat(sender, "&9Missing Arguments!");
-								break;
-							}
-							String str = args[2];
-							if(args.length > 3){
-								for(int i = 3; i < args.length; i++){
-									str += " " + args[i];
-								}
-							}
-							if(str.replace(" ", "").length() < 3){
-								Print.chat(sender, "&cName is too short!");
-								break;
-							}
-							mun.setRulesetTitle(str);
-							mun.setChanged(Time.getDate());
-							mun.save();
-							Print.chat(sender, "&6Ruleset Name set to: &7" + mun.getName());
-							Print.log(StateLogger.player(player) + " changed ruleset name of " + StateLogger.municipality(mun) + " to " + mun.getName() + ".");
-						}
-						else{
-							Print.chat(sender, "&cNo permission.");
-						}
-						break;
-					}
-					case "price":{
-						if(mun.isAuthorized(mun.r_SET_PRICE.id, ply.getUUID()).isTrue() || StateUtil.bypass(player)){
-							if(args.length < 3){
-								Print.chat(sender, "&9Missing Argument!");
-								Print.chat(sender, "&7Setting the price to \"0\" makes the municipality not buyable.");
-								break;
-							}
-							try{
-								Long price = Long.parseLong(args[2]);
-								if(price < 0){ price = 0l; }
-								mun.setPrice(price);
-								mun.setChanged(Time.getDate());
-								mun.save();
-								Print.chat(sender, "&2Price set to: &7" + Config.getWorthAsString(mun.getPrice()));
-								Print.log(StateLogger.player(player) + " changed price of " + StateLogger.municipality(mun) + " to " + mun.getPrice() + ".");
-							}
-							catch(Exception e){
-								Print.chat(sender, "&cError: &7" + e.getMessage());
-							}
-						}
-						else{
-							Print.chat(sender, "&cNo permission.");
-						}
-						break;
-					}
-					case "color":{
-						if(mun.isAuthorized(mun.r_COLOR.id, ply.getUUID()).isTrue() || StateUtil.bypass(player)){
-							if(args.length < 3){
-								Print.chat(sender, "&9Missing Argument!");
-								break;
-							}
-							try{
-								String str = args[2];
-								if(str.replace("#", "").length() != 6){
-									Print.chat(sender, "&cInvalid HEX String.");
-									break;
-								}
-								str = str.startsWith("#") ? str : "#" + str;
-								Color color = Color.decode(str);
-								mun.setColor(str);
-								mun.setChanged(Time.getDate());
-								mun.save();
-								Print.chat(sender, "&6Color set to &7" + str + "&6! (" + color.getRed() + ", " + color.getGreen() + ", " + color.getBlue() + ");");
-								Print.log(StateLogger.player(player) + " changed color of " + StateLogger.municipality(mun) + " to " + mun.getColor() + ".");
-							}
-							catch(Exception e){
-								Print.chat(sender, "&2Error: &7" + e.getMessage());
-							}
-						}
-						else{
-							Print.chat(sender, "&cNo permission.");
-						}
-						break;
-					}
-					case "open":{
-						if(mun.isAuthorized(mun.r_OPEN.id, ply.getUUID()).isTrue() || StateUtil.bypass(player)){
-							if(args.length < 3){
-								Print.chat(sender, "&9Missing Argument!");
-								break;
-							}
-							mun.r_OPEN.set(Boolean.parseBoolean(args[2]));
-							mun.setChanged(Time.getDate());
-							mun.save();
-							Print.chat(sender, "&2Open: &7" + mun.r_OPEN.get());
-							Print.log(StateLogger.player(player) + " set " + StateLogger.municipality(mun) + " to " + (mun.r_OPEN.get() ? "OPEN" : "CLOSED") + ".");
-						}
-						else{
-							Print.chat(sender, "&cNo permission.");
-						}
-						break;
-					}
-					case "icon":{
-						if(mun.isAuthorized(mun.r_ICON.id, ply.getUUID()).isTrue() || StateUtil.bypass(player)){
-							if(args.length < 3){
-								Print.chat(sender, "&9Missing Argument!");
-								break;
-							}
-							try{
-								mun.setIcon(args[2]);
-								mun.setChanged(Time.getDate());
-								mun.save();
-								Print.chat(sender, "&6Icon set to &7" + args[2] + "&6!");
-								Print.log(StateLogger.player(player) + " changed icon of " + StateLogger.municipality(mun) + " to " + mun.getIcon() + ".");
-							}
-							catch(Exception e){
-								Print.chat(sender, "&2Error: &7" + e.getMessage());
-							}
-						}
-						else{
-							Print.chat(sender, "&cNo permission.");
-						}
-						break;
-					}
-					case "citizen-tax":{
-						if(mun.isAuthorized(mun.r_SET_CITIZENTAX.id, ply.getUUID()).isTrue() || StateUtil.bypass(player)){
-							if(args[2].equals("reset") || args[2].equals("disable")){
-								mun.setCitizenTax(0); mun.save();
-								Print.chat(sender, "&9Municipality's Citizen Tax was reset!");
-							}
-							else if(NumberUtils.isCreatable(args[2])){
-								mun.setCitizenTax(Long.parseLong(args[2])); mun.save();
-								Print.chat(sender, "&9Municipality's Citizen Tax was set! (" + ggas(mun.getCitizenTax()) + ")");
-							}
-							else{
-								Print.chat(sender, "Not a (valid) number.");
-							}
-						}
-						break;
-					}
-					case "kick-if-bankrupt":{
-						if(mun.isAuthorized(mun.r_KIB.id, ply.getUUID()).isTrue() || StateUtil.bypass(player)){
-							if(args.length < 3){ Print.chat(sender, "&9Missing Argument!"); break; }
-							mun.r_KIB.set(Boolean.parseBoolean(args[2]));
-							mun.setChanged(Time.getDate()); mun.save();
-							Print.chat(sender, "&2KIB: &7" + mun.r_KIB.get());
-							Print.log(StateLogger.player(player) + " changed 'kick-if-brankrupt' of " + StateLogger.municipality(mun) + " to " + mun.r_KIB.get() + ".");
-						}
-						break;
-					}
-					default:{
-						Print.chat(sender, "&9Invalid Argument.");
-						break;
-					}
 				}
 				return;
 			}
@@ -869,10 +600,6 @@ public class MunicipalityCmd extends CommandBase {
 
 	private boolean isLastCitizen(Municipality mun, PlayerCapability ply){
 		return mun.getCitizen().size() == 1 && mun.getCitizen().contains(ply.getUUID());
-	}
-
-	private String ggas(long citizenTax){
-		return ChunkCmd.ggas(citizenTax);
 	}
 	
 }

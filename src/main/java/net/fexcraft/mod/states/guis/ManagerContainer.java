@@ -1,6 +1,7 @@
 package net.fexcraft.mod.states.guis;
 
 import static net.fexcraft.mod.states.util.StateUtil.bypass;
+import static net.fexcraft.mod.states.util.StateUtil.translate;
 
 import java.awt.Color;
 
@@ -21,6 +22,7 @@ import net.fexcraft.mod.states.data.MunicipalityType;
 import net.fexcraft.mod.states.data.State;
 import net.fexcraft.mod.states.data.capabilities.PlayerCapability;
 import net.fexcraft.mod.states.data.capabilities.StatesCapabilities;
+import net.fexcraft.mod.states.data.root.AnnounceLevel;
 import net.fexcraft.mod.states.util.StateLogger;
 import net.fexcraft.mod.states.util.StateUtil;
 import net.minecraft.entity.player.EntityPlayer;
@@ -143,6 +145,7 @@ public class ManagerContainer extends GenericContainer {
 				addKey(list, "creator", Static.getPlayerNameByUUID(mun.getCreator()), ViewMode.NONE);
 				addKey(list, "created", time(mun.getCreated()), ViewMode.NONE);
 				addKey(list, "forcechunks", mun.getForceLoadedChunks() == null ? NONE : mun.getForceLoadedChunks().size(), ViewMode.NONE);
+				addKey(list, "ruleset", mun.getRulesetTitle(), ViewMode.EDIT);
 				addKey(list, "mailbox", mun.getMailbox() == null ? NOMAILBOX : mun.getMailbox().toString(), ViewMode.RESET);
 				addKey(list, "icon", mun.getIcon(), ViewMode.EDIT);
 				if(!mun.isAbandoned()){
@@ -202,7 +205,13 @@ public class ManagerContainer extends GenericContainer {
 						case INFO:
 							sendViewData();
 							break;
-						case LIST:
+						case LIST_COMPONENTS:
+							//
+							break;
+						case LIST_CITIZENS:
+							//
+							break;
+						case LIST_COUNCIL:
 							//
 							break;
 						default:
@@ -220,7 +229,7 @@ public class ManagerContainer extends GenericContainer {
 							break;
 						case DISTRICT:
 							switch(keys[packet.getInteger("button")]){
-								case "name":
+								case "name":{
 									if(dis.isAuthorized(dis.r_SET_NAME.id, cap.getUUID()).isTrue() || bypass(player)){
 										value = value.trim();
 										if(value.replace(" ", "").length() < 3){
@@ -235,6 +244,7 @@ public class ManagerContainer extends GenericContainer {
 									}
 									else sendStatus(null);
 									break;
+								}
 								case "municipality":{
 									openGui(Layer.MUNICIPALITY, Mode.INFO, dis.getMunicipality().getId());
 									break;
@@ -319,11 +329,13 @@ public class ManagerContainer extends GenericContainer {
 									if(dis.isAuthorized(dis.r_SET_CHUNKTAX.id, cap.getUUID()).isTrue() || bypass(player)){
 										if(value.equals("reset") || value.equals("disable")){
 											dis.setChunkTax(0);
+											dis.setChanged(Time.getDate());
 											dis.save();
 											sendViewData();
 										}
 										else if(NumberUtils.isCreatable(value)){
 											dis.setChunkTax(Long.parseLong(value));
+											dis.setChanged(Time.getDate());
 											dis.save();
 											sendViewData();
 										}
@@ -402,6 +414,203 @@ public class ManagerContainer extends GenericContainer {
 							}
 							break;
 						case MUNICIPALITY:
+							switch(keys[packet.getInteger("button")]){
+								case "name":{
+									if(mun.isAuthorized(mun.r_SET_NAME.id, cap.getUUID()).isTrue() || bypass(player)){
+										value = value.trim();
+										if(value.replace(" ", "").length() < 3){
+											sendStatus("states.manager_gui.view.name_short");
+											break;
+										}
+										mun.setName(value);
+										mun.setChanged(Time.getDate());
+										mun.save();
+										sendViewData();
+										Print.log(StateLogger.player(player) + " changed name of " + StateLogger.municipality(mun) + " to " + mun.getName() + ".");
+									}
+									else sendStatus(null);
+									break;
+								}
+								case "state":{
+									openGui(Layer.STATE, Mode.INFO, dis.getMunicipality().getId());
+									break;
+								}
+								case "mayor":{
+									if(mun.isAuthorized(mun.r_SET_MAYOR.id, cap.getUUID()).isTrue() || bypass(player)){
+										if(value.equals("null") || value.equals("reset")){
+											if(mun.isAuthorized(mun.r_RESET_MAYOR.id, cap.getUUID()).isFalse() && !bypass(player)){
+												sendStatus(null);
+												return;
+											}
+											mun.setHead(null);
+											mun.save();
+											sendViewData();
+											StateUtil.announce(null, AnnounceLevel.MUNICIPALITY_ALL, translate("states.announce.municipality.mayor_reset"), mun.getId());
+											Print.log(StateLogger.player(player) + " reset mayor of " + StateLogger.municipality(mun) + ".");
+											return;
+										}
+										GameProfile gp = Static.getServer().getPlayerProfileCache().getGameProfileForUsername(value);
+										if(gp == null || gp.getId() == null){
+											sendStatus("states.manager_gui.view.player_not_found_cache");
+											break;
+										}
+										if(!mun.getCouncil().contains(gp.getId()) && !mun.getCitizen().contains(gp.getId())){
+											sendStatus("states.manager_gui.view.player_not_council_or_citizen");
+											break;
+										}
+										mun.setHead(gp.getId());
+										mun.setChanged(Time.getDate());
+										mun.save();
+										sendViewData();
+										Print.log(StateLogger.player(player) + " changed mayor of " + StateLogger.municipality(mun) + " to " + StateLogger.player(gp) + ".");
+									}
+									else sendStatus(null);
+									break;
+								}
+								case "price":{
+									if(mun.isAuthorized(mun.r_SET_PRICE.id, cap.getUUID()).isTrue() || bypass(player)){
+										try{
+											Long price = Long.parseLong(value);
+											if(price < 0){ price = 0l; }
+											mun.setPrice(price);
+											mun.setChanged(Time.getDate());
+											mun.save();
+											sendViewData();
+											Print.log(StateLogger.player(player) + " changed price of " + StateLogger.municipality(mun) + " to " + mun.getPrice() + ".");
+										}
+										catch(Exception e){
+											sendStatus("&cError: &7" + e.getMessage());
+										}
+									}
+									else sendStatus(null);
+									break;
+								}
+								case "color":{
+									if(mun.isAuthorized(mun.r_COLOR.id, cap.getUUID()).isTrue() || bypass(player)){
+										try{
+											String str = value;
+											if(str.replace("#", "").length() != 6){
+												sendStatus("states.manager_gui.view.invalid_hex");
+												break;
+											}
+											str = str.startsWith("#") ? str : "#" + str;
+											Color.decode(str);
+											mun.setColor(str);
+											mun.setChanged(Time.getDate());
+											mun.save();
+											sendViewData();
+											Print.log(StateLogger.player(player) + " changed color of " + StateLogger.municipality(mun) + " to " + mun.getColor() + ".");
+										}
+										catch(Exception e){
+											sendStatus("&2Error: &7" + e.getMessage());
+										}
+									}
+									else sendStatus(null);
+									break;
+								}
+								case "citizen":{
+									openGui(Layer.MUNICIPALITY, Mode.LIST_CITIZENS, mun.getId());
+									break;
+								}
+								case "citizen_tax":{
+									if(mun.isAuthorized(mun.r_SET_CITIZENTAX.id, cap.getUUID()).isTrue() || bypass(player)){
+										if(value.equals("reset") || value.equals("disable")){
+											mun.setCitizenTax(0);
+											mun.setChanged(Time.getDate());
+											mun.save();
+											sendViewData();
+										}
+										else if(NumberUtils.isCreatable(value)){
+											mun.setCitizenTax(Long.parseLong(value));
+											mun.setChanged(Time.getDate());
+											mun.save();
+											sendViewData();
+										}
+										else{
+											sendStatus("states.manager_gui.view.not_number");
+										}
+									}
+									else sendStatus(null);
+									break;
+								}
+								case "council":{
+									openGui(Layer.MUNICIPALITY, Mode.LIST_COUNCIL, mun.getId());
+									break;
+								}
+								case "districts":{
+									openGui(Layer.MUNICIPALITY, Mode.LIST_COMPONENTS, mun.getId());
+									break;
+								}
+								case "neighbors":{
+									openGui(Layer.MUNICIPALITY, Mode.LIST_NEIGHBORS, mun.getId());
+									break;
+								}
+								case "opentojoin":{
+									if(mun.isAuthorized(mun.r_OPEN.id, cap.getUUID()).isTrue() || bypass(player)){
+										mun.r_OPEN.set(!mun.r_OPEN.get());
+										mun.setChanged(Time.getDate());
+										mun.save();
+										sendViewData();
+										Print.log(StateLogger.player(player) + " set " + StateLogger.municipality(mun) + " to " + (mun.r_OPEN.get() ? "OPEN" : "CLOSED") + ".");
+									}
+									else sendStatus(null);
+									break;
+								}
+								case "kickbankrupt":{
+									if(mun.isAuthorized(mun.r_KIB.id, cap.getUUID()).isTrue() || bypass(player)){
+										mun.r_KIB.set(!mun.r_KIB.get());
+										mun.setChanged(Time.getDate());
+										mun.save();
+										sendViewData();
+										Print.log(StateLogger.player(player) + " changed 'kick-if-brankrupt' of " + StateLogger.municipality(mun) + " to " + mun.r_OPEN.get() + ".");
+									}
+									else sendStatus(null);
+									break;
+								}
+								case "ruleset":{
+									if(mun.isAuthorized(mun.r_SET_RULESET.id, cap.getUUID()).isTrue() || bypass(player)){
+										value = value.trim();
+										if(value.replace(" ", "").length() < 3){
+											sendStatus("states.manager_gui.view.name_short");
+											break;
+										}
+										mun.setRulesetTitle(value);
+										mun.setChanged(Time.getDate());
+										mun.save();
+										sendViewData();
+										Print.log(StateLogger.player(player) + " changed ruleset name of " + StateLogger.municipality(mun) + " to " + mun.getName() + ".");
+									}
+									else sendStatus(null);
+									break;
+								}
+								case "mailbox":{
+									if(mun.isAuthorized(mun.r_SET_MAILBOX.id, cap.getUUID()).isTrue() || bypass(player)){
+										mun.setMailbox(null);
+										mun.setChanged(Time.getDate());
+										mun.save();
+										sendViewData();
+										Print.log(StateLogger.player(player) + " reset mailbox location of" + StateLogger.municipality(mun) + ".");
+									}
+									else sendStatus(null);
+									break;
+								}
+								case "icon":{
+									if(mun.isAuthorized(mun.r_ICON.id, cap.getUUID()).isTrue() || bypass(player)){
+										try{
+											mun.setIcon(value);
+											mun.setChanged(Time.getDate());
+											mun.save();
+											sendViewData();
+											Print.log(StateLogger.player(player) + " changed icon of " + StateLogger.municipality(mun) + " to " + mun.getIcon() + ".");
+										}
+										catch(Exception e){
+											sendStatus("&2Error: &7" + e.getMessage());
+										}
+									}
+									else sendStatus(null);
+									break;
+								}
+							}
 							break;
 						case PLAYERDATA:
 							break;
@@ -454,10 +663,14 @@ public class ManagerContainer extends GenericContainer {
 	public static enum Mode {
 		
 		INFO,
-		LIST;
+		LIST_COMPONENTS,
+		LIST_CITIZENS,
+		LIST_COUNCIL,
+		LIST_NEIGHBORS,
+		LIST_BWLIST;
 
 		public int entries(){
-			return this == LIST ? 10 : 12;
+			return this != INFO ? 10 : 12;
 		}
 		
 	}

@@ -34,7 +34,7 @@ public class ManagerGui extends GenericGui<ManagerContainer> {
 				ySize = 217;
 				texloc = VIEW;
 				break;
-			case LIST:
+			case LIST_COMPONENTS:
 				xSize = 224;
 				ySize = 200;
 				texloc = LIST;
@@ -68,7 +68,11 @@ public class ManagerGui extends GenericGui<ManagerContainer> {
 					fields.put("field" + i, field);
 				}
 				break;
-			case LIST:
+			case LIST_COMPONENTS:
+				break;
+			case LIST_CITIZENS:
+				break;
+			case LIST_COUNCIL:
 				break;
 			default: return;
         }

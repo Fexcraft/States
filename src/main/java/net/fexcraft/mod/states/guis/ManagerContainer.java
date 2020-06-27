@@ -346,6 +346,10 @@ public class ManagerContainer extends GenericContainer {
 									else sendStatus(null);
 									break;
 								}
+								case "neighbors":{
+									openGui(Layer.DISTRICT, Mode.LIST_NEIGHBORS, dis.getId());
+									break;
+								}
 								case "canforsettle":{
 									if(dis.isAuthorized(dis.r_CFS.id, cap.getUUID()).isTrue() || bypass(player)){
 										dis.r_CFS.set(!dis.r_CFS.get());

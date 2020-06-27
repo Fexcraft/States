@@ -16,6 +16,7 @@ public class ManagerGui extends GenericGui<ManagerContainer> {
 	public static final ResourceLocation STONE = new ResourceLocation("minecraft:textures/blocks/stone.png");
 	public static final ResourceLocation LIST = new ResourceLocation("states:textures/gui/manager_list.png");
 	public static final ResourceLocation VIEW = new ResourceLocation("states:textures/gui/manager_view.png");
+	public static final ResourceLocation EDITLIST = new ResourceLocation("states:textures/gui/manager_list_editable.png");
 	public static int texcol = MapColor.SNOW.colorValue;
 	private int scroll;
 
@@ -35,9 +36,17 @@ public class ManagerGui extends GenericGui<ManagerContainer> {
 				texloc = VIEW;
 				break;
 			case LIST_COMPONENTS:
+			case LIST_NEIGHBORS:
+				xSize = 224;
+				ySize = 184;
+				texloc = LIST;
+				break;
+			case LIST_CITIZENS:
+			case LIST_COUNCIL:
+			case LIST_BWLIST:
 				xSize = 224;
 				ySize = 200;
-				texloc = LIST;
+				texloc = EDITLIST;
 				break;
 			default:
 				xSize = 0;

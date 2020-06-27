@@ -57,9 +57,9 @@ public class ManagerContainer extends GenericContainer {
 
 	public ManagerContainer(EntityPlayer player, int layerid, int x, int y, int z){
 		super(player);
-		Print.debug("CREATED " + player.world.isRemote);
 		mode = Mode.values()[x];
 		layer = Layer.values()[layerid];
+		Print.debug("CREATED " + player.world.isRemote + " " + layer + "/" + layerid + " " + mode + "/" + x);
 		if(player.world.isRemote) return;
 		chunk = StateUtil.getChunk(player);
 		cap = player.getCapability(StatesCapabilities.PLAYER, null);
@@ -436,7 +436,7 @@ public class ManagerContainer extends GenericContainer {
 									break;
 								}
 								case "state":{
-									openGui(Layer.STATE, Mode.INFO, dis.getMunicipality().getId());
+									openGui(Layer.STATE, Mode.INFO, mun.getId());
 									break;
 								}
 								case "mayor":{
@@ -633,8 +633,8 @@ public class ManagerContainer extends GenericContainer {
 		}
 	}
 
-	private void openGui(Layer municipality, Mode info, int id){
-		GuiHandler.openGui(player, layer.ordinal() + 3, mode.ordinal(), id, 0);
+	private void openGui(Layer layer, Mode mode, int id){
+		GuiHandler.openGui(player, layer.ordinal() + 2, mode.ordinal(), id, 0);
 	}
 
 	private void sendStatus(String reason){

@@ -186,7 +186,7 @@ public class ManagerContainer extends GenericContainer {
 				addKey(list, "chatcolor", cap.getNicknameColor(), ViewMode.EDIT);
 				addKey(list, "municipality", cap.getMunicipality().getName() + " (" + cap.getMunicipality().getId() + ")", ViewMode.GOTO);
 				addKey(list, "custom_tax", cap.getCustomTax() > 0 ? ggas(cap.getCustomTax()) : NONE, ViewMode.RESET);
-				addKey(list, "balance", cap.getAccount().getBalance(), ViewMode.GOTO);
+				addKey(list, "balance", ggas(cap.getAccount().getBalance()), ViewMode.GOTO);
 				addKey(list, "bank", cap.getBank().getName(), ViewMode.GOTO);
 				addKey(list, "mailbox", cap.getMailbox() == null ? NOMAILBOX : cap.getMailbox().toString(), ViewMode.RESET);
 				break;
@@ -888,7 +888,7 @@ public class ManagerContainer extends GenericContainer {
 									else{
 										cap.setRawNickname(value);
 										cap.save();
-										sendViewData();
+										sendStatus("states.manager_gui.view.change_applied");
 									}
 									break;
 								}
@@ -899,7 +899,7 @@ public class ManagerContainer extends GenericContainer {
 									}
 									cap.setNicknameColor(Integer.parseInt(value, StringUtils.indexOfAny(value, new String[]{"a", "b", "c", "d", "e", "f"}) >= 0 ? 16 : 10));
 									cap.save();
-									sendViewData();
+									sendStatus("states.manager_gui.view.change_applied");
 									break;
 								}
 								case "municipality":{

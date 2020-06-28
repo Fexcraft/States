@@ -7,6 +7,7 @@ import java.awt.Color;
 import java.util.ArrayList;
 import java.util.UUID;
 
+import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.math.NumberUtils;
 
 import com.mojang.authlib.GameProfile;
@@ -25,6 +26,8 @@ import net.fexcraft.mod.states.data.State;
 import net.fexcraft.mod.states.data.capabilities.PlayerCapability;
 import net.fexcraft.mod.states.data.capabilities.StatesCapabilities;
 import net.fexcraft.mod.states.data.root.AnnounceLevel;
+import net.fexcraft.mod.states.util.Perms;
+import net.fexcraft.mod.states.util.StConfig;
 import net.fexcraft.mod.states.util.StateLogger;
 import net.fexcraft.mod.states.util.StateUtil;
 import net.minecraft.entity.player.EntityPlayer;
@@ -178,6 +181,14 @@ public class ManagerContainer extends GenericContainer {
 				//TODO
 				break;
 			case PLAYERDATA:
+				addKey(list, "uuid", cap.getUUIDAsString(), ViewMode.NONE);
+				addKey(list, "nick", cap.getRawNickname() == null ? NONE : cap.getRawNickname(), ViewMode.EDIT);
+				addKey(list, "chatcolor", cap.getNicknameColor(), ViewMode.EDIT);
+				addKey(list, "municipality", cap.getMunicipality().getName() + " (" + cap.getMunicipality().getId() + ")", ViewMode.GOTO);
+				addKey(list, "custom_tax", cap.getCustomTax() > 0 ? ggas(cap.getCustomTax()) : NONE, ViewMode.RESET);
+				addKey(list, "balance", cap.getAccount().getBalance(), ViewMode.GOTO);
+				addKey(list, "bank", cap.getBank().getName(), ViewMode.GOTO);
+				addKey(list, "mailbox", cap.getMailbox() == null ? NOMAILBOX : cap.getMailbox().toString(), ViewMode.RESET);
 				break;
 			case CHUNK:
 				//TODO
@@ -862,6 +873,46 @@ public class ManagerContainer extends GenericContainer {
 						case COMPANY:
 							break;
 						case PLAYERDATA:
+							switch(keys[packet.getInteger("button")]){
+								case "nick":{
+									if(!Perms.NICKNAME_CHANGE_SELF.has(player)){
+										sendStatus(null);
+										return;
+									}
+									if(value.length() > StConfig.NICKNAME_LENGTH){
+										sendStatus("states.manager_gui.view.nick_too_long");
+									}
+									else if(value.length() < 1){
+										sendStatus("states.manager_gui.view.nick_too_short");
+									}
+									else{
+										cap.setRawNickname(value);
+										cap.save();
+										sendViewData();
+									}
+									break;
+								}
+								case "chatcolor":{
+									if(!Perms.NICKNAME_CHANGE_SELF.has(player)){
+										sendStatus(null);
+										return;
+									}
+									cap.setNicknameColor(Integer.parseInt(value, StringUtils.indexOfAny(value, new String[]{"a", "b", "c", "d", "e", "f"}) >= 0 ? 16 : 10));
+									cap.save();
+									sendViewData();
+									break;
+								}
+								case "municipality":{
+									openGui(Layer.MUNICIPALITY, Mode.INFO, cap.getMunicipality().getId());
+									break;
+								}
+								case "mailbox":{
+									cap.setMailbox(null);
+									cap.save();
+									sendViewData();
+									break;
+								}
+							}
 							break;
 						case CHUNK:
 							break;
@@ -957,7 +1008,7 @@ public class ManagerContainer extends GenericContainer {
 			case MUNICIPALITY:
 				return mun.getName();
 			case PLAYERDATA:
-				return cap.getFormattedNickname();
+				return player.getName();
 			case PROPERTY:
 				return "//TODO";
 			case STATE:

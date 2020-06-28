@@ -41,6 +41,7 @@ states.announce.state.leader_reset=&2&oState Leader was &c&oreset&2&o.
 states.manager_gui.title_district=District: %s
 states.manager_gui.title_municipality=Municipality: %s
 states.manager_gui.title_state=State: %s
+states.manager_gui.title_playerdata=%s
 //
 states.manager_gui.view.no_one=no one
 states.manager_gui.view.no_tax=no tax
@@ -55,6 +56,8 @@ states.manager_gui.view.not_number=&cNot a (valid) number.
 states.manager_gui.view.name_short=&cName is too short!
 states.manager_gui.view.player_not_council_or_citizen=&cPlayer not found in Council or Citizens.
 states.manager_gui.view.municipality_not_in_state=&cThat Municipality isn't part of our State.
+states.manager_gui.view.nick_too_short=Nickname is too short.
+states.manager_gui.view.nick_too_long=Nickname is too long.
 //
 states.manager_gui.view_district.id=District ID
 states.manager_gui.view_district.name=Name
@@ -121,3 +124,12 @@ states.manager_gui.view_state.created=Created
 states.manager_gui.view_state.ruleset=Ruleset
 states.manager_gui.view_state.Mailbox=Mailbox
 states.manager_gui.view_state.icon=Icon/Logo
+//
+states.manager_gui.view_playerdata.uuid=UUID
+states.manager_gui.view_playerdata.nick=Custom Nickname
+states.manager_gui.view_playerdata.chatcolor=Custom Chatcolor
+states.manager_gui.view_playerdata.balance=Balance
+states.manager_gui.view_playerdata.bank=Bank
+states.manager_gui.view_playerdata.municipality=Municipality
+states.manager_gui.view_playerdata.custom_tax=Custom Tax
+states.manager_gui.view_playerdata.mailbox=Mailbox

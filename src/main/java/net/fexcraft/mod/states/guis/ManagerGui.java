@@ -173,6 +173,10 @@ public class ManagerGui extends GenericGui<ManagerContainer> {
 						break;
 					}
 				}
+				if(container.view_values[i].startsWith("#") && container.keys[i].equals("color")){
+					field.setTextColor(Integer.parseInt(field.getText().replace("#", ""), 16));
+				}
+				else field.setTextColor(texcol);
 				field.setEnabled(container.view_modes[i] == ViewMode.EDIT);
 				BasicButton button = buttons.get("mode" + j);
 				button.tx = container.view_modes[i].ordinal() * 10;

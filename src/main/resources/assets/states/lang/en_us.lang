@@ -42,6 +42,7 @@ states.manager_gui.title_district=District: %s
 states.manager_gui.title_municipality=Municipality: %s
 states.manager_gui.title_state=State: %s
 states.manager_gui.title_playerdata=%s
+states.manager_gui.title_chunk=Chunk %s
 //
 states.manager_gui.view.no_one=no one
 states.manager_gui.view.no_tax=no tax
@@ -134,3 +135,18 @@ states.manager_gui.view_playerdata.bank=Bank
 states.manager_gui.view_playerdata.municipality=Municipality
 states.manager_gui.view_playerdata.custom_tax=Custom Tax
 states.manager_gui.view_playerdata.mailbox=Mailbox
+//
+states.manager_gui.view_chunk.coords=Coordinates
+states.manager_gui.view_chunk.district=District
+states.manager_gui.view_chunk.owner=Owner
+states.manager_gui.view_chunk.price=Price
+states.manager_gui.view_chunk.tax=Tax
+states.manager_gui.view_chunk.type=Type
+states.manager_gui.view_chunk.last_edited=Last Edit
+states.manager_gui.view_chunk.last_taxcoll=Last Tax Coll.
+states.manager_gui.view_chunk.linked_chunks=Linked Chunks
+states.manager_gui.view_chunk.linked_to=Linked To
+states.manager_gui.view_chunk.claimed_by=Claimbed By
+states.manager_gui.view_chunk.claimed_at=Created/Claimed
+states.manager_gui.view_chunk.transit=Transit Zone
+states.manager_gui.view_chunk.forceloaded=Force Loaded

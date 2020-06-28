@@ -18,6 +18,7 @@ import net.fexcraft.lib.mc.utils.Print;
 import net.fexcraft.lib.mc.utils.Static;
 import net.fexcraft.mod.fsmm.util.Config;
 import net.fexcraft.mod.states.data.Chunk;
+import net.fexcraft.mod.states.data.ChunkType;
 import net.fexcraft.mod.states.data.District;
 import net.fexcraft.mod.states.data.DistrictType;
 import net.fexcraft.mod.states.data.Municipality;
@@ -70,7 +71,10 @@ public class ManagerContainer extends GenericContainer {
 		cap = player.getCapability(StatesCapabilities.PLAYER, null);
 		switch(layer){
 			case CHUNK:
-				//
+				if(mode == Mode.CKINFO){
+					mode = Mode.INFO;
+					chunk = StateUtil.getTempChunk(x, z);
+				}
 				break;
 			case COMPANY:
 				//
@@ -191,7 +195,24 @@ public class ManagerContainer extends GenericContainer {
 				addKey(list, "mailbox", cap.getMailbox() == null ? NOMAILBOX : cap.getMailbox().toString(), ViewMode.RESET);
 				break;
 			case CHUNK:
-				//TODO
+				addKey(list, "coords", chunk.xCoord() + ", " + chunk.zCoord(), ViewMode.NONE);
+				addKey(list, "district", chunk.getDistrict().getName() + " (" + chunk.getDistrict().getId() + ")", ViewMode.GOTO);
+				addKey(list, "owner", chunk.getType() == ChunkType.PRIVATE ? Static.getPlayerNameByUUID(chunk.getOwner()) : chunk.getOwner(), ViewMode.GOTO);
+				addKey(list, "price", chunk.getPrice() > 0 ? ggas(chunk.getPrice()) : NOTFORSALE, ViewMode.EDIT);
+				addKey(list, "tax", chunk.getCustomTax() > 0 ? ggas(chunk.getCustomTax()) + "c" : chunk.getDistrict().getChunkTax() > 0 ? ggas(chunk.getDistrict().getChunkTax()) + "d" : NOTAX, ViewMode.EDIT);
+				addKey(list, "type", chunk.getType().name().toLowerCase(), ViewMode.EDIT);
+				addKey(list, "last_edited", time(chunk.getChanged()), ViewMode.NONE);
+				addKey(list, "last_taxcoll", time(chunk.lastTaxCollection()), ViewMode.NONE);
+				addKey(list, "linked_chunks", chunk.getLinkedChunks().size(), ViewMode.LIST);
+				addKey(list, "linked_to", chunk.getLink() == null ? NONE : chunk.getLink().x + ", " + chunk.getLink().z, ViewMode.GOTO);
+				addKey(list, "claimed_by", Static.getPlayerNameByUUID(chunk.getClaimer()), ViewMode.NONE);
+				addKey(list, "claimed_at", time(chunk.getCreated()), ViewMode.NONE);
+				if(chunk.getDistrict().getId() == -2){
+					addKey(list, "transit", time(chunk.getChanged() + Time.DAY_MS), ViewMode.NONE);
+				}
+				if(chunk.isForceLoaded()){
+					addKey(list, "forceloaded", "true", ViewMode.NONE);
+				}
 				break;
 			case PROPERTY:
 				break;
@@ -965,7 +986,8 @@ public class ManagerContainer extends GenericContainer {
 		LIST_CITIZENS,
 		LIST_COUNCIL,
 		LIST_NEIGHBORS,
-		LIST_BWLIST;
+		LIST_BWLIST,
+		CKINFO;//to detect if a local chunk is opened or remote
 
 		public int entries(){
 			return this != INFO ? 10 : 12;
@@ -1000,7 +1022,7 @@ public class ManagerContainer extends GenericContainer {
 	public String getLayerTitle(){
 		switch(layer){
 			case CHUNK:
-				return chunk.xCoord() + "x " + chunk.zCoord() + "z";
+				return chunk.xCoord() + ", " + chunk.zCoord();
 			case COMPANY:
 				return "//TODO";
 			case DISTRICT:

@@ -1,6 +1,7 @@
 package net.fexcraft.mod.states.cmds;
 
 import static net.fexcraft.mod.states.guis.GuiHandler.CLAIM_MAP;
+import static net.fexcraft.mod.states.guis.GuiHandler.MANAGER_CHUNK;
 import static net.fexcraft.mod.states.guis.GuiHandler.openGui;
 
 import java.util.UUID;
@@ -23,6 +24,7 @@ import net.fexcraft.mod.states.data.ChunkPos;
 import net.fexcraft.mod.states.data.ChunkType;
 import net.fexcraft.mod.states.data.capabilities.PlayerCapability;
 import net.fexcraft.mod.states.data.capabilities.StatesCapabilities;
+import net.fexcraft.mod.states.guis.ManagerContainer;
 import net.fexcraft.mod.states.util.ImageCache;
 import net.fexcraft.mod.states.util.StateLogger;
 import net.fexcraft.mod.states.util.StateUtil;
@@ -137,29 +139,7 @@ public class ChunkCmd extends CommandBase {
 					int z = Integer.parseInt(args[2]);
 					chunk = StateUtil.getTempChunk(x, z);
 				}
-				Print.chat(sender, "&e====-====-====-====-====-====&0[&2States&0]");
-				Print.chat(sender, "&6Info of chunk &7" + chunk.xCoord() + "x&2, &7" + chunk.zCoord() + "z&2:");
-				Print.chat(sender, "&9District: &7" + chunk.getDistrict().getName() + " (" + chunk.getDistrict().getId() + ")");
-				Print.chat(sender, "&9Owner: &7" + (chunk.getType() == ChunkType.PRIVATE ? Static.getPlayerNameByUUID(chunk.getOwner()) : chunk.getOwner()));
-				Print.chat(sender, "&9Price: &7" + (chunk.getPrice() > 0 ? Config.getWorthAsString(chunk.getPrice()) : "not for sale"));
-				Print.chat(sender, "&9Tax: &7" + (chunk.getCustomTax() > 0 ? ggas(chunk.getCustomTax()) + " &c&m" : "") + ggas(chunk.getDistrict().getChunkTax()));
-				Print.chat(sender, "&9Type: &7" + chunk.getType().name().toLowerCase());
-				Print.chat(sender, "&9Last change: &7" + Time.getAsString(chunk.getChanged()));
-				Print.chat(sender, "&9Last TaxColl.: &7" + Time.getAsString(chunk.lastTaxCollection()));
-				Print.chat(sender, "&9Linked chunks: &7" + chunk.getLinkedChunks().size());
-				if(chunk.getLinkedChunks().size() > 0){
-					for(int i = 0; i < chunk.getLinkedChunks().size(); i++){
-						Print.chat(sender, "&c-> &9" + chunk.getLinkedChunks().get(i));
-					}
-				}
-				Print.chat(sender, "&9Linked: &7" + (chunk.getLink() == null ? "false" : chunk.getLink().x + "x, " + chunk.getLink().z + "z"));
-				Print.chat(sender, "&2Claimed by &7" + Static.getPlayerNameByUUID(chunk.getClaimer()) + "&2 at &8" + Time.getAsString(chunk.getCreated()));
-				if(chunk.getDistrict().getId() == -2){
-					Print.chat(sender, "&9Transit Zone till: &7" + Time.getAsString(chunk.getChanged() + Time.DAY_MS));
-				}
-				if(chunk.isForceLoaded()){
-					Print.chat(sender, "&4&oThis is a force-loaded chunk.");
-				}
+				openGui(player, MANAGER_CHUNK, chunk.xCoord(), ManagerContainer.Mode.CKINFO.ordinal(), chunk.zCoord());
 				return;
 			}
 			case "update":{

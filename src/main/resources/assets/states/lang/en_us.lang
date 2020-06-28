@@ -34,6 +34,8 @@ states.welcome_msg.pending_votes=&6You have &7$0 &6votes waiting! &7/st-vote my-
 
 # Announcements
 states.announce.municipality.mayor_reset=&2&oMunicipality mayor was &c&oreset&2&o.
+states.announce.state.new_capital=&6%s&9 is now the new Capital!
+states.announce.state.leader_reset=&2&oState Leader was &c&oreset&2&o.
 
 # Manager GUI
 states.manager_gui.title_district=District: %s
@@ -52,6 +54,7 @@ states.manager_gui.view.invalid_hex=&cInvalid HEX String.
 states.manager_gui.view.not_number=&cNot a (valid) number.
 states.manager_gui.view.name_short=&cName is too short!
 states.manager_gui.view.player_not_council_or_citizen=&cPlayer not found in Council or Citizens.
+states.manager_gui.view.municipality_not_in_state=&cThat Municipality isn't part of our State.
 //
 states.manager_gui.view_district.id=District ID
 states.manager_gui.view_district.name=Name
@@ -98,3 +101,23 @@ states.manager_gui.view_municipality.icon=Icon/Logo
 states.manager_gui.view_municipality.abandoned=Abandoned
 states.manager_gui.view_municipality.abandoned_since=Abandoned Since
 states.manager_gui.view_municipality.abandoned_by=Abandoned By
+//
+states.manager_gui.view.state.id=State ID
+states.manager_gui.view.state.name=name
+states.manager_gui.view.state.capital=Capital
+states.manager_gui.view.state.leader=Leader
+states.manager_gui.view.state.price=Price
+states.manager_gui.view.state.color=Color
+states.manager_gui.view.state.citizen=Citizen
+states.manager_gui.view.state.balance=Balance
+states.manager_gui.view.state.chunk_tax=Chunk Tax (%)
+states.manager_gui.view.state.citizen_tax=Citizen Tax (%)
+states.manager_gui.view.state.last_edited=Last Edit
+states.manager_gui.view.state.council=Council
+states.manager_gui.view.state.municipalities=Municipalities
+states.manager_gui.view.state.neighbors=Neighbors
+states.manager_gui.view.state.creator=Creator
+states.manager_gui.view.state.created=Created
+states.manager_gui.view.state.ruleset=Ruleset
+states.manager_gui.view.state.Mailbox=Mailbox
+states.manager_gui.view.state.icon=Icon/Logo

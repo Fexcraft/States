@@ -1,13 +1,11 @@
 package net.fexcraft.mod.states.cmds;
 
+import static net.fexcraft.mod.states.guis.GuiHandler.MANAGER_STATE;
 import static net.fexcraft.mod.states.guis.GuiHandler.RULE_EDITOR;
 import static net.fexcraft.mod.states.guis.GuiHandler.openGui;
 
-import java.awt.Color;
 import java.util.ArrayList;
 import java.util.UUID;
-
-import org.apache.commons.lang3.math.NumberUtils;
 
 import com.mojang.authlib.GameProfile;
 
@@ -28,6 +26,7 @@ import net.fexcraft.mod.states.data.capabilities.StatesCapabilities;
 import net.fexcraft.mod.states.data.root.AnnounceLevel;
 import net.fexcraft.mod.states.data.root.Mailbox.MailType;
 import net.fexcraft.mod.states.data.root.Mailbox.RecipientType;
+import net.fexcraft.mod.states.guis.ManagerContainer;
 import net.fexcraft.mod.states.util.MailUtil;
 import net.fexcraft.mod.states.util.Perms;
 import net.fexcraft.mod.states.util.StateLogger;
@@ -67,7 +66,6 @@ public class StateCmd extends CommandBase {
 		if(args.length == 0){
 			Print.chat(sender, "&7/st info");
 			Print.chat(sender, "&7/st rules");
-			Print.chat(sender, "&7/st set <option> <value>");
 			Print.chat(sender, "&7/st council <args...>");
 			Print.chat(sender, "&7/st blacklist <args...>");
 			Print.chat(sender, "&7/st mun <option> <args>");
@@ -86,275 +84,11 @@ public class StateCmd extends CommandBase {
 		State state = chunk.getDistrict().getMunicipality().getState();
 		switch(args[0]){
 			case "info":{
-				Print.chat(sender, "&e====-====-====-====-====-====&0[&2States&0]");
-				Print.chat(sender, "&6Info of State &7" + state.getName() + " (" + state.getId() + ")&2:");
-				Print.chat(sender, "&9Capital: &7" + StateUtil.getMunicipality(state.getCapitalId()).getName() + " (" + state.getCapitalId() + ")");
-				Print.chat(sender, "&9Leader: &7" + (state.getHead() == null ? "no one" : Static.getPlayerNameByUUID(state.getHead())));
-				Print.chat(sender, "&9Price: &7" + (state.getPrice() > 0 ? ggas(state.getPrice()) : "not for sale"));
-				Print.chat(sender, "&6Color: &7" + state.getColor());
-				Print.chat(sender, "&8Citizen: &7" + getCitizens(state).size());
-				Print.chat(sender, "&9Balance: &7" + Config.getWorthAsString(state.getAccount().getBalance()));
-				Print.chat(sender, "&9Last change: &7" + Time.getAsString(state.getChanged()));
-				Print.chat(sender, "&9ChunkTax%: &7" + state.getChunkTaxPercentage() + "%");
-				Print.chat(sender, "&9CitizenTax%: &7" + state.getCitizenTaxPercentage() + "%");
-				Print.chat(sender, "&9Council Members: &7" + state.getCouncil().size());
-				state.getCouncil().forEach(uuid -> {
-					Print.chat(sender, "&c-> &9" + Static.getPlayerNameByUUID(uuid));
-				});
-				Print.chat(sender, "&9Municipalities: &7" + state.getMunicipalities().size());
-				state.getMunicipalities().forEach(var -> {
-					Municipality municipality = StateUtil.getMunicipality(var);
-					Print.chat(sender, "&c-> &9" + municipality.getName() + " &7(" + municipality.getId() + ");");
-				});
-				Print.chat(sender, "&9Neighbors: &7" + state.getNeighbors().size());
-				state.getNeighbors().forEach(var -> {
-					State st = StateUtil.getState(var);
-					Print.chat(sender, "&c-> &9" + st.getName() + " &7(" + st.getId() + ");");
-				});
-				Print.chat(sender, "&2Created by &7" + Static.getPlayerNameByUUID(state.getCreator()) + "&2 at &8" + Time.getAsString(state.getCreated()));
-				Print.chat(sender, "&6Mailbox: &7" + (state.getMailbox() == null ? "No mailbox set." : state.getMailbox().toString()));
+				openGui(player, MANAGER_STATE, ManagerContainer.Mode.INFO.ordinal(), state.getId(), 0);
 				return;
 			}
 			case "rules":{
 				openGui(player, RULE_EDITOR, 3, 0, 0);
-				return;
-			}
-			case "set":{
-				if(args.length < 2){
-					Print.chat(sender, "&7/st set name <new name>");
-					Print.chat(sender, "&7/st set price <price/0>");
-					Print.chat(sender, "&7/st set color <hex>");
-					Print.chat(sender, "&7/st set leader <playername>");
-					Print.chat(sender, "&7/st set leader <null/reset>");
-					Print.chat(sender, "&7/st set capital <municipality id>");
-					Print.chat(sender, "&7/st set icon <url>");
-					Print.chat(sender, "&7/st set chunk-tax-percentage <0-100/reset>");
-					Print.chat(sender, "&7/st set citizen-tax-percentage <0-100/reset>");
-					Print.chat(sender, "&7/st set ruleset <new name>");
-					return;
-				}
-				switch(args[1]){
-					case "leader":{
-						if(state.isAuthorized(state.r_SET_LEADER.id, ply.getUUID()).isTrue()){
-							if(args.length < 3){
-								Print.chat(sender, "&9Missing Argument!");
-								break;
-							}
-							if(args[2].equals("null") || args[2].equals("reset")){
-								if(state.isAuthorized(state.r_RESET_HEAD.id, ply.getUUID()).isFalse() && !StateUtil.bypass(player)){
-									Print.chat(sender, "&cNot Authorized to reset State Leader."); return;
-								}
-								state.setHead(null); state.save();
-								Print.chat(sender, "&2State Leader was &creset&2.");
-								StateUtil.announce(null, AnnounceLevel.MUNICIPALITY_ALL, "&2&oState Leader was &c&oreset&2&o.", state.getId());
-								Print.log(StateLogger.player(player) + " reset head of " + StateLogger.state(state) + ".");
-								return;
-							}
-							GameProfile gp = Static.getServer().getPlayerProfileCache().getGameProfileForUsername(args[2]);
-							if(gp == null || gp.getId() == null){
-								Print.chat(sender, "&cPlayer not found in Cache.");
-								break;
-							}
-							state.setHead(gp.getId());
-							state.setChanged(Time.getDate());
-							state.save();
-							Print.chat(sender, "&2Set &7" + gp.getName() + "&2 to new State Leader!");
-							Print.log(StateLogger.player(player) + " changed leader of " + StateLogger.state(state) + " to " + StateLogger.player(gp) + ".");
-						}
-						else{
-							Print.chat(sender, "&cNo permission.");
-						}
-						break;
-					}
-					case "name":{
-						if(state.isAuthorized(state.r_SET_NAME.id, ply.getUUID()).isTrue()){
-							if(args.length < 3){
-								Print.chat(sender, "&9Missing Arguments!");
-								break;
-							}
-							String str = args[2];
-							if(args.length > 3){
-								for(int i = 3; i < args.length; i++){
-									str += " " + args[i];
-								}
-							}
-							if(str.replace(" ", "").length() < 3){
-								Print.chat(sender, "&cName is too short!");
-								break;
-							}
-							state.setName(str);
-							state.setChanged(Time.getDate());
-							state.save();
-							Print.chat(sender, "&6Name set to: &7" + state.getName());
-							Print.log(StateLogger.player(player) + " set the name of " + StateLogger.state(state) + " to " + state.getName());
-						}
-						else{
-							Print.chat(sender, "&cNo permission.");
-						}
-						break;
-					}
-					case "ruleset":{
-						if(state.isAuthorized(state.r_SET_RULESET.id, ply.getUUID()).isTrue()){
-							if(args.length < 3){
-								Print.chat(sender, "&9Missing Arguments!");
-								break;
-							}
-							String str = args[2];
-							if(args.length > 3){
-								for(int i = 3; i < args.length; i++){
-									str += " " + args[i];
-								}
-							}
-							if(str.replace(" ", "").length() < 3){
-								Print.chat(sender, "&cName is too short!");
-								break;
-							}
-							state.setRulesetTitle(str);
-							state.setChanged(Time.getDate());
-							state.save();
-							Print.chat(sender, "&6Ruleset Name set to: &7" + state.getName());
-							Print.log(StateLogger.player(player) + " set the ruleset name of " + StateLogger.state(state) + " to " + state.getName());
-						}
-						else{
-							Print.chat(sender, "&cNo permission.");
-						}
-						break;
-					}
-					case "price":{
-						if(state.isAuthorized(state.r_SET_PRICE.id, ply.getUUID()).isTrue()){
-							if(args.length < 3){
-								Print.chat(sender, "&9Missing Argument!");
-								Print.chat(sender, "&7Setting the price to \"0\" makes the state not buyable.");
-								break;
-							}
-							try{
-								Long price = Long.parseLong(args[2]);
-								if(price < 0){ price = 0l; }
-								state.setPrice(price);
-								state.setChanged(Time.getDate());
-								state.save();
-								Print.chat(sender, "&2Price set to: &7" + Config.getWorthAsString(state.getPrice()));
-								Print.log(StateLogger.player(player) + " set the price of " + StateLogger.state(state) + " to " + state.getPrice());
-							}
-							catch(Exception e){
-								Print.chat(sender, "&cError: &7" + e.getMessage());
-							}
-						}
-						else{
-							Print.chat(sender, "&cNo permission.");
-						}
-						break;
-					}
-					case "color":{
-						if(state.isAuthorized(state.r_SET_COLOR.id, ply.getUUID()).isTrue()){
-							if(args.length < 3){
-								Print.chat(sender, "&9Missing Argument!");
-								break;
-							}
-							try{
-								String str = args[2];
-								if(str.replace("#", "").length() != 6){
-									Print.chat(sender, "&cInvalid HEX String.");
-									break;
-								}
-								str = str.startsWith("#") ? str : "#" + str;
-								Color color = Color.decode(str);
-								state.setColor(str);
-								state.setChanged(Time.getDate());
-								state.save();
-								Print.chat(sender, "&6Color set to &7" + str + "&6! (" + color.getRed() + ", " + color.getGreen() + ", " + color.getBlue() + ");");
-								Print.log(StateLogger.player(player) + " set the color of " + StateLogger.state(state) + " to " + state.getColor());
-							}
-							catch(Exception e){
-								Print.chat(sender, "&2Error: &7" + e.getMessage());
-							}
-						}
-						else{
-							Print.chat(sender, "&cNo permission.");
-						}
-						break;
-					}
-					case "capital":{
-						if(state.isAuthorized(state.r_SET_CAPITAL.id, ply.getUUID()).isTrue()){
-							if(args.length < 3){
-								Print.chat(sender, "&9Missing Argument!");
-								break;
-							}
-							Municipality mun = StateUtil.getMunicipality(Integer.parseInt(args[2]));
-							if(mun.getId() <= 0 || mun.getState().getId() != state.getId()){
-								Print.chat(sender, "&cThat Municipality isn't part of our State.");
-								break;
-							}
-							state.setCapitalId(mun.getId());
-							state.setChanged(Time.getDate());
-							StateUtil.announce(server, AnnounceLevel.STATE_ALL, "&6" + mun.getName() + " &9 is now the new Capital!", state.getId());
-							Print.log(StateLogger.player(player) + " set the capital of " + StateLogger.state(state) + " to " + StateLogger.municipality(mun));
-							return;
-						}
-						else{
-							Print.chat(sender, "&cNo permission.");
-						}
-						break;
-					}
-					case "icon":{
-						if(state.isAuthorized(state.r_SET_ICON.id, ply.getUUID()).isTrue()){
-							if(args.length < 3){
-								Print.chat(sender, "&9Missing Argument!");
-								break;
-							}
-							try{
-								state.setIcon(args[2]);
-								state.setChanged(Time.getDate());
-								state.save();
-								Print.chat(sender, "&6Icon set to &7" + args[2] + "&6!");
-								Print.log(StateLogger.player(player) + " set the icon of " + StateLogger.state(state) + " to " + state.getIcon());
-							}
-							catch(Exception e){
-								Print.chat(sender, "&2Error: &7" + e.getMessage());
-							}
-						}
-						else{
-							Print.chat(sender, "&cNo permission.");
-						}
-						break;
-					}
-					case "chunk-tax-percentage":{
-						if(state.isAuthorized(state.r_SET_CHUNK_TAX_PERCENT.id, ply.getUUID()).isTrue()){
-							if(args[2].equals("reset") || args[2].equals("disable")){
-								state.setChunkTaxPercentage((byte)0); state.save();
-								Print.chat(sender, "&State's Chunk Tax Percentage was reset!");
-							}
-							else if(NumberUtils.isCreatable(args[2])){
-								byte byt = Byte.parseByte(args[2]);
-								if(byt > 100){ byt = 100; } if(byt < 0){ byt = 0; }
-								state.setChunkTaxPercentage(byt); state.save();
-								Print.chat(sender, "&9State's Chunk Tax Percentage was set! (" + state.getChunkTaxPercentage() + "%)");
-							}
-							else{
-								Print.chat(sender, "Not a (valid) number.");
-							}
-						}
-						break;
-					}
-					case "citizen-tax-percentage":{
-						if(state.isAuthorized(state.r_SET_CITIZEN_TAX_PERCENT.id, ply.getUUID()).isTrue()){
-							if(args[2].equals("reset") || args[2].equals("disable")){
-								state.setCitizenTaxPercentage((byte)0); state.save();
-								Print.chat(sender, "&State's Citizen Tax Percentage was reset!");
-							}
-							else if(NumberUtils.isCreatable(args[2])){
-								byte byt = Byte.parseByte(args[2]);
-								if(byt > 100){ byt = 100; } if(byt < 0){ byt = 0; }
-								state.setCitizenTaxPercentage(byt); state.save();
-								Print.chat(sender, "&9State's Citizen Tax Percentage was set! (" + state.getCitizenTaxPercentage() + "%)");
-							}
-							else{
-								Print.chat(sender, "Not a (valid) number.");
-							}
-						}
-						break;
-					}
-				}
 				return;
 			}
 			case "council":{
@@ -636,10 +370,6 @@ public class StateCmd extends CommandBase {
 				return;
 			}
 		}
-	}
-	
-	private String ggas(long leng){
-		return ChunkCmd.ggas(leng);
 	}
 
 	private ArrayList<UUID> getCitizens(State state){

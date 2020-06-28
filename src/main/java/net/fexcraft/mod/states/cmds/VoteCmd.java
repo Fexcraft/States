@@ -105,9 +105,12 @@ public class VoteCmd extends CommandBase {
 				return;
 			}
 			case "relevant": case "my-votes":{
-				Print.chat(sender, "&7Welcome! &aYou are requisted to\n&aparttake in these votes:");
+				Print.chat(sender, "&7Welcome! &aYou are requested to\n&aparttake in these votes:");
 				for(Vote vote : ply.getRelevantVotes()){
 					Print.chat(sender, "&7- &a" + vote.id + ", &e" + (vote.type.assignment() ? "assignment" : "rule change") + ", &bof " + vote.targetAsString());
+				}
+				if(ply.getRelevantVotes().isEmpty()){
+					Print.chat(sender, "&7- &ano active votes");
 				}
 				Print.chat(sender, "&7Use &a/st-vote status <id> &7to see vote details.");
 				return;

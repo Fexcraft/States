@@ -113,8 +113,8 @@ public class ManagerGui extends GenericGui<ManagerContainer> {
 			container.send(Side.SERVER, packet);
 		}
 		switch(key){
-			case "su": scroll(+1); break;
-			case "sd": scroll(-1); break;
+			case "su": scroll(-1); break;
+			case "sd": scroll(+1); break;
 		}
 		//
 		return false;

@@ -6,8 +6,8 @@ import net.fexcraft.lib.mc.api.registry.fCommand;
 import net.fexcraft.lib.mc.utils.Print;
 import net.fexcraft.mod.states.data.capabilities.PlayerCapability;
 import net.fexcraft.mod.states.data.capabilities.StatesCapabilities;
-import net.fexcraft.mod.states.util.StConfig;
 import net.fexcraft.mod.states.util.Perms;
+import net.fexcraft.mod.states.util.StConfig;
 import net.minecraft.command.CommandBase;
 import net.minecraft.command.CommandException;
 import net.minecraft.command.ICommandSender;
@@ -19,12 +19,12 @@ public class NickCmd extends CommandBase {
 
 	@Override
 	public String getName(){
-		return "nick";
+		return "st-nick";
 	}
 
 	@Override
 	public String getUsage(ICommandSender sender){
-		return "/nick";
+		return "/st-nick";
 	}
 	
 	@Override
@@ -40,13 +40,13 @@ public class NickCmd extends CommandBase {
 	@Override
 	public void execute(MinecraftServer server, ICommandSender sender, String[] args) throws CommandException {
 		if(args.length == 0){
-			Print.chat(sender, "&7/nick name <nickname>");
-			Print.chat(sender, "&7/nick color <code>");
-			Print.chat(sender, "&7/nick reset");
+			Print.chat(sender, "&7/st-nick name <nickname>");
+			Print.chat(sender, "&7/st-nick color <code>");
+			Print.chat(sender, "&7/st-nick reset");
 			Print.chat(sender, "&8 - - - - - - -");
-			Print.chat(sender, "&7/nick setname <player> <nickname>");
-			Print.chat(sender, "&7/nick setcolor <player> <code>");
-			Print.chat(sender, "&7/nick reset <player>");
+			Print.chat(sender, "&7/st-nick setname <player> <nickname>");
+			Print.chat(sender, "&7/st-nick setcolor <player> <code>");
+			Print.chat(sender, "&7/st-nick reset <player>");
 			return;
 		}
 		if(sender.getCommandSenderEntity() instanceof EntityPlayer == false){

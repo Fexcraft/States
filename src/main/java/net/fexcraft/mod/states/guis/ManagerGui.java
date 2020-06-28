@@ -31,6 +31,7 @@ public class ManagerGui extends GenericGui<ManagerContainer> {
 	protected void init(){
 		switch(container.mode){
 			case INFO:
+			case CKINFO:
 				xSize = 256;
 				ySize = 217;
 				texloc = VIEW;

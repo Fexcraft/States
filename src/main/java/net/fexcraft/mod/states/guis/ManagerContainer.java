@@ -937,6 +937,34 @@ public class ManagerContainer extends GenericContainer {
 							}
 							break;
 						case CHUNK:
+							switch(keys[packet.getInteger("button")]){
+								case "district":{
+									openGui(Layer.DISTRICT, Mode.INFO, chunk.getDistrict().getId());
+									break;
+								}
+								case "owner":{
+									switch(chunk.getType()){
+										case COMPANY:
+											//TODO
+											break;
+										case DISTRICT:
+											openGui(Layer.DISTRICT, Mode.INFO, chunk.getDistrict().getId());
+											break;
+										case MUNICIPAL:
+											openGui(Layer.MUNICIPALITY, Mode.INFO, chunk.getMunicipality().getId());
+											break;
+										case STATEOWNED:
+											openGui(Layer.STATE, Mode.INFO, chunk.getState().getId());
+											break;
+										default: return;
+									}
+									break;
+								}
+								case "price":{
+									
+									break;
+								}
+							}
 							break;
 						case PROPERTY:
 							break;

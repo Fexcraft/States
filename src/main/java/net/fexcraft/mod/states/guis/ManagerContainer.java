@@ -45,6 +45,7 @@ public class ManagerContainer extends GenericContainer {
 	protected static final String NOTFORSALE = "not_for_sale";
 	protected static final String NONE = "none";
 	protected static final String UNKNOWN = "unknown";
+	protected static final String NOTHING = "nothing";
 	//
 	private ManagerGui gui;
 	protected Mode mode;
@@ -197,14 +198,14 @@ public class ManagerContainer extends GenericContainer {
 			case CHUNK:
 				addKey(list, "coords", chunk.xCoord() + ", " + chunk.zCoord(), ViewMode.NONE);
 				addKey(list, "district", chunk.getDistrict().getName() + " (" + chunk.getDistrict().getId() + ")", ViewMode.GOTO);
-				addKey(list, "owner", chunk.getType() == ChunkType.PRIVATE ? Static.getPlayerNameByUUID(chunk.getOwner()) : chunk.getOwner(), ViewMode.GOTO);
+				addKey(list, "owner", chunk.getType() == ChunkType.PRIVATE ? Static.getPlayerNameByUUID(chunk.getOwner()) : chunk.getOwner(), chunk.getType() == ChunkType.PRIVATE ? ViewMode.NONE : ViewMode.GOTO);
 				addKey(list, "price", chunk.getPrice() > 0 ? ggas(chunk.getPrice()) : NOTFORSALE, ViewMode.EDIT);
 				addKey(list, "tax", chunk.getCustomTax() > 0 ? ggas(chunk.getCustomTax()) + "c" : chunk.getDistrict().getChunkTax() > 0 ? ggas(chunk.getDistrict().getChunkTax()) + "d" : NOTAX, ViewMode.EDIT);
 				addKey(list, "type", chunk.getType().name().toLowerCase(), ViewMode.EDIT);
 				addKey(list, "last_edited", time(chunk.getChanged()), ViewMode.NONE);
 				addKey(list, "last_taxcoll", time(chunk.lastTaxCollection()), ViewMode.NONE);
-				addKey(list, "linked_chunks", chunk.getLinkedChunks().size(), ViewMode.LIST);
-				addKey(list, "linked_to", chunk.getLink() == null ? NONE : chunk.getLink().x + ", " + chunk.getLink().z, ViewMode.GOTO);
+				addKey(list, "linked_chunks", chunk.getLinkedChunks().size() > 0 ? chunk.getLinkedChunks().size() : NONE, ViewMode.LIST);
+				addKey(list, "linked_to", chunk.getLink() == null ? NOTHING : chunk.getLink().x + ", " + chunk.getLink().z, ViewMode.GOTO);
 				addKey(list, "claimed_by", Static.getPlayerNameByUUID(chunk.getClaimer()), ViewMode.NONE);
 				addKey(list, "claimed_at", time(chunk.getCreated()), ViewMode.NONE);
 				if(chunk.getDistrict().getId() == -2){

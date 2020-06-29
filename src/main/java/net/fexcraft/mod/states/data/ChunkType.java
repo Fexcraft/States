@@ -34,4 +34,11 @@ public enum ChunkType implements ColorHolder {
 		return name;
 	}
 
+	public static ChunkType get(String uppercased){
+		for(ChunkType type : values()){
+			if(type.name().equals(uppercased)) return type;
+		}
+		return null;
+	}
+
 }

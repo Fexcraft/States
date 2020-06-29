@@ -73,11 +73,10 @@ public class ChunkCmd extends CommandBase {
 			Print.chat(sender, "&7/ck info");
 			Print.chat(sender, "&7/ck map");
 			Print.chat(sender, "&7/ck buy");
-			Print.chat(sender, "&7/ck sfs (set for-sale)");
 			Print.chat(sender, "&7/ck unclaim [admin-only]");
-			Print.chat(sender, "&7/ck set <args>");
 			Print.chat(sender, "&7/ck link <args>");
 			Print.chat(sender, "&7/ck whitelist <args>");
+			Print.chat(sender, "&7/ck force-load <true/false>");
 			Print.chat(sender, "&7/ck update <option:range> [admin-only]");
 			Print.chat(sender, "&7/ck queue");
 			Print.chat(sender, "&7/ck types");
@@ -140,7 +139,7 @@ public class ChunkCmd extends CommandBase {
 					int z = Integer.parseInt(args[2]);
 					chunk = StateUtil.getTempChunk(x, z);
 				}
-				openGui(player, MANAGER_CHUNK, chunk.xCoord(), ManagerContainer.Mode.CKINFO.ordinal(), chunk.zCoord());
+				openGui(player, MANAGER_CHUNK, ManagerContainer.Mode.CKINFO.ordinal(), chunk.xCoord(), chunk.zCoord());
 				return;
 			}
 			case "update":{
@@ -332,32 +331,6 @@ public class ChunkCmd extends CommandBase {
 				}
 				return;
 			}
-			case "set_for_sale":
-			case "set-for-sale":
-			case "setforsale":
-			case "sell":
-			case "sfs":{
-				if(isPermitted(chunk, player)){
-					if(args.length < 2){
-						Print.chat(sender, "&9Missing argument.");
-						Print.chat(sender, "&7/ck set-for-sale <price>");
-						Print.chat(sender, "&6Remember!&2 1000 equals &71" + Config.CURRENCY_SIGN + "&2!");
-						return;
-					}
-					try{
-						Long price = Long.parseLong(args[1]);
-						chunk.setPrice(price);
-						chunk.setChanged(Time.getDate());
-						chunk.save();
-						Print.chat(sender, "&9Price set to &7" + Config.getWorthAsString(price));
-						Print.log(StateLogger.player(player) + " set the price of the " + StateLogger.chunk(chunk) + " to " + chunk.getPrice() + ".");
-					}
-					catch(Exception e){
-						Print.chat(sender, "&9Error: &7" + e.getMessage());
-					}
-				}
-				return;
-			}
 			case "set":{
 				if(isPermitted(chunk, player)){
 					if(args.length < 2){
@@ -382,146 +355,32 @@ public class ChunkCmd extends CommandBase {
 							}
 							break;
 						}
-						case "price":{
-							Print.chat(sender, "&2Please use the &7/ck set-for-sale &2command instead!");
-							break;
-						}
-						case "link":{
-							Print.chat(sender, "&2Please use the &7/ck link &2command instead!");
-							break;
-						}
-						case "type":{
-							if(args.length < 3){
-								Print.chat(sender, "&7&o/ck set type <type>");
-								break;
-							}
-							ChunkType type = ChunkType.valueOf(args[2].toUpperCase());
-							if(type == null){
-								Print.chat(sender, "&9Chunk Type not found. Use &7/ck types &9to see available types.");
-							}
-							else{
-								long time = Time.getDate();
-								switch(type){
-									case COMPANY:{
-										Print.chat(sender, "&2Please use the &7/ck set-for-sale &2command instead.");
-										Print.chat(sender, "&2To buy as company use &7/ck buy company");
-										break;
-									}
-									case STATEOWNED:
-									case MUNICIPAL:
-									case DISTRICT:
-									case NORMAL:{
-										String to = type == ChunkType.NORMAL || type == ChunkType.DISTRICT ? "District" : type == ChunkType.MUNICIPAL ? "Municipality" : type == ChunkType.STATEOWNED ? "State" : "ERROR";
-										chunk.setType(type);
-										chunk.setOwner(null);
-										chunk.setPrice(0);
-										chunk.setChanged(time);
-										chunk.getLinkedChunks().forEach(link -> {
-											Chunk ck = StateUtil.getTempChunk(link);
-											ck.setType(type);
-											ck.setOwner(null);
-											ck.setPrice(0);
-											ck.setChanged(time);
-											ck.save();
-											Print.log(StateLogger.player(player) + " gave the linked " + StateLogger.chunk(ck) + " to the " + to + ".");
-										});
-										chunk.save();
-										Print.chat(sender, "&9Chunk given to the &2" + to + "&9!");
-										Print.log(StateLogger.player(player) + " gave the  " + StateLogger.chunk(chunk) + " to the " + to + ".");
-										break;
-									}
-									case PRIVATE:{
-										Print.chat(sender, "&2Please use the &7/ck set-for-sale &2command instead.");
-										break;
-									}
-									case PUBLIC:{
-										chunk.setType(type);
-										chunk.setChanged(time);
-										chunk.getLinkedChunks().forEach(link -> {
-											Chunk ck = StateUtil.getTempChunk(link);
-											ck.setType(type);
-											ck.setChanged(time);
-											ck.save();
-											Print.log(StateLogger.player(player) + " set the type of linked " + StateLogger.chunk(ck) + " to PUBLIC.");
-										});
-										chunk.save();
-										Print.chat(sender, "&2Chunk set to &cPUBLIC&2!");
-										Print.chat(sender, "&2It is still yours, but anyone can edit blocks.");
-										Print.log(StateLogger.player(player) + " set the type of " + StateLogger.chunk(chunk) + " to PUBLIC.");
-										break;
-									}
-									default:{
-										Print.chat(sender, "&4Invalid chunk type, this actually shouldn't happen.");
-										break;
-									}
-								}
-							}
-							break;
-						}
-						case "owner":{
-							Print.chat(sender, "&2If you want to give the chunk to a player or company, use the &7/ck set-for-sale &2command instead.");
-							Print.chat(sender, "&2If you want to give the chunk to the district, municipality or state, use the &7/ck set type &2command.");
-							Print.chat(sender, "&c&oGiving the chunk to the district, municipality or state does not give you money, and removes you from ownership!");
-							break;
-						}
-						case "whitelist":{
-							Print.chat(sender, "&2Please use the &7/ck whitelist &2command instead!");
-							break;
-						}
-						case "force-loaded":{
-							if(args.length < 3){
-								Print.chat(sender, "&9Missing argument.");
-								Print.chat(sender, "&7/ck set force-loaded true");
-								Print.chat(sender, "&7/ck set force-loaded false");
-								return;
-							}
-							if(chunk.getMunicipality().r_FORCE_LOAD_CHUNKS.isAuthorized(chunk.getMunicipality(), playerdata.getUUID()).isTrue()){
-								if(chunk.getMunicipality().getAccount().getBalance() < StConfig.LOADED_CHUNKS_TAX){
-									Print.chat(sender, "Not enough money to pay the tax.");
-									return;
-								}
-								boolean bool = Boolean.parseBoolean(args[2]);
-								chunk.getMunicipality().modifyForceloadedChunk(player, chunk.getChunkPos(), bool);
-								Print.log(StateLogger.player(player) + " " + (bool ? "enabled" : "disabled") + " chunk force-loading at " + StateLogger.chunk(chunk) + ", in the District of " + StateLogger.district(chunk.getDistrict()) + ", which is in " + StateLogger.municipality(chunk.getMunicipality()) + ".");
-								//
-								Bank bank = chunk.getMunicipality().getBank();
-								bank.processAction(Bank.Action.TRANSFER, Static.getServer(), chunk.getMunicipality().getAccount(), StConfig.LOADED_CHUNKS_TAX, States.SERVERACCOUNT);
-								return;
-							}
-							break;
-						}
-						case "custom-tax":{
-							if(args.length < 3){
-								Print.chat(sender, "&9Missing argument!");
-								Print.chat(sender, "&7/ck set custom-tax <amount>");
-								Print.chat(sender, "&7/ck set custom-tax reset/disable");
-								return;
-							}
-							if(chunk.getDistrict().isAuthorized(chunk.getDistrict().r_SET_CUSTOM_CHUNKTAX.id, playerdata.getUUID()).isTrue()){
-								if(args[2].equals("reset") || args[2].equals("disable")){
-									chunk.setCustomTax(0); chunk.save();
-									Print.chat(sender, "&9Chunk's Custom Tax was reset!");
-								}
-								else if(NumberUtils.isCreatable(args[2])){
-									chunk.setCustomTax(Long.parseLong(args[2])); chunk.save();
-									Print.chat(sender, "&9Chunk's Custom Tax was set! (" + ggas(chunk.getCustomTax()) + ")");
-								}
-								else{
-									Print.chat(sender, "Not a (valid) number.");
-								}
-							}
-							break;
-						}
-						case "help":
-						default:{
-							Print.chat(sender, "&9Available options:");
-							Print.chat(sender, "&7district, price, link, type, owner, whitelist");
-							Print.chat(sender, "&7force-loaded, custom-tax");
-							break;
-						}
 					}
 				}
 				return;
+			}
+			case "force-loade":{
+				if(!isPermitted(chunk, player)) return;
+				if(args.length < 2){
+					Print.chat(sender, "&9Missing argument.");
+					Print.chat(sender, "&7/ck force-load true");
+					Print.chat(sender, "&7/ck force-load false");
+					return;
+				}
+				if(chunk.getMunicipality().r_FORCE_LOAD_CHUNKS.isAuthorized(chunk.getMunicipality(), playerdata.getUUID()).isTrue()){
+					if(chunk.getMunicipality().getAccount().getBalance() < StConfig.LOADED_CHUNKS_TAX){
+						Print.chat(sender, "Not enough money to pay the tax.");
+						return;
+					}
+					boolean bool = Boolean.parseBoolean(args[1]);
+					chunk.getMunicipality().modifyForceloadedChunk(player, chunk.getChunkPos(), bool);
+					Print.log(StateLogger.player(player) + " " + (bool ? "enabled" : "disabled") + " chunk force-loading at " + StateLogger.chunk(chunk) + ", in the District of " + StateLogger.district(chunk.getDistrict()) + ", which is in " + StateLogger.municipality(chunk.getMunicipality()) + ".");
+					//
+					Bank bank = chunk.getMunicipality().getBank();
+					bank.processAction(Bank.Action.TRANSFER, Static.getServer(), chunk.getMunicipality().getAccount(), StConfig.LOADED_CHUNKS_TAX, States.SERVERACCOUNT);
+					return;
+				}
+				break;
 			}
 			case "link":{
 				if(isOwner(chunk, player)){

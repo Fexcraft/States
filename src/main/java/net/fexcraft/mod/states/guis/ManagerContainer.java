@@ -18,6 +18,7 @@ import net.fexcraft.lib.mc.utils.Print;
 import net.fexcraft.lib.mc.utils.Static;
 import net.fexcraft.mod.fsmm.util.Config;
 import net.fexcraft.mod.states.data.Chunk;
+import net.fexcraft.mod.states.data.ChunkPos;
 import net.fexcraft.mod.states.data.ChunkType;
 import net.fexcraft.mod.states.data.District;
 import net.fexcraft.mod.states.data.DistrictType;
@@ -72,9 +73,9 @@ public class ManagerContainer extends GenericContainer {
 		cap = player.getCapability(StatesCapabilities.PLAYER, null);
 		switch(layer){
 			case CHUNK:
-				if(mode == Mode.CKINFO){
-					mode = Mode.INFO;
-					chunk = StateUtil.getTempChunk(x, z);
+				if(mode != Mode.INFO){
+					if(mode == Mode.CKINFO) mode = Mode.INFO;
+					chunk = StateUtil.getTempChunk(y, z);
 				}
 				break;
 			case COMPANY:
@@ -206,6 +207,7 @@ public class ManagerContainer extends GenericContainer {
 				addKey(list, "last_taxcoll", time(chunk.lastTaxCollection()), ViewMode.NONE);
 				addKey(list, "linked_chunks", chunk.getLinkedChunks().size() > 0 ? chunk.getLinkedChunks().size() : NONE, ViewMode.LIST);
 				addKey(list, "linked_to", chunk.getLink() == null ? NOTHING : chunk.getLink().x + ", " + chunk.getLink().z, ViewMode.GOTO);
+				addKey(list, "whitelist", chunk.getPlayerWhitelist().size(), ViewMode.LIST);
 				addKey(list, "claimed_by", Static.getPlayerNameByUUID(chunk.getClaimer()), ViewMode.NONE);
 				addKey(list, "claimed_at", time(chunk.getCreated()), ViewMode.NONE);
 				if(chunk.getDistrict().getId() == -2){
@@ -961,8 +963,119 @@ public class ManagerContainer extends GenericContainer {
 									break;
 								}
 								case "price":{
-									
+									if(isPermitted(chunk, player)){
+										try{
+											Long price = Long.parseLong(value);
+											chunk.setPrice(price);
+											chunk.setChanged(Time.getDate());
+											chunk.save();
+											sendViewData();
+											Print.log(StateLogger.player(player) + " set the price of the " + StateLogger.chunk(chunk) + " to " + chunk.getPrice() + ".");
+										}
+										catch(Exception e){
+											sendStatus("&9Error: &7" + e.getMessage());
+										}
+									}
 									break;
+								}
+								case "tax":{
+									if(chunk.getDistrict().isAuthorized(chunk.getDistrict().r_SET_CUSTOM_CHUNKTAX.id, cap.getUUID()).isTrue()){
+										if(value.equals("reset") || value.equals("disable")){
+											chunk.setCustomTax(0);
+											chunk.save();
+											sendViewData();
+											Print.log(StateLogger.player(player) + " reset the custom-tax of " + StateLogger.chunk(chunk) + ".");
+										}
+										else if(NumberUtils.isCreatable(value)){
+											chunk.setCustomTax(Long.parseLong(value));
+											chunk.save();
+											sendViewData();
+											Print.log(StateLogger.player(player) + " set the custom-tax of " + StateLogger.chunk(chunk) + " to " + chunk.getCustomTax() + ".");
+										}
+										else{
+											sendStatus("states.manager_gui.view.not_number");
+										}
+									}
+									break;
+								}
+								case "type":{
+									if(isPermitted(chunk, player)){
+										ChunkType type = ChunkType.get(value.toUpperCase());
+										if(type == null){
+											sendStatus("states.manager_gui.view_chunk.type.not_found0");
+											Print.chat(player, translate("states.manager_gui.view_chunk.type.not_found1"));
+										}
+										else{
+											long time = Time.getDate();
+											switch(type){
+												case COMPANY:{
+													sendStatus("states.manager_gui.view_chunk.type.sale_only");
+													break;
+												}
+												case STATEOWNED:
+												case MUNICIPAL:
+												case DISTRICT:
+												case NORMAL:{
+													String to = type == ChunkType.NORMAL || type == ChunkType.DISTRICT ? "District" : type == ChunkType.MUNICIPAL ? "Municipality" : type == ChunkType.STATEOWNED ? "State" : "ERROR";
+													chunk.setType(type);
+													chunk.setOwner(null);
+													chunk.setPrice(0);
+													chunk.setChanged(time);
+													chunk.getLinkedChunks().forEach(link -> {
+														Chunk ck = StateUtil.getTempChunk(link);
+														ck.setType(type);
+														ck.setOwner(null);
+														ck.setPrice(0);
+														ck.setChanged(time);
+														ck.save();
+														Print.log(StateLogger.player(player) + " gave the linked " + StateLogger.chunk(ck) + " to the " + to + ".");
+													});
+													chunk.save();
+													sendViewData();
+													Print.log(StateLogger.player(player) + " gave the  " + StateLogger.chunk(chunk) + " to the " + to + ".");
+													break;
+												}
+												case PRIVATE:{
+													sendStatus("states.manager_gui.view_chunk.type.sale_only");
+													break;
+												}
+												case PUBLIC:{
+													chunk.setType(type);
+													chunk.setChanged(time);
+													chunk.getLinkedChunks().forEach(link -> {
+														Chunk ck = StateUtil.getTempChunk(link);
+														ck.setType(type);
+														ck.setChanged(time);
+														ck.save();
+														Print.log(StateLogger.player(player) + " set the type of linked " + StateLogger.chunk(ck) + " to PUBLIC.");
+													});
+													chunk.save();
+													sendViewData();
+													Print.chat(player, translate("states.manager_gui.view_chunk.type.public0"));
+													Print.chat(player, translate("states.manager_gui.view_chunk.type.public1"));
+													Print.log(StateLogger.player(player) + " set the type of " + StateLogger.chunk(chunk) + " to PUBLIC.");
+													break;
+												}
+												default:{
+													sendStatus("ERROR:INVALID_REQUEST_TYPE");
+													break;
+												}
+											}
+										}
+									}
+									break;
+								}
+								case "linked_chunks":{
+									openGui(Layer.CHUNK, Mode.LIST_COMPONENTS, chunk.xCoord(), chunk.zCoord());
+									break;
+								}
+								case "linked_to":{
+									if(chunk.getLink() == null) return;
+									openGui(Layer.CHUNK, Mode.CKINFO, chunk.getLink().x, chunk.getLink().z);
+									break;
+								}
+								case "whitelist":{
+									openGui(Layer.CHUNK, Mode.LIST_BWLIST, chunk.xCoord(), chunk.zCoord());
 								}
 							}
 							break;
@@ -979,6 +1092,10 @@ public class ManagerContainer extends GenericContainer {
 
 	private void openGui(Layer layer, Mode mode, int id){
 		GuiHandler.openGui(player, layer.ordinal() + 2, mode.ordinal(), id, 0);
+	}
+
+	private void openGui(Layer layer, Mode mode, int x, int z){
+		GuiHandler.openGui(player, layer.ordinal() + 2, mode.ordinal(), x, z);
 	}
 
 	private void sendStatus(String reason){
@@ -1079,6 +1196,42 @@ public class ManagerContainer extends GenericContainer {
 			list.addAll(mun.getCitizen());
 		}
 		return list;
+	}
+	
+	private boolean isPermitted(Chunk chunk, EntityPlayer player){
+		if(chunk.getLink() != null){
+			ChunkPos link = chunk.getLink();
+			Print.chat(player, translate("states.manager_gui.perm_chunk.linked0", link.x, link.z));
+			Print.chat(player, translate("states.manager_gui.perm_chunk.linked1"));
+			Print.chat(player, translate("states.manager_gui.perm_chunk.linked2"));
+			return false;
+		}
+		if(bypass(player)){
+			Print.chat(player, translate("states.manager_gui.perm_admin.bypass"));
+			return true;
+		}
+		boolean result = false;
+		UUID uuid = player.getGameProfile().getId();
+		boolean isco = chunk.getOwner().equals(uuid.toString());
+		boolean ismn = chunk.getDistrict().getHead() != null && chunk.getDistrict().getHead().equals(uuid);
+		boolean ismy = chunk.getMunicipality().getHead() != null && chunk.getMunicipality().getHead().equals(uuid);
+		boolean isst = chunk.getState().getCouncil().contains(uuid) || (chunk.getState().getHead() != null && chunk.getState().getHead().equals(uuid));
+		boolean iscm = false;//TODO companies
+		Print.debug(isco, ismn, ismy, isst, iscm);
+		switch(chunk.getType()){
+			case COMPANY: result = iscm || isst; break;
+			case DISTRICT: result = ismn || ismy || isst; break;
+			case MUNICIPAL: result = ismy || isst; break;
+			case NORMAL: result = ismn || ismy || isst; break;
+			case PRIVATE: result = isco || ismy || isst; break;
+			case PUBLIC: result = ismn || ismy || isst; break;
+			case STATEOWNED: result = isst; break;
+			default: result = false; break;
+		}
+		if(!result){
+			sendStatus(null);
+		}
+		return result;
 	}
 
 }

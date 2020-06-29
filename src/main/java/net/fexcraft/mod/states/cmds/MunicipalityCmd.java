@@ -460,7 +460,7 @@ public class MunicipalityCmd extends CommandBase {
 					return;
 				}
 				if(ply.getState().getId() > 0 && !ply.getState().isAuthorized(ply.getState().r_CREATE_MUNICIPALITY.id, ply.getUUID()).isTrue()){
-					Print.chat(sender, "&cYour State does not allow you to createa a new Municipality.");
+					Print.chat(sender, "&cYour State does not allow you to create a new Municipality.");
 					return;
 				}
 				if(ply.getMunicipality().getId() >= 0){

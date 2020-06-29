@@ -272,9 +272,10 @@ public class StateUtil extends TimerTask {
 
 	public static boolean bypass(EntityPlayer player){
 		if(isAdmin(player)){
-			Print.chat(player, "&7&oAdmin bypass mode.");
+			Print.chat(player, translate("states.manager_gui.perm_admin.bypass"));
 			return true;
-		} else return false;
+		}
+		else return false;
 	}
 	
 	// --- /// --- //

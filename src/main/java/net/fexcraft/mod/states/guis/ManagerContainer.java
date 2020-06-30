@@ -1137,7 +1137,11 @@ public class ManagerContainer extends GenericContainer {
 		CKINFO;//to detect if a local chunk is opened or remote
 
 		public int entries(){
-			return this != INFO ? 10 : 12;
+			return this.isInfo() ? 12 : 10;
+		}
+
+		boolean isInfo(){
+			return this == INFO || this == CKINFO;
 		}
 		
 	}

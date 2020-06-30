@@ -2,6 +2,7 @@ package net.fexcraft.mod.states.guis;
 
 import net.fexcraft.lib.mc.gui.GenericGui;
 import net.fexcraft.lib.mc.utils.Formatter;
+import net.fexcraft.mod.states.guis.ManagerContainer.Layer;
 import net.fexcraft.mod.states.guis.ManagerContainer.Mode;
 import net.fexcraft.mod.states.guis.ManagerContainer.ViewMode;
 import net.minecraft.block.material.MapColor;
@@ -29,31 +30,17 @@ public class ManagerGui extends GenericGui<ManagerContainer> {
 
 	@Override
 	protected void init(){
-		switch(container.mode){
-			case INFO:
-			case CKINFO:
-				xSize = 256;
-				ySize = 217;
-				texloc = VIEW;
-				break;
-			case LIST_COMPONENTS:
-			case LIST_NEIGHBORS:
-				xSize = 224;
-				ySize = 184;
-				texloc = LIST;
-				break;
-			case LIST_CITIZENS:
-			case LIST_COUNCIL:
-			case LIST_BWLIST:
-				xSize = 224;
-				ySize = 200;
-				texloc = EDITLIST;
-				break;
-			default:
-				xSize = 0;
-				ySize = 0;
-				texloc = STONE;
-				break;
+		if(container.mode.isInfo()){
+			xSize = 256;
+			ySize = 217;
+			texloc = VIEW;
+		}
+		else{
+			boolean normal = container.mode == Mode.LIST_NEIGHBORS;
+			if(container.mode == Mode.LIST_COMPONENTS && container.layer == Layer.MUNICIPALITY) normal = true;
+			xSize = 224;
+			ySize = normal ? 184 : 200;
+			texloc = normal ? LIST : EDITLIST;
 		}
         this.guiLeft = (this.width - this.xSize) / 2;
         this.guiTop = (this.height - this.ySize) / 2;

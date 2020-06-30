@@ -19,6 +19,7 @@ public class ManagerGui extends GenericGui<ManagerContainer> {
 	public static final ResourceLocation VIEW = new ResourceLocation("states:textures/gui/manager_view.png");
 	public static final ResourceLocation EDITLIST = new ResourceLocation("states:textures/gui/manager_list_editable.png");
 	public static int texcol = MapColor.SNOW.colorValue;
+	private boolean normallist;
 	private int scroll;
 
 	public ManagerGui(EntityPlayer player, int layer, int x, int y, int z){
@@ -36,11 +37,12 @@ public class ManagerGui extends GenericGui<ManagerContainer> {
 			texloc = VIEW;
 		}
 		else{
-			boolean normal = container.mode == Mode.LIST_NEIGHBORS;
-			if(container.mode == Mode.LIST_COMPONENTS && container.layer == Layer.MUNICIPALITY) normal = true;
+			normallist = container.mode == Mode.LIST_NEIGHBORS;
+			if(container.mode == Mode.LIST_COMPONENTS && container.layer == Layer.MUNICIPALITY) normallist = true;
+			if(container.mode == Mode.LIST_CITIZENS && container.layer == Layer.STATE) normallist = true;
 			xSize = 224;
-			ySize = normal ? 184 : 200;
-			texloc = normal ? LIST : EDITLIST;
+			ySize = normallist ? 184 : 200;
+			texloc = normallist ? LIST : EDITLIST;
 		}
         this.guiLeft = (this.width - this.xSize) / 2;
         this.guiTop = (this.height - this.ySize) / 2;
@@ -49,29 +51,45 @@ public class ManagerGui extends GenericGui<ManagerContainer> {
         fields.clear();
         //
         texts.put("title", new BasicText(guiLeft + 8, guiTop + 8, 196, texcol, ""));
-        switch(container.mode){
-			case INFO:
-				buttons.put("su", new BasicButton("scroll_up", guiLeft + 239, guiTop + 21, 239, 21, 11, 13, true));
-				buttons.put("sd", new BasicButton("scroll_down", guiLeft + 239, guiTop + 198, 239, 198, 11, 13, true));
-				for(int i = 0; i < container.mode.entries(); i++){
-					int offset = i * 16;
-					buttons.put("mode" + i, new BasicButton("mode" + i, guiLeft + 225, guiTop + 23 + offset, 225, 23, 10, 10, true));
-					texts.put("key" + i, new BasicText(guiLeft + 9, guiTop + 24 + offset, 109, texcol, ""));
-					TextField field = new TextField(i, fontRenderer, guiLeft + 125, guiTop + 24 + offset, 96, 8);
-					field.setEnableBackgroundDrawing(false);
-					field.setEnabled(false);
-					field.setTextColor(texcol);
-					field.setDisabledTextColour(texcol);
-					fields.put("field" + i, field);
+        if(container.mode.isInfo()){
+			buttons.put("su", new BasicButton("scroll_up", guiLeft + 239, guiTop + 21, 239, 21, 11, 13, true));
+			buttons.put("sd", new BasicButton("scroll_down", guiLeft + 239, guiTop + 198, 239, 198, 11, 13, true));
+			for(int i = 0; i < container.mode.entries(); i++){
+				int offset = i * 16;
+				buttons.put("mode" + i, new BasicButton("mode" + i, guiLeft + 225, guiTop + 23 + offset, 225, 23, 10, 10, true));
+				texts.put("key" + i, new BasicText(guiLeft + 9, guiTop + 24 + offset, 109, texcol, ""));
+				TextField field = new TextField(i, fontRenderer, guiLeft + 125, guiTop + 24 + offset, 96, 8);
+				field.setEnableBackgroundDrawing(false);
+				field.setEnabled(false);
+				field.setTextColor(texcol);
+				field.setDisabledTextColour(texcol);
+				fields.put("field" + i, field);
+			}
+        }
+        else{
+			buttons.put("su", new BasicButton("scroll_up", guiLeft + 204, guiTop + 36, 204, 36, 14, 14, true));
+			buttons.put("sd", new BasicButton("scroll_down", guiLeft + 204, guiTop + (normallist ? 164 : 180), 204, (normallist ? 164 : 180), 14, 14, true));
+			buttons.put(normallist ? "home" : "add", new BasicButton(normallist ? "home" : "add", guiLeft + 204, guiTop + 20, 204, 20, 14, 14, true));
+			int texoff = normallist ? 23 : 39;
+			for(int i = 0; i < 10; i++){
+				TextField field = new TextField(i, fontRenderer, guiLeft + 10, guiTop + texoff + (i * 16), 188, 8);
+				field.setEnableBackgroundDrawing(false);
+				field.setEnabled(false);
+				field.setTextColor(texcol);
+				field.setDisabledTextColour(texcol);
+				fields.put("field" + i, field);
+			}
+			if(!normallist){
+				TextField field = new TextField(10, fontRenderer, guiLeft + 10, guiTop + 23, 188, 8);
+				field.setEnableBackgroundDrawing(false);
+				field.setEnabled(true);
+				field.setTextColor(texcol);
+				fields.put("add", field);
+				//
+				for(int i = 0; i < 10; i++){
+					buttons.put("rem" + i, new BasicButton("rem" + i, guiLeft + 191, guiTop + 39 + (i * 16), 191, 39, 8, 8, true));
 				}
-				break;
-			case LIST_COMPONENTS:
-				break;
-			case LIST_CITIZENS:
-				break;
-			case LIST_COUNCIL:
-				break;
-			default: return;
+        	}
         }
 		NBTTagCompound packet = new NBTTagCompound();
 		packet.setString("cargo", "init");
@@ -128,10 +146,15 @@ public class ManagerGui extends GenericGui<ManagerContainer> {
 		for(int j = 0; j < container.mode.entries(); j++){
 			int i = j + scroll;
 			if(i >= container.keys.length) break;
-			texts.get("key" + j).string = I18n.format("states.manager_gui.view_" + layerid + "." + container.keys[i]);
+			if(container.mode.isInfo()){
+				texts.get("key" + j).string = I18n.format("states.manager_gui.view_" + layerid + "." + container.keys[i]);
+			}
+			else{
+				fields.get("field" + j).setText(container.keys[i]);
+			}
 			if(container.mode == Mode.INFO){
 				TextField field = fields.get("field" + j);
-				switch(container.view_values[i]){
+				switch(container.values[i]){
 					case ManagerContainer.NOONE:{
 						field.setText(I18n.format("states.manager_gui.view.no_one"));
 						break;
@@ -157,11 +180,11 @@ public class ManagerGui extends GenericGui<ManagerContainer> {
 						break;
 					}
 					default:{
-						field.setText(container.view_values[i]);
+						field.setText(container.values[i]);
 						break;
 					}
 				}
-				if(container.view_values[i].startsWith("#") && container.keys[i].equals("color")){
+				if(container.values[i].startsWith("#") && container.keys[i].equals("color")){
 					field.setTextColor(Integer.parseInt(field.getText().replace("#", ""), 16));
 				}
 				else field.setTextColor(texcol);

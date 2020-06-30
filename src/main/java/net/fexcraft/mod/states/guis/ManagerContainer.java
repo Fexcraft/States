@@ -36,6 +36,7 @@ import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
 import net.minecraft.nbt.NBTTagString;
+import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.fml.relauncher.Side;
 
 public class ManagerContainer extends GenericContainer {
@@ -59,8 +60,7 @@ public class ManagerContainer extends GenericContainer {
 	//
 	protected String layer_title;
 	protected String[] keys = new String[0];
-	//
-	protected String[] view_values;
+	protected String[] values;
 	protected ViewMode[] view_modes;
 
 	public ManagerContainer(EntityPlayer player, int layerid, int x, int y, int z){
@@ -104,7 +104,7 @@ public class ManagerContainer extends GenericContainer {
 	private void sendViewData(){
 		NBTTagCompound packet = new NBTTagCompound();
 		packet.setString("cargo", "init");
-		packet.setString("layer_title", getLayerTitle());
+		packet.setString("layer_title", getLayerInfoTitle());
 		NBTTagList list = new NBTTagList();
 		switch(layer){
 			case DISTRICT:
@@ -232,6 +232,88 @@ public class ManagerContainer extends GenericContainer {
 		list.appendTag(new NBTTagString(key + ";" + value.toString() + ";" + mode.ordinal()));
 	}
 	
+	public void sendListData(){
+		NBTTagCompound packet = new NBTTagCompound();
+		packet.setString("cargo", "init");
+		packet.setString("layer_title", getLayerListTitle());
+		NBTTagList list = new NBTTagList();
+		switch(mode){
+			case LIST_BWLIST:
+				if(layer.isChunk()){
+					for(UUID uuid : chunk.getPlayerWhitelist()) addKey(list, uuid);
+				}
+				if(layer.isMunicipality()){
+					for(UUID uuid : mun.getPlayerBlacklist()) addKey(list, uuid);
+				}
+				if(layer.isState()){
+					for(int id : state.getBlacklist()) addKey(list, id);
+				}
+				break;
+			case LIST_CITIZENS:
+				if(layer.isMunicipality()){
+					for(UUID uuid : mun.getCitizen()) addKey(list, uuid);
+				}
+				if(layer.isState()){
+					ArrayList<UUID> citizen = getCitizens(state);
+					for(UUID uuid : citizen) addKey(list, uuid);
+				}
+				break;
+			case LIST_COMPONENTS:
+				if(layer.isChunk()){
+					for(ResourceLocation pos : chunk.getLinkedChunks()){
+						addKey(list, pos.getNamespace() + ", " + pos.getPath());
+					}
+				}
+				if(layer.isMunicipality()){
+					for(int id : mun.getDistricts()){
+						addKey(list, id);//TODO grab name from cache
+					}
+				}
+				if(layer.isState()){
+					for(int id : state.getMunicipalities()){
+						addKey(list, id);//TODO grab name from cache
+					}
+				}
+				break;
+			case LIST_COUNCIL:
+				if(layer.isMunicipality()){
+					for(UUID uuid : mun.getCouncil()) addKey(list, uuid);
+				}
+				if(layer.isState()){
+					for(UUID uuid : state.getCouncil()) addKey(list, uuid);
+				}
+				break;
+			case LIST_NEIGHBORS:
+				if(layer.isDistrict()){
+					for(int id : dis.getNeighbors()){
+						addKey(list, id);//TODO grab name from cache
+					}
+				}
+				if(layer.isMunicipality()){
+					for(int id : mun.getNeighbors()){
+						addKey(list, id);//TODO grab name from cache
+					}
+				}
+				if(layer.isState()){
+					for(int id : state.getNeighbors()){
+						addKey(list, id);//TODO grab name from cache
+					}
+				}
+				break;
+			default: return;
+		}
+		readInit(list);
+		packet.setTag("keys", list);
+		this.send(Side.CLIENT, packet);
+	}
+
+	private void addKey(NBTTagList list, Object key){
+		if(key instanceof UUID){
+			key = Static.getPlayerNameByUUID((UUID)key);
+		}
+		list.appendTag(new NBTTagString(key.toString()));
+	}
+	
 	public static final String ggas(long value){
 		return Config.getWorthAsString(value, false);
 	}
@@ -260,21 +342,11 @@ public class ManagerContainer extends GenericContainer {
 		else{
 			switch(packet.getString("cargo")){
 				case "init":{
-					switch(mode){
-						case INFO:
-							sendViewData();
-							break;
-						case LIST_COMPONENTS:
-							//
-							break;
-						case LIST_CITIZENS:
-							//
-							break;
-						case LIST_COUNCIL:
-							//
-							break;
-						default:
-							break;
+					if(mode.isInfo()){
+						sendViewData();
+					}
+					else{
+						sendListData();
 					}
 					break;
 				}
@@ -1109,16 +1181,17 @@ public class ManagerContainer extends GenericContainer {
 	private void readInit(NBTTagList list){
 		keys = new String[list.tagCount()];
 		if(mode == Mode.INFO){
-			view_values = new String[list.tagCount()];
+			values = new String[list.tagCount()];
 			view_modes = new ViewMode[list.tagCount()];
 		}
 		for(int i = 0; i < list.tagCount(); i++){
-			String[] arr = list.getStringTagAt(i).split(";");
-			keys[i] = arr[0];
 			if(mode == Mode.INFO){
-				view_values[i] = arr[1];
+				String[] arr = list.getStringTagAt(i).split(";");
+				keys[i] = arr[0];
+				values[i] = arr[1];
 				view_modes[i] = ViewMode.values()[Integer.parseInt(arr[2])];
 			}
+			else keys[i] = list.getStringTagAt(i);
 		}
 	}
 
@@ -1156,6 +1229,26 @@ public class ManagerContainer extends GenericContainer {
 		PLAYERDATA,
 		CHUNK,
 		PROPERTY;
+
+		boolean isChunk(){
+			return this == CHUNK;
+		}
+
+		boolean isDistrict(){
+			return this == DISTRICT;
+		}
+
+		boolean isMunicipality(){
+			return this == MUNICIPALITY;
+		}
+
+		boolean isState(){
+			return this == STATE;
+		}
+
+		boolean isPlayer(){
+			return this == PLAYERDATA;
+		}
 		
 	}
 	
@@ -1170,7 +1263,7 @@ public class ManagerContainer extends GenericContainer {
 		
 	}
 
-	public String getLayerTitle(){
+	public String getLayerInfoTitle(){
 		switch(layer){
 			case CHUNK:
 				return chunk.xCoord() + ", " + chunk.zCoord();
@@ -1191,6 +1284,29 @@ public class ManagerContainer extends GenericContainer {
 			default:
 				return "NONE";
 		}
+	}
+
+	public String getLayerListTitle(){
+		switch(mode){
+			case LIST_BWLIST:
+				if(layer.isChunk()) return translate("states.manager_gui.title_whitelist");
+				if(layer.isMunicipality()) return translate("states.manager_gui.title_blacklist");
+				if(layer.isState()) return translate("states.manager_gui.title_blacklist");
+				break;
+			case LIST_CITIZENS:
+				return translate("states.manager_gui.title_citizens");
+			case LIST_COMPONENTS:
+				if(layer.isChunk()) return translate("states.manager_gui.title_links");
+				if(layer.isMunicipality()) return translate("states.manager_gui.title_ditricts");
+				if(layer.isState()) return translate("states.manager_gui.title_municipalities");
+				break;
+			case LIST_COUNCIL:
+				return translate("states.manager_gui.title_council");
+			case LIST_NEIGHBORS:
+				return translate("states.manager_gui.title_neighbors");
+			default: break;
+		}
+		return "INVALID_TYPE";
 	}
 
 	private ArrayList<UUID> getCitizens(State state){

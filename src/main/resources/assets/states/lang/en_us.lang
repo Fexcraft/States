@@ -44,6 +44,15 @@ states.manager_gui.title_state=State: %s
 states.manager_gui.title_playerdata=%s
 states.manager_gui.title_chunk=Chunk %s
 //
+states.manager_gui.title_municipalities=Municipalities
+states.manager_gui.title_neighbors=Neighbors
+states.manager_gui.title_whitelist=WhiteList
+states.manager_gui.title_blacklist=BlackList
+states.manager_gui.title_citizens=Citizens
+states.manager_gui.title_ditricts=Ditricts
+states.manager_gui.title_council=Council
+states.manager_gui.title_links=Links
+//
 states.manager_gui.perm_admin.bypass=&7&oAdmin bypass mode.
 states.manager_gui.perm_chunk.linked0=&7Chunk is linked to a chunk at &2%sx&7, &2%sz&7.
 states.manager_gui.perm_chunk.linked1=&7Please make changes to that chunk, they will be copied to this one.
@@ -163,3 +172,5 @@ states.manager_gui.view_chunk.claimed_by=Claimbed By
 states.manager_gui.view_chunk.claimed_at=Created/Claimed
 states.manager_gui.view_chunk.transit=Transit Zone
 states.manager_gui.view_chunk.forceloaded=Force Loaded
+//
+states.manager_gui.list_district_

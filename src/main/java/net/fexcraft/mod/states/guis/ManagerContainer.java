@@ -1076,6 +1076,7 @@ public class ManagerContainer extends GenericContainer {
 								}
 								case "whitelist":{
 									openGui(Layer.CHUNK, Mode.LIST_BWLIST, chunk.xCoord(), chunk.zCoord());
+									break;
 								}
 							}
 							break;

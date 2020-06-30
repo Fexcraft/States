@@ -30,6 +30,7 @@ public class ChunkEvents {
     @SubscribeEvent
     public static void onLoad(ChunkEvent.Load event){
 		if(!LOADED){
+			if(event.getWorld().isRemote) return;
 			if(!event.getWorld().isRemote && !FSMM.isDataManagerLoaded()){
 				FSMM.loadDataManager();
 			}

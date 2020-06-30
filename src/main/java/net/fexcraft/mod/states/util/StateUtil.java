@@ -6,9 +6,12 @@ import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.TimerTask;
+import java.util.TreeMap;
 import java.util.UUID;
 
 import javax.annotation.Nullable;
+
+import org.apache.commons.lang3.math.NumberUtils;
 
 import com.google.common.collect.ImmutableList;
 import com.google.gson.JsonElement;
@@ -403,6 +406,50 @@ public class StateUtil extends TimerTask {
 			str = str.replace("$" + i, format[i].toString());
 		}
 		return str;
+	}
+	
+	//
+	
+	public static TreeMap<Integer, String> NAMECACHE_STATE = new TreeMap<>();
+	public static TreeMap<Integer, String> NAMECACHE_MUNICIPALITY = new TreeMap<>();
+	public static TreeMap<Integer, String> NAMECACHE_DISTRICT = new TreeMap<>();
+	
+	public static String getStateName(int id){
+		State state = States.STATES.get(id);
+		return state == null ? NAMECACHE_STATE.get(id) : state.getName();
+	}
+	
+	public static String getMunicipalityName(int id){
+		Municipality mun = States.MUNICIPALITIES.get(id);
+		return mun == null ? NAMECACHE_MUNICIPALITY.get(id) : mun.getName();
+	}
+	
+	public static String getDistrictName(int id){
+		District dis = States.DISTRICTS.get(id);
+		return dis == null ? NAMECACHE_DISTRICT.get(id) : dis.getName();
+	}
+	
+	public static final void loadNameCache(){
+		new Thread("STATES_NAME_CACHE_COLLECTOR"){
+			
+			@Override
+			public void run(){
+				search(NAMECACHE_STATE, new File(States.getSaveDirectory(), "states/"));
+				search(NAMECACHE_MUNICIPALITY, new File(States.getSaveDirectory(), "municipalitites/"));
+				search(NAMECACHE_DISTRICT, new File(States.getSaveDirectory(), "districts/"));
+			}
+			
+			private void search(TreeMap<Integer, String> map, File folder){
+				JsonObject obj = null;
+				for(File file : folder.listFiles()){
+					if(NumberUtils.isCreatable(file.getName().replace(".json", ""))){
+						obj = JsonUtil.get(file);
+						map.put(obj.get("id").getAsInt(), obj.get("name").getAsString());
+					}
+				}
+			}
+			
+		}.start();
 	}
 
 }

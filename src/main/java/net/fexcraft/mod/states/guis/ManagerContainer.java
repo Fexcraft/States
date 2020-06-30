@@ -266,12 +266,12 @@ public class ManagerContainer extends GenericContainer {
 				}
 				if(layer.isMunicipality()){
 					for(int id : mun.getDistricts()){
-						addKey(list, id);//TODO grab name from cache
+						addKey(list, StateUtil.getDistrictName(id));
 					}
 				}
 				if(layer.isState()){
 					for(int id : state.getMunicipalities()){
-						addKey(list, id);//TODO grab name from cache
+						addKey(list, StateUtil.getMunicipalityName(id));
 					}
 				}
 				break;
@@ -286,17 +286,17 @@ public class ManagerContainer extends GenericContainer {
 			case LIST_NEIGHBORS:
 				if(layer.isDistrict()){
 					for(int id : dis.getNeighbors()){
-						addKey(list, id);//TODO grab name from cache
+						addKey(list, StateUtil.getDistrictName(id));
 					}
 				}
 				if(layer.isMunicipality()){
 					for(int id : mun.getNeighbors()){
-						addKey(list, id);//TODO grab name from cache
+						addKey(list, StateUtil.getMunicipalityName(id));
 					}
 				}
 				if(layer.isState()){
 					for(int id : state.getNeighbors()){
-						addKey(list, id);//TODO grab name from cache
+						addKey(list, StateUtil.getStateName(id));
 					}
 				}
 				break;

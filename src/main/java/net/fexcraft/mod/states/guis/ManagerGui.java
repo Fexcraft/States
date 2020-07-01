@@ -173,6 +173,7 @@ public class ManagerGui extends GenericGui<ManagerContainer> {
 			else{
 				packet.setString("input", fields.get("add").getText());
 			}
+			fields.get("add").setText("");
 			container.send(Side.SERVER, packet);
 			return true;
 		}

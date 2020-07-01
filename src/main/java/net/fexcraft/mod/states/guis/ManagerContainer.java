@@ -1235,9 +1235,19 @@ public class ManagerContainer extends GenericContainer {
 							if(layer.isChunk()){
 								if(isOwner(chunk, player)){
 									chunk.getPlayerWhitelist().remove(list_values[index]);
+									chunk.save();
 									sendListData();
 									return;
 								}
+								//TODO handling of companies
+							}
+							if(layer.isMunicipality()){
+								if(mun.isAuthorized(mun.r_EDIT_BL.id, cap.getUUID()).isTrue() || bypass(player)){
+									mun.getPlayerBlacklist().remove(list_values[index]);
+									mun.save();
+									sendListData();
+								}
+								else sendStatus(null);
 								//TODO handling of companies
 							}
 							break;

@@ -1246,6 +1246,7 @@ public class ManagerContainer extends GenericContainer {
 									mun.getPlayerBlacklist().remove(list_values[index]);
 									mun.save();
 									sendListData();
+									Print.log(StateLogger.player(player) + " removed " + (UUID)list_values[index] + " from the blacklist of " + StateLogger.municipality(mun) + ".");
 								}
 								else sendStatus(null);
 								//TODO handling of companies
@@ -1283,6 +1284,31 @@ public class ManagerContainer extends GenericContainer {
 									sendListData();
 									return;
 								}
+							}
+							if(layer.isMunicipality()){
+								if(mun.isAuthorized(mun.r_EDIT_BL.id, cap.getUUID()).isTrue() || bypass(player)){
+									GameProfile prof = Static.getServer().getPlayerProfileCache().getGameProfileForUsername(input);
+									if(prof == null){
+										sendStatus("states.manager_gui.view.player_not_found_cache");
+										return;
+									}
+									if(mun.getCouncil().contains(prof.getId())){
+										Print.chat(player, "states.manager_gui.list_council.cannot_kick0");
+										Print.chat(player, "states.manager_gui.list_council.cannot_kick1");
+										sendStatus(null);
+										return;
+									}
+									if(mun.getPlayerBlacklist().contains(prof.getId())){
+										sendStatus("states.manager_gui.view.duplicate");
+										return;
+									}
+									mun.getPlayerBlacklist().add(prof.getId());
+									Print.log(StateLogger.player(player) + " added " + StateLogger.player(prof) + " to the blacklist of " + StateLogger.municipality(mun) + ".");
+									mun.save();
+									sendListData();
+								}
+								else sendStatus(null);
+								//TODO handling of companies
 							}
 							break;
 						case LIST_CITIZENS:

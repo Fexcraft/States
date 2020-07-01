@@ -174,4 +174,5 @@ states.manager_gui.view_chunk.claimed_at=Created/Claimed
 states.manager_gui.view_chunk.transit=Transit Zone
 states.manager_gui.view_chunk.forceloaded=Force Loaded
 //
-states.manager_gui.list_district_
+states.manager_gui.list_council.cannot_kick0=&9You can not blacklist council members!
+states.manager_gui.list_council.cannot_kick1=&cKick them from the council first!

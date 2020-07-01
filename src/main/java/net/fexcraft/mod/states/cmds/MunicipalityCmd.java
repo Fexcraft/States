@@ -67,7 +67,6 @@ public class MunicipalityCmd extends CommandBase {
 			Print.chat(sender, "&7/mun types");
 			Print.chat(sender, "&7/mun buy");
 			Print.chat(sender, "&7/mun council <args...>");
-			Print.chat(sender, "&7/mun blacklist <args...>");
 			Print.chat(sender, "&7/mun citizen");
 			Print.chat(sender, "&7/mun join");
 			Print.chat(sender, "&7/mun leave");
@@ -268,62 +267,6 @@ public class MunicipalityCmd extends CommandBase {
 						Print.log(StateLogger.player(player) + " invited " + StateLogger.player(gp) + " to the council of " + StateLogger.municipality(mun) + ".");
 						return;
 					}
-				}
-				return;
-			}
-			case "blacklist":{
-				if(args.length < 2){
-					Print.chat(sender, "&7/mun blacklist add <playername/company:id>");
-					Print.chat(sender, "&7/mun blacklist remove <playername/company:id>");
-					Print.chat(sender, "&7/mun blacklist view");
-					return;
-				}
-				if(args[1].equals("view")){
-					Print.chat(sender, "&9Blacklisted Players: &7" + mun.getPlayerBlacklist().size());
-					mun.getPlayerBlacklist().forEach(uuid -> {
-						Print.chat(sender, "&c-> &9" + Static.getPlayerNameByUUID(uuid));
-					});
-					Print.chat(sender, "&9Blacklisted Companies: &7" + mun.getCompanyBlacklist().size());
-					mun.getCompanyBlacklist().forEach(id -> {
-						Print.chat(sender, "&c-> &9" + id);
-					});//TODO
-					return;
-				}
-				if(!(mun.isAuthorized(mun.r_EDIT_BL.id, ply.getUUID()).isTrue() || StateUtil.bypass(player))){
-					Print.chat(sender, "&cNo permission!");
-					return;
-				}
-				if(args[1].equals("add") || args[1].equals("remove") || args[1].equals("rem")){
-					if(args.length < 3){
-						Print.chat(sender, "&cMissing Argument.");
-						return;
-					}
-					GameProfile gp = Static.getServer().getPlayerProfileCache().getGameProfileForUsername(args[2]);
-					if(gp == null || gp.getId() == null){
-						Print.chat(sender, "&aPlayer not found.");
-						return;
-					}
-					if(mun.getCouncil().contains(gp.getId())){
-						Print.chat(sender, "&9You can not blacklist council members!");
-						Print.chat(sender, "&cKick them from the council first!");
-						return;
-					}
-					if(args[1].equals("add")){
-						mun.getPlayerBlacklist().add(gp.getId());
-						Print.chat(sender, "&9Player &7" + gp.getName() + "&9 added to blacklist!");
-
-						Print.log(StateLogger.player(player) + " added " + StateLogger.player(gp) + " to the blacklist of " + StateLogger.municipality(mun) + ".");
-						return;
-					}
-					else{
-						mun.getPlayerBlacklist().remove(gp.getId());
-						Print.chat(sender, "&9Player &7" + gp.getName() + "&9 removed from blacklist!");
-						Print.log(StateLogger.player(player) + " removed " + StateLogger.player(gp) + " from the blacklist of " + StateLogger.municipality(mun) + ".");
-						return;
-					}
-				}
-				else{
-					Print.chat(sender, "&9Invalid Argument.");
 				}
 				return;
 			}

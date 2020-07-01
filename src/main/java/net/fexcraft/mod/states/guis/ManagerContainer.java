@@ -156,6 +156,7 @@ public class ManagerContainer extends GenericContainer {
 				addKey(list, "forcechunks", mun.getForceLoadedChunks() == null ? NONE : mun.getForceLoadedChunks().size(), ViewMode.NONE);
 				addKey(list, "ruleset", mun.getRulesetTitle(), ViewMode.EDIT);
 				addKey(list, "mailbox", mun.getMailbox() == null ? NOMAILBOX : mun.getMailbox().toString(), ViewMode.RESET);
+				addKey(list, "blacklist", mun.getPlayerBlacklist().size(), ViewMode.LIST);
 				addKey(list, "icon", mun.getIcon(), ViewMode.EDIT);
 				if(!mun.isAbandoned()){
 					addKey(list, "abandoned", mun.isAbandoned(), ViewMode.NONE);
@@ -180,6 +181,7 @@ public class ManagerContainer extends GenericContainer {
 				addKey(list, "created", time(state.getCreated()), ViewMode.NONE);
 				addKey(list, "ruleset", state.getRulesetTitle(), ViewMode.EDIT);
 				addKey(list, "mailbox", state.getMailbox() == null ? NOMAILBOX : state.getMailbox().toString(), ViewMode.RESET);
+				addKey(list, "blacklist", state.getBlacklist().size(), ViewMode.LIST);
 				addKey(list, "icon", state.getIcon(), ViewMode.EDIT);
 				break;
 			case UNION:
@@ -752,6 +754,10 @@ public class ManagerContainer extends GenericContainer {
 									else sendStatus(null);
 									break;
 								}
+								case "blacklist":{
+									openGui(Layer.MUNICIPALITY, Mode.LIST_BWLIST, mun.getId());
+									break;
+								}
 								case "icon":{
 									if(mun.isAuthorized(mun.r_ICON.id, cap.getUUID()).isTrue() || bypass(player)){
 										try{
@@ -967,6 +973,10 @@ public class ManagerContainer extends GenericContainer {
 										Print.log(StateLogger.player(player) + " reset mailbox location of" + StateLogger.state(state) + ".");
 									}
 									else sendStatus(null);
+									break;
+								}
+								case "blacklist":{
+									openGui(Layer.STATE, Mode.LIST_BWLIST, state.getId());
 									break;
 								}
 								case "icon":{

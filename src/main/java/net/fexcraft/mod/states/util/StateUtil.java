@@ -434,6 +434,9 @@ public class StateUtil extends TimerTask {
 			
 			@Override
 			public void run(){
+				NAMECACHE_STATE.clear();
+				NAMECACHE_MUNICIPALITY.clear();
+				NAMECACHE_DISTRICT.clear();
 				search(NAMECACHE_STATE, new File(States.getSaveDirectory(), "states/"));
 				search(NAMECACHE_MUNICIPALITY, new File(States.getSaveDirectory(), "municipalitites/"));
 				search(NAMECACHE_DISTRICT, new File(States.getSaveDirectory(), "districts/"));

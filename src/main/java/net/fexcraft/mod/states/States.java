@@ -111,7 +111,6 @@ public class States {
 		PacketHandler.getInstance().registerMessage(ImagePacketHandler.Client.class, ImagePacket.class, 29910, Side.CLIENT);
 		PacketHandler.getInstance().registerMessage(ImagePacketHandler.Server.class, ImagePacket.class, 29911, Side.SERVER);
 		UpdateHandler.initialize();
-		StateUtil.loadNameCache();
 	}
 	
 	private static File statesdir;
@@ -126,6 +125,7 @@ public class States {
 	
 	@Mod.EventHandler
 	public void serverStarting(FMLServerStartingEvent event){
+		StateUtil.loadNameCache();
 		if(MessageSender.RECEIVER == null) StConfig.updateWebHook();
 	}
 	

@@ -359,7 +359,7 @@ public class ChunkCmd extends CommandBase {
 				}
 				return;
 			}
-			case "force-loade":{
+			case "force-load":{
 				if(!isPermitted(chunk, player)) return;
 				if(args.length < 2){
 					Print.chat(sender, "&9Missing argument.");

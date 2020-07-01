@@ -162,7 +162,7 @@ public class ManagerGui extends GenericGui<ManagerContainer> {
 			this.refreshKeys();
 			return true;
 		}
-		if(key.equals("cancel")){
+		if(key.equals("confirm")){
 			NBTTagCompound packet = new NBTTagCompound();
 			packet.setString("cargo", "list_mode_" + (confirmmode ? "add" : "remove"));
 			if(!confirmmode){
@@ -196,9 +196,9 @@ public class ManagerGui extends GenericGui<ManagerContainer> {
 		texts.get("confirm0").visible = texts.get("confirm1").visible = true;
 		texts.get("cancel").visible = texts.get("confirm").visible = true;
 		String midfix = container.mode.name().toLowerCase() + "_" + container.layer.name().toLowerCase();
-		String suffix = confirmmode ? "add" : "rem";
-		texts.get("confirm0").string = I18n.format("states.manager_gui." + midfix + suffix + "0", input);
-		texts.get("confirm1").string = I18n.format("states.manager_gui." + midfix + suffix + "1", input);
+		String string = "states.manager_gui." + midfix + "." + (confirmmode ? "add" : "rem");
+		texts.get("confirm0").string = I18n.hasKey(string + "0") ? Formatter.format(I18n.format(string + "0", input)) : ">";
+		texts.get("confirm1").string = I18n.hasKey(string + "1") ? Formatter.format(I18n.format(string + "1", input)) : ">";
 	}
 
 	@Override

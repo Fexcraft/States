@@ -114,25 +114,44 @@ public class ManagerGui extends GenericGui<ManagerContainer> {
 			NBTTagCompound packet = new NBTTagCompound();
 			packet.setString("cargo", "view_mode_click");
 			int buttonid = Integer.parseInt(key.replace("mode", ""));
+			if(scroll + buttonid >= container.keys.length) return true;
 			packet.setInteger("button", scroll + buttonid);
 			if(container.view_modes[scroll + buttonid] == ViewMode.EDIT){
 				packet.setString("value", fields.get("field" + buttonid).getText());
 			}
 			container.send(Side.SERVER, packet);
+			return true;
 		}
 		if(key.startsWith("row")){
 			NBTTagCompound packet = new NBTTagCompound();
 			packet.setString("cargo", "list_mode_click");
 			int buttonid = Integer.parseInt(key.replace("row", ""));
+			if(scroll + buttonid >= container.keys.length) return true;
 			packet.setInteger("button", scroll + buttonid);
 			container.send(Side.SERVER, packet);
+			return true;
 		}
 		if(key.startsWith("rem")){
 			NBTTagCompound packet = new NBTTagCompound();
 			packet.setString("cargo", "list_mode_remove");
-			int buttonid = Integer.parseInt(key.replace("row", ""));
+			int buttonid = Integer.parseInt(key.replace("rem", ""));
+			if(scroll + buttonid >= container.keys.length) return true;
 			packet.setInteger("button", scroll + buttonid);
 			container.send(Side.SERVER, packet);
+			return true;
+		}
+		if(key.equals("home")){
+			NBTTagCompound packet = new NBTTagCompound();
+			packet.setString("cargo", "list_mode_home");
+			container.send(Side.SERVER, packet);
+			return true;
+		}
+		if(key.equals("add")){
+			NBTTagCompound packet = new NBTTagCompound();
+			packet.setString("cargo", "list_mode_add");
+			packet.setString("input", fields.get("add").getText());
+			container.send(Side.SERVER, packet);
+			return true;
 		}
 		switch(key){
 			case "su": scroll(-1); break;
@@ -161,12 +180,12 @@ public class ManagerGui extends GenericGui<ManagerContainer> {
 		setTitle("states.manager_gui.title_" + layerid);
 		for(int j = 0; j < container.mode.entries(); j++){
 			int i = j + scroll;
-			if(i >= container.keys.length) break;
+			String keyval = i >= container.keys.length ? "" : container.keys[i];
 			if(container.mode.isInfo()){
-				texts.get("key" + j).string = I18n.format("states.manager_gui.view_" + layerid + "." + container.keys[i]);
+				texts.get("key" + j).string = I18n.format("states.manager_gui.view_" + layerid + "." + keyval);
 			}
 			else{
-				texts.get("field" + j).string = container.keys[i];
+				texts.get("field" + j).string = keyval;
 			}
 			if(container.mode == Mode.INFO){
 				TextField field = fields.get("field" + j);

@@ -1263,6 +1263,44 @@ public class ManagerContainer extends GenericContainer {
 					}
 					break;
 				}
+				case "list_mode_add":{
+					String input = packet.getString("input");
+					switch(mode){
+						case LIST_BWLIST:
+							if(layer.isChunk()){
+								if(isOwner(chunk, player)){
+									GameProfile prof = Static.getServer().getPlayerProfileCache().getGameProfileForUsername(input);
+									if(prof == null){
+										sendStatus("states.manager_gui.view.player_not_found_cache");
+										return;
+									}
+									if(chunk.getPlayerWhitelist().contains(prof.getId())){
+										sendStatus("states.manager_gui.view.duplicate");
+										return;
+									}
+									chunk.getPlayerWhitelist().add(prof.getId());
+									chunk.save();
+									sendListData();
+									return;
+								}
+							}
+							break;
+						case LIST_CITIZENS:
+							break;
+						case LIST_COMPONENTS:
+							break;
+						case LIST_COUNCIL:
+							break;
+						case LIST_NEIGHBORS:
+							break;
+						default: return;
+					}
+					break;
+				}
+				case "list_mode_home":{
+					//
+					break;
+				}
 			}
 		}
 	}

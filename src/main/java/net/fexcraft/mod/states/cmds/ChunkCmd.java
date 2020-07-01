@@ -8,8 +8,6 @@ import java.util.UUID;
 
 import org.apache.commons.lang3.math.NumberUtils;
 
-import com.mojang.authlib.GameProfile;
-
 import net.fexcraft.lib.common.math.Time;
 import net.fexcraft.lib.mc.api.registry.fCommand;
 import net.fexcraft.lib.mc.utils.Print;
@@ -66,6 +64,11 @@ public class ChunkCmd extends CommandBase {
 
 	@Override
 	public void execute(MinecraftServer server, ICommandSender sender, String[] args) throws CommandException {
+		if(sender.getCommandSenderEntity() instanceof EntityPlayer == false){
+			Print.chat(sender, "&7Only available Ingame.");
+			return;
+		}
+		EntityPlayer player = (EntityPlayer)sender.getCommandSenderEntity();
 		if(args.length == 0){
 			Print.chat(sender, "&7/ck claim <args>");
 			Print.chat(sender, "&7/ck reclaim <args>");
@@ -73,20 +76,17 @@ public class ChunkCmd extends CommandBase {
 			Print.chat(sender, "&7/ck info");
 			Print.chat(sender, "&7/ck map");
 			Print.chat(sender, "&7/ck buy");
-			Print.chat(sender, "&7/ck unclaim [admin-only]");
 			Print.chat(sender, "&7/ck link <args>");
-			Print.chat(sender, "&7/ck whitelist <args>");
 			Print.chat(sender, "&7/ck force-load <true/false>");
-			Print.chat(sender, "&7/ck update <option:range> [admin-only]");
 			Print.chat(sender, "&7/ck queue");
 			Print.chat(sender, "&7/ck types");
+			if(StateUtil.isAdmin(player)){
+				Print.chat(sender, "&a/ck unclaim");
+				Print.chat(sender, "&a/ck update <option:range>");
+				Print.chat(sender, "&a/ck set-district <option:range>");
+			}
 			return;
 		}
-		if(sender.getCommandSenderEntity() instanceof EntityPlayer == false){
-			Print.chat(sender, "&7Only available Ingame.");
-			return;
-		}
-		EntityPlayer player = (EntityPlayer)sender.getCommandSenderEntity();
 		PlayerCapability playerdata = player.getCapability(StatesCapabilities.PLAYER, null);
 		Chunk chunk = StateUtil.getChunk(player);
 		switch(args[0]){
@@ -410,90 +410,6 @@ public class ChunkCmd extends CommandBase {
 						}
 						catch(Exception e){
 							Print.chat(sender, "&9Error: &c" + e.getMessage());
-						}
-					}
-				}
-				return;
-			}
-			case "whitelist":{
-				if(isOwner(chunk, player) || (args.length >= 2 && args[1].equals("view"))){
-					if(args.length < 2){
-						Print.chat(sender, "&9Missing argument.");
-						Print.chat(sender, "&7/ck whitelist add <playername>");
-						Print.chat(sender, "&7/ck whitelist add company <id>");
-						Print.chat(sender, "&7/ck whitelist rem <playername>");
-						Print.chat(sender, "&7/ck whitelist rem company <id>");
-						Print.chat(sender, "&7/ck whitelist clear");
-						Print.chat(sender, "&7/ck whitelist view");
-						return;
-					}
-					switch(args[1]){
-						case "add":
-						case "rem":{
-							if(args.length < 3){
-								Print.chat(sender, "&9Missing Arguemnt.");
-								return;
-							}
-							if(args[2].equals("company")){
-								if(args.length < 4){
-									Print.chat(sender, "&9Missing Arguemnt.");
-									return;
-								}
-								Print.chat(sender, "&cNot available yet.");
-								//TODO companies
-								return;
-							}
-							GameProfile gp = Static.getServer().getPlayerProfileCache().getGameProfileForUsername(args[2]);
-							if(gp == null){
-								Print.chat(sender, "&7Player not found.");
-							}
-							else{
-								if(args[1].equals("add")){
-									chunk.getPlayerWhitelist().add(gp.getId());
-									chunk.save();
-									Print.chat(sender, "&aPlayer added to whitelist.");
-									Print.log(StateLogger.player(player) + " added " + StateLogger.player(gp) + " to the whitelist of " + StateLogger.chunk(chunk) + ".");
-								}
-								else if(args[1].equals("rem")){
-									chunk.getPlayerWhitelist().remove(gp.getId());
-									chunk.save();
-									Print.chat(sender, "&aPlayer removed from whitelist.");
-									Print.log(StateLogger.player(player) + " removed " + StateLogger.player(gp) + " from the whitelist of " + StateLogger.chunk(chunk) + ".");
-								}
-								else{
-									Print.chat(sender, "&c&oHow could this happen?! Report this issue immediatelly.");
-								}
-							}
-							return;
-						}
-						case "clear":{
-							chunk.getPlayerWhitelist().clear();
-							chunk.getCompanyWhitelist().clear();
-							chunk.save();
-							Print.chat(sender, "Whitelist cleared.");
-							Print.log(StateLogger.player(player) + " cleared the whitelist of " + StateLogger.chunk(chunk) + ".");
-							return;
-						}
-						case "view":{
-							Print.chat(sender, "&2Whitelist of " + chunk.xCoord() + "x, " + chunk.zCoord() + "z &0:");
-							if(chunk.getPlayerWhitelist().size() <= 0){
-								Print.chat(sender, "&eNo players are whitelisted.");
-							}
-							else{
-								chunk.getPlayerWhitelist().forEach(uuid -> Print.chat(sender, "&5-> &7" + Static.getPlayerNameByUUID(uuid)));
-							}
-							if(chunk.getCompanyWhitelist().size() <= 0){
-								Print.chat(sender, "&eNo companies are whitelisted.");
-							}
-							else{
-								//TODO companies
-								chunk.getCompanyWhitelist().forEach(id -> Print.chat(sender, "&9-> &7Company (" + id + ");"));
-							}
-							return;
-						}
-						default:{
-							Print.chat(sender, "&cInvalid Argument.");
-							return;
 						}
 					}
 				}

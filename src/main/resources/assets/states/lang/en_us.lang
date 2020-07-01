@@ -75,6 +75,7 @@ states.manager_gui.view.municipality_not_in_state=&cThat Municipality isn't part
 states.manager_gui.view.nick_too_short=Nickname is too short.
 states.manager_gui.view.nick_too_long=Nickname is too long.
 states.manager_gui.view.change_applied=&aChange Applied
+states.manager_gui.view.duplicate=&aEntry already present.
 //
 states.manager_gui.view_district.id=District ID
 states.manager_gui.view_district.name=Name

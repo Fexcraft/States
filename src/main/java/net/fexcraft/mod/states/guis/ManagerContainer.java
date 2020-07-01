@@ -253,7 +253,7 @@ public class ManagerContainer extends GenericContainer {
 				}
 				if(layer.isState()){
 					initListValues(state.getBlacklist().size());
-					for(int id : state.getBlacklist()) addKey(list, id, id);//TODO
+					for(int id : state.getBlacklist()) addKey(list, id, "company:" + id);
 				}
 				break;
 			case LIST_CITIZENS:
@@ -1250,6 +1250,7 @@ public class ManagerContainer extends GenericContainer {
 									return;
 								}
 								//TODO handling of companies
+								return;
 							}
 							if(layer.isMunicipality()){
 								if(mun.isAuthorized(mun.r_EDIT_BL.id, cap.getUUID()).isTrue() || bypass(player)){
@@ -1260,6 +1261,17 @@ public class ManagerContainer extends GenericContainer {
 								}
 								else sendStatus(null);
 								//TODO handling of companies
+								return;
+							}
+							if(layer.isState()){
+								if(state.isAuthorized(state.r_EDIT_BL.id, cap.getUUID()).isTrue() || bypass(player)){
+									state.getBlacklist().remove(list_values[index]);
+									state.save();
+									sendListData();
+									Print.log(StateLogger.player(player) + " removed " + list_values[index] + " from the blacklist of " + StateLogger.state(state) + ".");
+								}
+								else sendStatus(null);
+								return;
 							}
 							break;
 						case LIST_CITIZENS:
@@ -1294,6 +1306,7 @@ public class ManagerContainer extends GenericContainer {
 									sendListData();
 									return;
 								}
+								return;
 							}
 							if(layer.isMunicipality()){
 								if(mun.isAuthorized(mun.r_EDIT_BL.id, cap.getUUID()).isTrue() || bypass(player)){
@@ -1313,12 +1326,28 @@ public class ManagerContainer extends GenericContainer {
 										return;
 									}
 									mun.getPlayerBlacklist().add(prof.getId());
-									Print.log(StateLogger.player(player) + " added " + StateLogger.player(prof) + " to the blacklist of " + StateLogger.municipality(mun) + ".");
 									mun.save();
 									sendListData();
+									Print.log(StateLogger.player(player) + " added " + StateLogger.player(prof) + " to the blacklist of " + StateLogger.municipality(mun) + ".");
 								}
 								else sendStatus(null);
 								//TODO handling of companies
+								return;
+							}
+							if(layer.isState()){
+								if(state.isAuthorized(state.r_EDIT_BL.id, cap.getUUID()).isTrue() || bypass(player)){
+									//TODO company id validation
+									if(!NumberUtils.isCreatable(input)){
+										sendStatus("states.manager_gui.view.not_number");
+										return;
+									}
+									state.getBlacklist().add(Integer.parseInt(input));
+									state.save();
+									sendListData();
+									Print.log(StateLogger.player(player) + " added company" + input + " to the blacklist of " + StateLogger.state(state) + ".");
+								}
+								else sendStatus(null);
+								return;
 							}
 							break;
 						case LIST_CITIZENS:

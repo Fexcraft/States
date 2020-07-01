@@ -76,14 +76,15 @@ public class ChunkCmd extends CommandBase {
 			Print.chat(sender, "&7/ck info");
 			Print.chat(sender, "&7/ck map");
 			Print.chat(sender, "&7/ck buy");
-			Print.chat(sender, "&7/ck link <args>");
+			//Print.chat(sender, "&7/ck link <args>");
 			Print.chat(sender, "&7/ck force-load <true/false>");
 			Print.chat(sender, "&7/ck queue");
 			Print.chat(sender, "&7/ck types");
 			if(StateUtil.isAdmin(player)){
+				Print.chat(sender, "&cAdmin CMDs");
 				Print.chat(sender, "&a/ck unclaim");
 				Print.chat(sender, "&a/ck update <option:range>");
-				Print.chat(sender, "&a/ck set-district <option:range>");
+				Print.chat(sender, "&a/ck set-district <id>");
 			}
 			return;
 		}
@@ -331,31 +332,27 @@ public class ChunkCmd extends CommandBase {
 				}
 				return;
 			}
-			case "set":{
+			case "set-district":{
 				if(isPermitted(chunk, player)){
 					if(args.length < 2){
 						Print.chat(sender, "&9Missing argument.");
-						Print.chat(sender, "&7/ck set <option> <value>");
+						Print.chat(sender, "&7/ck set-district <id>");
 						return;
 					}
-					switch(args[1]){
-						case "district":{
-							if(StateUtil.isAdmin(player)){
-								try{
-									chunk.setDistrict(StateUtil.getDistrict(Integer.parseInt(args[2])));
-									Print.chat(sender, "&2District set to: " + chunk.getDistrict().getName() + " (" + chunk.getDistrict().getId() + ");");
-									Print.log(StateLogger.player(player) + " set the district of " + StateLogger.chunk(chunk) + " to " + StateLogger.district(chunk.getDistrict()) + ".");
-								}
-								catch(Exception e){
-									Print.chat(sender, "&9Error: &7" + e.getMessage());
-								}
-							}
-							else{
-								Print.chat(sender, "&2Try &7/ck reclaim&2!");
-							}
-							break;
+					if(StateUtil.isAdmin(player)){
+						try{
+							chunk.setDistrict(StateUtil.getDistrict(Integer.parseInt(args[1])));
+							Print.chat(sender, "&2District set to: " + chunk.getDistrict().getName() + " (" + chunk.getDistrict().getId() + ");");
+							Print.log(StateLogger.player(player) + " set the district of " + StateLogger.chunk(chunk) + " to " + StateLogger.district(chunk.getDistrict()) + ".");
+						}
+						catch(Exception e){
+							Print.chat(sender, "&9Error: &7" + e.getMessage());
 						}
 					}
+					else{
+						Print.chat(sender, "&2Try &7/ck reclaim&2!");
+					}
+					break;
 				}
 				return;
 			}

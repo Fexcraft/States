@@ -19,7 +19,7 @@ public class ManagerGui extends GenericGui<ManagerContainer> {
 	public static final ResourceLocation VIEW = new ResourceLocation("states:textures/gui/manager_view.png");
 	public static final ResourceLocation EDITLIST = new ResourceLocation("states:textures/gui/manager_list_editable.png");
 	public static int texcol = MapColor.SNOW.colorValue;
-	private boolean normallist;
+	private boolean normallist, confirmopen, confirmmode;
 	private int scroll;
 
 	public ManagerGui(EntityPlayer player, int layer, int x, int y, int z){
@@ -91,6 +91,15 @@ public class ManagerGui extends GenericGui<ManagerContainer> {
 				for(int i = 0; i < 10; i++){
 					buttons.put("rem" + i, new BasicButton("rem" + i, guiLeft + 191, guiTop + 39 + (i * 16), 191, 39, 8, 8, true));
 				}
+				buttons.put("cancel", new BasicButton("cancel", guiLeft + 6, guiTop + 90, 6, 236, 70, 14, true));
+				buttons.put("confirm", new BasicButton("confirm", guiLeft + 77, guiTop + 90, 77, 236, 70, 14, true));
+				buttons.get("cancel").visible = buttons.get("confirm").visible = false;
+				texts.put("confirm0", new BasicText(guiLeft + 8, guiTop + 64, 208, texcol, ""));
+				texts.put("confirm1", new BasicText(guiLeft + 8, guiTop + 78, 208, texcol, ""));
+				texts.get("confirm0").visible = texts.get("confirm1").visible = false;
+				texts.put("cancel", new BasicText(guiLeft + 10, guiTop + 93, 62, texcol, "Cancel"));
+				texts.put("confirm", new BasicText(guiLeft + 81, guiTop + 93, 62, texcol, "Confirm"));
+				texts.get("cancel").visible = texts.get("confirm").visible = false;
         	}
         }
 		NBTTagCompound packet = new NBTTagCompound();
@@ -105,7 +114,9 @@ public class ManagerGui extends GenericGui<ManagerContainer> {
 
 	@Override
 	protected void drawbackground(float pticks, int mouseX, int mouseY){
-		//
+		if(confirmopen){
+			drawTexturedModalRect(guiLeft, guiTop + 56, 0, 202, 224, 54);
+		}
 	}
 
 	@Override
@@ -132,12 +143,9 @@ public class ManagerGui extends GenericGui<ManagerContainer> {
 			return true;
 		}
 		if(key.startsWith("rem")){
-			NBTTagCompound packet = new NBTTagCompound();
-			packet.setString("cargo", "list_mode_remove");
 			int buttonid = Integer.parseInt(key.replace("rem", ""));
 			if(scroll + buttonid >= container.keys.length) return true;
-			packet.setInteger("button", scroll + buttonid);
-			container.send(Side.SERVER, packet);
+			openConfirm(false, container.keys[buttonid]);
 			return true;
 		}
 		if(key.equals("home")){
@@ -147,9 +155,24 @@ public class ManagerGui extends GenericGui<ManagerContainer> {
 			return true;
 		}
 		if(key.equals("add")){
+			openConfirm(true, fields.get("add").getText());
+			return true;
+		}
+		if(key.equals("cancel")){
+			this.refreshKeys();
+			return true;
+		}
+		if(key.equals("cancel")){
 			NBTTagCompound packet = new NBTTagCompound();
-			packet.setString("cargo", "list_mode_add");
-			packet.setString("input", fields.get("add").getText());
+			packet.setString("cargo", "list_mode_" + (confirmmode ? "add" : "remove"));
+			if(!confirmmode){
+				int buttonid = Integer.parseInt(key.replace("rem", ""));
+				if(scroll + buttonid >= container.keys.length) return true;
+				packet.setInteger("button", scroll + buttonid);
+			}
+			else{
+				packet.setString("input", fields.get("add").getText());
+			}
 			container.send(Side.SERVER, packet);
 			return true;
 		}
@@ -159,6 +182,23 @@ public class ManagerGui extends GenericGui<ManagerContainer> {
 		}
 		//
 		return false;
+	}
+
+	private void openConfirm(boolean mode, String input){
+		this.confirmopen = true;
+		this.confirmmode = mode;
+		for(int i = 1; i < 5; i++){
+			texts.get("field" + i).visible = false;
+			buttons.get("row" + i).visible = false;
+			buttons.get("rem" + i).visible = false;
+		}
+		buttons.get("cancel").visible = buttons.get("confirm").visible = true;
+		texts.get("confirm0").visible = texts.get("confirm1").visible = true;
+		texts.get("cancel").visible = texts.get("confirm").visible = true;
+		String midfix = container.mode.name().toLowerCase() + "_" + container.layer.name().toLowerCase();
+		String suffix = confirmmode ? "add" : "rem";
+		texts.get("confirm0").string = I18n.format("states.manager_gui." + midfix + suffix + "0", input);
+		texts.get("confirm1").string = I18n.format("states.manager_gui." + midfix + suffix + "1", input);
 	}
 
 	@Override
@@ -178,6 +218,17 @@ public class ManagerGui extends GenericGui<ManagerContainer> {
 	protected void refreshKeys(){
 		String layerid = container.layer.name().toLowerCase();
 		setTitle("states.manager_gui.title_" + layerid);
+		if(confirmopen){
+			confirmopen = false;
+			for(int i = 1; i < 5; i++){
+				texts.get("field" + i).visible = true;
+				buttons.get("row" + i).visible = true;
+				buttons.get("rem" + i).visible = true;
+			}
+			buttons.get("cancel").visible = buttons.get("confirm").visible = false;
+			texts.get("confirm0").visible = texts.get("confirm1").visible = false;
+			texts.get("cancel").visible = texts.get("confirm").visible = false;
+		}
 		for(int j = 0; j < container.mode.entries(); j++){
 			int i = j + scroll;
 			String keyval = i >= container.keys.length ? "" : container.keys[i];

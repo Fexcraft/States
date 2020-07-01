@@ -178,3 +178,6 @@ states.manager_gui.view_chunk.forceloaded=Force Loaded
 //
 states.manager_gui.list.cannot_kick_council0=&9You can not blacklist council members!
 states.manager_gui.list.cannot_kick_council1=&cKick them from the council first!
+//
+
+

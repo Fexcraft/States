@@ -173,7 +173,6 @@ public class ManagerGui extends GenericGui<ManagerContainer> {
 			else{
 				packet.setString("input", fields.get("add").getText());
 			}
-			fields.get("add").setText("");
 			container.send(Side.SERVER, packet);
 			return true;
 		}
@@ -201,6 +200,18 @@ public class ManagerGui extends GenericGui<ManagerContainer> {
 		texts.get("confirm0").string = I18n.hasKey(string + "0") ? Formatter.format(I18n.format(string + "0", input)) : ">";
 		texts.get("confirm1").string = I18n.hasKey(string + "1") ? Formatter.format(I18n.format(string + "1", input)) : ">";
 	}
+	
+	private void closeConfirm(){
+		confirmopen = false;
+		for(int i = 1; i < 5; i++){
+			texts.get("field" + i).visible = true;
+			buttons.get("row" + i).visible = true;
+			buttons.get("rem" + i).visible = true;
+		}
+		buttons.get("cancel").visible = buttons.get("confirm").visible = false;
+		texts.get("confirm0").visible = texts.get("confirm1").visible = false;
+		texts.get("cancel").visible = texts.get("confirm").visible = false;
+	}
 
 	@Override
 	protected void scrollwheel(int am, int x, int y){
@@ -220,15 +231,8 @@ public class ManagerGui extends GenericGui<ManagerContainer> {
 		String layerid = container.layer.name().toLowerCase();
 		setTitle("states.manager_gui.title_" + layerid);
 		if(confirmopen){
-			confirmopen = false;
-			for(int i = 1; i < 5; i++){
-				texts.get("field" + i).visible = true;
-				buttons.get("row" + i).visible = true;
-				buttons.get("rem" + i).visible = true;
-			}
-			buttons.get("cancel").visible = buttons.get("confirm").visible = false;
-			texts.get("confirm0").visible = texts.get("confirm1").visible = false;
-			texts.get("cancel").visible = texts.get("confirm").visible = false;
+			fields.get("add").setText("");
+			closeConfirm();
 		}
 		for(int j = 0; j < container.mode.entries(); j++){
 			int i = j + scroll;
@@ -286,6 +290,7 @@ public class ManagerGui extends GenericGui<ManagerContainer> {
 
 	protected void setTitle(String string){
 		texts.get("title").string = Formatter.format(I18n.format(string, container.layer_title));
+		if(confirmopen) closeConfirm();
 	}
 
 }

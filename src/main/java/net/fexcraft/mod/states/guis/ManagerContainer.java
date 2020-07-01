@@ -1293,8 +1293,8 @@ public class ManagerContainer extends GenericContainer {
 										return;
 									}
 									if(mun.getCouncil().contains(prof.getId())){
-										Print.chat(player, "states.manager_gui.list_council.cannot_kick0");
-										Print.chat(player, "states.manager_gui.list_council.cannot_kick1");
+										Print.chat(player, "states.manager_gui.list.cannot_kick_council0");
+										Print.chat(player, "states.manager_gui.list.cannot_kick_council1");
 										sendStatus(null);
 										return;
 									}

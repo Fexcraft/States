@@ -70,14 +70,16 @@ public class ManagerGui extends GenericGui<ManagerContainer> {
 			buttons.put("su", new BasicButton("scroll_up", guiLeft + 204, guiTop + 36, 204, 36, 14, 14, true));
 			buttons.put("sd", new BasicButton("scroll_down", guiLeft + 204, guiTop + (normallist ? 164 : 180), 204, (normallist ? 164 : 180), 14, 14, true));
 			buttons.put(normallist ? "home" : "add", new BasicButton(normallist ? "home" : "add", guiLeft + 204, guiTop + 20, 204, 20, 14, 14, true));
-			int texoff = normallist ? 23 : 39;
+			int texoff = normallist ? 20 : 36;
 			for(int i = 0; i < 10; i++){
-				TextField field = new TextField(i, fontRenderer, guiLeft + 10, guiTop + texoff + (i * 16), 188, 8);
+				texts.put("field" + i, new BasicText(guiLeft + 10, guiTop + 3 + texoff + (i * 16), 188, texcol, ""));
+				buttons.put("row" + i, new BasicButton("row" + i, guiLeft + 6, guiTop + texoff + (i * 16), 6, texoff, 196, 14, true));
+				/*TextField field = new TextField(i, fontRenderer, guiLeft + 10, guiTop + texoff + (i * 16), 188, 8);
 				field.setEnableBackgroundDrawing(false);
 				field.setEnabled(false);
 				field.setTextColor(texcol);
 				field.setDisabledTextColour(texcol);
-				fields.put("field" + i, field);
+				fields.put("field" + i, field);*/
 			}
 			if(!normallist){
 				TextField field = new TextField(10, fontRenderer, guiLeft + 10, guiTop + 23, 188, 8);
@@ -118,6 +120,20 @@ public class ManagerGui extends GenericGui<ManagerContainer> {
 			}
 			container.send(Side.SERVER, packet);
 		}
+		if(key.startsWith("row")){
+			NBTTagCompound packet = new NBTTagCompound();
+			packet.setString("cargo", "list_mode_click");
+			int buttonid = Integer.parseInt(key.replace("row", ""));
+			packet.setInteger("button", scroll + buttonid);
+			container.send(Side.SERVER, packet);
+		}
+		if(key.startsWith("rem")){
+			NBTTagCompound packet = new NBTTagCompound();
+			packet.setString("cargo", "list_mode_remove");
+			int buttonid = Integer.parseInt(key.replace("row", ""));
+			packet.setInteger("button", scroll + buttonid);
+			container.send(Side.SERVER, packet);
+		}
 		switch(key){
 			case "su": scroll(-1); break;
 			case "sd": scroll(+1); break;
@@ -150,11 +166,11 @@ public class ManagerGui extends GenericGui<ManagerContainer> {
 				texts.get("key" + j).string = I18n.format("states.manager_gui.view_" + layerid + "." + container.keys[i]);
 			}
 			else{
-				fields.get("field" + j).setText(container.keys[i]);
+				texts.get("field" + j).string = container.keys[i];
 			}
 			if(container.mode == Mode.INFO){
 				TextField field = fields.get("field" + j);
-				switch(container.values[i]){
+				switch(container.view_values[i]){
 					case ManagerContainer.NOONE:{
 						field.setText(I18n.format("states.manager_gui.view.no_one"));
 						break;
@@ -180,11 +196,11 @@ public class ManagerGui extends GenericGui<ManagerContainer> {
 						break;
 					}
 					default:{
-						field.setText(container.values[i]);
+						field.setText(container.view_values[i]);
 						break;
 					}
 				}
-				if(container.values[i].startsWith("#") && container.keys[i].equals("color")){
+				if(container.view_values[i].startsWith("#") && container.keys[i].equals("color")){
 					field.setTextColor(Integer.parseInt(field.getText().replace("#", ""), 16));
 				}
 				else field.setTextColor(texcol);

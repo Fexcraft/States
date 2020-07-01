@@ -60,7 +60,8 @@ public class ManagerContainer extends GenericContainer {
 	//
 	protected String layer_title;
 	protected String[] keys = new String[0];
-	protected String[] values;
+	protected Object[] list_values;
+	protected String[] view_values;
 	protected ViewMode[] view_modes;
 
 	public ManagerContainer(EntityPlayer player, int layerid, int x, int y, int z){
@@ -240,63 +241,77 @@ public class ManagerContainer extends GenericContainer {
 		switch(mode){
 			case LIST_BWLIST:
 				if(layer.isChunk()){
-					for(UUID uuid : chunk.getPlayerWhitelist()) addKey(list, uuid);
+					initListValues(chunk.getPlayerWhitelist().size());
+					for(UUID uuid : chunk.getPlayerWhitelist()) addKey(list, uuid, uuid);
+					//TODO company white list
 				}
 				if(layer.isMunicipality()){
-					for(UUID uuid : mun.getPlayerBlacklist()) addKey(list, uuid);
+					initListValues(mun.getPlayerBlacklist().size());
+					for(UUID uuid : mun.getPlayerBlacklist()) addKey(list, uuid, uuid);
 				}
 				if(layer.isState()){
-					for(int id : state.getBlacklist()) addKey(list, id);
+					initListValues(state.getBlacklist().size());
+					for(int id : state.getBlacklist()) addKey(list, id, id);//TODO
 				}
 				break;
 			case LIST_CITIZENS:
 				if(layer.isMunicipality()){
-					for(UUID uuid : mun.getCitizen()) addKey(list, uuid);
+					initListValues(mun.getCitizen().size());
+					for(UUID uuid : mun.getCitizen()) addKey(list, uuid, uuid);
 				}
 				if(layer.isState()){
 					ArrayList<UUID> citizen = getCitizens(state);
-					for(UUID uuid : citizen) addKey(list, uuid);
+					initListValues(citizen.size());
+					for(UUID uuid : citizen) addKey(list, uuid, uuid);
 				}
 				break;
 			case LIST_COMPONENTS:
 				if(layer.isChunk()){
+					initListValues(chunk.getLinkedChunks().size());
 					for(ResourceLocation pos : chunk.getLinkedChunks()){
-						addKey(list, pos.getNamespace() + ", " + pos.getPath());
+						addKey(list, pos, pos.getNamespace() + ", " + pos.getPath());
 					}
 				}
 				if(layer.isMunicipality()){
+					initListValues(mun.getDistricts().size());
 					for(int id : mun.getDistricts()){
-						addKey(list, StateUtil.getDistrictName(id));
+						addKey(list, id, StateUtil.getDistrictName(id));
 					}
 				}
 				if(layer.isState()){
+					initListValues(state.getMunicipalities().size());
 					for(int id : state.getMunicipalities()){
-						addKey(list, StateUtil.getMunicipalityName(id));
+						addKey(list, id, StateUtil.getMunicipalityName(id));
 					}
 				}
 				break;
 			case LIST_COUNCIL:
 				if(layer.isMunicipality()){
-					for(UUID uuid : mun.getCouncil()) addKey(list, uuid);
+					initListValues(mun.getCouncil().size());
+					for(UUID uuid : mun.getCouncil()) addKey(list, uuid, uuid);
 				}
 				if(layer.isState()){
-					for(UUID uuid : state.getCouncil()) addKey(list, uuid);
+					initListValues(state.getCouncil().size());
+					for(UUID uuid : state.getCouncil()) addKey(list, uuid, uuid);
 				}
 				break;
 			case LIST_NEIGHBORS:
 				if(layer.isDistrict()){
+					initListValues(dis.getNeighbors().size());
 					for(int id : dis.getNeighbors()){
-						addKey(list, StateUtil.getDistrictName(id));
+						addKey(list, id, StateUtil.getDistrictName(id));
 					}
 				}
 				if(layer.isMunicipality()){
+					initListValues(mun.getNeighbors().size());
 					for(int id : mun.getNeighbors()){
-						addKey(list, StateUtil.getMunicipalityName(id));
+						addKey(list, id, StateUtil.getMunicipalityName(id));
 					}
 				}
 				if(layer.isState()){
+					initListValues(state.getNeighbors().size());
 					for(int id : state.getNeighbors()){
-						addKey(list, StateUtil.getStateName(id));
+						addKey(list, id, StateUtil.getStateName(id));
 					}
 				}
 				break;
@@ -306,8 +321,16 @@ public class ManagerContainer extends GenericContainer {
 		packet.setTag("keys", list);
 		this.send(Side.CLIENT, packet);
 	}
+	
+	private int listinitindex = 0;
+	
+	private void initListValues(int amount){
+		list_values = new Object[amount];
+		listinitindex = 0;
+	}
 
-	private void addKey(NBTTagList list, Object key){
+	private void addKey(NBTTagList list, Object rawval, Object key){
+		list_values[listinitindex++] = rawval;
 		if(key instanceof UUID){
 			key = Static.getPlayerNameByUUID((UUID)key);
 		}
@@ -1159,6 +1182,77 @@ public class ManagerContainer extends GenericContainer {
 					}
 					break;
 				}
+				case "list_mode_click":{
+					switch(mode){
+						case LIST_BWLIST:
+							//do nothing for now
+							break;
+						case LIST_CITIZENS:
+							//also nothing yet
+							break;
+						case LIST_COMPONENTS:
+							if(layer.isChunk()){
+								ResourceLocation resloc = chunk.getLinkedChunks().get(packet.getInteger("button"));
+								openGui(Layer.CHUNK, Mode.CKINFO, Integer.parseInt(resloc.getNamespace()), Integer.parseInt(resloc.getPath()));
+								return;
+							}
+							if(layer.isMunicipality()){
+								openGui(Layer.DISTRICT, Mode.INFO, mun.getDistricts().get(packet.getInteger("button")));
+								return;
+							}
+							if(layer.isState()){
+								openGui(Layer.MUNICIPALITY, Mode.INFO, state.getMunicipalities().get(packet.getInteger("button")));
+								return;
+							}
+							//TODO check if the component is loaded in memory?
+							break;
+						case LIST_COUNCIL:
+							//nothing also yet
+							break;
+						case LIST_NEIGHBORS:
+							if(layer.isDistrict()){
+								openGui(Layer.DISTRICT, Mode.INFO, dis.getNeighbors().get(packet.getInteger("button")));
+								return;
+							}
+							if(layer.isMunicipality()){
+								openGui(Layer.MUNICIPALITY, Mode.INFO, mun.getNeighbors().get(packet.getInteger("button")));
+								return;
+							}
+							if(layer.isState()){
+								openGui(Layer.STATE, Mode.INFO, state.getNeighbors().get(packet.getInteger("button")));
+								return;
+							}
+							//TODO check if the component is loaded in memory?
+							break;
+						default: return;
+					}
+					break;
+				}
+				case "list_mode_remove":{
+					int index = packet.getInteger("button");
+					switch(mode){
+						case LIST_BWLIST:
+							if(layer.isChunk()){
+								if(isOwner(chunk, player)){
+									chunk.getPlayerWhitelist().remove(list_values[index]);
+									sendListData();
+									return;
+								}
+								//TODO handling of companies
+							}
+							break;
+						case LIST_CITIZENS:
+							break;
+						case LIST_COMPONENTS:
+							break;
+						case LIST_COUNCIL:
+							break;
+						case LIST_NEIGHBORS:
+							break;
+						default: return;
+					}
+					break;
+				}
 			}
 		}
 	}
@@ -1181,14 +1275,14 @@ public class ManagerContainer extends GenericContainer {
 	private void readInit(NBTTagList list){
 		keys = new String[list.tagCount()];
 		if(mode == Mode.INFO){
-			values = new String[list.tagCount()];
+			view_values = new String[list.tagCount()];
 			view_modes = new ViewMode[list.tagCount()];
 		}
 		for(int i = 0; i < list.tagCount(); i++){
 			if(mode == Mode.INFO){
 				String[] arr = list.getStringTagAt(i).split(";");
 				keys[i] = arr[0];
-				values[i] = arr[1];
+				view_values[i] = arr[1];
 				view_modes[i] = ViewMode.values()[Integer.parseInt(arr[2])];
 			}
 			else keys[i] = list.getStringTagAt(i);
@@ -1348,6 +1442,42 @@ public class ManagerContainer extends GenericContainer {
 			case PUBLIC: result = ismn || ismy || isst; break;
 			case STATEOWNED: result = isst; break;
 			default: result = false; break;
+		}
+		if(!result){
+			sendStatus(null);
+		}
+		return result;
+	}
+
+	private boolean isOwner(Chunk chunk2, EntityPlayer player){
+		if(chunk.getLink() != null){
+			ChunkPos link = chunk.getLink();
+			Print.chat(player, translate("states.manager_gui.perm_chunk.linked0", link.x, link.z));
+			Print.chat(player, translate("states.manager_gui.perm_chunk.linked1"));
+			Print.chat(player, translate("states.manager_gui.perm_chunk.linked2"));
+			return false;
+		}
+		if(bypass(player)){
+			Print.chat(player, translate("states.manager_gui.perm_admin.bypass"));
+			return true;
+		}
+		boolean result = false;
+		UUID uuid = player.getGameProfile().getId();
+		boolean isco = chunk.getOwner().equals(uuid.toString());
+		boolean ismn = chunk.getDistrict().getHead() != null && chunk.getDistrict().getHead().equals(uuid);
+		boolean ismy = chunk.getMunicipality().getHead() != null && chunk.getMunicipality().getHead().equals(uuid);
+		boolean isst = chunk.getState().getCouncil().contains(uuid) || (chunk.getState().getHead() != null && chunk.getState().getHead().equals(uuid));
+		boolean iscm = false;//TODO companies
+		Print.debug(isco, ismn, ismy, isst, iscm);
+		switch(chunk.getType()){
+			case COMPANY: result = iscm; break;
+			case DISTRICT: result = ismn || ismy || isst; break;
+			case MUNICIPAL: result = ismy || isst; break;
+			case NORMAL: result = ismn || ismy || isst; break;
+			case PRIVATE: result = isco || ismy; break;
+			case PUBLIC: result = false; break;
+			case STATEOWNED: result = isst; break;
+			default: result = false;
 		}
 		if(!result){
 			sendStatus(null);

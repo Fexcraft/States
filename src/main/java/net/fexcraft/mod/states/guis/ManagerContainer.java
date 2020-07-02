@@ -1439,6 +1439,11 @@ public class ManagerContainer extends GenericContainer {
 									return;
 								}
 								ck.setLink(chunk.getChunkPos());
+								ck.setChanged(Time.getDate());
+								ck.save();
+								chunk.getLinkedChunks().add(new ResourceLocation(x + "", z + ""));
+								chunk.setChanged(Time.getDate());
+								chunk.save();
 								Print.log(StateLogger.player(player) + " linked " + StateLogger.chunk(ck) + " to " + StateLogger.chunk(chunk) + ".");
 								sendListData();
 								return;

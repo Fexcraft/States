@@ -28,6 +28,9 @@ import net.fexcraft.mod.states.data.State;
 import net.fexcraft.mod.states.data.capabilities.PlayerCapability;
 import net.fexcraft.mod.states.data.capabilities.StatesCapabilities;
 import net.fexcraft.mod.states.data.root.AnnounceLevel;
+import net.fexcraft.mod.states.data.root.Mailbox.MailType;
+import net.fexcraft.mod.states.data.root.Mailbox.RecipientType;
+import net.fexcraft.mod.states.util.MailUtil;
 import net.fexcraft.mod.states.util.Perms;
 import net.fexcraft.mod.states.util.StConfig;
 import net.fexcraft.mod.states.util.StateLogger;
@@ -1275,6 +1278,30 @@ public class ManagerContainer extends GenericContainer {
 							}
 							break;
 						case LIST_CITIZENS:
+							if(layer.isMunicipality()){
+								if(!(mun.isAuthorized(mun.r_KICK.id, cap.getUUID()).isTrue() || bypass(player))){
+									sendStatus(null);
+									return;
+								}
+								if(mun.getCouncil().contains(list_values[index])){
+									Print.chat(player, "states.manager_gui.list.cannot_kick_council0");
+									Print.chat(player, "states.manager_gui.list.cannot_kick_council1");
+									sendStatus(null);
+									return;
+								}
+								if(!mun.getCitizen().contains(list_values[index])){
+									sendStatus("states.manager_gui.list.not_a_citizen");
+									return;
+								}
+								mun.getCitizen().remove(list_values[index]);
+								String kickmsg = translate("states.manager_gui.list_citizens_municipality.rem_msg");
+								PlayerCapability playr = StateUtil.getPlayer((UUID)list_values[index], false);
+								if(playr != null){ playr.setMunicipality(StateUtil.getMunicipality(-1)); }
+								MailUtil.send(player, RecipientType.PLAYER, list_values[index].toString(), player.getGameProfile().getId().toString(), kickmsg, MailType.SYSTEM, Time.DAY_MS * 64);
+								Print.log(StateLogger.player(player) + " kicked " + list_values[index].toString() + " from " + StateLogger.municipality(mun) + ".");
+								sendListData();
+								return;
+							}
 							break;
 						case LIST_COMPONENTS:
 							break;
@@ -1316,8 +1343,8 @@ public class ManagerContainer extends GenericContainer {
 										return;
 									}
 									if(mun.getCouncil().contains(prof.getId())){
-										Print.chat(player, "states.manager_gui.list.cannot_kick_council0");
-										Print.chat(player, "states.manager_gui.list.cannot_kick_council1");
+										Print.chat(player, "states.manager_gui.list.cannot_blacklist_council0");
+										Print.chat(player, "states.manager_gui.list.cannot_blacklist_council1");
 										sendStatus(null);
 										return;
 									}

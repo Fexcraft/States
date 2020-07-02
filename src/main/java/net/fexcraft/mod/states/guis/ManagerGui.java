@@ -20,7 +20,7 @@ public class ManagerGui extends GenericGui<ManagerContainer> {
 	public static final ResourceLocation EDITLIST = new ResourceLocation("states:textures/gui/manager_list_editable.png");
 	public static int texcol = MapColor.SNOW.colorValue;
 	private boolean normallist, confirmopen, confirmmode;
-	private int scroll;
+	private int scroll, confirmid;
 
 	public ManagerGui(EntityPlayer player, int layer, int x, int y, int z){
 		super(STONE, new ManagerContainer(player, layer, x, y, z), player);
@@ -145,7 +145,7 @@ public class ManagerGui extends GenericGui<ManagerContainer> {
 		if(key.startsWith("rem")){
 			int buttonid = Integer.parseInt(key.replace("rem", ""));
 			if(scroll + buttonid >= container.keys.length) return true;
-			openConfirm(false, container.keys[buttonid]);
+			openConfirm(false, container.keys[buttonid], buttonid);
 			return true;
 		}
 		if(key.equals("home")){
@@ -155,7 +155,7 @@ public class ManagerGui extends GenericGui<ManagerContainer> {
 			return true;
 		}
 		if(key.equals("add")){
-			openConfirm(true, fields.get("add").getText());
+			openConfirm(true, fields.get("add").getText(), 0);
 			return true;
 		}
 		if(key.equals("cancel")){
@@ -166,9 +166,8 @@ public class ManagerGui extends GenericGui<ManagerContainer> {
 			NBTTagCompound packet = new NBTTagCompound();
 			packet.setString("cargo", "list_mode_" + (confirmmode ? "add" : "remove"));
 			if(!confirmmode){
-				int buttonid = Integer.parseInt(key.replace("rem", ""));
-				if(scroll + buttonid >= container.keys.length) return true;
-				packet.setInteger("button", scroll + buttonid);
+				if(scroll + confirmid >= container.keys.length) return true;
+				packet.setInteger("button", scroll + confirmid);
 			}
 			else{
 				packet.setString("input", fields.get("add").getText());
@@ -184,9 +183,10 @@ public class ManagerGui extends GenericGui<ManagerContainer> {
 		return false;
 	}
 
-	private void openConfirm(boolean mode, String input){
+	private void openConfirm(boolean mode, String input, int id){
 		this.confirmopen = true;
 		this.confirmmode = mode;
+		this.confirmid = id;
 		for(int i = 1; i < 5; i++){
 			texts.get("field" + i).visible = false;
 			buttons.get("row" + i).visible = false;

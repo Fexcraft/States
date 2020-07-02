@@ -66,12 +66,10 @@ public class MunicipalityCmd extends CommandBase {
 			Print.chat(sender, "&7/mun rules");
 			Print.chat(sender, "&7/mun types");
 			Print.chat(sender, "&7/mun buy");
-			Print.chat(sender, "&7/mun council <args...>");
-			Print.chat(sender, "&7/mun citizen");
 			Print.chat(sender, "&7/mun join");
 			Print.chat(sender, "&7/mun leave");
-			Print.chat(sender, "&7/mun kick <player>");
-			Print.chat(sender, "&7/mun invite <player>");
+			Print.chat(sender, "&7/mun kick <player> <reason>");
+			Print.chat(sender, "&7/mun invite <player> <msg>");
 			Print.chat(sender, "&8- &6- &8- - - - - -");
 			Print.chat(sender, "&7/mun create <name...>");
 			Print.chat(sender, "&7/mun abandon");
@@ -268,13 +266,6 @@ public class MunicipalityCmd extends CommandBase {
 						return;
 					}
 				}
-				return;
-			}
-			case "citizen":{
-				Print.chat(sender, "&9Citizen: &7" + mun.getCitizen().size());
-				mun.getCitizen().forEach(uuid -> {
-					Print.chat(sender, "&c-> &9" + Static.getPlayerNameByUUID(uuid) + (mun.getCouncil().contains(uuid) ? " &6" + "[CM]" : ""));
-				});
 				return;
 			}
 			case "kick":{

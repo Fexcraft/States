@@ -23,7 +23,6 @@ import net.fexcraft.mod.states.util.StConfig;
 import net.fexcraft.mod.states.util.StateLogger;
 import net.fexcraft.mod.states.util.StateUtil;
 import net.fexcraft.mod.states.util.TaxSystem;
-import net.minecraft.util.ResourceLocation;
 import net.minecraft.world.World;
 
 public class Chunk implements BuyableType, Taxable/*, RuleHolder*/ {
@@ -33,7 +32,7 @@ public class Chunk implements BuyableType, Taxable/*, RuleHolder*/ {
 	private int x, z;
 	private ChunkPos link, pos;
 	private UUID creator;
-	private ArrayList<ResourceLocation> linked;
+	private ArrayList<int[]> linked = new ArrayList<>();
 	private ChunkType type;
 	private String owner;
 	private List<UUID> wl_players = new ArrayList<>();
@@ -75,7 +74,19 @@ public class Chunk implements BuyableType, Taxable/*, RuleHolder*/ {
 		created = JsonUtil.getIfExists(obj, "created", Time.getDate()).longValue();
 		creator = UUID.fromString(obj.has("creator") ? obj.get("creator").getAsString() : States.CONSOLE_UUID);
 		changed = JsonUtil.getIfExists(obj, "changed", Time.getDate()).longValue();
-		linked = JsonUtil.jsonArrayToResourceLocationArray(JsonUtil.getIfExists(obj, "linked", new JsonArray()).getAsJsonArray());
+		if(obj.has("linked")){
+			JsonArray array = obj.get("linked").getAsJsonArray();
+			array.forEach(elm -> {
+				try{
+					String[] split = elm.getAsString().split(":");
+					linked.add(new int[]{ Integer.parseInt(split[0]), Integer.parseInt(split[1]) });
+				}
+				catch(Exception e){
+					e.printStackTrace();
+				}
+			});
+		}
+		else linked.clear();
 		type = ChunkType.valueOf(JsonUtil.getIfExists(obj, "type", ChunkType.NORMAL.name()).toUpperCase());
 		owner = JsonUtil.getIfExists(obj, "owner", "null");
 		lasttaxcheck = JsonUtil.getIfExists(obj, "last_tax_collection", 0).longValue();
@@ -134,7 +145,7 @@ public class Chunk implements BuyableType, Taxable/*, RuleHolder*/ {
 		}
 		if(!linked.isEmpty()){
 			JsonArray array = new JsonArray();
-			linked.forEach(rs -> array.add(rs.toString()));
+			linked.forEach(rs -> array.add(rs[0] + ":" + rs[1]));
 			obj.add("linked", array);
 		}
 		if(wl_players.size() > 0 || wl_companies.size() > 0){
@@ -200,7 +211,7 @@ public class Chunk implements BuyableType, Taxable/*, RuleHolder*/ {
 		SignTileEntityCapabilityUtil.processChunkChange(StateUtil.getChunk(this), "chunk");
 	}
 
-	public List<ResourceLocation> getLinkedChunks(){
+	public List<int[]> getLinkedChunks(){
 		return linked;
 	}
 

@@ -38,7 +38,6 @@ import net.minecraft.command.ICommandSender;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.server.MinecraftServer;
-import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.util.text.TextComponentString;
@@ -84,10 +83,8 @@ public class StateUtil extends TimerTask {
         return chunk == null ? new Chunk(null, pos, false) : chunk;
     }
     
-    public static Chunk getTempChunk(ResourceLocation ckpos){
-        int x = Integer.parseInt(ckpos.getNamespace());
-        int z = Integer.parseInt(ckpos.getPath());
-        return getTempChunk(x, z);
+    public static Chunk getTempChunk(int[] ckpos){
+        return getTempChunk(ckpos[0], ckpos[1]);
     }
 	
 	public static District getDistrict(int value){

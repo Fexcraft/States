@@ -32,7 +32,6 @@ import net.minecraft.command.CommandException;
 import net.minecraft.command.ICommandSender;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.server.MinecraftServer;
-import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
 
 @fCommand
@@ -318,7 +317,7 @@ public class ChunkCmd extends CommandBase {
 					Print.chat(sender, "&aChunk bought!");
 					Print.log(StateLogger.player(player) + " bought the " + StateLogger.chunk(chunk) + "!");
 					if(chunk.getLinkedChunks().size() > 0){
-						for(ResourceLocation ckpos : chunk.getLinkedChunks()){
+						for(int[] ckpos : chunk.getLinkedChunks()){
 							Chunk ck = StateUtil.getTempChunk(ckpos);
 							ck.setOwner(player.getGameProfile().getId().toString());
 							ck.setPrice(0);

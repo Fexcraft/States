@@ -39,7 +39,6 @@ import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
 import net.minecraft.nbt.NBTTagString;
-import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.fml.relauncher.Side;
 
 public class ManagerContainer extends GenericContainer {
@@ -276,8 +275,8 @@ public class ManagerContainer extends GenericContainer {
 			case LIST_COMPONENTS:
 				if(layer.isChunk()){
 					initListValues(chunk.getLinkedChunks().size());
-					for(ResourceLocation pos : chunk.getLinkedChunks()){
-						addKey(list, pos, pos.getNamespace() + ", " + pos.getPath());
+					for(int[] pos : chunk.getLinkedChunks()){
+						addKey(list, pos, pos[0] + ", " + pos[1]);
 					}
 				}
 				if(layer.isMunicipality()){
@@ -1208,8 +1207,8 @@ public class ManagerContainer extends GenericContainer {
 							break;
 						case LIST_COMPONENTS:
 							if(layer.isChunk()){
-								ResourceLocation resloc = chunk.getLinkedChunks().get(packet.getInteger("button"));
-								openGui(Layer.CHUNK, Mode.CKINFO, Integer.parseInt(resloc.getNamespace()), Integer.parseInt(resloc.getPath()));
+								int[] resloc = chunk.getLinkedChunks().get(packet.getInteger("button"));
+								openGui(Layer.CHUNK, Mode.CKINFO, resloc[0], resloc[1]);
 								return;
 							}
 							if(layer.isMunicipality()){
@@ -1312,7 +1311,7 @@ public class ManagerContainer extends GenericContainer {
 									sendStatus(null);
 									return;
 								}
-								Chunk linked = StateUtil.getTempChunk((ResourceLocation)list_values[index]);
+								Chunk linked = StateUtil.getTempChunk((int[])list_values[index]);
 								if(linked.getLink().x == chunk.xCoord() && linked.getChunkPos().z == chunk.zCoord()){
 									linked.setLink(null);
 									linked.save();
@@ -1441,7 +1440,7 @@ public class ManagerContainer extends GenericContainer {
 								ck.setLink(chunk.getChunkPos());
 								ck.setChanged(Time.getDate());
 								ck.save();
-								chunk.getLinkedChunks().add(new ResourceLocation(x + "", z + ""));
+								chunk.getLinkedChunks().add(new int[]{ x, z });
 								chunk.setChanged(Time.getDate());
 								chunk.save();
 								Print.log(StateLogger.player(player) + " linked " + StateLogger.chunk(ck) + " to " + StateLogger.chunk(chunk) + ".");

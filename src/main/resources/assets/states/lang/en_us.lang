@@ -181,6 +181,7 @@ states.manager_gui.list.cannot_blacklist_council1=&cKick them from the council f
 states.manager_gui.list.cannot_kick_council0=&9You can not kick council members!
 states.manager_gui.list.cannot_kick_council1=&cKick them from the council first!
 states.manager_gui.list.not_a_citizen=That player isn't a citizen of this Municipality.
+states.manager_gui.list.a_citizen=That player is already a citizen of this Municipality.
 //
 states.manager_gui.list_bwlist_chunk.add0=Do you want to add &a%s
 states.manager_gui.list_bwlist_chunk.add1=to the chunk's whitelist/access?
@@ -197,4 +198,7 @@ states.manager_gui.list_bwlist_state.rem1=from the state's blacklist?
 states.manager_gui.list_citizens_municipality.rem0=Are you sure to kick &c%s
 states.manager_gui.list_citizens_municipality.rem1=from the municipality?
 states.manager_gui.list_citizens_municipality.rem_msg=You have been kicked from the Municipality (%s)!
+states.manager_gui.list_citizens_municipality.add0=Are you sure to invite &c%s
+states.manager_gui.list_citizens_municipality.add1=to join the municipality?
+states.manager_gui.list_citizens_municipality.add_msg=You have been invited to join the Municipality %s
 

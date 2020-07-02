@@ -1294,7 +1294,7 @@ public class ManagerContainer extends GenericContainer {
 									return;
 								}
 								mun.getCitizen().remove(list_values[index]);
-								String kickmsg = translate("states.manager_gui.list_citizens_municipality.rem_msg");
+								String kickmsg = translate("states.manager_gui.list_citizens_municipality.rem_msg", mun.getId());
 								PlayerCapability playr = StateUtil.getPlayer((UUID)list_values[index], false);
 								if(playr != null){ playr.setMunicipality(StateUtil.getMunicipality(-1)); }
 								MailUtil.send(player, RecipientType.PLAYER, list_values[index].toString(), player.getGameProfile().getId().toString(), kickmsg, MailType.SYSTEM, Time.DAY_MS * 64);
@@ -1378,6 +1378,31 @@ public class ManagerContainer extends GenericContainer {
 							}
 							break;
 						case LIST_CITIZENS:
+							if(layer.isMunicipality()){
+								if(!(mun.isAuthorized(mun.r_INVITE.id, cap.getUUID()).isTrue() || bypass(player))){
+									sendStatus(null);
+									return;
+								}
+								GameProfile gp = Static.getServer().getPlayerProfileCache().getGameProfileForUsername(input);
+								if(gp == null || gp.getId() == null){
+									sendStatus("states.manager_gui.view.player_not_found_cache");
+									return;
+								}
+								if(mun.getCitizen().contains(gp.getId())){
+									sendStatus("states.manager_gui.list.a_citizen");
+									return;
+								}
+								String invmsg = translate("states.manager_gui.list_citizens_municipality.add_msg", mun.getName() + " (" + mun.getId() + ")");
+								NBTTagCompound compound = new NBTTagCompound();
+								compound.setString("type", "municipality");
+								compound.setInteger("id", mun.getId());
+								compound.setString("from", player.getGameProfile().getId().toString());
+								compound.setLong("at", Time.getDate());
+								MailUtil.send(player, RecipientType.PLAYER, gp.getId().toString(), player.getGameProfile().getId().toString(), invmsg, MailType.INVITE, Time.DAY_MS * 2, compound);
+								Print.log(StateLogger.player(player) + " invited " + StateLogger.player(gp) + " to join "+ StateLogger.municipality(mun) + ".");
+								sendListData();
+								return;
+							}
 							break;
 						case LIST_COMPONENTS:
 							break;

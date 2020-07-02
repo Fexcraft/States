@@ -1454,7 +1454,18 @@ public class ManagerContainer extends GenericContainer {
 					break;
 				}
 				case "list_mode_home":{
-					//
+					if(layer.isChunk()){
+						openGui(Layer.CHUNK, Mode.CKINFO, chunk.xCoord(), chunk.zCoord());
+					}
+					if(layer.isDistrict()){
+						openGui(Layer.DISTRICT, Mode.INFO, dis.getId());
+					}
+					if(layer.isMunicipality()){
+						openGui(Layer.MUNICIPALITY, Mode.INFO, mun.getId());
+					}
+					if(layer.isState()){
+						openGui(Layer.STATE, Mode.INFO, state.getId());
+					}
 					break;
 				}
 			}

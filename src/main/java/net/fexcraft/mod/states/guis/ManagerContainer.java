@@ -72,7 +72,10 @@ public class ManagerContainer extends GenericContainer {
 		mode = Mode.values()[x];
 		layer = Layer.values()[layerid];
 		Print.debug("CREATED " + player.world.isRemote + " " + layer + "/" + layerid + " " + mode + "/" + x);
-		if(player.world.isRemote) return;
+		if(player.world.isRemote){
+			if(layer.isChunk() && mode == Mode.CKINFO) mode = Mode.INFO;
+			return;
+		}
 		chunk = StateUtil.getChunk(player);
 		cap = player.getCapability(StatesCapabilities.PLAYER, null);
 		switch(layer){

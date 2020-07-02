@@ -205,3 +205,4 @@ states.manager_gui.list_components_chunk.rem0=Remove &b%s&r from linked?
 states.manager_gui.list_components_chunk.add0=Link &a%s&r?
 states.manager_gui.list_components_chunk.invalid_format=Invalid chunk format, is it separated?
 states.manager_gui.list_components_chunk.not_owner=&cYou must be the Owner of the other chunk!
+states.manager_gui.list_components_chunk.same_chunk=&bCan not link chunk to itself!

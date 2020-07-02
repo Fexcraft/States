@@ -1313,12 +1313,17 @@ public class ManagerContainer extends GenericContainer {
 								}
 								Chunk linked = StateUtil.getTempChunk((int[])list_values[index]);
 								if(linked.getLink().x == chunk.xCoord() && linked.getChunkPos().z == chunk.zCoord()){
+									chunk.getLinkedChunks().removeIf(pre -> pre[0] == linked.xCoord() && pre[1] == linked.zCoord());
+									chunk.setEdited(Time.getDate());
+									chunk.save();
 									linked.setLink(null);
+									linked.setEdited(Time.getDate());
 									linked.save();
 									Print.log(StateLogger.player(player) + " unlinked the " + StateLogger.chunk(chunk) + ".");
 									sendListData();
 								}
 								else sendStatus("ERROR:[01]");
+								//TODO property checks
 								return;
 							}
 							break;
@@ -1432,6 +1437,10 @@ public class ManagerContainer extends GenericContainer {
 								}
 								int x = Integer.parseInt(split[0].trim());
 								int z = Integer.parseInt(split[1].trim());
+								if(x == chunk.xCoord() && z == chunk.zCoord()){
+									sendStatus("states.manager_gui.list_components_chunk.same_chunk");
+									return;
+								}
 								Chunk ck = StateUtil.getChunk(x, z);
 								if(!isOwner(ck, player)){
 									sendStatus("states.manager_gui.list_components_chunk.not_owner");
@@ -1445,6 +1454,7 @@ public class ManagerContainer extends GenericContainer {
 								chunk.save();
 								Print.log(StateLogger.player(player) + " linked " + StateLogger.chunk(ck) + " to " + StateLogger.chunk(chunk) + ".");
 								sendListData();
+								//TODO property checks
 								return;
 							}
 							break;

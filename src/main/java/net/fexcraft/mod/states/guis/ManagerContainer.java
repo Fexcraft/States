@@ -1307,6 +1307,21 @@ public class ManagerContainer extends GenericContainer {
 							}
 							break;
 						case LIST_COMPONENTS:
+							if(layer.isChunk()){
+								if(!isOwner(chunk, player)){
+									sendStatus(null);
+									return;
+								}
+								Chunk linked = StateUtil.getTempChunk((ResourceLocation)list_values[index]);
+								if(linked.getLink().x == chunk.xCoord() && linked.getChunkPos().z == chunk.zCoord()){
+									linked.setLink(null);
+									linked.save();
+									Print.log(StateLogger.player(player) + " unlinked the " + StateLogger.chunk(chunk) + ".");
+									sendListData();
+								}
+								else sendStatus("ERROR:[01]");
+								return;
+							}
 							break;
 						case LIST_COUNCIL:
 							break;
@@ -1408,6 +1423,27 @@ public class ManagerContainer extends GenericContainer {
 							}
 							break;
 						case LIST_COMPONENTS:
+							if(layer.isChunk()){
+								String[] split = null;
+								if(input.contains(":")) split = input.split(":");
+								else if(input.contains(",")) split = input.split(",");
+								else if(input.contains(" ")) split = input.split(" ");
+								else{
+									sendStatus("states.manager_gui.list_components_chunk.invalid_format");
+									return;
+								}
+								int x = Integer.parseInt(split[0]);
+								int z = Integer.parseInt(split[1]);
+								Chunk ck = StateUtil.getChunk(x, z);
+								if(!isOwner(ck, player)){
+									sendStatus("states.manager_gui.list_components_chunk.not_owner");
+									return;
+								}
+								ck.setLink(chunk.getChunkPos());
+								Print.log(StateLogger.player(player) + " linked " + StateLogger.chunk(ck) + " to " + StateLogger.chunk(chunk) + ".");
+								sendListData();
+								return;
+							}
 							break;
 						case LIST_COUNCIL:
 							break;

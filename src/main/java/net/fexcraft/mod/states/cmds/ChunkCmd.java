@@ -379,39 +379,6 @@ public class ChunkCmd extends CommandBase {
 				}
 				break;
 			}
-			case "link":{
-				if(isOwner(chunk, player)){
-					if(args.length < 2){
-						Print.chat(sender, "&9Missing argument.");
-						Print.chat(sender, "&7/ck link <x> <z>");
-						Print.chat(sender, "&7/ck link reset");
-						return;
-					}
-					if(args[1].equals("reset")){
-						chunk.setLink(null);
-						Print.chat(sender, "&6Chunk unlinked.");
-						Print.log(StateLogger.player(player) + " unliked the " + StateLogger.chunk(chunk) + ".");
-					}
-					else{
-						try{
-							int x = Integer.parseInt(args[1]);
-							int z = Integer.parseInt(args[2]);
-							Chunk ck = StateUtil.getTempChunk(x, z);
-							if(!isOwner(ck, player)){
-								Print.chat(sender, "&cYou must be the owner of the Linked chunk aswel!");
-								return;
-							}
-							chunk.setLink(new ChunkPos(x, z));
-							Print.chat(sender, "&6Chunk linked. ( " + x + " | " + z + " );");
-							Print.log(StateLogger.player(player) + " linked " + StateLogger.chunk(chunk) + " to (" + x + ", " + z + ").");
-						}
-						catch(Exception e){
-							Print.chat(sender, "&9Error: &c" + e.getMessage());
-						}
-					}
-				}
-				return;
-			}
 			case "types":{
 				Print.chat(sender, "&9Existing chunk types:");
 				for(ChunkType type : ChunkType.values()){
@@ -455,42 +422,6 @@ public class ChunkCmd extends CommandBase {
 			case PUBLIC: result = ismn || ismy || isst; break;
 			case STATEOWNED: result = isst; break;
 			default: result = false; break;
-		}
-		if(!result){
-			Print.chat(player, "&7No Permission.");
-		}
-		return result;
-	}
-	
-	private boolean isOwner(Chunk chunk, EntityPlayer player){
-		if(chunk.getLink() != null){
-			ChunkPos link = chunk.getLink();
-			Print.chat(player, "&7Chunk is linked to a chunk at &2" + link.x + "x&7, &2" + link.z + "z&7.");
-			Print.chat(player, "&7Please make changes to that chunk, they will be copied to this one.");
-			Print.chat(player, "&7Alternatively unlink this chunk.");
-			return false;
-		}
-		if(StateUtil.isAdmin(player)){
-			Print.chat(player, "&7&oAdmin bypass.");
-			return true;
-		}
-		boolean result = false;
-		UUID uuid = player.getGameProfile().getId();
-		boolean isco = chunk.getOwner().equals(uuid.toString());
-		boolean ismn = chunk.getDistrict().getHead() != null && chunk.getDistrict().getHead().equals(uuid);
-		boolean ismy = chunk.getMunicipality().getHead() != null && chunk.getMunicipality().getHead().equals(uuid);
-		boolean isst = chunk.getState().getCouncil().contains(uuid) || (chunk.getState().getHead() != null && chunk.getState().getHead().equals(uuid));
-		boolean iscm = false;//TODO companies
-		Print.debug(isco, ismn, ismy, isst, iscm);
-		switch(chunk.getType()){
-			case COMPANY: result = iscm; break;
-			case DISTRICT: result = ismn || ismy || isst; break;
-			case MUNICIPAL: result = ismy || isst; break;
-			case NORMAL: result = ismn || ismy || isst; break;
-			case PRIVATE: result = isco || ismy; break;
-			case PUBLIC: result = false; break;
-			case STATEOWNED: result = isst; break;
-			default: result = false;
 		}
 		if(!result){
 			Print.chat(player, "&7No Permission.");

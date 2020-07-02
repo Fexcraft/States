@@ -201,4 +201,7 @@ states.manager_gui.list_citizens_municipality.rem_msg=You have been kicked from 
 states.manager_gui.list_citizens_municipality.add0=Are you sure to invite &a%s
 states.manager_gui.list_citizens_municipality.add1=to join the municipality?
 states.manager_gui.list_citizens_municipality.add_msg=You have been invited to join the Municipality %s
-
+states.manager_gui.list_components_chunk.rem0=Remove &b%s&r from linked?
+states.manager_gui.list_components_chunk.add0=Link &a%s&r?
+states.manager_gui.list_components_chunk.invalid_format=Invalid chunk format, is it separated?
+states.manager_gui.list_components_chunk.not_owner=&cYou must be the Owner of the other chunk!

@@ -185,20 +185,20 @@ states.manager_gui.list.a_citizen=That player is already a citizen of this Munic
 //
 states.manager_gui.list_bwlist_chunk.add0=Do you want to add &a%s
 states.manager_gui.list_bwlist_chunk.add1=to the chunk's whitelist/access?
-states.manager_gui.list_bwlist_chunk.rem0=Do you want to remove &c%s
+states.manager_gui.list_bwlist_chunk.rem0=Do you want to remove &b%s
 states.manager_gui.list_bwlist_chunk.rem1=from the chunk's whitelist/access?
 states.manager_gui.list_bwlist_municipality.add0=Do you want to add &a%s
 states.manager_gui.list_bwlist_municipality.add1=to the municipality's blacklist?
-states.manager_gui.list_bwlist_municipality.rem0=Do you want to remove &c%s
+states.manager_gui.list_bwlist_municipality.rem0=Do you want to remove &b%s
 states.manager_gui.list_bwlist_municipality.rem1=from the municipality's blacklist?
 states.manager_gui.list_bwlist_state.add0=Do you want to add &a%s
 states.manager_gui.list_bwlist_state.add1=to the state's blacklist?
-states.manager_gui.list_bwlist_state.rem0=Do you want to remove &c%s
+states.manager_gui.list_bwlist_state.rem0=Do you want to remove &b%s
 states.manager_gui.list_bwlist_state.rem1=from the state's blacklist?
-states.manager_gui.list_citizens_municipality.rem0=Are you sure to kick &c%s
+states.manager_gui.list_citizens_municipality.rem0=Are you sure to kick &b%s
 states.manager_gui.list_citizens_municipality.rem1=from the municipality?
 states.manager_gui.list_citizens_municipality.rem_msg=You have been kicked from the Municipality (%s)!
-states.manager_gui.list_citizens_municipality.add0=Are you sure to invite &c%s
+states.manager_gui.list_citizens_municipality.add0=Are you sure to invite &a%s
 states.manager_gui.list_citizens_municipality.add1=to join the municipality?
 states.manager_gui.list_citizens_municipality.add_msg=You have been invited to join the Municipality %s
 

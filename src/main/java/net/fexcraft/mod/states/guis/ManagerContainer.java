@@ -1431,8 +1431,8 @@ public class ManagerContainer extends GenericContainer {
 									sendStatus("states.manager_gui.list_components_chunk.invalid_format");
 									return;
 								}
-								int x = Integer.parseInt(split[0]);
-								int z = Integer.parseInt(split[1]);
+								int x = Integer.parseInt(split[0].trim());
+								int z = Integer.parseInt(split[1].trim());
 								Chunk ck = StateUtil.getChunk(x, z);
 								if(!isOwner(ck, player)){
 									sendStatus("states.manager_gui.list_components_chunk.not_owner");

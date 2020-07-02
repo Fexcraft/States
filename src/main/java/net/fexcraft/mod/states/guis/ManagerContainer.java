@@ -1325,8 +1325,7 @@ public class ManagerContainer extends GenericContainer {
 							break;
 						case LIST_COUNCIL:
 							break;
-						case LIST_NEIGHBORS:
-							break;
+						case LIST_NEIGHBORS: return;
 						default: return;
 					}
 					break;
@@ -1447,8 +1446,7 @@ public class ManagerContainer extends GenericContainer {
 							break;
 						case LIST_COUNCIL:
 							break;
-						case LIST_NEIGHBORS:
-							break;
+						case LIST_NEIGHBORS: return;
 						default: return;
 					}
 					break;

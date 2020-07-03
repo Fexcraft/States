@@ -1344,6 +1344,7 @@ public class ManagerContainer extends GenericContainer {
 								kicktar.setChanged(Time.getDate());
 								kicktar.save();
 								state.getMunicipalities().removeIf(val -> val == kicktar.getId());
+								state.setChanged(Time.getDate());
 								state.save();
 								StateUtil.announce(null, AnnounceLevel.STATE, "Municipality of " + kicktar.getName() + " was removed from our State!", state.getId());
 								Print.log(StateLogger.player(player) + " kicked " + StateLogger.municipality(kicktar) + " from the State of " + StateLogger.state(state));

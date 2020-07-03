@@ -67,7 +67,6 @@ public class StateCmd extends CommandBase {
 			Print.chat(sender, "&7/st info");
 			Print.chat(sender, "&7/st rules");
 			Print.chat(sender, "&7/st council <args...>");
-			Print.chat(sender, "&7/st blacklist <args...>");
 			Print.chat(sender, "&7/st mun <option> <args>");
 			Print.chat(sender, "&7/st create <name...>");
 			Print.chat(sender, "&7/st citizen");
@@ -207,10 +206,6 @@ public class StateCmd extends CommandBase {
 						return;
 					}
 				}
-				return;
-			}
-			case "blacklist":{
-				Print.chat(sender, "Not available yet.");
 				return;
 			}
 			case "mun": case "municipality":{

@@ -155,7 +155,7 @@ public class MunicipalityCmd extends CommandBase {
 				}
 				return;
 			}
-			case "council-leave":{
+			case "leave-council":{
 				if(!mun.getCouncil().contains(ply.getUUID())){
 					Print.chat(sender, "&7You are not a council member!");
 					return;

@@ -103,6 +103,14 @@ public class StateUtil extends TimerTask {
 		else return wilderness ? States.DISTRICTS.get(-1) : null;
 	}
 
+	public static District getDistrictByName(String name){
+		name = name.toLowerCase().trim();
+		for(District dis : States.DISTRICTS.values()){
+			if(dis.getName().toLowerCase().equals(name)) return dis;
+		}
+		return null;
+	}
+
 	public static Municipality getMunicipality(int value){
 		return getMunicipality(value, true);
 	}
@@ -117,6 +125,14 @@ public class StateUtil extends TimerTask {
 			return municipality;
 		}
 		else return bool ? States.MUNICIPALITIES.get(-1) : null;
+	}
+
+	public static Municipality getMunicipalityByName(String name){
+		name = name.toLowerCase().trim();
+		for(Municipality mun : States.MUNICIPALITIES.values()){
+			if(mun.getName().toLowerCase().equals(name)) return mun;
+		}
+		return null;
 	}
 	
 	public static State getState(int value){
@@ -133,6 +149,14 @@ public class StateUtil extends TimerTask {
 			return state;
 		}
 		else return bool ? States.STATES.get(-1) : null;
+	}
+
+	public static State getStateByName(String name){
+		name = name.toLowerCase().trim();
+		for(State state : States.STATES.values()){
+			if(state.getName().toLowerCase().equals(name)) return state;
+		}
+		return null;
 	}
 	
 	public static Vote getVote(Ruleable holder, int value){

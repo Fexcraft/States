@@ -67,7 +67,6 @@ public class StateCmd extends CommandBase {
 			Print.chat(sender, "&7/st info");
 			Print.chat(sender, "&7/st rules");
 			Print.chat(sender, "&7/st council <args...>");
-			Print.chat(sender, "&7/st mun <option> <args>");
 			Print.chat(sender, "&7/st create <name...>");
 			Print.chat(sender, "&7/st citizen");
 			Print.chat(sender, "&7/st buy");
@@ -203,78 +202,6 @@ public class StateCmd extends CommandBase {
 						MailUtil.send(sender, RecipientType.PLAYER, gp.getId().toString(), player.getGameProfile().getId().toString(), invmsg, MailType.INVITE, Time.DAY_MS * 5, compound);
 						Print.chat(sender, "&7&oInvite sent! (Will be valid for 5 days.)");
 						Print.log(StateLogger.player(player) + " invited " + StateLogger.player(gp) + " to the council of " + StateLogger.state(state) + ".");
-						return;
-					}
-				}
-				return;
-			}
-			case "mun": case "municipality":{
-				if(args.length == 1){
-					Print.chat(sender, "&7/st mun list");
-					Print.chat(sender, "&7/st mun invite <municipality id>");
-					Print.chat(sender, "&7/st mun kick/remove");
-					return;
-				}
-				switch(args[1]){
-					case "list":{
-						Print.chat(sender, "&9Municipalities: &7" + state.getMunicipalities().size());
-						state.getMunicipalities().forEach(var -> {
-							Municipality municipality = StateUtil.getMunicipality(var);
-							Print.chat(sender, "&c-> &9" + municipality.getName() + " &7(" + municipality.getId() + ");");
-						});
-						return;
-					}
-					case "invite":{
-						if(args.length < 3){
-							Print.chat(sender, "Missing Municipality Id.");
-							return;
-						}
-						if(state.isAuthorized(state.r_MUN_INVITE.id, ply.getUUID()).isTrue()){
-							Municipality mun = StateUtil.getMunicipality(Integer.parseInt(args[2]));
-							if(mun == null || mun.getId() <= 0){
-								Print.chat(sender, "&6Municipality not found.");
-								return;
-							}
-							if(mun.getHead() == null){
-								Print.chat(sender, "&7Municipality has no Mayor.");
-								return;
-							}
-							String invmsg = "Your Municipality was invited to join the State of " + state.getName() + " (" + state.getId() + ")!";
-							NBTTagCompound compound = new NBTTagCompound();
-							compound.setString("type", "state_municipality");
-							compound.setInteger("id", state.getId());
-							compound.setString("from", player.getGameProfile().getId().toString());
-							compound.setLong("at", Time.getDate());
-							MailUtil.send(sender, RecipientType.MUNICIPALITY, mun.getId(), player.getGameProfile().getId().toString(), invmsg, MailType.INVITE, Time.DAY_MS * 12, compound);
-							Print.chat(sender, "&7&oInvite sent! (Will be valid for 12 days.)");
-							Print.log(StateLogger.player(player) + " invited " + StateLogger.municipality(mun) + " to join the State of " + StateLogger.state(state));
-							return;
-						}
-						else{
-							Print.chat(sender, "&6No Permission.");
-						}
-						return;
-					}
-					case "kick": case "remove":{
-						if(args.length < 3){
-							Print.chat(sender, "Missing Municipality Id.");
-							return;
-						}
-						if(state.isAuthorized(state.r_MUN_KICK.id, ply.getUUID()).isTrue()){
-							Municipality mun = StateUtil.getMunicipality(Integer.parseInt(args[2]));
-							if(mun == null || mun.getId() <= 0){
-								Print.chat(sender, "&6Municipality not found.");
-								return;
-							}
-							mun.setState(StateUtil.getState(-1));
-							mun.setChanged(Time.getDate());
-							mun.save();
-							StateUtil.announce(server, AnnounceLevel.STATE, "Municipality of " + mun.getName() + " was removed from our State!", state.getId());
-							Print.log(StateLogger.player(player) + " kicked " + StateLogger.municipality(mun) + " from the State of " + StateLogger.state(state));
-						}
-						else{
-							Print.chat(sender, "&6No Permission.");
-						}
 						return;
 					}
 				}

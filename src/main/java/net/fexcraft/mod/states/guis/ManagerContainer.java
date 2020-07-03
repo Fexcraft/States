@@ -1326,6 +1326,30 @@ public class ManagerContainer extends GenericContainer {
 								//TODO property checks
 								return;
 							}
+							if(layer.isState()){
+								if(!state.isAuthorized(state.r_MUN_KICK.id, cap.getUUID()).isTrue() || !bypass(player)){
+									sendStatus(null);
+									return;
+								}
+								Municipality kicktar = StateUtil.getMunicipality((int)list_values[index]);
+								if(kicktar == null || kicktar.getId() <= 0){
+									sendStatus("states.manager_gui.list_components_state.mun_not_found");
+									return;
+								}
+								if(kicktar.getId() == state.getCapitalId()){
+									sendStatus("states.manager_gui.list_components_state.cannot_kick_capital");
+									return;
+								}
+								kicktar.setState(StateUtil.getState(-1));
+								kicktar.setChanged(Time.getDate());
+								kicktar.save();
+								state.getMunicipalities().removeIf(val -> val == kicktar.getId());
+								state.save();
+								StateUtil.announce(null, AnnounceLevel.STATE, "Municipality of " + kicktar.getName() + " was removed from our State!", state.getId());
+								Print.log(StateLogger.player(player) + " kicked " + StateLogger.municipality(kicktar) + " from the State of " + StateLogger.state(state));
+								sendListData();
+								return;
+							}
 							break;
 						case LIST_COUNCIL:
 							break;
@@ -1470,11 +1494,11 @@ public class ManagerContainer extends GenericContainer {
 								else{
 									invtar = StateUtil.getMunicipalityByName(input);
 								}
-								if(invtar == null || mun.getId() <= 0){
+								if(invtar == null || invtar.getId() <= 0){
 									sendStatus("states.manager_gui.list_components_state.mun_not_found");
 									return;
 								}
-								if(mun.getHead() == null){
+								if(invtar.getHead() == null){
 									sendStatus("states.manager_gui.list_components_state.mun_no_mayor");
 									return;
 								}
@@ -1484,8 +1508,8 @@ public class ManagerContainer extends GenericContainer {
 								compound.setInteger("id", state.getId());
 								compound.setString("from", player.getGameProfile().getId().toString());
 								compound.setLong("at", Time.getDate());
-								MailUtil.send(player, RecipientType.MUNICIPALITY, mun.getId(), player.getGameProfile().getId().toString(), invmsg, MailType.INVITE, Time.DAY_MS * 12, compound);
-								Print.log(StateLogger.player(player) + " invited " + StateLogger.municipality(mun) + " to join the State of " + StateLogger.state(state));
+								MailUtil.send(player, RecipientType.MUNICIPALITY, invtar.getId(), player.getGameProfile().getId().toString(), invmsg, MailType.INVITE, Time.DAY_MS * 12, compound);
+								Print.log(StateLogger.player(player) + " invited " + StateLogger.municipality(invtar) + " to join the State of " + StateLogger.state(state));
 								Print.chat(player, translate("states.manager_gui.list_components_state.add_done"));
 								sendListData();
 								return;

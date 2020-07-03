@@ -455,6 +455,8 @@ public class MunicipalityCmd extends CommandBase {
 					Print.chat(player, "&3-> authorized to execute rule 'abandon'");
 					Print.chat(player, "&3-> has admin permission / operator");
 					Print.chat(player, "&3-> is last citizen in the municipality");
+					//Print.chat(player, "&3-> the municipality has no active players");
+					//TODO add config for when players are considered inactive
 				}
 				return;
 			}

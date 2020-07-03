@@ -61,29 +61,34 @@ public class MunicipalityCmd extends CommandBase {
 
 	@SuppressWarnings("unused") @Override
 	public void execute(MinecraftServer server, ICommandSender sender, String[] args) throws CommandException {
-		if(args.length == 0){
-			Print.chat(sender, "&7/mun info");
-			Print.chat(sender, "&7/mun rules");
-			Print.chat(sender, "&7/mun types");
-			Print.chat(sender, "&7/mun buy");
-			Print.chat(sender, "&7/mun join");
-			Print.chat(sender, "&7/mun leave");
-			Print.chat(sender, "&7/mun kick <player> <reason>");
-			Print.chat(sender, "&7/mun invite <player> <msg>");
-			Print.chat(sender, "&8- &6- &8- - - - - -");
-			Print.chat(sender, "&7/mun create <name...>");
-			Print.chat(sender, "&7/mun abandon");
-			Print.chat(sender, "&7/mun claim");
-			return;
-		}
 		EntityPlayer player = (EntityPlayer)sender.getCommandSenderEntity();
 		PlayerCapability ply = player.getCapability(StatesCapabilities.PLAYER, null);
+		Chunk chunk = StateUtil.getChunk(player);
+		Municipality mun = chunk.getDistrict().getMunicipality();
 		if(ply == null){
 			Print.chat(sender, "&o&4There was an error loading your Playerdata.");
 			return;
 		}
-		Chunk chunk = StateUtil.getChunk(player);
-		Municipality mun = chunk.getDistrict().getMunicipality();
+		if(args.length == 0){
+			Print.chat(sender, "&7/mun info");
+			Print.chat(sender, "&7/mun rules");
+			Print.chat(sender, "&7/mun types");
+			Print.chat(sender, "&7/mun join");
+			Print.chat(sender, "&7/mun leave");
+			Print.chat(sender, "&7/mun kick <player> <reason>");
+			Print.chat(sender, "&7/mun invite <player> <msg>");
+			if(mun.getCouncil().contains(ply.getUUID()) || StateUtil.isAdmin(player)){
+				Print.chat(sender, "&8- &5- &8- - - - - -");
+				Print.chat(sender, "&7/mun vote-mayor <player>");
+				Print.chat(sender, "&7/mun leave-council");
+			}
+			Print.chat(sender, "&8- &6- &8- - - - - -");
+			Print.chat(sender, "&7/mun create <name...>");
+			Print.chat(sender, "&7/mun abandon");
+			Print.chat(sender, "&7/mun claim");
+			Print.chat(sender, "&7/mun buy");
+			return;
+		}
 		switch(args[0]){
 			case "info":{
 				openGui(player, MANAGER_MUNICIPALITY, ManagerContainer.Mode.INFO.ordinal(), mun.getId(), 0);
@@ -150,121 +155,53 @@ public class MunicipalityCmd extends CommandBase {
 				}
 				return;
 			}
-			case "council":{
-				if(args.length < 2){
-					Print.chat(sender, "&7/mun council vote <playername> (for mayor)");
-					Print.chat(sender, "&7/mun council kick <playername>");
-					Print.chat(sender, "&7/mun council invite <playername>");
-					Print.chat(sender, "&7/mun council leave");
+			case "council-leave":{
+				if(!mun.getCouncil().contains(ply.getUUID())){
+					Print.chat(sender, "&7You are not a council member!");
 					return;
 				}
-				switch(args[1]){
-					case "vote":{
-						if(!mun.isAuthorized(mun.r_VOTE_MAYOR.id, ply.getUUID()).isTrue() && !StateUtil.bypass(player)){
-							Print.chat(sender, "&4No permission.");
-							return;
-						}
-						if(mun.getHead() != null){
-							Print.chat(sender, "&aA vote for a new mayor can be only started when there is no mayor!");
-							return;
-						}
-						if(args.length < 3){
-							Print.chat(sender, "&7/mun council vote &e>>playername<<"); return;
-						}
-						GameProfile gp = Static.getServer().getPlayerProfileCache().getGameProfileForUsername(args[2]);
-						if(gp == null || gp.getId() == null){
-							Print.chat(sender, "&cPlayer not found in Cache.");
-							break;
-						}
-						if(Vote.exists(mun, VoteType.ASSIGNMENT, null)){
-							Print.chat(sender, "&bThere is already an assignment vote ongoing!");
-							return;
-						}
-						int newid = sender.getEntityWorld().getCapability(StatesCapabilities.WORLD, null).getNewVoteId();
-						Vote newvote = new Vote(newid, null, ply.getUUID(), Time.getDate(), Time.getDate() + (Time.DAY_MS * 7),
-							mun, VoteType.ASSIGNMENT, !mun.r_VOTE_MAYOR.setter.isCitizenVote(), null, null);
-						if(newvote.getVoteFile().exists()){
-							new Exception("Tried to create new Vote with ID '" + newvote.id + "', but savefile already exists."); return;
-						}
-						newvote.save(); newvote.vote(sender, ply.getUUID(), gp.getId()); States.VOTES.put(newvote.id, newvote);
-						StateUtil.announce(null, AnnounceLevel.MUNICIPALITY_ALL, "A new vote to choose a Mayor started!", 0);
-						for(UUID member : newvote.council ? mun.getCouncil() : mun.getCitizen()){
-							MailUtil.send(null, RecipientType.PLAYER, member, null, "&7A new vote to choose a Mayor started!\n&7Detailed info via &e/st-vote status " + newvote.id, MailType.SYSTEM);
-						}
-						return;
-					}
-					case "kick":{
-						if(!(mun.isAuthorized(mun.r_COUNCIL_KICK.id, ply.getUUID()).isTrue() || StateUtil.bypass(player))){
-							Print.chat(sender, "&4No permission.");
-							return;
-						}
-						if(args.length < 3){
-							Print.chat(sender, "&9Missing Argument.");
-							return;
-						}
-						GameProfile gp = Static.getServer().getPlayerProfileCache().getGameProfileForUsername(args[2]);
-						if(gp == null){
-							Print.chat(sender, "&eGameProfile not found.");
-							return;
-						}
-						if(!mun.getCouncil().contains(gp.getId())){
-							Print.chat(sender, "Player isn't part of the council.");
-							return;
-						}
-						mun.getCouncil().remove(gp.getId());
-						mun.save();
-						StateUtil.announce(server, AnnounceLevel.MUNICIPALITY, gp.getName() + " &9was removed from the Municipality Council!", mun.getId());
-						Print.log(StateLogger.player(player) + " removed " + StateLogger.player(gp) + " from the council of " + StateLogger.municipality(mun) + ".");
-						break;
-					}
-					case "leave":{
-						if(mun.getCouncil().size() < 2){
-							Print.chat(sender, "&9You cannot leave while being the last council member.");
-							return;
-						}
-						mun.getCouncil().remove(ply.getUUID());
-						mun.save();
-						StateUtil.announce(server, AnnounceLevel.MUNICIPALITY, ply.getFormattedNickname() + " &9left the Municipality Council!", mun.getId());
-						Print.log(StateLogger.player(player) + " left of the council of " + StateLogger.municipality(mun) + ".");
-					}
-					case "invite":{
-						if(!(mun.isAuthorized(mun.r_COUNCIL_INVITE.id, ply.getUUID()).isTrue() || StateUtil.bypass(player))){
-							Print.chat(sender, "&4No permission.");
-							return;
-						}
-						if(args.length < 3){
-							Print.chat(sender, "&7/mun council invite <playername> <optional:message>");
-							return;
-						}
-						GameProfile gp = server.getPlayerProfileCache().getGameProfileForUsername(args[2]);
-						if(gp == null || gp.getId() == null){
-							Print.chat(sender, "&cPlayer not found.");
-							return;
-						}
-						if(mun.getCouncil().contains(gp.getId())){
-							Print.chat(sender, "That player is already a Council member.");
-							return;
-						}
-						String msg = null;
-						if(args.length > 3){
-							msg = args[3];
-							if(args.length >= 4){
-								for(int i = 4; i < args.length; i++){
-									msg += " " + args[i];
-								}
-							}
-						}
-						String invmsg = "You have been invited become a Municipality Council Member " + mun.getName() + " (" + mun.getId() + ")!" + (msg == null ? "" : " MSG: " + msg);
-						NBTTagCompound compound = new NBTTagCompound();
-						compound.setString("type", "municipality_council");
-						compound.setInteger("id", mun.getId());
-						compound.setString("from", player.getGameProfile().getId().toString());
-						compound.setLong("at", Time.getDate());
-						MailUtil.send(sender, RecipientType.PLAYER, gp.getId().toString(), player.getGameProfile().getId().toString(), invmsg, MailType.INVITE, Time.DAY_MS * 5, compound);
-						Print.chat(sender, "&7&oInvite sent! (Will be valid for 5 days.)");
-						Print.log(StateLogger.player(player) + " invited " + StateLogger.player(gp) + " to the council of " + StateLogger.municipality(mun) + ".");
-						return;
-					}
+				if(mun.getCouncil().size() < 2){
+					Print.chat(sender, "&9You cannot leave while being the last council member.");
+					return;
+				}
+				mun.getCouncil().remove(ply.getUUID());
+				mun.setChanged(Time.getDate());
+				mun.save();
+				StateUtil.announce(server, AnnounceLevel.MUNICIPALITY, ply.getFormattedNickname() + " &9left the Municipality Council!", mun.getId());
+				Print.log(StateLogger.player(player) + " left of the council of " + StateLogger.municipality(mun) + ".");
+				return;
+			}
+			case "vote-mayor":{
+				if(!mun.isAuthorized(mun.r_VOTE_MAYOR.id, ply.getUUID()).isTrue() && !StateUtil.bypass(player)){
+					Print.chat(sender, "&4No permission.");
+					return;
+				}
+				if(mun.getHead() != null){
+					Print.chat(sender, "&aA vote for a new mayor can be only started when there is no mayor!");
+					return;
+				}
+				if(args.length < 3){
+					Print.chat(sender, "&7/mun vote-mayor &e>>playername<<"); return;
+				}
+				GameProfile gp = Static.getServer().getPlayerProfileCache().getGameProfileForUsername(args[1]);
+				if(gp == null || gp.getId() == null){
+					Print.chat(sender, "&cPlayer not found in Cache.");
+					break;
+				}
+				if(Vote.exists(mun, VoteType.ASSIGNMENT, null)){
+					Print.chat(sender, "&bThere is already an assignment vote ongoing!");
+					return;
+				}
+				int newid = sender.getEntityWorld().getCapability(StatesCapabilities.WORLD, null).getNewVoteId();
+				Vote newvote = new Vote(newid, null, ply.getUUID(), Time.getDate(), Time.getDate() + (Time.DAY_MS * 7),
+					mun, VoteType.ASSIGNMENT, !mun.r_VOTE_MAYOR.setter.isCitizenVote(), null, null);
+				if(newvote.getVoteFile().exists()){
+					new Exception("Tried to create new Vote with ID '" + newvote.id + "', but savefile already exists."); return;
+				}
+				newvote.save(); newvote.vote(sender, ply.getUUID(), gp.getId()); States.VOTES.put(newvote.id, newvote);
+				StateUtil.announce(null, AnnounceLevel.MUNICIPALITY_ALL, "A new vote to choose a Mayor started!", 0);
+				for(UUID member : newvote.council ? mun.getCouncil() : mun.getCitizen()){
+					MailUtil.send(null, RecipientType.PLAYER, member, null, "&7A new vote to choose a Mayor started!\n&7Detailed info via &e/st-vote status " + newvote.id, MailType.SYSTEM);
 				}
 				return;
 			}

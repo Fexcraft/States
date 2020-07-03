@@ -1421,6 +1421,7 @@ public class ManagerContainer extends GenericContainer {
 								compound.setLong("at", Time.getDate());
 								MailUtil.send(player, RecipientType.PLAYER, gp.getId().toString(), player.getGameProfile().getId().toString(), invmsg, MailType.INVITE, Time.DAY_MS * 2, compound);
 								Print.log(StateLogger.player(player) + " invited " + StateLogger.player(gp) + " to join "+ StateLogger.municipality(mun) + ".");
+								Print.chat(player, translate("states.manager_gui.list_citizens_municipality.add_done"));
 								sendListData();
 								return;
 							}
@@ -1455,6 +1456,38 @@ public class ManagerContainer extends GenericContainer {
 								Print.log(StateLogger.player(player) + " linked " + StateLogger.chunk(ck) + " to " + StateLogger.chunk(chunk) + ".");
 								sendListData();
 								//TODO property checks
+								return;
+							}
+							if(layer.isState()){
+								if(!state.isAuthorized(state.r_MUN_INVITE.id, cap.getUUID()).isTrue() && !bypass(player)){
+									sendStatus(null);
+									return;
+								}
+								Municipality invtar = null;
+								if(NumberUtils.isCreatable(input)){
+									invtar = StateUtil.getMunicipality(Integer.parseInt(input));
+								}
+								else{
+									invtar = StateUtil.getMunicipalityByName(input);
+								}
+								if(invtar == null || mun.getId() <= 0){
+									sendStatus("states.manager_gui.list_components_state.mun_not_found");
+									return;
+								}
+								if(mun.getHead() == null){
+									sendStatus("states.manager_gui.list_components_state.mun_no_mayor");
+									return;
+								}
+								String invmsg = translate("states.manager_gui.list_components_state.add_msg", state.getName() + " (" + state.getId() + ")");
+								NBTTagCompound compound = new NBTTagCompound();
+								compound.setString("type", "state_municipality");
+								compound.setInteger("id", state.getId());
+								compound.setString("from", player.getGameProfile().getId().toString());
+								compound.setLong("at", Time.getDate());
+								MailUtil.send(player, RecipientType.MUNICIPALITY, mun.getId(), player.getGameProfile().getId().toString(), invmsg, MailType.INVITE, Time.DAY_MS * 12, compound);
+								Print.log(StateLogger.player(player) + " invited " + StateLogger.municipality(mun) + " to join the State of " + StateLogger.state(state));
+								Print.chat(player, translate("states.manager_gui.list_components_state.add_done"));
+								sendListData();
 								return;
 							}
 							break;

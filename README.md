@@ -4,39 +4,39 @@ _A Successor to the FSU "Nations" series._
 
 ### What is "States"?
 Similarly to "Nations" (an old FSU module), it contains a _multi-layer_ protection system.    
-It is composed as follows: `Chunk -> District -> Municipality -> State`.    
+It is composed of (in order): `Chunk -> District -> Municipality -> State`.    
 
 Players can create a "Municipality", technically regard it as a "town" which expands.    
 Depending on it's size it will get various Titles ("Hamlet", "Village", "Town" and so on).    
-You can configure those titles and aswel limit how many districts a municipality can have, in config.    
+You can configure those titles and also limit how many districts a municipality can have in the config.    
 
 Here an example of how a populated/claimed area could look like:
 ![STCM](https://i.imgur.com/6KgjMei.png)
 
 
 Chunks have "types", based on their type their protection is handled differently, chunks can also be linked    
-to each other - the "core" chunk will store essential data then (owner, type, tax), and if you sell the core    
-chunk, all linked to it are sold ofcourse too!
+to each other - the "core" chunk will then store the essential data (owner, type, tax), and if you sell the core    
+chunk, all which are linked to it will be sold of course too!
 
 Here an example of various _Chunk Types_ in various districts:
 ![STPM](https://i.imgur.com/pDfBGTV.png)
 
 
-By default "wilderness" (unclaimed land) is _protected_, making players unable to edit blocks there, you can    
-ofcourse disable that in config. In case when the wilderness is protected players can make "temporary" claims    
+By default "wilderness" (unclaimed land) is _protected_, making players unable to edit/access blocks there,    
+you can disable that in config. In case when the wilderness is protected players can make "temporary" claims    
 which are called "Transit Zones" - they automatically unclaim after a day and cost 10% of the chunk's price.    
 They are for example useful to e.g. build roads from one municipality to another which are a distance apart.    
-_Ofcourse, the "transit zone" does not give access to the whole chunk, only a specific level set in config._
+_The "transit zone" does not give access to the whole chunk, only a specific block level set in config._
 
 
-There are also other nice side-features like "Sign Ships", which can be either linked to the player himself    
-(private player shops) or to the municipality or state - so the income/outcome goes directly there.    
+There are also other nice side-features like "Sign Ships", which can be either linked to the player self    
+(private player shops) or to the municipality or state - so the income/outcome goes directly there!    
 _[SignShop - VIDEO](https://cdn.discordapp.com/attachments/424351061873131521/443900271362572288/2018-05-10_00-17-07.mp4)
 
 
 ### Other mentionable things:
 - an special ingame GUI to claim land
-- a GUI to see the whole region at once (32x32 chunks area) (note: currently instable)
+- a GUI to see the whole region at once (32x32 chunks area) (note: currently unstable)
   - available modes being "terrain", "claims", "districts", "municipalities", "states"
 - every district/municipality/state can have a custom (HEX) color on the map! (or actually should)
 - districts have also "types", based on them e.g. (once _Companies_ are implemented) buying terrain as Company     
@@ -59,8 +59,8 @@ depending on mood on that day)
 **THIS MOD DOES NOT CONTAIN A "WAR" MODE**    
 As some years of server management confirm, for one it's hard to have a "realistic" war in MC    
 and for other if allowing it to be "minecrafty" - it's a strange mere clicking of swords,    
-which is strange on itself and I never understood it.    
-Not even Towny (bukkit plugin) had a war mode due to similar reasons - "how to do it??".
+which is odd on itself and I never understood it.    
+Not even Towny (bukkit plugin) had a war mode due to similar reasons - "how to do it??" (last time I used it, that is)..
 
 
 ### Why "States" as name? Wasn't the "nations" one good enough?
@@ -77,7 +77,7 @@ e.g. "Germany, Italy, and other European states"
 ```
 From past experience, people tended to either wanting to recreate a past time country - or went full nationalist    
 on their made up ingame country, and that's not something I like to see and it constantly degraded gameplay.    
-People instead of working together (or perhaps compete against) kept a constant a tense relation,    
+People instead of working together (or perhaps compete against) kept a constanly tense relation,    
 and seriously, we're here to enjoy our free time, not recreate world problems in a blocky game?    
 "States" is a more neutral name, a state is an organizational unit, you can assign towns/villages to it    
 and the state's job is to keep all running smoothly, and eventually protect from current/future issues.
@@ -92,12 +92,12 @@ _Well, at least in theory._
 
 
 ### Anything else I need to know?
-- _**Ask**, as I have partial memory loss, and already did forget some of things I wanted to write. At least I think._
+- _**Ask**, as I have partial memory loss, and already did forget some of things I wanted to write. At least I think so..._
 - Eventually check the Wiki, although it might not be complete yet.
 
 ### Depencencies
 - [FCL](https://github.com/Fexcraft/FCL) - Fexcraft Common Library
-  - Utils & other Common stuff States is  making use of.
+  - Utils & other Common stuff States is making use of.
 - [FSMM](https://github.com/Fexcraft/FSMM) - Fex's Small Money Mod
   - Account & Money (Currency) Management mod, which is in it's latest versions pretty well customisable.
 

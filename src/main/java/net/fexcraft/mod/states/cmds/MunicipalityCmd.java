@@ -460,13 +460,13 @@ public class MunicipalityCmd extends CommandBase {
 						Print.chat(player, "&3-> abandoning the state");
 					}
 					if(!pass && mun.isAuthorized(mun.r_ABANDON.id, ply.getUUID()).isVote()){
-						if(Vote.exists(mun, VoteType.ABANDONEMENT, null)){
+						if(Vote.exists(mun, VoteType.ABANDONMENT, null)){
 							Print.chat(sender, "&bThere is already an abandonement vote ongoing!");
 							return;
 						}
 						int newid = sender.getEntityWorld().getCapability(StatesCapabilities.WORLD, null).getNewVoteId();
 						Vote newvote = new Vote(newid, null, ply.getUUID(), Time.getDate(), Time.getDate() + (Time.DAY_MS * 7),
-							mun, VoteType.ABANDONEMENT, !mun.r_ABANDON.setter.isCitizenVote(), null, null);
+							mun, VoteType.ABANDONMENT, !mun.r_ABANDON.setter.isCitizenVote(), null, null);
 						if(newvote.getVoteFile().exists()){
 							new Exception("Tried to create new Vote with ID '" + newvote.id + "', but savefile already exists.");
 							return;

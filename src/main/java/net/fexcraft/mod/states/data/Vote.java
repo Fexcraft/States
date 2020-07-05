@@ -89,7 +89,7 @@ public class Vote {
 				new_value = (boolean)value;
 				to = null; return;
 			}
-			case ABANDONEMENT:{
+			case ABANDONMENT:{
 				new_value = false;
 				to = null; return;
 			}
@@ -189,7 +189,7 @@ public class Vote {
 		Print.chat(sender, "&6Authorized: &b" + (council ? "council vote" : "citizen vote"));
 		String typestr = null;
 		switch(type){
-			case ABANDONEMENT:
+			case ABANDONMENT:
 				typestr = "Abandonement of " + (holder instanceof State ? "State" : "Municipality");
 				break;
 			case ASSIGNMENT:
@@ -300,6 +300,9 @@ public class Vote {
 	@SuppressWarnings("incomplete-switch")
 	private void end(){
 		if(this.ended) return; ended = true; this.save();
+		if(type.abandonment()){
+			//TODO
+		}
 		if(type.assignment()){
 			if(votes.size() < (holder.getCouncil().size() / 2) + (holder.getCouncil().size() % 2 == 1 ? 1 : 0)){
 				String string = "&7Vote for new Head ended, due to missing votes it got &ccancelled&7.";
@@ -374,10 +377,10 @@ public class Vote {
 	}
 	
 	public static enum VoteType {
-		ASSIGNMENT, CHANGE_REVISER, CHANGE_SETTER, CHANGE_VALUE, ABANDONEMENT;
+		ASSIGNMENT, CHANGE_REVISER, CHANGE_SETTER, CHANGE_VALUE, ABANDONMENT;
 		public boolean assignment(){ return this == ASSIGNMENT; }
 		public boolean valueful(){ return this == CHANGE_VALUE; }
-		public boolean abandonement(){ return this == ABANDONEMENT; }
+		public boolean abandonment(){ return this == ABANDONMENT; }
 	}
 
 	public String targetAsString(){
@@ -403,7 +406,7 @@ public class Vote {
 	public static boolean exists(Ruleable holder, VoteType type, String rule){
 		for(Vote vote : holder.getActiveVotes()){
 			if(vote.type == type){
-				if(type.assignment() || type.abandonement()) return true;
+				if(type.assignment() || type.abandonment()) return true;
 				else if(vote.rule.equals(rule)) return true;
 			}
 		} return false;

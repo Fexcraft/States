@@ -63,15 +63,6 @@ public class StateCmd extends CommandBase {
 
 	@Override
 	public void execute(MinecraftServer server, ICommandSender sender, String[] args) throws CommandException {
-		if(args.length == 0){
-			Print.chat(sender, "&7/st info");
-			Print.chat(sender, "&7/st rules");
-			Print.chat(sender, "&7/st council <args...>");
-			Print.chat(sender, "&7/st create <name...>");
-			Print.chat(sender, "&7/st citizen");
-			Print.chat(sender, "&7/st buy");
-			return;
-		}
 		EntityPlayer player = (EntityPlayer)sender.getCommandSenderEntity();
 		PlayerCapability ply = player.getCapability(StatesCapabilities.PLAYER, null);
 		if(ply == null){
@@ -80,6 +71,21 @@ public class StateCmd extends CommandBase {
 		}
 		Chunk chunk = StateUtil.getChunk(player);
 		State state = chunk.getDistrict().getMunicipality().getState();
+		if(args.length == 0){
+			Print.chat(sender, "&7/st info");
+			Print.chat(sender, "&7/st rules");
+			if(state.getCouncil().contains(ply.getUUID()) || StateUtil.isAdmin(player)){
+				Print.chat(sender, "&8- &5- &8- - - - - -");
+				Print.chat(sender, "&7/st vote-head <player>");
+				Print.chat(sender, "&7/st leave-council");
+			}
+			Print.chat(sender, "&8- &6- &8- - - - - -");
+			Print.chat(sender, "&7/st create <name...>");
+			Print.chat(sender, "&7&m/st abandon");
+			Print.chat(sender, "&7&m/st claim");
+			Print.chat(sender, "&7/st buy");
+			return;
+		}
 		switch(args[0]){
 			case "info":{
 				openGui(player, MANAGER_STATE, ManagerContainer.Mode.INFO.ordinal(), state.getId(), 0);
@@ -89,49 +95,62 @@ public class StateCmd extends CommandBase {
 				openGui(player, RULE_EDITOR, 3, 0, 0);
 				return;
 			}
+			case "vote-head":{
+				if(!state.isAuthorized(state.r_VOTE_LEADER.id, ply.getUUID()).isTrue() && !StateUtil.bypass(player)){
+					Print.chat(sender, "&4No permission.");
+					return;
+				}
+				if(state.getHead() != null){
+					Print.chat(sender, "&aA vote for a new leader can be only started when there is no leader!");
+					return;
+				}
+				if(args.length < 2){
+					Print.chat(sender, "&7/st vote-head &e>>playername<<"); return;
+				}
+				GameProfile gp = Static.getServer().getPlayerProfileCache().getGameProfileForUsername(args[1]);
+				if(gp == null || gp.getId() == null){
+					Print.chat(sender, "&cPlayer not found in Cache.");
+					break;
+				}
+				if(Vote.exists(state, VoteType.ASSIGNMENT, null)){
+					Print.chat(sender, "&bThere is already an assignment vote ongoing!");
+					return;
+				}
+				int newid = sender.getEntityWorld().getCapability(StatesCapabilities.WORLD, null).getNewVoteId();
+				Vote newvote = new Vote(newid, null, ply.getUUID(), Time.getDate(), Time.getDate() + (Time.DAY_MS * 7),
+					state, VoteType.ASSIGNMENT, true, null, null);
+				if(newvote.getVoteFile().exists()){
+					new Exception("Tried to create new Vote with ID '" + newvote.id + "', but savefile already exists."); return;
+				}
+				newvote.save(); newvote.vote(sender, ply.getUUID(), gp.getId()); States.VOTES.put(newvote.id, newvote);
+				StateUtil.announce(null, AnnounceLevel.STATE_ALL, "A new vote to choose a State Leader started!", 0);
+				for(UUID member : state.getCouncil()){
+					MailUtil.send(null, RecipientType.PLAYER, member, null, "&7A new vote to choose a Head of State started!\n&7Detailed info via &e/st-vote status " + newvote.id, MailType.SYSTEM);
+				}
+				return;
+			}
+			case "leave-council":{
+				if(!state.getCouncil().contains(ply.getUUID())){
+					Print.chat(sender, "&7You are not a council member!");
+					return;
+				}
+				if(state.getCouncil().size() < 2){
+					Print.chat(sender, "&9You cannot leave while being the last council member.");
+					return;
+				}
+				state.getCouncil().remove(ply.getUUID());
+				state.save();
+				StateUtil.announce(server, AnnounceLevel.MUNICIPALITY, ply.getFormattedNickname() + " &9left the State Council!", state.getId());
+				Print.log(StateLogger.player(player) + " left the council of " + StateLogger.state(state) + ".");
+				return;
+			}
 			case "council":{
 				if(args.length == 1){
-					Print.chat(sender, "&7/st council vote <playername> (for leader)");
 					Print.chat(sender, "&7/st council kick <playername>");
 					Print.chat(sender, "&7/st council invite <playername>");
-					Print.chat(sender, "&7/st council leave");
                     return;
 				}
 				switch(args[1]){
-					case "vote":{
-						if(!state.isAuthorized(state.r_VOTE_LEADER.id, ply.getUUID()).isTrue() && !StateUtil.bypass(player)){
-							Print.chat(sender, "&4No permission.");
-							return;
-						}
-						if(state.getHead() != null){
-							Print.chat(sender, "&aA vote for a new leader can be only started when there is no leader!");
-							return;
-						}
-						if(args.length < 3){
-							Print.chat(sender, "&7/st council vote &e>>playername<<"); return;
-						}
-						GameProfile gp = Static.getServer().getPlayerProfileCache().getGameProfileForUsername(args[2]);
-						if(gp == null || gp.getId() == null){
-							Print.chat(sender, "&cPlayer not found in Cache.");
-							break;
-						}
-						if(Vote.exists(state, VoteType.ASSIGNMENT, null)){
-							Print.chat(sender, "&bThere is already an assignment vote ongoing!");
-							return;
-						}
-						int newid = sender.getEntityWorld().getCapability(StatesCapabilities.WORLD, null).getNewVoteId();
-						Vote newvote = new Vote(newid, null, ply.getUUID(), Time.getDate(), Time.getDate() + (Time.DAY_MS * 7),
-							state, VoteType.ASSIGNMENT, true, null, null);
-						if(newvote.getVoteFile().exists()){
-							new Exception("Tried to create new Vote with ID '" + newvote.id + "', but savefile already exists."); return;
-						}
-						newvote.save(); newvote.vote(sender, ply.getUUID(), gp.getId()); States.VOTES.put(newvote.id, newvote);
-						StateUtil.announce(null, AnnounceLevel.STATE_ALL, "A new vote to choose a State Leader started!", 0);
-						for(UUID member : state.getCouncil()){
-							MailUtil.send(null, RecipientType.PLAYER, member, null, "&7A new vote to choose a Head of State started!\n&7Detailed info via &e/st-vote status " + newvote.id, MailType.SYSTEM);
-						}
-						return;
-					}
 					case "kick":{
 						if(!state.isAuthorized(state.r_COUNCIL_KICK.id, ply.getUUID()).isTrue()){
 							Print.chat(sender, "&4No permission.");
@@ -155,16 +174,6 @@ public class StateCmd extends CommandBase {
 						StateUtil.announce(server, AnnounceLevel.MUNICIPALITY, gp.getName() + " &9was removed from the State Council!", state.getId());
 						Print.log(StateLogger.player(player) + " removed " + StateLogger.player(gp) + " from the council of " + StateLogger.state(state) + ".");
 						break;
-					}
-					case "leave":{
-						if(state.getCouncil().size() < 2){
-							Print.chat(sender, "&9You cannot leave while being the last council member.");
-							return;
-						}
-						state.getCouncil().remove(ply.getUUID());
-						state.save();
-						StateUtil.announce(server, AnnounceLevel.MUNICIPALITY, ply.getFormattedNickname() + " &9left the State Council!", state.getId());
-						Print.log(StateLogger.player(player) + " left the council of " + StateLogger.state(state) + ".");
 					}
 					case "invite":{
 						if(!state.isAuthorized(state.r_COUNCIL_INVITE.id, ply.getUUID()).isTrue()){

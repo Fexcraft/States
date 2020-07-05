@@ -5,6 +5,7 @@ import java.util.UUID;
 import net.fexcraft.lib.mc.utils.Print;
 import net.fexcraft.mod.states.data.root.Initiator;
 import net.fexcraft.mod.states.data.root.Ruleable;
+import net.fexcraft.mod.states.guis.ManagerContainer;
 
 public class Rule {
 	
@@ -59,12 +60,19 @@ public class Rule {
 				if(holder instanceof Municipality){
 					return Result.bool(((Municipality)holder).getCitizen().contains(uuid));
 				}
+				if(holder instanceof State){//initially not been intended be an option
+					return Result.bool(ManagerContainer.getCitizens((State)holder).contains(uuid));
+				}
 				else return Result.FALSE;//it shouldn't get this far
 			}
 			case CITIZEN_VOTE:{
 				if(votable_set){
 					if(holder instanceof Municipality){
 						if(((Municipality)holder).getCitizen().contains(uuid)) return Result.VOTE;
+						return Result.FALSE;
+					}
+					else if(holder instanceof State){//initially not been intended be an option
+						if(ManagerContainer.getCitizens((State)holder).contains(uuid)) return Result.VOTE;
 						return Result.FALSE;
 					}
 					else return Result.FALSE;//it shouldn't get this far

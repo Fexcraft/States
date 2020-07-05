@@ -351,6 +351,7 @@ public class MunicipalityCmd extends CommandBase {
 				}
 				if(!passed){
 					Print.chat(sender, "&cYou must be at least 3 chunks away from existing municipalities.");
+					return;
 				}
 				if(chunk.getDistrict().getId() >= 0){
 					Print.chat(sender, "&cThis chunk is already part of a municipality.");

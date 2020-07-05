@@ -69,12 +69,7 @@ public class PlayerImpl implements PlayerCapability {
 		this.nick = obj.has("nickname") ? obj.get("nickname").getAsString() : null;
 		this.color = JsonUtil.getIfExists(obj, "color", 2).intValue();
 		Municipality mun = StateUtil.getMunicipality(JsonUtil.getIfExists(obj, "municipality", -1).intValue());
-		if(mun != null && mun.getId() >= 0 && mun.getCitizen().contains(getUUID())){
-			this.setMunicipality(mun);
-		}
-		else{
-			this.setMunicipality(mun == null || (mun.getId() >= 0 && !mun.getCitizen().contains(getUUID())) ? StateUtil.getMunicipality(-1) : mun);
-		}
+		this.setMunicipality(mun == null || (mun.getId() >= 0 && !mun.getCitizen().contains(getUUID())) ? StateUtil.getMunicipality(-1) : mun);
 		this.account = this.isOnlinePlayer() ? entity.getCapability(FSMMCapabilities.PLAYER, null).getAccount() : DataManager.getAccount("player:" + getUUID().toString(), true, true);
 		this.lasttaxcoll = JsonUtil.getIfExists(obj, "last_tax_collection", 0).longValue();
 		this.customtax = JsonUtil.getIfExists(obj, "custom_tax", 0).longValue();

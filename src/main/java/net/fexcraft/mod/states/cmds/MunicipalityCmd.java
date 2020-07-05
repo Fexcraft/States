@@ -334,9 +334,23 @@ public class MunicipalityCmd extends CommandBase {
 					Print.chat(sender, "&cYour State does not allow you to create a new Municipality.");
 					return;
 				}
-				if(ply.getMunicipality().getId() >= 0){
+				/*if(ply.getMunicipality().getId() >= 0){
 					Print.chat(sender, "&cYou must leave your current municipality to create a new one.");
 					return;
+				}*/
+				boolean passed = true;
+				Chunk tempchunk = null;
+				for(int i = -3; i < 4 && passed; i++){
+					for(int j = -3; j < 4; j++){
+						tempchunk = StateUtil.getChunk(chunk.xCoord() + i, chunk.zCoord() + j);
+						if(tempchunk.getDistrict().getId() >= 0){
+							passed = false;
+							break;
+						}
+					}
+				}
+				if(!passed){
+					Print.chat(sender, "&cYou must be at least 3 chunks away from existing municipalities.");
 				}
 				if(chunk.getDistrict().getId() >= 0){
 					Print.chat(sender, "&cThis chunk is already part of a municipality.");

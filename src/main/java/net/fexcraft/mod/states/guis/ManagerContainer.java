@@ -1373,6 +1373,26 @@ public class ManagerContainer extends GenericContainer {
 								MailUtil.send(player, RecipientType.PLAYER, list_values[index].toString(), player.getGameProfile().getId().toString(), kickmsg, MailType.SYSTEM, Time.DAY_MS * 14);
 								return;
 							}
+							if(layer.isState()){
+								if(!state.isAuthorized(state.r_COUNCIL_KICK.id, cap.getUUID()).isTrue() && !bypass(player)){
+									sendStatus(null);
+									return;
+								}
+								if(!state.getCouncil().contains((UUID)list_values[index])){
+									sendStatus("states.manager_gui.list.not_council");
+									return;
+								}
+								state.getCouncil().remove((UUID)list_values[index]);
+								state.setChanged(Time.getDate());
+								state.save();
+								String name = Static.getPlayerNameByUUID((UUID)list_values[index]);
+								StateUtil.announce(null, AnnounceLevel.MUNICIPALITY, name + " &9was removed from the State Council!", state.getId());
+								Print.log(StateLogger.player(player) + " removed " + list_values[index].toString() + " from the council of " + StateLogger.state(state) + ".");
+								//
+								String kickmsg = translate("states.manager_gui.list_council_state.rem_msg", state.getName() + "(" + state.getId() + ")");
+								MailUtil.send(player, RecipientType.PLAYER, list_values[index].toString(), player.getGameProfile().getId().toString(), kickmsg, MailType.SYSTEM, Time.DAY_MS * 14);
+								return;
+							}
 							break;
 						case LIST_NEIGHBORS: return;
 						default: return;
@@ -1565,6 +1585,35 @@ public class ManagerContainer extends GenericContainer {
 								Print.log(StateLogger.player(player) + " invited " + StateLogger.player(gp) + " to the council of " + StateLogger.municipality(mun) + ".");
 								Print.chat(player, translate("states.manager_gui.list_council_municipality.add_done"));
 								sendListData();
+								return;
+							}
+							if(layer.isState()){
+								if(!state.isAuthorized(state.r_COUNCIL_INVITE.id, cap.getUUID()).isTrue() && !bypass(player)){
+									sendStatus(null);
+									return;
+								}
+								GameProfile gp = Static.getServer().getPlayerProfileCache().getGameProfileForUsername(input);
+								if(gp == null || gp.getId() == null){
+									sendStatus("states.manager_gui.view.player_not_found_cache");
+									return;
+								}
+								if(state.getCouncil().contains(gp.getId())){
+									sendStatus("states.manager_gui.list.is_council");
+									return;
+								}
+								if(!getCitizens(state).contains(gp.getId())){
+									sendStatus("states.manager_gui.list.not_a_citizen");
+									return;
+								}
+								String invmsg = translate("states.manager_gui.list_council_state.add_msg", state.getName() + " (" + state.getId() + ")");
+								NBTTagCompound compound = new NBTTagCompound();
+								compound.setString("type", "state_council");
+								compound.setInteger("id", state.getId());
+								compound.setString("from", player.getGameProfile().getId().toString());
+								compound.setLong("at", Time.getDate());
+								MailUtil.send(player, RecipientType.PLAYER, gp.getId().toString(), player.getGameProfile().getId().toString(), invmsg, MailType.INVITE, Time.DAY_MS * 5, compound);
+								Print.chat(player, translate("states.manager_gui.list_council_state.add_done"));
+								Print.log(StateLogger.player(player) + " invited " + StateLogger.player(gp) + " to the council of " + StateLogger.state(state) + ".");
 								return;
 							}
 							break;

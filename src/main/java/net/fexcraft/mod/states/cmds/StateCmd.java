@@ -35,7 +35,6 @@ import net.minecraft.command.CommandBase;
 import net.minecraft.command.CommandException;
 import net.minecraft.command.ICommandSender;
 import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.server.MinecraftServer;
 
 @fCommand
@@ -142,78 +141,6 @@ public class StateCmd extends CommandBase {
 				state.save();
 				StateUtil.announce(server, AnnounceLevel.MUNICIPALITY, ply.getFormattedNickname() + " &9left the State Council!", state.getId());
 				Print.log(StateLogger.player(player) + " left the council of " + StateLogger.state(state) + ".");
-				return;
-			}
-			case "council":{
-				if(args.length == 1){
-					Print.chat(sender, "&7/st council kick <playername>");
-					Print.chat(sender, "&7/st council invite <playername>");
-                    return;
-				}
-				switch(args[1]){
-					case "kick":{
-						if(!state.isAuthorized(state.r_COUNCIL_KICK.id, ply.getUUID()).isTrue()){
-							Print.chat(sender, "&4No permission.");
-							return;
-						}
-						if(args.length < 3){
-							Print.chat(sender, "&9Missing Argument.");
-							return;
-						}
-						GameProfile gp = Static.getServer().getPlayerProfileCache().getGameProfileForUsername(args[2]);
-						if(gp == null){
-							Print.chat(sender, "&eGameProfile not found.");
-							return;
-						}
-						if(!state.getCouncil().contains(gp.getId())){
-							Print.chat(sender, "Player isn't part of the council.");
-							return;
-						}
-						state.getCouncil().remove(gp.getId());
-						state.save();
-						StateUtil.announce(server, AnnounceLevel.MUNICIPALITY, gp.getName() + " &9was removed from the State Council!", state.getId());
-						Print.log(StateLogger.player(player) + " removed " + StateLogger.player(gp) + " from the council of " + StateLogger.state(state) + ".");
-						break;
-					}
-					case "invite":{
-						if(!state.isAuthorized(state.r_COUNCIL_INVITE.id, ply.getUUID()).isTrue()){
-							Print.chat(sender, "&4No permission.");
-							return;
-						}
-						if(args.length < 3){
-							Print.chat(sender, "&7/mun council invite <playername> <optional:message>");
-							return;
-						}
-						GameProfile gp = server.getPlayerProfileCache().getGameProfileForUsername(args[2]);
-						if(gp == null || gp.getId() == null){
-							Print.chat(sender, "&cPlayer not found.");
-							return;
-						}
-						if(state.getCouncil().contains(gp.getId())){
-							Print.chat(sender, "That player is already a Council member.");
-							return;
-						}
-						String msg = null;
-						if(args.length > 3){
-							msg = args[3];
-							if(args.length >= 4){
-								for(int i = 4; i < args.length; i++){
-									msg += " " + args[i];
-								}
-							}
-						}
-						String invmsg = "You have been invited become a State Countil Member " + state.getName() + " (" + state.getId() + ")!" + (msg == null ? "" : " MSG: " + msg);
-						NBTTagCompound compound = new NBTTagCompound();
-						compound.setString("type", "state_council");
-						compound.setInteger("id", state.getId());
-						compound.setString("from", player.getGameProfile().getId().toString());
-						compound.setLong("at", Time.getDate());
-						MailUtil.send(sender, RecipientType.PLAYER, gp.getId().toString(), player.getGameProfile().getId().toString(), invmsg, MailType.INVITE, Time.DAY_MS * 5, compound);
-						Print.chat(sender, "&7&oInvite sent! (Will be valid for 5 days.)");
-						Print.log(StateLogger.player(player) + " invited " + StateLogger.player(gp) + " to the council of " + StateLogger.state(state) + ".");
-						return;
-					}
-				}
 				return;
 			}
 			case "create":{

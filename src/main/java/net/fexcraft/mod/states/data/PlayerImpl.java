@@ -73,10 +73,7 @@ public class PlayerImpl implements PlayerCapability {
 			this.setMunicipality(mun);
 		}
 		else{
-			this.setMunicipality(mun == null ? StateUtil.getMunicipality(-1) : mun);
-			if(!this.municipality.getCitizen().contains(getUUID())){
-				this.municipality.getCitizen().add(getUUID());
-			}
+			this.setMunicipality(mun == null || (mun.getId() >= 0 && !mun.getCitizen().contains(getUUID())) ? StateUtil.getMunicipality(-1) : mun);
 		}
 		this.account = this.isOnlinePlayer() ? entity.getCapability(FSMMCapabilities.PLAYER, null).getAccount() : DataManager.getAccount("player:" + getUUID().toString(), true, true);
 		this.lasttaxcoll = JsonUtil.getIfExists(obj, "last_tax_collection", 0).longValue();

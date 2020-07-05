@@ -89,6 +89,12 @@ public class Vote {
 				new_value = (boolean)value;
 				to = null; return;
 			}
+			case ABANDONEMENT:{
+				new_value = false;
+				to = null; return;
+			}
+			default:
+				break;
 		}
 	}
 	
@@ -181,18 +187,34 @@ public class Vote {
 		Print.chat(sender, "&9Created: &7" + timeformat(created));
 		Print.chat(sender, "&9Expiry: &7" + timeformat(expiry));
 		Print.chat(sender, "&6Authorized: &b" + (council ? "council vote" : "citizen vote"));
-		if(holder instanceof District){
-			Print.chat(sender, "&9Type: &7" + (type.assignment() ? "Assignment of new Manager" : "Vote For Rule Change"));
+		String typestr = null;
+		switch(type){
+			case ABANDONEMENT:
+				typestr = "Abandonement of " + (holder instanceof State ? "State" : "Municipality");
+				break;
+			case ASSIGNMENT:
+				typestr = "Assignment of new ";
+				if(holder instanceof District){
+					typestr += "Manager";
+				}
+				else if(holder instanceof Municipality){
+					typestr += "Mayor";
+				}
+				else if(holder instanceof State){
+					typestr += "Head";
+				}
+				else{
+					typestr += "INVALID TARGET";
+				}
+				break;
+			case CHANGE_REVISER:
+			case CHANGE_SETTER:
+			case CHANGE_VALUE:
+				typestr = "Vote For Rule Change";
+				break;
+			
 		}
-		else if(holder instanceof Municipality){
-			Print.chat(sender, "&9Type: &7" + (type.assignment() ? "Assignment of new Mayor" : "Vote For Rule Change"));
-		}
-		else if(holder instanceof State){
-			Print.chat(sender, "&9Type: &7" + (type.assignment() ? "Assignment of new Head" : "Vote For Rule Change"));
-		}
-		else{
-			Print.chat(sender, "&9Type: &7INVALID TARGET");
-		}
+		Print.chat(sender, "&9Type: &7" + typestr);
 		if(!type.assignment()){
 			Print.chat(sender, "&9Rule: &7" + rule);
 			switch(type){
@@ -352,9 +374,10 @@ public class Vote {
 	}
 	
 	public static enum VoteType {
-		ASSIGNMENT, CHANGE_REVISER, CHANGE_SETTER, CHANGE_VALUE;
+		ASSIGNMENT, CHANGE_REVISER, CHANGE_SETTER, CHANGE_VALUE, ABANDONEMENT;
 		public boolean assignment(){ return this == ASSIGNMENT; }
 		public boolean valueful(){ return this == CHANGE_VALUE; }
+		public boolean abandonement(){ return this == ABANDONEMENT; }
 	}
 
 	public String targetAsString(){
@@ -380,7 +403,7 @@ public class Vote {
 	public static boolean exists(Ruleable holder, VoteType type, String rule){
 		for(Vote vote : holder.getActiveVotes()){
 			if(vote.type == type){
-				if(type.assignment()) return true;
+				if(type.assignment() || type.abandonement()) return true;
 				else if(vote.rule.equals(rule)) return true;
 			}
 		} return false;

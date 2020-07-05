@@ -338,6 +338,7 @@ public class MunicipalityCmd extends CommandBase {
 					Print.chat(sender, "&cYou must leave your current municipality to create a new one.");
 					return;
 				}*/
+				if(!ply.canLeave(sender)) return;
 				if(chunk.getDistrict().getId() >= 0){
 					Print.chat(sender, "&cThis chunk is already part of a municipality.");
 					return;
@@ -391,7 +392,8 @@ public class MunicipalityCmd extends CommandBase {
 						newmun.setPrice(0);
 						newmun.getCitizen().add(ply.getUUID());
 						newmun.setChanged(Time.getDate());
-                                                newmun.getCouncil().add(ply.getUUID());
+						newmun.getCouncil().add(ply.getUUID());
+						newmun.setState(ply.getState());
 						//
 						District newdis = new District(sender.getEntityWorld().getCapability(StatesCapabilities.WORLD, null).getNewDistrictId());
 						if(newdis.getDistrictFile().exists() || StateUtil.getDistrict(newdis.getId()).getId() >= 0){
@@ -422,6 +424,9 @@ public class MunicipalityCmd extends CommandBase {
 								StateUtil.announce(server, "&9New Municipality and District was created!");
 								StateUtil.announce(server, "&9Created by " + ply.getFormattedNickname());
 								StateUtil.announce(server, "&9Name&0: &7" + newmun.getName());
+								if(newmun.getState().getId() >= 0){
+									StateUtil.announce(server, "&9Part of&0: &7" + newmun.getState().getName());
+								}
 								Print.log(StateLogger.player(player) + " created " + StateLogger.municipality(newmun) + " at " + StateLogger.chunk(chunk) + ".");
 								Print.log(StateLogger.player(player) + " created " + StateLogger.district(newdis) + " at " + StateLogger.chunk(chunk) + ".");
 								Print.log(StateLogger.player(player) + " created a Municipality at " + StateLogger.chunk(chunk) + ".");

@@ -338,6 +338,10 @@ public class MunicipalityCmd extends CommandBase {
 					Print.chat(sender, "&cYou must leave your current municipality to create a new one.");
 					return;
 				}*/
+				if(chunk.getDistrict().getId() >= 0){
+					Print.chat(sender, "&cThis chunk is already part of a municipality.");
+					return;
+				}
 				boolean passed = true;
 				Chunk tempchunk = null;
 				for(int i = -3; i < 4 && passed; i++){
@@ -351,10 +355,6 @@ public class MunicipalityCmd extends CommandBase {
 				}
 				if(!passed){
 					Print.chat(sender, "&cYou must be at least 3 chunks away from existing municipalities.");
-					return;
-				}
-				if(chunk.getDistrict().getId() >= 0){
-					Print.chat(sender, "&cThis chunk is already part of a municipality.");
 					return;
 				}
 				if(ply.getAccount().getBalance() < price){

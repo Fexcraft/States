@@ -87,6 +87,7 @@ public class PlayerImpl implements PlayerCapability {
 	public void setMunicipality(Municipality mun){
 		if(this.municipality != null){
 			this.municipality.getCitizen().remove(this.getUUID());
+			this.municipality.getCouncil().remove(this.getUUID());
 			//
 			for(int id : this.municipality.getDistricts()){
 				District dis = StateUtil.getDistrict(id);

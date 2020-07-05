@@ -451,7 +451,7 @@ public class MunicipalityCmd extends CommandBase {
 				if(!res.isFalse() || pass){
 					Account munacc = mun.getAccount();
 					if(munacc.getBalance() < StConfig.MUNICIPALITY_ABANDONMENT_PRICE){
-						Print.chat(player, "&cMunicipality does not have enought money to pay the abandonement server fee.");
+						Print.chat(player, "&cMunicipality does not have enough money to pay the abandonement server fee.");
 					}
 					if(mun.isCapital()){
 						Print.chat(player, "&cYou cannot abandon the capital!");
@@ -460,7 +460,24 @@ public class MunicipalityCmd extends CommandBase {
 						Print.chat(player, "&3-> abandoning the state");
 					}
 					if(!pass && mun.isAuthorized(mun.r_ABANDON.id, ply.getUUID()).isVote()){
-						
+						if(Vote.exists(mun, VoteType.ABANDONEMENT, null)){
+							Print.chat(sender, "&bThere is already an abandonement vote ongoing!");
+							return;
+						}
+						int newid = sender.getEntityWorld().getCapability(StatesCapabilities.WORLD, null).getNewVoteId();
+						Vote newvote = new Vote(newid, null, ply.getUUID(), Time.getDate(), Time.getDate() + (Time.DAY_MS * 7),
+							mun, VoteType.ABANDONEMENT, !mun.r_ABANDON.setter.isCitizenVote(), null, null);
+						if(newvote.getVoteFile().exists()){
+							new Exception("Tried to create new Vote with ID '" + newvote.id + "', but savefile already exists.");
+							return;
+						}
+						newvote.vote(sender, ply.getUUID(), true);
+						newvote.save();
+						States.VOTES.put(newvote.id, newvote);
+						StateUtil.announce(null, AnnounceLevel.MUNICIPALITY_ALL, "A new vote to abandon the Municipality started!", 0);
+						for(UUID member : newvote.council ? mun.getCouncil() : mun.getCitizen()){
+							MailUtil.send(null, RecipientType.PLAYER, member, null, "&7A new vote to abandon the Municipality started!\n&7Detailed info via &e/st-vote status " + newvote.id, MailType.SYSTEM);
+						}
 					}
 					else{
 						mun.setAbandoned(player.getGameProfile().getId());

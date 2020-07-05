@@ -60,7 +60,7 @@ public class Rule {
 				if(holder instanceof Municipality){
 					return Result.bool(((Municipality)holder).getCitizen().contains(uuid));
 				}
-				if(holder instanceof State){//initially not been intended be an option
+				else if(holder instanceof State){//initially not been intended be an option
 					return Result.bool(ManagerContainer.getCitizens((State)holder).contains(uuid));
 				}
 				else return Result.FALSE;//it shouldn't get this far
@@ -111,11 +111,18 @@ public class Rule {
 				if(holder instanceof Municipality){
 					return Result.bool(((Municipality)holder).getCitizen().contains(uuid));
 				}
+				else if(holder instanceof State){//initially not been intended be an option
+					return Result.bool(ManagerContainer.getCitizens((State)holder).contains(uuid));
+				}
 				else return Result.FALSE;
 			}
 			case CITIZEN_VOTE:{
 				if(holder instanceof Municipality){
 					if(((Municipality)holder).getCitizen().contains(uuid)) return Result.VOTE;
+					return Result.FALSE;
+				}
+				else if(holder instanceof State){//initially not been intended be an option
+					if(ManagerContainer.getCitizens((State)holder).contains(uuid)) return Result.VOTE;
 					return Result.FALSE;
 				}
 				else return Result.FALSE;

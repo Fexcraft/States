@@ -1787,7 +1787,7 @@ public class ManagerContainer extends GenericContainer {
 		return "INVALID_TYPE";
 	}
 
-	private ArrayList<UUID> getCitizens(State state){
+	public static ArrayList<UUID> getCitizens(State state){
 		ArrayList<UUID> list = new ArrayList<UUID>();
 		for(int id : state.getMunicipalities()){
 			Municipality mun = StateUtil.getMunicipality(id);

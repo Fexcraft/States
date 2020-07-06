@@ -16,6 +16,7 @@ import net.fexcraft.lib.common.math.Time;
 import net.fexcraft.lib.mc.utils.Print;
 import net.fexcraft.lib.mc.utils.Static;
 import net.fexcraft.mod.states.States;
+import net.fexcraft.mod.states.data.capabilities.PlayerCapability;
 import net.fexcraft.mod.states.data.root.AnnounceLevel;
 import net.fexcraft.mod.states.data.root.Initiator;
 import net.fexcraft.mod.states.data.root.Mailbox.MailType;
@@ -301,7 +302,45 @@ public class Vote {
 	private void end(){
 		if(this.ended) return; ended = true; this.save();
 		if(type.abandonment()){
-			//TODO
+			boolean isstate = holder instanceof State;
+			if(votes.size() < (holder.getCouncil().size() / 2) + (holder.getCouncil().size() % 2 == 1 ? 1 : 0)){
+				String string = "&7Vote for new abandonment ended, due to missing votes it got &ccancelled&7.";
+				StateUtil.announce(Static.getServer(), isstate ? AnnounceLevel.STATE_ALL : AnnounceLevel.MUNICIPALITY_ALL, string, isstate ? ((State)holder).getId() : ((Municipality)holder).getId());
+			}
+			int a = 0, d = 0;
+			for(Object obj : votes.values())
+				if((boolean)obj) a++;
+				else d++;
+			String text0;
+			boolean fail = false;
+			if(a == 0 && d == 0){
+				text0 = "&7Vote [&9" + id + "&7] for abandonment ended without votes."; fail = true;
+			}
+			else if(a < d){
+				text0 = "&7Vote [&9" + id + "&7] ended. &cAbandonment cancelled."; fail = true;
+			}
+			else if(a == d){
+				text0 = "&7Vote [&9" + id + "&7] for abandonment ended, &esame amount of votes&7."; fail = true;
+			}
+			else{
+				text0 = "&7Vote [&9" + id + "&7] ended. &aAbandonment will be executed.";
+			}
+			AnnounceLevel level = isstate ? AnnounceLevel.STATE_ALL : AnnounceLevel.MUNICIPALITY_ALL;
+			int range = isstate ? ((State)holder).getId() : ((Municipality)holder).getId();
+			StateUtil.announce(Static.getServer(), level, text0, range);
+			if(!fail){
+				PlayerCapability cap = StateUtil.getPlayer(beginner, true);
+				if(isstate){
+					//TODO ((State)holder)
+				}
+				else{
+					Municipality mun = (Municipality)holder;
+					mun.setAbandoned(this.beginner);
+					StateUtil.announce(null, "&9A Municipality was voted to be abandoned!");
+					StateUtil.announce(null, "&9Name&0: &7" + mun.getName() + " &3(&6" + mun.getId() + "&3)");
+					StateUtil.announce(null, "&9By " + cap.getFormattedNickname());
+				}
+			}
 		}
 		if(type.assignment()){
 			if(votes.size() < (holder.getCouncil().size() / 2) + (holder.getCouncil().size() % 2 == 1 ? 1 : 0)){
@@ -315,8 +354,10 @@ public class Vote {
 					vots.put(uuid, vots.get(uuid) + 1);
 				} else vots.put(uuid, 1);
 			}
-			int summary = 0; for(int i : vots.values()) summary += i;
-			int mostv = -1; UUID most = null;
+			int summary = 0;
+			for(int i : vots.values()) summary += i;
+			int mostv = -1;
+			UUID most = null;
 			for(Map.Entry<String, Integer> entry : vots.entrySet()){
 				if(entry.getValue() > mostv){
 					mostv = entry.getValue(); most = UUID.fromString(entry.getKey());
@@ -333,7 +374,12 @@ public class Vote {
 		}
 		AnnounceLevel level = holder instanceof District ? AnnounceLevel.DISTRICT : holder instanceof State ? AnnounceLevel.STATE_ALL : AnnounceLevel.MUNICIPALITY_ALL;
 		int range = holder instanceof District ? ((District)holder).getId() : holder instanceof State ? ((State)holder).getId() : ((Municipality)holder).getId();
-		int a = 0, d = 0; for(Object obj : votes.values()) if((boolean)obj) a++; else d++; String text0, text1, text2; boolean fail = false;
+		int a = 0, d = 0;
+		for(Object obj : votes.values())
+			if((boolean)obj) a++;
+			else d++;
+		String text0, text1, text2;
+		boolean fail = false;
 		if(a == 0 && d == 0){
 			text0 = "&7Vote [&9" + id + "&7] for rule change ended without votes."; fail = true;
 		}

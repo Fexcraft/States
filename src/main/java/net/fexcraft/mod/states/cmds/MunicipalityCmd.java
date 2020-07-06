@@ -446,6 +446,10 @@ public class MunicipalityCmd extends CommandBase {
 					Print.chat(player, "&cYou cannot abandon system municipalities.");
 					return;
 				}
+				if(mun.isAbandoned()){
+					Print.chat(player, "&cMunicipality is marked as abandoned already.");
+					return;
+				}
 				Rule.Result res = mun.isAuthorized(mun.r_ABANDON.id, ply.getUUID());
 				boolean pass = StateUtil.bypass(player) || isLastCitizen(mun, ply);
 				if(!res.isFalse() || pass){
@@ -498,7 +502,30 @@ public class MunicipalityCmd extends CommandBase {
 				return;
 			}
 			case "claim":{
-				
+				if(mun.getId() < 1){
+					Print.chat(player, "&cYou cannot claim system municipalities.");
+					return;
+				}
+				if(!mun.isAbandoned()){
+					Print.chat(player, "&cMunicipality is not marked as abandoned.");
+					return;
+				}
+				if(ply.getState().isAuthorized(ply.getState().r_CLAIM_MUNICIPALITY.id, ply.getUUID()).isTrue() ||  StateUtil.bypass(player)){
+					mun.getAbandoned(ply);
+					StateUtil.announce(server, "&9A Municipality has been claimed!");
+					StateUtil.announce(server, "&9Name&0: &7" + mun.getName() + " &3(&6" + mun.getId() + "&3)");
+					StateUtil.announce(server, "&9By " + ply.getFormattedNickname());
+					if(mun.getState().getId() >= 0){
+						StateUtil.announce(server, "&9Is now part of&0: &7" + mun.getState().getName());
+					}
+				}
+				else{
+					Print.chat(player, "&cNo permission to claim this municipality.");
+					Print.chat(player, "&7Conditions: (at least one must apply)");
+					Print.chat(player, "&3-> authorized to execute rule 'claim'");
+					Print.chat(player, "&3-> has admin permission / operator");
+					Print.chat(player, "&3-> is not a citizen of a municipality");
+				}
 				return;
 			}
 			default:{

@@ -442,6 +442,7 @@ public class Municipality implements ColorHolder, BuyableType, IconHolder, Accou
 		council.add(by.getUUID());
 		citizen.clear();
 		citizen.add(by.getUUID());
+		setState(by.getState());
 		by.setMunicipality(this);
 		mayor = by.getUUID();
 		save();

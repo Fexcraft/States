@@ -41,7 +41,7 @@ public class State implements ColorHolder, BuyableType, IconHolder, AccountHolde
 	//
 	private String ruleset;
 	private RuleMap rules = new RuleMap();
-	public final Rule r_CREATE_SIGN_SHOP, r_SET_MAILBOX, r_OPEN_MAILBOX, r_CREATE_MUNICIPALITY;
+	public final Rule r_CREATE_SIGN_SHOP, r_SET_MAILBOX, r_OPEN_MAILBOX, r_CREATE_MUNICIPALITY, r_CLAIM_MUNICIPALITY;
 	public final Rule r_SET_COLOR, r_SET_ICON, r_SET_NAME, r_SET_PRICE, r_SET_LEADER, r_SET_CHUNK_TAX_PERCENT;
 	public final Rule r_EDIT_BL, r_MUN_KICK, r_MUN_INVITE, r_COUNCIL_KICK, r_COUNCIL_INVITE, r_VOTE_LEADER;
 	public final Rule r_SET_CAPITAL, r_SET_CITIZEN_TAX_PERCENT, r_SET_RULESET, r_RESET_HEAD;
@@ -88,6 +88,7 @@ public class State implements ColorHolder, BuyableType, IconHolder, AccountHolde
 		rules.add(r_SET_CAPITAL = new Rule("set.capital", null, false, Initiator.COUNCIL_VOTE, Initiator.INCHARGE));
 		rules.add(r_SET_RULESET = new Rule("set.ruleset-name", null, false, Initiator.COUNCIL_VOTE, Initiator.INCHARGE));
 		rules.add(r_RESET_HEAD = new Rule("set.leader.none", null, false, Initiator.COUNCIL_VOTE, Initiator.INCHARGE));
+		rules.add(r_CLAIM_MUNICIPALITY = new Rule("claim.municipality", null, false, Initiator.COUNCIL_VOTE, Initiator.CITIZEN_ANY));
 		if(obj.has("rules")){
 			JsonObject rls = obj.get("rules").getAsJsonObject();
 			for(Map.Entry<String, JsonElement> entry : rls.entrySet()){

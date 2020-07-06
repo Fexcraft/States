@@ -3,6 +3,8 @@ package net.fexcraft.mod.states.cmds;
 import static net.fexcraft.mod.states.guis.GuiHandler.MANAGER_MUNICIPALITY;
 import static net.fexcraft.mod.states.guis.GuiHandler.RULE_EDITOR;
 import static net.fexcraft.mod.states.guis.GuiHandler.openGui;
+import static net.fexcraft.mod.states.util.StConfig.MUNICIPALITY_ABANDONMENT_PRICE;
+import static net.fexcraft.mod.states.util.StConfig.MUNICIPALITY_CLAIM_PRICE;
 
 import java.util.UUID;
 
@@ -14,7 +16,9 @@ import net.fexcraft.lib.mc.utils.Print;
 import net.fexcraft.lib.mc.utils.Static;
 import net.fexcraft.mod.fsmm.api.Account;
 import net.fexcraft.mod.fsmm.api.Bank;
+import net.fexcraft.mod.fsmm.api.Bank.Action;
 import net.fexcraft.mod.fsmm.util.Config;
+import net.fexcraft.mod.fsmm.util.DataManager;
 import net.fexcraft.mod.states.States;
 import net.fexcraft.mod.states.data.*;
 import net.fexcraft.mod.states.data.Vote.VoteType;
@@ -454,8 +458,9 @@ public class MunicipalityCmd extends CommandBase {
 				boolean pass = StateUtil.bypass(player) || isLastCitizen(mun, ply);
 				if(!res.isFalse() || pass){
 					Account munacc = mun.getAccount();
-					if(munacc.getBalance() < StConfig.MUNICIPALITY_ABANDONMENT_PRICE){
+					if(munacc.getBalance() < MUNICIPALITY_ABANDONMENT_PRICE){
 						Print.chat(player, "&cMunicipality does not have enough money to pay the abandonement server fee.");
+						return;
 					}
 					if(mun.isCapital()){
 						Print.chat(player, "&cYou cannot abandon the capital!");
@@ -484,10 +489,13 @@ public class MunicipalityCmd extends CommandBase {
 						}
 					}
 					else{
-						mun.setAbandoned(player.getGameProfile().getId());
-						StateUtil.announce(server, "&9A Municipality became abandoned!");
-						StateUtil.announce(server, "&9Name&0: &7" + mun.getName() + " &3(&6" + mun.getId() + "&3)");
-						StateUtil.announce(server, "&9By " + ply.getFormattedNickname());
+						Bank bank = DataManager.getBank(mun.getAccount().getBankId(), true, false);
+						if(MUNICIPALITY_ABANDONMENT_PRICE <= 0 || bank.processAction(Action.TRANSFER, player, mun.getAccount(), MUNICIPALITY_ABANDONMENT_PRICE, States.SERVERACCOUNT)){
+							mun.setAbandoned(player.getGameProfile().getId());
+							StateUtil.announce(server, "&9A Municipality became abandoned!");
+							StateUtil.announce(server, "&9Name&0: &7" + mun.getName() + " &3(&6" + mun.getId() + "&3)");
+							StateUtil.announce(server, "&9By " + ply.getFormattedNickname());
+						}
 					}
 				}
 				else{
@@ -511,12 +519,19 @@ public class MunicipalityCmd extends CommandBase {
 					return;
 				}
 				if(ply.getState().isAuthorized(ply.getState().r_CLAIM_MUNICIPALITY.id, ply.getUUID()).isTrue() ||  StateUtil.bypass(player)){
-					mun.getAbandoned(ply);
-					StateUtil.announce(server, "&9A Municipality has been claimed!");
-					StateUtil.announce(server, "&9Name&0: &7" + mun.getName() + " &3(&6" + mun.getId() + "&3)");
-					StateUtil.announce(server, "&9By " + ply.getFormattedNickname());
-					if(mun.getState().getId() >= 0){
-						StateUtil.announce(server, "&9Is now part of&0: &7" + mun.getState().getName());
+					if(ply.getAccount().getBalance() < MUNICIPALITY_CLAIM_PRICE){
+						Print.chat(player, "&cNot enough money to pay the claim server fee.");
+						return;
+					}
+					Bank bank = DataManager.getBank(mun.getAccount().getBankId(), true, false);
+					if(MUNICIPALITY_CLAIM_PRICE <= 0 || bank.processAction(Action.TRANSFER, player, ply.getAccount(), MUNICIPALITY_CLAIM_PRICE, States.SERVERACCOUNT)){
+						mun.getAbandoned(ply);
+						StateUtil.announce(server, "&9A Municipality has been claimed!");
+						StateUtil.announce(server, "&9Name&0: &7" + mun.getName() + " &3(&6" + mun.getId() + "&3)");
+						StateUtil.announce(server, "&9By " + ply.getFormattedNickname());
+						if(mun.getState().getId() >= 0){
+							StateUtil.announce(server, "&9Is now part of&0: &7" + mun.getState().getName());
+						}
 					}
 				}
 				else{

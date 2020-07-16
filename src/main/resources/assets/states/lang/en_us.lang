@@ -95,6 +95,7 @@ states.manager_gui.view_district.creator=Creator
 states.manager_gui.view_district.created=Created
 states.manager_gui.view_district.ruleset=Ruleset
 states.manager_gui.view_district.mailbox=Mailbox
+states.manager_gui.view_district.explosion=Allow Explosions
 //
 states.manager_gui.view_municipality.id=Municipality ID
 states.manager_gui.view_municipality.name=Name

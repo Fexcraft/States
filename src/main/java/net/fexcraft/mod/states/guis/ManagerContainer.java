@@ -132,6 +132,7 @@ public class ManagerContainer extends GenericContainer {
 				addKey(list, "ruleset", dis.getRulesetTitle(), ViewMode.EDIT);
 				addKey(list, "mailbox", dis.getMailbox() == null ? NOMAILBOX : dis.getMailbox().toString(), ViewMode.RESET);
 				addKey(list, "icon", dis.getIcon(), ViewMode.EDIT);
+				addKey(list, "explosion", dis.r_ALLOW_EXPLOSIONS.get(), ViewMode.BOOL);
 				break;
 			case MUNICIPALITY:
 				addKey(list, "id", mun.getId(), ViewMode.NONE);
@@ -569,6 +570,17 @@ public class ManagerContainer extends GenericContainer {
 										catch(Exception e){
 											sendStatus("&2Error: &7" + e.getMessage());
 										}
+									}
+									else sendStatus(null);
+									break;
+								}
+								case "explosion":{
+									if(dis.isAuthorized(dis.r_ALLOW_EXPLOSIONS.id, cap.getUUID()).isTrue() || bypass(player)){
+										dis.r_ALLOW_EXPLOSIONS.set(!dis.r_ALLOW_EXPLOSIONS.get());
+										dis.setChanged(Time.getDate());
+										dis.save();
+										this.sendViewData();
+										Print.log(StateLogger.player(player) + " changed 'allow-explosions' of " + StateLogger.district(dis) + " to " + dis.r_ALLOW_EXPLOSIONS.get() + ".");
 									}
 									else sendStatus(null);
 									break;

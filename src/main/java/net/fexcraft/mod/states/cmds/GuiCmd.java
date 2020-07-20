@@ -35,6 +35,16 @@ public class GuiCmd extends CommandBase {
 	}
 	
 	@Override
+    public boolean checkPermission(MinecraftServer server, ICommandSender sender){
+        return sender != null;
+    }
+	
+	@Override
+    public int getRequiredPermissionLevel(){
+        return 0;
+    }
+	
+	@Override
 	public List<String> getAliases(){
 		return aliases;
 	}

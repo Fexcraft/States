@@ -68,6 +68,10 @@ public class MunicipalityCmd extends CommandBase {
 		EntityPlayer player = (EntityPlayer)sender.getCommandSenderEntity();
 		PlayerCapability ply = player.getCapability(StatesCapabilities.PLAYER, null);
 		Chunk chunk = StateUtil.getChunk(player);
+		Print.log("player: " + player);
+		Print.log("cap: " + ply);
+		Print.log("chunk: " + chunk);
+		Print.log("dis: " + (chunk == null ? "chunk is null" : chunk.getDistrict()));
 		Municipality mun = chunk.getDistrict().getMunicipality();
 		if(ply == null){
 			Print.chat(sender, "&o&4There was an error loading your Playerdata.");

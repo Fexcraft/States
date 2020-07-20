@@ -5,8 +5,11 @@ import org.apache.commons.lang3.math.NumberUtils;
 import net.fexcraft.lib.common.math.Time;
 import net.fexcraft.lib.mc.api.registry.fCommand;
 import net.fexcraft.lib.mc.utils.Print;
+import net.fexcraft.mod.states.States;
 import net.fexcraft.mod.states.data.Chunk;
 import net.fexcraft.mod.states.data.District;
+import net.fexcraft.mod.states.data.capabilities.PlayerCapability;
+import net.fexcraft.mod.states.data.capabilities.StatesCapabilities;
 import net.fexcraft.mod.states.guis.Listener;
 import net.fexcraft.mod.states.util.ImageCache;
 import net.fexcraft.mod.states.util.StateLogger;
@@ -16,6 +19,7 @@ import net.minecraft.command.CommandException;
 import net.minecraft.command.ICommandSender;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.server.MinecraftServer;
+import net.minecraftforge.server.permission.PermissionAPI;
 
 @fCommand
 public class AdminCmd extends CommandBase {
@@ -44,7 +48,7 @@ public class AdminCmd extends CommandBase {
 	public void execute(MinecraftServer server, ICommandSender sender, String[] args) throws CommandException {
 		if(args.length == 0){
 			Print.chat(sender, "&7/st-admin forceclaim <dis-id>");
-			Print.chat(sender, "&7/st-admin ...");
+			Print.chat(sender, "&7/st-admin toggle");
 			Print.chat(sender, "&7/st-admin ...");
 			return;
 		}
@@ -52,9 +56,9 @@ public class AdminCmd extends CommandBase {
 			Print.chat(sender, "&7Only available Ingame."); return;
 		}
 		EntityPlayer player = getCommandSenderAsPlayer(sender);
-		//PlayerCapability cap = player.getCapability(StatesCapabilities.PLAYER, null);
+		PlayerCapability cap = player.getCapability(StatesCapabilities.PLAYER, null);
 		Chunk chunk = StateUtil.getChunk(player);
-		if(!StateUtil.isAdmin(player)){
+		if(!PermissionAPI.hasPermission(player, States.ADMIN_PERM)){
 			Print.chat(player, "&7No Permission."); return;
 		}
 		switch(args[0]){
@@ -79,6 +83,13 @@ public class AdminCmd extends CommandBase {
 					Print.log(StateLogger.player(player) + " (force-)claimed " + StateLogger.chunk(chunk) + ", it is now part of " + StateLogger.district(dis) + ".");
 					ImageCache.update(player.world, player.world.getChunk(chunk.xCoord(), chunk.zCoord()));
 				}
+				return;
+			}
+			case "toggle":{
+				boolean is = cap.isAdmin();
+				cap.setAdminMode(is = !is);
+				Print.chat(player, "&6States &4Admin &6mode set to " + (is ? "&aon" : "&coff") + "!");
+				Print.log(StateLogger.player(player) + " toggled their admin mode to " + (is ? "ON/true" : "OFF/false") + "!");
 				return;
 			}
 		}

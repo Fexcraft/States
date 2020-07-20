@@ -34,7 +34,7 @@ public class PlayerImpl implements PlayerCapability {
 	private BlockPos mailbox;
 	//
 	private Municipality municipality;
-	private boolean loaded;
+	private boolean loaded, admin;
 	
 	public PlayerImpl(){}
 
@@ -59,6 +59,7 @@ public class PlayerImpl implements PlayerCapability {
 		obj.addProperty("last_tax_collection", lasttaxcoll);
 		if(customtax > 0){ obj.addProperty("custom_tax", customtax); }
 		if(mailbox != null) obj.addProperty("mailbox", mailbox.toLong());
+		if(admin) obj.addProperty("admin", admin);
 		return obj;
 	}
 
@@ -74,6 +75,7 @@ public class PlayerImpl implements PlayerCapability {
 		this.lasttaxcoll = JsonUtil.getIfExists(obj, "last_tax_collection", 0).longValue();
 		this.customtax = JsonUtil.getIfExists(obj, "custom_tax", 0).longValue();
 		this.mailbox = obj.has("mailbox") ? BlockPos.fromLong(obj.get("mailbox").getAsLong()) : null;
+		this.admin = JsonUtil.getIfExists(obj, "admin", false);
 		loaded = true;
 		TaxSystem.processPlayerTax(TaxSystem.getProbableSchedule(), this);
 	}
@@ -305,6 +307,7 @@ public class PlayerImpl implements PlayerCapability {
 		this.current_chunk = player.current_chunk;
 		this.mailbox = player.mailbox;
 		this.municipality = player.municipality;
+		this.admin = player.admin;
 	}
 
 	@Override
@@ -315,6 +318,17 @@ public class PlayerImpl implements PlayerCapability {
 	@Override
 	public List<Vote> getRelevantVotes(){
 		return States.VOTES.values().stream().filter(pre -> pre.isVoter(null, getUUID())).collect(Collectors.toList());
+	}
+
+	@Override
+	public boolean isAdmin(){
+		return admin;
+	}
+
+	@Override
+	public void setAdminMode(boolean bool){
+		admin = bool;
+		save();
 	}
 
 }

@@ -117,4 +117,8 @@ public interface PlayerCapability extends ICommandSender, Taxable, AccountHolder
 	
 	public List<Vote> getRelevantVotes();
 
+	public boolean isAdmin();
+
+	public void setAdminMode(boolean bool);
+
 }

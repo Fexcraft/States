@@ -19,6 +19,7 @@ public class StConfig {
 	
 	public static File CONFIG_PATH;
 	//CHUNK
+	public static boolean ALLOW_CHUNK_UNCLAIM;
 	public static long DEFAULT_CHUNK_PRICE;
 	//CREATE/CLAIM/ABANDON
 	public static long MUNICIPALITY_CREATION_PRICE, STATE_CREATION_PRICE, DISTRICT_CREATION_PRICE;
@@ -76,6 +77,7 @@ public class StConfig {
 			for(String str : arr){ new MunicipalityType(JsonUtil.getFromString(str).getAsJsonObject()); }
 		}
 		//CHUNK PRICES
+		ALLOW_CHUNK_UNCLAIM = config.getBoolean("allow_chunk_unclaim", DEFAULT_CAT, false, "If Mayors should have permission to unclaim chunks, usually only Admins are allowed to do so.");
 		DEFAULT_CHUNK_PRICE = config.getInt("default_chunk_price", DEFAULT_CAT, 100000, 0, Integer.MAX_VALUE, "Default price for unclaimed chunks. (1000 == 1F$)");
 		//CREATE/CLAIM/ABANDON
 		DISTRICT_CREATION_PRICE = config.getInt("district_creation_price", DEFAULT_CAT, 1200000, 0, Integer.MAX_VALUE, "Amount of Money Needded to create a district. (1000 == 1F$)");

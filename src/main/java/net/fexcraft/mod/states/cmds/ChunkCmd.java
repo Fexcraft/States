@@ -72,6 +72,7 @@ public class ChunkCmd extends CommandBase {
 			Print.chat(sender, "&7/ck claim <args>");
 			Print.chat(sender, "&7/ck reclaim <args>");
 			Print.chat(sender, "&7/ck tempclaim");
+			if(StConfig.ALLOW_CHUNK_UNCLAIM) Print.chat(sender, "&8/ck unclaim");
 			Print.chat(sender, "&7/ck info");
 			Print.chat(sender, "&7/ck map");
 			Print.chat(sender, "&7/ck buy");
@@ -81,7 +82,7 @@ public class ChunkCmd extends CommandBase {
 			Print.chat(sender, "&7/ck types");
 			if(StateUtil.isAdmin(player)){
 				Print.chat(sender, "&cAdmin CMDs");
-				Print.chat(sender, "&a/ck unclaim");
+				if(!StConfig.ALLOW_CHUNK_UNCLAIM)Print.chat(sender, "&a/ck unclaim");
 				Print.chat(sender, "&a/ck update <option:range>");
 				Print.chat(sender, "&a/ck set-district <id>");
 			}
@@ -186,7 +187,8 @@ public class ChunkCmd extends CommandBase {
 				return;
 			}
 			case "unclaim":{
-				if(StateUtil.isAdmin(player)){
+				if(StateUtil.isAdmin(player) || (StConfig.ALLOW_CHUNK_UNCLAIM && playerdata.isMayorOf(chunk.getMunicipality()))){
+					Integer asmun = !StateUtil.isAdmin(player) ? chunk.getMunicipality().getId() : null;
 					int range = args.length > 1 ? Integer.parseInt(args[1]) : 0;
 					if(range <= 0){
 						chunk.setClaimer(player.getGameProfile().getId());
@@ -210,6 +212,7 @@ public class ChunkCmd extends CommandBase {
 								if(ck == null){
 									continue;
 								}
+								if(asmun != null && ck.getMunicipality().getId() != asmun) continue;
 								ck.setClaimer(player.getGameProfile().getId());
 								ck.setDistrict(StateUtil.getDistrict(-1));
 								ck.setChanged(Time.getDate());

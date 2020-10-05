@@ -142,7 +142,7 @@ public class Listener implements IPacketListener<PacketNBTTagCompound> {
 							for(int j = -5; j < 6; j++){
 								net.minecraft.world.chunk.Chunk ch = world.getChunk(chunk.xCoord() + i, chunk.zCoord() + j);
 								Chunk ck = ch == null ? null : ch.getCapability(StatesCapabilities.CHUNK, null).getStatesChunk();
-								Print.debug(ch, ck);
+								//Print.debug(ch, ck);
 								NBTTagCompound compound = new NBTTagCompound();
 								if(ck == null){
 									compound.setInteger("color", Color.BLACK.getRGB());
@@ -162,7 +162,7 @@ public class Listener implements IPacketListener<PacketNBTTagCompound> {
 									compound.setInteger("z", ck.zCoord());
 									compound.setBoolean("linked", ck.getLink() != null);
 									if(compound.getBoolean("linked")){
-										compound.setIntArray("link", new int[]{ chunk.getLink().x, chunk.getLink().z });
+										compound.setIntArray("link", new int[]{ ck.getLink().x, ck.getLink().z });
 									}
 									compound.setBoolean("owned", ck.getOwner() != null && !ck.getOwner().equals("null"));
 									if(compound.getBoolean("owned")){

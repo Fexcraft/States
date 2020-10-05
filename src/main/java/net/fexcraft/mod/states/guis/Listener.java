@@ -22,6 +22,7 @@ import net.fexcraft.mod.states.data.capabilities.PlayerCapability;
 import net.fexcraft.mod.states.data.capabilities.StatesCapabilities;
 import net.fexcraft.mod.states.packets.ImagePacket;
 import net.fexcraft.mod.states.util.ImageCache;
+import net.fexcraft.mod.states.util.StConfig;
 import net.fexcraft.mod.states.util.StateLogger;
 import net.fexcraft.mod.states.util.StateUtil;
 import net.minecraft.entity.player.EntityPlayerMP;
@@ -209,7 +210,7 @@ public class Listener implements IPacketListener<PacketNBTTagCompound> {
 			compound.setString("result", "Transit Zones (-2) are disabled.");
 			return compound;
 		}
-		if(dis.getId() != -2 && dis.getMunicipality().getClaimedChunks() + 1 > MunicipalityType.getChunkLimitFor(dis.getMunicipality())){
+		if(dis.getId() != -2 && (!StConfig.ALLOW_CHUNK_OVERCLAIM && dis.getMunicipality().getClaimedChunks() + 1 > MunicipalityType.getChunkLimitFor(dis.getMunicipality()))){
 			compound.setString("result", "Municipality reached the Chunk Limit.");
 			return compound;
 		}
@@ -236,9 +237,14 @@ public class Listener implements IPacketListener<PacketNBTTagCompound> {
 			compound.setString("result", "No permission. (1)");
 			return compound;
 		}
-		if(mode == 0 && dis.getId() != -2 && dis.getMunicipality().getAccount().getBalance() < ck.getPrice()){
+		boolean over = dis.getMunicipality().getClaimedChunks() + 1 > MunicipalityType.getChunkLimitFor(dis.getMunicipality());
+		long price = over ? StConfig.OVERCLAIM_CHUNK_PRICE : StConfig.DEFAULT_CHUNK_PRICE;
+		if(over){
+			Print.chat(player, "&7Municipality reached chunk limit,\n&7paying overclaim fee instead of normal price.");
+		}
+		if(mode == 0 && dis.getId() != -2 && dis.getMunicipality().getAccount().getBalance() < price){
 			Print.chat(player, "&7Municipality does not have enough money to claim this chunk.");
-			Print.chat(player, "&7Required: &9" + Config.getWorthAsString(ck.getPrice()) + " &8|| &7Available: &9" + Config.getWorthAsString(dis.getMunicipality().getAccount().getBalance()));
+			Print.chat(player, "&7Required: &9" + Config.getWorthAsString(price) + " &8|| &7Available: &9" + Config.getWorthAsString(dis.getMunicipality().getAccount().getBalance()));
 			return null;
 		}
 		if(mode == 0){
@@ -248,9 +254,9 @@ public class Listener implements IPacketListener<PacketNBTTagCompound> {
 					return compound;
 				}
 				else{
-					if(ck.getPrice() > 0){
+					if(price > 0){
 						if(dis.getId() != -2){
-							if(!dis.getMunicipality().getBank().processAction(Bank.Action.TRANSFER, player, dis.getMunicipality().getAccount(), ck.getPrice(), States.SERVERACCOUNT)){
+							if(!dis.getMunicipality().getBank().processAction(Bank.Action.TRANSFER, player, dis.getMunicipality().getAccount(), price, States.SERVERACCOUNT)){
 								return null;
 							}
 						}

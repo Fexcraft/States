@@ -168,7 +168,7 @@ public class PlayerImpl implements PlayerCapability {
 	@Override
 	public boolean canLeave(ICommandSender sender){
 		if(municipality == null){ return true; }
-		if(municipality.getHead().equals(getUUID())){
+		if(municipality.getHead() != null && municipality.getHead().equals(getUUID())){
 			Print.chat(sender, "&eYou must assign a new Mayor first, or remove youself as one, before you can leave the Municipality.");
 			return false;
 		}

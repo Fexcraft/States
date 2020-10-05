@@ -179,7 +179,7 @@ public class ClaimMap extends GuiContainer {
             	arr.add(Formatter.PARAGRAPH_SIGN + "7Coords: " + compound.getInteger("x") + "x, " + compound.getInteger("z") + "z");
             	arr.add(Formatter.PARAGRAPH_SIGN + "7District: " + compound.getInteger("district"));
             	if(compound.hasKey("linked") && compound.getBoolean("linked")){
-            		arr.add(Formatter.PARAGRAPH_SIGN + "&7Linked: " + compound.getIntArray("link")[0] + "x, " + compound.getIntArray("link")[1] + "z");
+            		arr.add(Formatter.PARAGRAPH_SIGN + "7Linked: " + compound.getIntArray("link")[0] + "x, " + compound.getIntArray("link")[1] + "z");
             	}
             	if(compound.hasKey("owned") && compound.getBoolean("owned")){
             		arr.add(Formatter.PARAGRAPH_SIGN + "9Owner: " + compound.getString("owner"));

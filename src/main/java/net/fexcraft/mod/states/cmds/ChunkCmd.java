@@ -14,6 +14,7 @@ import net.fexcraft.lib.mc.utils.Print;
 import net.fexcraft.lib.mc.utils.Static;
 import net.fexcraft.mod.fsmm.api.Account;
 import net.fexcraft.mod.fsmm.api.Bank;
+import net.fexcraft.mod.fsmm.api.Bank.Action;
 import net.fexcraft.mod.fsmm.api.FSMMCapabilities;
 import net.fexcraft.mod.fsmm.util.Config;
 import net.fexcraft.mod.states.States;
@@ -191,6 +192,16 @@ public class ChunkCmd extends CommandBase {
 					Integer asmun = !StateUtil.isAdmin(player) ? chunk.getMunicipality().getId() : null;
 					int range = args.length > 1 ? Integer.parseInt(args[1]) : 0;
 					if(range <= 0){
+						if(asmun != null && StConfig.UNCLAIM_CHUNK_PRICE > 0){
+							Bank bank = chunk.getMunicipality().getBank();
+							if(chunk.getMunicipality().getAccount().getBalance() < StConfig.UNCLAIM_CHUNK_PRICE){
+								Print.chat(player, "Municipality does not have enough money to pay the unclaim fee.");
+								return;
+							}
+							if(!bank.processAction(Action.TRANSFER, player, chunk.getMunicipality().getAccount(), StConfig.UNCLAIM_CHUNK_PRICE, States.SERVERACCOUNT)){
+								return;
+							}
+						}
 						chunk.setClaimer(player.getGameProfile().getId());
 						chunk.setDistrict(StateUtil.getDistrict(-1));
 						chunk.setChanged(Time.getDate());
@@ -212,7 +223,19 @@ public class ChunkCmd extends CommandBase {
 								if(ck == null){
 									continue;
 								}
-								if(asmun != null && ck.getMunicipality().getId() != asmun) continue;
+								if(asmun != null){
+									if(ck.getMunicipality().getId() != asmun) continue;
+									if(StConfig.UNCLAIM_CHUNK_PRICE > 0){
+										Bank bank = chunk.getMunicipality().getBank();
+										if(chunk.getMunicipality().getAccount().getBalance() < StConfig.UNCLAIM_CHUNK_PRICE){
+											Print.chat(player, "Municipality does not have enough money to pay the unclaim fee.");
+											break;
+										}
+										if(!bank.processAction(Action.TRANSFER, player, chunk.getMunicipality().getAccount(), StConfig.UNCLAIM_CHUNK_PRICE, States.SERVERACCOUNT)){
+											break;
+										}
+									}
+								}
 								ck.setClaimer(player.getGameProfile().getId());
 								ck.setDistrict(StateUtil.getDistrict(-1));
 								ck.setChanged(Time.getDate());

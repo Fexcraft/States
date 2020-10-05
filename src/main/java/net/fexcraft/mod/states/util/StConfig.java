@@ -20,7 +20,7 @@ public class StConfig {
 	public static File CONFIG_PATH;
 	//CHUNK
 	public static boolean ALLOW_CHUNK_UNCLAIM;
-	public static long DEFAULT_CHUNK_PRICE;
+	public static long DEFAULT_CHUNK_PRICE, UNCLAIM_CHUNK_PRICE;
 	//CREATE/CLAIM/ABANDON
 	public static long MUNICIPALITY_CREATION_PRICE, STATE_CREATION_PRICE, DISTRICT_CREATION_PRICE;
 	public static long MUNICIPALITY_ABANDONMENT_PRICE, MUNICIPALITY_CLAIM_PRICE;
@@ -79,6 +79,7 @@ public class StConfig {
 		//CHUNK PRICES
 		ALLOW_CHUNK_UNCLAIM = config.getBoolean("allow_chunk_unclaim", DEFAULT_CAT, false, "If Mayors should have permission to unclaim chunks, usually only Admins are allowed to do so.");
 		DEFAULT_CHUNK_PRICE = config.getInt("default_chunk_price", DEFAULT_CAT, 100000, 0, Integer.MAX_VALUE, "Default price for unclaimed chunks. (1000 == 1F$)");
+		UNCLAIM_CHUNK_PRICE = config.getInt("unclaim_chunk_price", DEFAULT_CAT, 1000000, 0, Integer.MAX_VALUE, "Price for unclaiming chunks (if unclaiming is allowed for mayors). (1000 == 1F$)");
 		//CREATE/CLAIM/ABANDON
 		DISTRICT_CREATION_PRICE = config.getInt("district_creation_price", DEFAULT_CAT, 1200000, 0, Integer.MAX_VALUE, "Amount of Money Needded to create a district. (1000 == 1F$)");
 		MUNICIPALITY_CREATION_PRICE = config.getInt("municipality_creation_price", DEFAULT_CAT, 2500000, 0, Integer.MAX_VALUE, "Amount of Money needed to create a municipality. (1000 == 1F$)");

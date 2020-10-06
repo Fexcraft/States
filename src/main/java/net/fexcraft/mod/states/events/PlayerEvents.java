@@ -86,8 +86,8 @@ public class PlayerEvents {
 	
 	@SubscribeEvent
 	public static void onLogout(PlayerLoggedOutEvent event){
-		States.PLAYERS.remove(event.player.getGameProfile().getId());
-		MessageSender.toWebhook(null, event.player.getGameProfile().getName() + " left.");
+		PlayerCapability cap = States.PLAYERS.remove(event.player.getGameProfile().getId());
+		MessageSender.toWebhook(null, event.player.getGameProfile().getName() + (cap == null ? " failed to join?" : " left."));
 	}
 	
 	@SubscribeEvent

@@ -176,6 +176,8 @@ states.manager_gui.view_chunk.claimed_by=Claimed By
 states.manager_gui.view_chunk.claimed_at=Created/Claimed
 states.manager_gui.view_chunk.transit=Transit Zone
 states.manager_gui.view_chunk.forceloaded=Force Loaded
+states.manager_gui.view_chunk.allow_interact=Allow Ex. Interact
+states.manager_gui.view_chunk.only_interact=Only Interact
 //
 states.manager_gui.list.cannot_blacklist_council0=&9You can not blacklist council members!
 states.manager_gui.list.cannot_blacklist_council1=&cKick them from the council first!

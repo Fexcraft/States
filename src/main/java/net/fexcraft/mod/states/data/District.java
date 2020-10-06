@@ -12,7 +12,6 @@ import com.google.gson.JsonObject;
 
 import net.fexcraft.lib.common.json.JsonUtil;
 import net.fexcraft.lib.common.math.Time;
-import net.fexcraft.lib.mc.utils.Static;
 import net.fexcraft.mod.states.States;
 import net.fexcraft.mod.states.data.root.BuyableType;
 import net.fexcraft.mod.states.data.root.ColorHolder;
@@ -20,7 +19,6 @@ import net.fexcraft.mod.states.data.root.IconHolder;
 import net.fexcraft.mod.states.data.root.Initiator;
 import net.fexcraft.mod.states.data.root.MailReceiver;
 import net.fexcraft.mod.states.data.root.Ruleable;
-import net.fexcraft.mod.states.impl.capabilities.SignTileEntityCapabilityUtil;
 import net.fexcraft.mod.states.util.RuleMap;
 import net.fexcraft.mod.states.util.StateUtil;
 import net.minecraft.util.math.BlockPos;
@@ -181,9 +179,6 @@ public class District implements ColorHolder, BuyableType, IconHolder, MailRecei
 
 	public void setChanged(long new_change){
 		changed = new_change;
-		Static.getServer().worlds[0].getChunkProvider().getLoadedChunks().forEach(chunk -> {
-			SignTileEntityCapabilityUtil.processChunkChange(chunk, "district");
-		});
 	}
 
 	public String getName(){

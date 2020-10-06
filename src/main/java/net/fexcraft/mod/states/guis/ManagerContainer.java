@@ -217,6 +217,7 @@ public class ManagerContainer extends GenericContainer {
 				addKey(list, "linked_chunks", chunk.getLinkedChunks().size() > 0 ? chunk.getLinkedChunks().size() : NONE, ViewMode.LIST);
 				addKey(list, "linked_to", chunk.getLink() == null ? NOTHING : chunk.getLink().x + ", " + chunk.getLink().z, ViewMode.GOTO);
 				addKey(list, "whitelist", chunk.getPlayerWhitelist().size(), ViewMode.LIST);
+				addKey(list, chunk.getType().interactPrefix() + "_interact", chunk.interact(), ViewMode.BOOL);
 				addKey(list, "claimed_by", Static.getPlayerNameByUUID(chunk.getClaimer()), ViewMode.NONE);
 				addKey(list, "claimed_at", time(chunk.getCreated()), ViewMode.NONE);
 				if(chunk.getDistrict().getId() == -2){
@@ -1075,11 +1076,15 @@ public class ManagerContainer extends GenericContainer {
 											openGui(Layer.DISTRICT, Mode.INFO, chunk.getDistrict().getId());
 											break;
 										case MUNICIPAL:
+										case NORMAL:
+										case PUBLIC:
 											openGui(Layer.MUNICIPALITY, Mode.INFO, chunk.getMunicipality().getId());
 											break;
 										case STATEOWNED:
+										case STATEPUBLIC:
 											openGui(Layer.STATE, Mode.INFO, chunk.getState().getId());
 											break;
+										case PRIVATE:
 										default: return;
 									}
 									break;
@@ -1134,6 +1139,7 @@ public class ManagerContainer extends GenericContainer {
 													sendStatus("states.manager_gui.view_chunk.type.sale_only");
 													break;
 												}
+												case STATEPUBLIC:
 												case STATEOWNED:
 												case MUNICIPAL:
 												case DISTRICT:
@@ -1198,6 +1204,18 @@ public class ManagerContainer extends GenericContainer {
 								}
 								case "whitelist":{
 									openGui(Layer.CHUNK, Mode.LIST_BWLIST, chunk.xCoord(), chunk.zCoord());
+									break;
+								}
+								case "allow_interact":
+								case "only_interact":
+								case "interact":{
+									if(isPermitted(chunk, player, true)){
+										chunk.interact(!chunk.interact());
+										chunk.setChanged(Time.getDate());
+										chunk.save();
+										sendViewData();
+										Print.log(StateLogger.player(player) + " set '" + chunk.getType().interactPrefix() + "_interact' of the " + StateLogger.chunk(chunk) + " to " + chunk.interact() + ".");
+									}
 									break;
 								}
 							}
@@ -1808,9 +1826,13 @@ public class ManagerContainer extends GenericContainer {
 		}
 		return list;
 	}
-	
+
 	private boolean isPermitted(Chunk chunk, EntityPlayer player){
-		if(chunk.getLink() != null){
+		return isPermitted(chunk, player, false);
+	}
+	
+	private boolean isPermitted(Chunk chunk, EntityPlayer player, boolean individual){
+		if(chunk.getLink() != null && !individual){
 			ChunkPos link = chunk.getLink();
 			Print.chat(player, translate("states.manager_gui.perm_chunk.linked0", link.x, link.z));
 			Print.chat(player, translate("states.manager_gui.perm_chunk.linked1"));
@@ -1837,6 +1859,7 @@ public class ManagerContainer extends GenericContainer {
 			case PRIVATE: result = isco || ismy || isst; break;
 			case PUBLIC: result = ismn || ismy || isst; break;
 			case STATEOWNED: result = isst; break;
+			case STATEPUBLIC: result = isst; break;
 			default: result = false; break;
 		}
 		if(!result){
@@ -1873,6 +1896,7 @@ public class ManagerContainer extends GenericContainer {
 			case PRIVATE: result = isco || ismy; break;
 			case PUBLIC: result = false; break;
 			case STATEOWNED: result = isst; break;
+			case STATEPUBLIC: result = isst; break;
 			default: result = false;
 		}
 		if(!result){

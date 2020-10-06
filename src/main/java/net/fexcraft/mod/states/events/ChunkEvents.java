@@ -11,7 +11,6 @@ import net.fexcraft.mod.states.data.ChunkPos;
 import net.fexcraft.mod.states.data.District;
 import net.fexcraft.mod.states.data.Municipality;
 import net.fexcraft.mod.states.data.State;
-import net.fexcraft.mod.states.impl.capabilities.SignTileEntityCapabilityUtil;
 import net.fexcraft.mod.states.util.ImageCache;
 import net.fexcraft.mod.states.util.StateLogger;
 import net.fexcraft.mod.states.util.StateUtil;
@@ -86,9 +85,6 @@ public class ChunkEvents {
             	ImageCache.update(event.getWorld(), event.getChunk());
             }
         }
-        event.getChunk().getTileEntityMap().keySet().forEach(key -> {
-            SignTileEntityCapabilityUtil.TILEENTITIES.remove(key);
-        });
     }
 
 }

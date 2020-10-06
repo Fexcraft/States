@@ -7,10 +7,11 @@ public enum ChunkType implements ColorHolder {
 	NORMAL("#003600"),
 	PUBLIC("#703DFF"),
 	PRIVATE("#0020D8"),
-	COMPANY("#008E96"),
+	COMPANY("#20d400"),//("#008E96"),
 	DISTRICT("#007F7F"),
 	MUNICIPAL("#C1A100"),
-	STATEOWNED("#A01818");
+	STATEOWNED("#A01818"),
+	STATEPUBLIC("#ed4a4a");
 	
 	private String name, color;
 	
@@ -39,6 +40,22 @@ public enum ChunkType implements ColorHolder {
 			if(type.name().equals(uppercased)) return type;
 		}
 		return null;
+	}
+
+	public String interactPrefix(){
+		switch(this){
+			case COMPANY:
+			case DISTRICT:
+			case MUNICIPAL:
+			case NORMAL:
+			case PRIVATE:
+			case STATEOWNED:
+				return "allow";
+			case PUBLIC:
+			case STATEPUBLIC:
+			default:
+				return "only";
+		}
 	}
 
 }

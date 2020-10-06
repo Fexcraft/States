@@ -17,7 +17,6 @@ import net.fexcraft.mod.states.data.District;
 import net.fexcraft.mod.states.data.Municipality;
 import net.fexcraft.mod.states.data.State;
 import net.fexcraft.mod.states.data.capabilities.PlayerCapability;
-import net.fexcraft.mod.states.data.capabilities.SignTileEntityCapability;
 import net.fexcraft.mod.states.data.capabilities.StatesCapabilities;
 import net.fexcraft.mod.states.impl.SignMailbox;
 import net.fexcraft.mod.states.util.MessageSender;
@@ -31,7 +30,6 @@ import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.tileentity.TileEntity;
-import net.minecraft.tileentity.TileEntitySign;
 import net.minecraft.util.EnumHand;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.text.ITextComponent;
@@ -105,23 +103,7 @@ public class PlayerEvents {
 			return;
 		}
 		IBlockState state = event.getWorld().getBlockState(event.getPos());
-		if(state.getBlock() instanceof BlockSign){
-			//IBlockState state = event.getWorld().getBlockState(event.getPos());
-			TileEntitySign te_sign = (TileEntitySign)event.getWorld().getTileEntity(event.getPos());
-			if(te_sign == null || te_sign.signText == null || te_sign.signText[0] == null){
-				return;
-			}
-			Chunk chunk = StateUtil.getChunk(event.getPos());
-			SignTileEntityCapability cap = te_sign.getCapability(StatesCapabilities.SIGN_TE, null);
-			if(te_sign.signText[0].getUnformattedText().equalsIgnoreCase("[States]")){
-				if(cap != null){ cap.setup(chunk); }
-			}
-			else if(cap != null && cap.isStatesSign()){
-				cap.onPlayerInteract(chunk, event.getEntityPlayer());
-			}
-			else return;
-		}
-		else if(state.getBlock() instanceof BlockChest || state.getBlock() instanceof BlockFurnace
+		if(state.getBlock() instanceof BlockChest || state.getBlock() instanceof BlockFurnace
 				|| state.getBlock() instanceof BlockHopper || state.getBlock() instanceof BlockDispenser
 				|| state.getBlock() instanceof BlockDropper || state.getBlock() instanceof BlockLever
 				|| state.getBlock() instanceof BlockButton || state.getBlock() instanceof BlockPressurePlate
@@ -272,6 +254,9 @@ public class PlayerEvents {
 			}
 			case STATEOWNED:{
 				return cap.isStateLeaderOf(chunk.getDistrict().getMunicipality().getState());
+			}
+			case STATEPUBLIC:{
+				return cap.getMunicipality().getState().getId() == chunk.getState().getId();
 			}
 			case COMPANY: return false;//TODO
 			case PUBLIC: return true;

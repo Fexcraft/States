@@ -405,7 +405,6 @@ public class Municipality implements ColorHolder, BuyableType, IconHolder, Accou
 		return abandoned;
 	}
 
-	@SuppressWarnings("unchecked")
 	@Override
 	public void setAbandoned(UUID by){
 		abandonedby = by;

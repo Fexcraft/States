@@ -11,9 +11,6 @@ public class StatesCapabilities {
 	@CapabilityInject(WorldCapability.class)
 	public static final Capability<WorldCapability> WORLD = null;
 	
-	@CapabilityInject(SignTileEntityCapability.class)
-	public static final Capability<SignTileEntityCapability> SIGN_TE = null;
-	
 	@CapabilityInject(PlayerCapability.class)
 	public static final Capability<PlayerCapability> PLAYER = null;
 	

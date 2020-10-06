@@ -17,7 +17,6 @@ import net.fexcraft.lib.mc.utils.Static;
 import net.fexcraft.mod.states.States;
 import net.fexcraft.mod.states.data.root.BuyableType;
 import net.fexcraft.mod.states.data.root.Taxable;
-import net.fexcraft.mod.states.impl.capabilities.SignTileEntityCapabilityUtil;
 import net.fexcraft.mod.states.util.ImageCache;
 import net.fexcraft.mod.states.util.StConfig;
 import net.fexcraft.mod.states.util.StateLogger;
@@ -37,6 +36,7 @@ public class Chunk implements BuyableType, Taxable/*, RuleHolder*/ {
 	private String owner;
 	private List<UUID> wl_players = new ArrayList<>();
 	private List<Integer> wl_companies = new ArrayList<>();
+	private boolean interact;
 	//private RuleMap rules = new RuleMap();
 	
 	public Chunk(World world, ChunkPos pos, boolean create){
@@ -91,6 +91,7 @@ public class Chunk implements BuyableType, Taxable/*, RuleHolder*/ {
 		owner = JsonUtil.getIfExists(obj, "owner", "null");
 		lasttaxcheck = JsonUtil.getIfExists(obj, "last_tax_collection", 0).longValue();
 		ctax = JsonUtil.getIfExists(obj, "custom_tax", 0).longValue();
+		interact = JsonUtil.getIfExists(obj, "interact", false);
 		//
 		try{
 			String str = JsonUtil.getIfExists(obj, "link", "");
@@ -156,6 +157,7 @@ public class Chunk implements BuyableType, Taxable/*, RuleHolder*/ {
 		}
 		obj.addProperty("last_tax_collection", lastTaxCollection());
 		if(ctax > 0){ obj.addProperty("custom_tax", ctax); }
+		if(interact) obj.addProperty("interact", interact);
 		obj.addProperty("edited", edited);
 		return obj;
 	}
@@ -208,7 +210,6 @@ public class Chunk implements BuyableType, Taxable/*, RuleHolder*/ {
 
 	public void setChanged(long new_change){
 		changed = new_change;
-		SignTileEntityCapabilityUtil.processChunkChange(StateUtil.getChunk(this), "chunk");
 	}
 
 	public List<int[]> getLinkedChunks(){
@@ -240,8 +241,9 @@ public class Chunk implements BuyableType, Taxable/*, RuleHolder*/ {
 			case MUNICIPAL: return "Municipal";
 			case NORMAL: return "(" + district.getMunicipality().getType().getTitle() + ") " + district.getMunicipality().getName();
 			case PRIVATE: return owner;
-			case PUBLIC: return "Public";
+			case PUBLIC: return "(Mun.) Public";
 			case STATEOWNED: return "State Owned";
+			case STATEPUBLIC: return "(State) Public";
 			default: return owner;
 		}
 	}
@@ -334,6 +336,9 @@ public class Chunk implements BuyableType, Taxable/*, RuleHolder*/ {
 			case STATEOWNED:{
 				return false;//TODO
 			}
+			case STATEPUBLIC:{
+				return false;//TODO
+			}
 			default: return false;
 		}
 	}
@@ -342,5 +347,13 @@ public class Chunk implements BuyableType, Taxable/*, RuleHolder*/ {
 	public Map<String, Rule> getRules(){
 		return rules;
 	}*/
+	
+	public boolean interact(){
+		return interact;
+	}
+
+	public boolean interact(boolean bool){
+		return interact = bool;
+	}
 
 }

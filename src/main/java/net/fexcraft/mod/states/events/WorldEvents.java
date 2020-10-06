@@ -6,14 +6,11 @@ import net.fexcraft.lib.mc.utils.Print;
 import net.fexcraft.mod.states.data.Chunk;
 import net.fexcraft.mod.states.impl.capabilities.ChunkCapabilityUtil;
 import net.fexcraft.mod.states.impl.capabilities.PlayerCapabilityUtil;
-import net.fexcraft.mod.states.impl.capabilities.SignTileEntityCapabilityUtil;
 import net.fexcraft.mod.states.impl.capabilities.WorldCapabilityUtil;
 import net.fexcraft.mod.states.util.ForcedChunksManager;
 import net.fexcraft.mod.states.util.ImageCache;
 import net.fexcraft.mod.states.util.StateUtil;
 import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.tileentity.TileEntitySign;
-import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
 import net.minecraftforge.event.AttachCapabilitiesEvent;
 import net.minecraftforge.event.world.ExplosionEvent;
@@ -60,12 +57,12 @@ public class WorldEvents {
 	
 	//
 	
-	@SubscribeEvent
+	/*@SubscribeEvent
 	public static void onAttachEventTileEntity(AttachCapabilitiesEvent<net.minecraft.tileentity.TileEntity> event){
 		if(event.getObject() instanceof TileEntitySign){
 			event.addCapability(new ResourceLocation("states", "sign"), new SignTileEntityCapabilityUtil(event.getObject()));
 		}
-	}
+	}*/
 	
 	@SubscribeEvent
 	public static void onAttachEventEntityPlayer(AttachCapabilitiesEvent<net.minecraft.entity.Entity> event){

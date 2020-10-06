@@ -312,6 +312,7 @@ public class ChunkCmd extends CommandBase {
 						}
 						case DISTRICT:
 						case MUNICIPAL:
+						case PUBLIC:
 						case NORMAL:{
 							receiver = chunk.getDistrict().getMunicipality().getAccount();
 							break;
@@ -320,7 +321,7 @@ public class ChunkCmd extends CommandBase {
 							receiver = player.world.getCapability(FSMMCapabilities.WORLD, null).getAccount("player:" + chunk.getOwner(), true, true);
 							break;
 						}
-						case PUBLIC:
+						case STATEPUBLIC:
 						case STATEOWNED:{
 							receiver = chunk.getDistrict().getMunicipality().getState().getAccount();
 							break;
@@ -446,6 +447,7 @@ public class ChunkCmd extends CommandBase {
 			case PRIVATE: result = isco || ismy || isst; break;
 			case PUBLIC: result = ismn || ismy || isst; break;
 			case STATEOWNED: result = isst; break;
+			case STATEPUBLIC: result = isst; break;
 			default: result = false; break;
 		}
 		if(!result){

@@ -61,7 +61,7 @@ public class SignShop implements SignCapability.Listener {
 				tileentity.signText[0] = Formatter.newTextComponentString("&0[&3St&8-&3Shop&0]");
 				TileEntity te = event.getWorld().getTileEntity(getPosAtBack(state, tileentity));
 				EnumFacing facing = state.getBlock() instanceof BlockWallSign ? EnumFacing.byIndex(tileentity.getBlockMetadata()) : null;
-				if(te != null && te.hasCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, facing) && PlayerEvents.checkAccess(te.getWorld(), te.getPos(), te.getWorld().getBlockState(te.getPos()), event.getEntityPlayer())){
+				if(te != null && te.hasCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, facing) && PlayerEvents.checkAccess(te.getWorld(), te.getPos(), te.getWorld().getBlockState(te.getPos()), event.getEntityPlayer(), true)){
 					itemtype = te.getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, facing).getStackInSlot(0).copy();
 					if(!tileentity.signText[1].getUnformattedText().equals("")){
 						Chunk chunk = StateUtil.getChunk(te.getPos()); UUID uuid = event.getEntityPlayer().getGameProfile().getId();

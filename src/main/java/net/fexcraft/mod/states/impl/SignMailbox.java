@@ -58,7 +58,7 @@ public class SignMailbox implements SignCapability.Listener {
 		if(!active){
 			if(tileentity.signText[0].getUnformattedText().toLowerCase().equals("[st-mailbox]")){
 				BlockPos back = getPosAtBack(state, tileentity);
-				if(!PlayerEvents.checkAccess(event.getWorld(), back, event.getWorld().getBlockState(back), event.getEntityPlayer())){
+				if(!PlayerEvents.checkAccess(event.getWorld(), back, event.getWorld().getBlockState(back), event.getEntityPlayer(), true)){
 					Print.chat(event.getEntityPlayer(), "Block/TileEntity behind sign cannot be accessed."); return false;
 				}
 				Chunk chunk = StateUtil.getChunk(tileentity.getPos());

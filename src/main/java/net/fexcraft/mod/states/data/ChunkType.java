@@ -47,10 +47,10 @@ public enum ChunkType implements ColorHolder {
 			case COMPANY:
 			case DISTRICT:
 			case MUNICIPAL:
-			case NORMAL:
 			case PRIVATE:
 			case STATEOWNED:
 				return "allow";
+			case NORMAL:
 			case PUBLIC:
 			case STATEPUBLIC:
 			default:

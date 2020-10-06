@@ -108,7 +108,7 @@ public class PlayerEvents {
 				|| state.getBlock() instanceof BlockDropper || state.getBlock() instanceof BlockLever
 				|| state.getBlock() instanceof BlockButton || state.getBlock() instanceof BlockPressurePlate
 				|| state.getBlock() instanceof BlockRedstoneRepeater || state.getBlock() instanceof BlockRedstoneComparator){
-			if(!checkAccess(event.getWorld(), event.getPos(), state, event.getEntityPlayer())){
+			if(!checkAccess(event.getWorld(), event.getPos(), state, event.getEntityPlayer(), true)){
 				Print.chat(event.getEntityPlayer(), "No permission to interact with these blocks here.");
 				event.setCanceled(true);
 				return;
@@ -120,7 +120,7 @@ public class PlayerEvents {
 	@SubscribeEvent(priority = EventPriority.HIGHEST)
 	public static void onBlockBreak0(BlockEvent.BreakEvent event){
 		if(event.getWorld().isRemote || event.getPlayer().dimension != 0){ return; }
-		if(!checkAccess(event.getWorld(), event.getPos(), event.getState(), event.getPlayer())){
+		if(!checkAccess(event.getWorld(), event.getPos(), event.getState(), event.getPlayer(), false)){
 			Print.bar(event.getPlayer(), "No permission to break blocks here.");
 			event.setCanceled(true);
 		}
@@ -188,14 +188,14 @@ public class PlayerEvents {
 	@SubscribeEvent
 	public static void onBlockPlace(BlockEvent.PlaceEvent event){
 		if(event.getWorld().isRemote || event.getPlayer().dimension != 0){ return; }
-		if(!checkAccess(event.getWorld(), event.getPos(), event.getState(), event.getPlayer())){
+		if(!checkAccess(event.getWorld(), event.getPos(), event.getState(), event.getPlayer(), false)){
 			Print.bar(event.getPlayer(), "No permission to place blocks here.");
 			event.setCanceled(true);
 		}
 		return;
 	}
 	
-	public static boolean checkAccess(World world, BlockPos pos, IBlockState state, EntityPlayer player){
+	public static boolean checkAccess(World world, BlockPos pos, IBlockState state, EntityPlayer player, boolean interact){
 		if(StateUtil.isAdmin(player)){ return true; }
 		Chunk chunk = StateUtil.getChunk(pos);
 		if(chunk.getDistrict().getId() < 0){
@@ -224,14 +224,14 @@ public class PlayerEvents {
 				return false;
 			}
 		}
-		if(hp(chunk, player)){
+		if(hp(chunk, player, interact)){
 			chunk.setEdited(Time.getDate());
 			return true;
 		}
 		return false;
 	}
 	
-	private static boolean hp(Chunk chunk, EntityPlayer player){
+	private static boolean hp(Chunk chunk, EntityPlayer player, boolean interact){
 		PlayerCapability cap = player.getCapability(StatesCapabilities.PLAYER, null);
 		if(cap == null && (cap = StateUtil.getPlayer(player.getUniqueID(), true)) == null){
 			return false;
@@ -241,25 +241,34 @@ public class PlayerEvents {
 		}
 		switch(chunk.getType()){
 			case PRIVATE:{
-				return chunk.getOwner().equals(cap.getUUIDAsString()) || chunk.getPlayerWhitelist().contains(cap.getUUID()) || cap.isMayorOf(chunk.getDistrict().getMunicipality()) || cap.isStateLeaderOf(chunk.getDistrict().getMunicipality().getState());
+				if(interact && chunk.interact() && cap.getMunicipality().getId() == chunk.getMunicipality().getId()) return true;
+				return chunk.getOwner().equals(cap.getUUIDAsString()) || chunk.getPlayerWhitelist().contains(cap.getUUID()) || cap.isMayorOf(chunk.getMunicipality()) || cap.isStateLeaderOf(chunk.getState());
 			}
 			case NORMAL:{
-				return cap.getMunicipality().getId() == chunk.getDistrict().getMunicipality().getId();
+				if(!interact && chunk.interact() && cap.getMunicipality().getId() == chunk.getMunicipality().getId()) return false;
+				return cap.getMunicipality().getId() == chunk.getMunicipality().getId();
 			}
 			case DISTRICT:{
-				return cap.isDistrictManagerOf(chunk.getDistrict()) || cap.isMayorOf(chunk.getDistrict().getMunicipality()) || cap.isStateLeaderOf(chunk.getDistrict().getMunicipality().getState());
+				if(interact && chunk.interact() && cap.getMunicipality().getId() == chunk.getMunicipality().getId()) return true;
+				return cap.isDistrictManagerOf(chunk.getDistrict()) || cap.isMayorOf(chunk.getMunicipality()) || cap.isStateLeaderOf(chunk.getState());
 			}
 			case MUNICIPAL:{
-				return cap.isMayorOf(chunk.getDistrict().getMunicipality()) || cap.isStateLeaderOf(chunk.getDistrict().getMunicipality().getState());
+				if(interact && chunk.interact() && cap.getMunicipality().getId() == chunk.getMunicipality().getId()) return true;
+				return cap.isMayorOf(chunk.getMunicipality()) || cap.isStateLeaderOf(chunk.getState());
 			}
 			case STATEOWNED:{
-				return cap.isStateLeaderOf(chunk.getDistrict().getMunicipality().getState());
+				if(interact && chunk.interact() && cap.getState().getId() == chunk.getState().getId()) return true;
+				return cap.isStateLeaderOf(chunk.getState());
 			}
 			case STATEPUBLIC:{
-				return cap.getMunicipality().getState().getId() == chunk.getState().getId();
+				if(!interact && chunk.interact() && cap.getState().getId() == chunk.getState().getId()) return false;
+				return cap.getState().getId() == chunk.getState().getId();
 			}
 			case COMPANY: return false;//TODO
-			case PUBLIC: return true;
+			case PUBLIC:{
+				if(!interact && chunk.interact()) return false;
+				return true;
+			}
 			default:{
 				return false;
 			}

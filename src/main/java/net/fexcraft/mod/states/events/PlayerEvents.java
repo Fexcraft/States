@@ -67,7 +67,7 @@ public class PlayerEvents {
 		else{
 			Chunk chunk = StateUtil.getChunk(event.player);
 			Print.chat(event.player, StateUtil.translate("states.welcome_msg.district", chunk.getDistrict().getName()));
-			Print.chat(event.player, StateUtil.translate("states.welcome_msg.municipality", chunk.getMunicipality().getName(), chunk.getMunicipality().getType().getTitle()));
+			Print.chat(event.player, StateUtil.translate("states.welcome_msg.municipality", chunk.getMunicipality().getName(), chunk.getMunicipality().getTitle()));
 			Print.chat(event.player, StateUtil.translate("states.welcome_msg.state", chunk.getState().getName()));
 		}
 		if(player.getMailbox() == null) Print.chat(event.player, StateUtil.translate("states.welcome_msg.no_mailbox"));

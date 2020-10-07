@@ -17,7 +17,6 @@ import net.fexcraft.mod.fsmm.util.Config;
 import net.fexcraft.mod.states.States;
 import net.fexcraft.mod.states.data.Chunk;
 import net.fexcraft.mod.states.data.District;
-import net.fexcraft.mod.states.data.MunicipalityType;
 import net.fexcraft.mod.states.data.capabilities.PlayerCapability;
 import net.fexcraft.mod.states.data.capabilities.StatesCapabilities;
 import net.fexcraft.mod.states.packets.ImagePacket;
@@ -210,7 +209,7 @@ public class Listener implements IPacketListener<PacketNBTTagCompound> {
 			compound.setString("result", "Transit Zones (-2) are disabled.");
 			return compound;
 		}
-		if(dis.getId() != -2 && (!StConfig.ALLOW_CHUNK_OVERCLAIM && dis.getMunicipality().getClaimedChunks() + 1 > MunicipalityType.getChunkLimitFor(dis.getMunicipality()))){
+		if(dis.getId() != -2 && (!StConfig.ALLOW_CHUNK_OVERCLAIM && dis.getMunicipality().getClaimedChunks() + 1 > dis.getMunicipality().getChunkLimit())){
 			compound.setString("result", "Municipality reached the Chunk Limit.");
 			return compound;
 		}
@@ -237,7 +236,7 @@ public class Listener implements IPacketListener<PacketNBTTagCompound> {
 			compound.setString("result", "No permission. (1)");
 			return compound;
 		}
-		boolean over = dis.getMunicipality().getClaimedChunks() + 1 > MunicipalityType.getChunkLimitFor(dis.getMunicipality());
+		boolean over = dis.getMunicipality().getClaimedChunks() + 1 > dis.getMunicipality().getChunkLimit();
 		long price = over ? StConfig.OVERCLAIM_CHUNK_PRICE : StConfig.DEFAULT_CHUNK_PRICE;
 		if(over){
 			Print.chat(player, "&7Municipality reached chunk limit,\n&7paying overclaim fee instead of normal price.");

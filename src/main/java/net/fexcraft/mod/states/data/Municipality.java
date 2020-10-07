@@ -37,7 +37,6 @@ public class Municipality implements ColorHolder, BuyableType, IconHolder, Accou
 	private Account account;
 	private ArrayList<Integer> neighbors, districts, com_blacklist;
 	private ArrayList<UUID> citizen, council, pl_blacklist;
-	private MunicipalityType type;
 	private State state;
 	private BlockPos mailbox;
 	//
@@ -62,7 +61,6 @@ public class Municipality implements ColorHolder, BuyableType, IconHolder, Accou
 		districts = JsonUtil.jsonArrayToIntegerArray(JsonUtil.getIfExists(obj, "districts", new JsonArray()).getAsJsonArray());
 		citizen = JsonUtil.jsonArrayToUUIDArray(JsonUtil.getIfExists(obj, "citizen", new JsonArray()).getAsJsonArray());
 		council = JsonUtil.jsonArrayToUUIDArray(JsonUtil.getIfExists(obj, "council", new JsonArray()).getAsJsonArray());
-		type = MunicipalityType.getType(this);
 		state = StateUtil.getState(JsonUtil.getIfExists(obj, "state", -1).intValue());
 		color = JsonUtil.getIfExists(obj, "color", "#ffffff");
 		com_blacklist = JsonUtil.jsonArrayToIntegerArray(JsonUtil.getIfExists(obj, "company_blacklist", new JsonArray()).getAsJsonArray());
@@ -235,15 +233,6 @@ public class Municipality implements ColorHolder, BuyableType, IconHolder, Accou
 	@Override
 	public List<UUID> getCouncil(){
 		return council;
-	}
-
-	public MunicipalityType getType(){
-		return type;
-	}
-	
-	/** Use this method when e.g. after updating the citizen list of a Municipality.*/
-	public void updateType(){
-		type = MunicipalityType.getType(this);
 	}
 
 	public State getState(){
@@ -449,6 +438,10 @@ public class Municipality implements ColorHolder, BuyableType, IconHolder, Accou
 
 	public int getDistrictLimit(){
 		return getClaimedChunks() / StConfig.CHUNKS_FOR_DISTRICT + 1;
+	}
+
+	public int getChunkLimit(){
+		return citizen.size() * StConfig.CHUNK_PER_CITIZEN;
 	}
 
 }

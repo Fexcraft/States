@@ -23,7 +23,6 @@ import net.fexcraft.mod.states.data.ChunkType;
 import net.fexcraft.mod.states.data.District;
 import net.fexcraft.mod.states.data.DistrictType;
 import net.fexcraft.mod.states.data.Municipality;
-import net.fexcraft.mod.states.data.MunicipalityType;
 import net.fexcraft.mod.states.data.State;
 import net.fexcraft.mod.states.data.capabilities.PlayerCapability;
 import net.fexcraft.mod.states.data.capabilities.StatesCapabilities;
@@ -145,7 +144,7 @@ public class ManagerContainer extends GenericContainer {
 				addKey(list, "state", mun.getState().getName() + " (" + mun.getState().getId() + ")", ViewMode.GOTO);
 				addKey(list, "mayor", mun.getHead() == null ? NOONE : Static.getPlayerNameByUUID(mun.getHead()), ViewMode.EDIT);
 				addKey(list, "price", mun.getPrice() == 0 ? NOTFORSALE : ggas(mun.getPrice()), ViewMode.EDIT);
-				addKey(list, "type", mun.getType().getTitle(), ViewMode.NONE);
+				//TODO addKey(list, "type", mun.getType().getTitle(), ViewMode.NONE);
 				addKey(list, "color", mun.getColor(), ViewMode.EDIT);
 				addKey(list, "citizen", mun.getCitizen().size(), ViewMode.LIST);
 				addKey(list, "balance", ggas(mun.getAccount().getBalance()), ViewMode.GOTO);
@@ -156,7 +155,7 @@ public class ManagerContainer extends GenericContainer {
 				addKey(list, "neighbors", mun.getNeighbors().size(), ViewMode.LIST);
 				addKey(list, "opentojoin", mun.r_OPEN.get(), ViewMode.BOOL);
 				addKey(list, "kickbankrupt", mun.r_KIB.get(), ViewMode.BOOL);
-				addKey(list, "chunks", mun.getClaimedChunks() + "/" + MunicipalityType.getChunkLimitFor(mun), ViewMode.NONE);
+				addKey(list, "chunks", mun.getClaimedChunks() + "/" + mun.getChunkLimit(), ViewMode.NONE);
 				addKey(list, "creator", Static.getPlayerNameByUUID(mun.getCreator()), ViewMode.NONE);
 				addKey(list, "created", time(mun.getCreated()), ViewMode.NONE);
 				addKey(list, "forcechunks", mun.getForceLoadedChunks() == null ? NONE : mun.getForceLoadedChunks().size(), ViewMode.NONE);

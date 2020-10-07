@@ -20,7 +20,14 @@ import net.fexcraft.mod.fsmm.api.Bank.Action;
 import net.fexcraft.mod.fsmm.util.Config;
 import net.fexcraft.mod.fsmm.util.DataManager;
 import net.fexcraft.mod.states.States;
-import net.fexcraft.mod.states.data.*;
+import net.fexcraft.mod.states.data.Chunk;
+import net.fexcraft.mod.states.data.ChunkType;
+import net.fexcraft.mod.states.data.District;
+import net.fexcraft.mod.states.data.DistrictType;
+import net.fexcraft.mod.states.data.Municipality;
+import net.fexcraft.mod.states.data.Rule;
+import net.fexcraft.mod.states.data.State;
+import net.fexcraft.mod.states.data.Vote;
 import net.fexcraft.mod.states.data.Vote.VoteType;
 import net.fexcraft.mod.states.data.capabilities.PlayerCapability;
 import net.fexcraft.mod.states.data.capabilities.StatesCapabilities;
@@ -80,7 +87,7 @@ public class MunicipalityCmd extends CommandBase {
 		if(args.length == 0){
 			Print.chat(sender, "&7/mun info");
 			Print.chat(sender, "&7/mun rules");
-			Print.chat(sender, "&7/mun types");
+			//Print.chat(sender, "&7/mun types");
 			Print.chat(sender, "&7/mun join");
 			Print.chat(sender, "&7/mun leave");
 			Print.chat(sender, "&7/mun kick <player> <reason>");
@@ -106,14 +113,14 @@ public class MunicipalityCmd extends CommandBase {
 				openGui(player, RULE_EDITOR, 2, 0, 0);
 				return;
 			}
-			case "types":{
+			/*case "types":{
 				Print.chat(sender, "&9Existing municipality types:");
 				for(MunicipalityType type : MunicipalityType.values()){
 					Print.chat(sender, "&2-> &3 " + type.toDetailedString());
 				}
 				Print.chat(sender, "&9While the numbers mean: &71. required citizen | 2. district limit");
 				return;
-			}
+			}*/
 			case "buy":{
 				if(true){//TODO permission for this will be stored in state ruleset //hasPerm("municipality.buy", player, mun)){
 					if(ply.getMunicipality().getState().getId() < 0){

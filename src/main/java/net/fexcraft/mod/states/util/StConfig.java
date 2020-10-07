@@ -5,11 +5,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
-import net.fexcraft.lib.common.json.JsonUtil;
 import net.fexcraft.lib.common.math.Time;
 import net.fexcraft.lib.mc.utils.Static;
 import net.fexcraft.mod.states.States;
-import net.fexcraft.mod.states.data.MunicipalityType;
 import net.minecraftforge.common.config.ConfigElement;
 import net.minecraftforge.common.config.Configuration;
 import net.minecraftforge.fml.client.config.IConfigElement;
@@ -70,12 +68,6 @@ public class StConfig {
 	}
 	
 	private static void refresh(){
-		//
-		{
-			String[] arr = config.getStringList("municipality_types", DEFAULT_CAT, MunicipalityType.DEFAULTS, "Municipality Sizes");
-			MunicipalityType.clearEntries();
-			for(String str : arr){ new MunicipalityType(JsonUtil.getFromString(str).getAsJsonObject()); }
-		}
 		//CHUNK PRICES
 		ALLOW_CHUNK_UNCLAIM = config.getBoolean("allow_chunk_unclaim", DEFAULT_CAT, false, "If Mayors should have permission to unclaim chunks, usually only Admins are allowed to do so.");
 		ALLOW_CHUNK_OVERCLAIM = config.getBoolean("allow_chunk_overclaim", DEFAULT_CAT, false, "If claiming over the Municipality's chunk limit should be allowed, with a separate fee for such.");

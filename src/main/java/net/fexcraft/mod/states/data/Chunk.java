@@ -239,7 +239,7 @@ public class Chunk implements BuyableType, Taxable/*, RuleHolder*/ {
 			case COMPANY: return owner;//TODO company
 			case DISTRICT: return "District";
 			case MUNICIPAL: return "Municipal";
-			case NORMAL: return "(" + district.getMunicipality().getType().getTitle() + ") " + district.getMunicipality().getName();
+			case NORMAL: return "(" + district.getMunicipality().getTitle() + ") " + district.getMunicipality().getName();
 			case PRIVATE: return owner;
 			case PUBLIC: return "(Mun.) Public";
 			case STATEOWNED: return "State Owned";

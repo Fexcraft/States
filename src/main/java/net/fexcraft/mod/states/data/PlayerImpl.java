@@ -77,7 +77,8 @@ public class PlayerImpl implements PlayerCapability {
 		this.lasttaxcoll = JsonUtil.getIfExists(obj, "last_tax_collection", 0).longValue();
 		this.customtax = JsonUtil.getIfExists(obj, "custom_tax", 0).longValue();
 		this.mailbox = obj.has("mailbox") ? BlockPos.fromLong(obj.get("mailbox").getAsLong()) : null;
-		this.admin = isOnlinePlayer() ?  PermissionAPI.hasPermission(entity, Perms.ADMIN_PERM.get()) : JsonUtil.getIfExists(obj, "admin", false);
+		boolean jadmin = JsonUtil.getIfExists(obj, "admin", false);
+		this.admin = (isOnlinePlayer() ?  PermissionAPI.hasPermission(entity, Perms.ADMIN_PERM.get()) : true) && jadmin;
 		loaded = true;
 		TaxSystem.processPlayerTax(TaxSystem.getProbableSchedule(), this);
 	}

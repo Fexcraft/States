@@ -104,27 +104,29 @@ public class PlayerEvents {
 		}
 		IBlockState state = event.getWorld().getBlockState(event.getPos());
 		boolean check = false;
-		switch(StConfig.PROTLVL){//TODO temporary, dynamic implementation to be added instead later
-			case ABSOLUTE:
-				check = true;
-				break;
-			case ADVANCED:
-				check = state.getBlock() instanceof BlockChest || state.getBlock() instanceof BlockFurnace
-				|| state.getBlock() instanceof BlockHopper || state.getBlock() instanceof BlockDispenser
-				|| state.getBlock() instanceof BlockDropper || state.getBlock() instanceof BlockLever
-				|| state.getBlock() instanceof BlockButton || state.getBlock() instanceof BlockPressurePlate
-				|| state.getBlock() instanceof BlockRedstoneRepeater || state.getBlock() instanceof BlockRedstoneComparator
-				|| state.getBlock() instanceof BlockDoor || state.getBlock() instanceof BlockTrapDoor;
-				break;
-			case BASIC:
-				check = state.getBlock() instanceof BlockChest || state.getBlock() instanceof BlockFurnace
+		if(state.getBlock() instanceof BlockSign == false){
+			switch(StConfig.PROTLVL){//TODO temporary, dynamic implementation to be added instead later
+				case ABSOLUTE:
+					check = true;
+					break;
+				case ADVANCED:
+					check = state.getBlock() instanceof BlockChest || state.getBlock() instanceof BlockFurnace
 					|| state.getBlock() instanceof BlockHopper || state.getBlock() instanceof BlockDispenser
 					|| state.getBlock() instanceof BlockDropper || state.getBlock() instanceof BlockLever
 					|| state.getBlock() instanceof BlockButton || state.getBlock() instanceof BlockPressurePlate
-					|| state.getBlock() instanceof BlockRedstoneRepeater || state.getBlock() instanceof BlockRedstoneComparator;
-				break;
-			default:
-				break;
+					|| state.getBlock() instanceof BlockRedstoneRepeater || state.getBlock() instanceof BlockRedstoneComparator
+					|| state.getBlock() instanceof BlockDoor || state.getBlock() instanceof BlockTrapDoor;
+					break;
+				case BASIC:
+					check = state.getBlock() instanceof BlockChest || state.getBlock() instanceof BlockFurnace
+						|| state.getBlock() instanceof BlockHopper || state.getBlock() instanceof BlockDispenser
+						|| state.getBlock() instanceof BlockDropper || state.getBlock() instanceof BlockLever
+						|| state.getBlock() instanceof BlockButton || state.getBlock() instanceof BlockPressurePlate
+						|| state.getBlock() instanceof BlockRedstoneRepeater || state.getBlock() instanceof BlockRedstoneComparator;
+					break;
+				default:
+					break;
+			}
 		}
 		if(check && !checkAccess(event.getWorld(), event.getPos(), state, event.getEntityPlayer(), true)){
 			Print.chat(event.getEntityPlayer(), "No permission to interact with these blocks here.");

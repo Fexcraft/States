@@ -93,7 +93,7 @@ public class PlayerImpl implements PlayerCapability {
 			//
 			for(int id : this.municipality.getDistricts()){
 				District dis = StateUtil.getDistrict(id);
-				if(dis == null){ continue; }
+				if(dis == null || dis.getHead() == null) continue;
 				if(dis.getHead().equals(this.getUUID())){
 					dis.setHead(null);
 					dis.save();

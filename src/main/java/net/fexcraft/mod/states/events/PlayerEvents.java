@@ -98,21 +98,38 @@ public class PlayerEvents {
 	}
 	
 	@SubscribeEvent
-	public static void onRickClickBlock(PlayerInteractEvent.RightClickBlock event){
+	public static void onRightClickBlock(PlayerInteractEvent.RightClickBlock event){
 		if(event.getWorld().isRemote || event.getEntityPlayer().dimension != 0 || event.getEntityPlayer().getActiveHand() == EnumHand.OFF_HAND){
 			return;
 		}
 		IBlockState state = event.getWorld().getBlockState(event.getPos());
-		if(state.getBlock() instanceof BlockChest || state.getBlock() instanceof BlockFurnace
+		boolean check = false;
+		switch(StConfig.PROTLVL){//TODO temporary, dynamic implementation to be added instead later
+			case ABSOLUTE:
+				check = true;
+				break;
+			case ADVANCED:
+				check = state.getBlock() instanceof BlockChest || state.getBlock() instanceof BlockFurnace
 				|| state.getBlock() instanceof BlockHopper || state.getBlock() instanceof BlockDispenser
 				|| state.getBlock() instanceof BlockDropper || state.getBlock() instanceof BlockLever
 				|| state.getBlock() instanceof BlockButton || state.getBlock() instanceof BlockPressurePlate
-				|| state.getBlock() instanceof BlockRedstoneRepeater || state.getBlock() instanceof BlockRedstoneComparator){
-			if(!checkAccess(event.getWorld(), event.getPos(), state, event.getEntityPlayer(), true)){
-				Print.chat(event.getEntityPlayer(), "No permission to interact with these blocks here.");
-				event.setCanceled(true);
-				return;
-			}
+				|| state.getBlock() instanceof BlockRedstoneRepeater || state.getBlock() instanceof BlockRedstoneComparator
+				|| state.getBlock() instanceof BlockDoor || state.getBlock() instanceof BlockTrapDoor;
+				break;
+			case BASIC:
+				check = state.getBlock() instanceof BlockChest || state.getBlock() instanceof BlockFurnace
+					|| state.getBlock() instanceof BlockHopper || state.getBlock() instanceof BlockDispenser
+					|| state.getBlock() instanceof BlockDropper || state.getBlock() instanceof BlockLever
+					|| state.getBlock() instanceof BlockButton || state.getBlock() instanceof BlockPressurePlate
+					|| state.getBlock() instanceof BlockRedstoneRepeater || state.getBlock() instanceof BlockRedstoneComparator;
+				break;
+			default:
+				break;
+		}
+		if(check && !checkAccess(event.getWorld(), event.getPos(), state, event.getEntityPlayer(), true)){
+			Print.chat(event.getEntityPlayer(), "No permission to interact with these blocks here.");
+			event.setCanceled(true);
+			return;
 		}
 		else return;
 	}

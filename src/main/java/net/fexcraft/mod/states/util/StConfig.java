@@ -34,7 +34,7 @@ public class StConfig {
 	public static boolean ALLOW_TRANSIT_ZONES;
 	public static int TRANSIT_ZONE_BOTTOM_LIMIT, TRANSIT_ZONE_TOP_LIMIT;
 	//LIMITS-OTHER
-	public static int MAP_UPDATES_PER_SECOND, CHUNK_PER_CITIZEN, NICKNAME_LENGTH, LOADED_CHUNKS_PER_MUNICIPALITY;
+	public static int MAP_UPDATES_PER_SECOND, CHUNK_PER_CITIZEN, NICKNAME_LENGTH, LOADED_CHUNKS_PER_MUNICIPALITY, CHUNKS_FOR_DISTRICT;
 	public static boolean ALLOW_WILDERNESS_ACCESS, STATES_CHAT, ALLOW_MAILBOX_COLLECT, FORGE_ADMIN_CHECK;
 	//CLIENT
 	public static boolean SHOW_MINIMAP;
@@ -113,6 +113,7 @@ public class StConfig {
 		NICKNAME_LENGTH = config.getInt("nickname_length", DEFAULT_CAT, 40, 3, 128, "Max length of Player Nicknames (/nick).");
 		ALLOW_MAILBOX_COLLECT = config.getBoolean("allow_mailbox_collect", DEFAULT_CAT, true, "Should players be allowed to use '/mail collect <box-type>'? Allows to collect player mail from non-player mailboxes without being directly nearby or needing permission for the mailbox.");
 		MAP_UPDATES_PER_SECOND = config.getInt("map_updates_per_second", DEFAULT_CAT, 20, 0, 128, "Max amount of Map updates per second.");
+		CHUNKS_FOR_DISTRICT = config.getInt("chunks_for_district", DEFAULT_CAT, 64, 1, Integer.MAX_VALUE, "Multiplier of chunk claims required to unlock more districts.");
 		//CLIENT
 		SHOW_MINIMAP = config.getBoolean("show_minimap", CLIENT_CAT, true, "If the States Minimap should be shown.");
 		updateWebHook();

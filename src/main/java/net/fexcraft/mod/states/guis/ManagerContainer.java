@@ -152,7 +152,7 @@ public class ManagerContainer extends GenericContainer {
 				addKey(list, "citizen_tax", mun.getCitizenTax() > 0 ? ggas(mun.getCitizenTax()) : NOTAX, ViewMode.EDIT);
 				addKey(list, "last_edited", time(mun.getChanged()), ViewMode.NONE);
 				addKey(list, "council", mun.getCouncil().size(), ViewMode.LIST);
-				addKey(list, "districts", mun.getDistricts().size(), ViewMode.LIST);
+				addKey(list, "districts", mun.getDistricts().size() + " / " + mun.getDistrictLimit(), ViewMode.LIST);
 				addKey(list, "neighbors", mun.getNeighbors().size(), ViewMode.LIST);
 				addKey(list, "opentojoin", mun.r_OPEN.get(), ViewMode.BOOL);
 				addKey(list, "kickbankrupt", mun.r_KIB.get(), ViewMode.BOOL);

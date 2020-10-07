@@ -14,7 +14,6 @@ import net.fexcraft.mod.states.data.District;
 import net.fexcraft.mod.states.data.DistrictAttribute;
 import net.fexcraft.mod.states.data.DistrictType;
 import net.fexcraft.mod.states.data.Municipality;
-import net.fexcraft.mod.states.data.MunicipalityType;
 import net.fexcraft.mod.states.data.capabilities.PlayerCapability;
 import net.fexcraft.mod.states.data.capabilities.StatesCapabilities;
 import net.fexcraft.mod.states.guis.Listener;
@@ -96,7 +95,7 @@ public class DistrictCmd extends CommandBase {
 			}
 			case "create":{
 				if(ply.getMunicipality().isAuthorized(ply.getMunicipality().r_CREATE_DISTRICT.id, ply.getUUID()).isTrue() || StateUtil.bypass(player)){
-					if(ply.getMunicipality().getDistricts().size() + 1 > MunicipalityType.getType(ply.getMunicipality()).getDistrictLimit()){
+					if(ply.getMunicipality().getDistricts().size() + 1 > ply.getMunicipality().getDistrictLimit()){
 						Print.chat(sender, "&aYour Municipality reached the limit of possible Districts.");
 						return;
 					}

@@ -447,4 +447,8 @@ public class Municipality implements ColorHolder, BuyableType, IconHolder, Accou
 		save();
 	}
 
+	public int getDistrictLimit(){
+		return getClaimedChunks() / StConfig.CHUNKS_FOR_DISTRICT + 1;
+	}
+
 }

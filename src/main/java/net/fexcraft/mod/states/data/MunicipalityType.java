@@ -81,10 +81,6 @@ public class MunicipalityType implements Comparable<MunicipalityType>{
 		return requred_citizen;
 	}
 	
-	public final int getDistrictLimit(){
-		return district_limit;
-	}
-	
 	public final boolean obtainableType(){
 		return obtainable;
 	}

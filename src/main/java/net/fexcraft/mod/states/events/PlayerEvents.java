@@ -113,16 +113,14 @@ public class PlayerEvents {
 					check = state.getBlock() instanceof BlockChest || state.getBlock() instanceof BlockFurnace
 					|| state.getBlock() instanceof BlockHopper || state.getBlock() instanceof BlockDispenser
 					|| state.getBlock() instanceof BlockDropper || state.getBlock() instanceof BlockLever
-					|| state.getBlock() instanceof BlockButton || state.getBlock() instanceof BlockPressurePlate
-					|| state.getBlock() instanceof BlockRedstoneRepeater || state.getBlock() instanceof BlockRedstoneComparator
-					|| state.getBlock() instanceof BlockDoor || state.getBlock() instanceof BlockTrapDoor;
+					|| state.getBlock() instanceof BlockButton || state.getBlock() instanceof BlockRedstoneDiode
+					|| state.getBlock() instanceof BlockDoor || state.getBlock() instanceof BlockTrapDoor
+					|| state.getBlock() instanceof BlockFenceGate;
 					break;
 				case BASIC:
 					check = state.getBlock() instanceof BlockChest || state.getBlock() instanceof BlockFurnace
 						|| state.getBlock() instanceof BlockHopper || state.getBlock() instanceof BlockDispenser
-						|| state.getBlock() instanceof BlockDropper || state.getBlock() instanceof BlockLever
-						|| state.getBlock() instanceof BlockButton || state.getBlock() instanceof BlockPressurePlate
-						|| state.getBlock() instanceof BlockRedstoneRepeater || state.getBlock() instanceof BlockRedstoneComparator;
+						|| state.getBlock() instanceof BlockDropper || state.getBlock() instanceof BlockRedstoneDiode;
 					break;
 				default:
 					break;

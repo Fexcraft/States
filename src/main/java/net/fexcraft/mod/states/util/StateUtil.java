@@ -42,7 +42,6 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.util.text.TextComponentString;
 import net.minecraftforge.fml.common.FMLCommonHandler;
-import net.minecraftforge.server.permission.PermissionAPI;
 
 public class StateUtil extends TimerTask {
     
@@ -291,7 +290,7 @@ public class StateUtil extends TimerTask {
     }
 
 	public static boolean isAdmin(EntityPlayer sender){
-		return (StConfig.FORGE_ADMIN_CHECK ? PermissionAPI.hasPermission(sender, States.ADMIN_PERM) : true) && isStateCapAdmin(sender);
+		return isStateCapAdmin(sender);
 	}
 
 	private static boolean isStateCapAdmin(EntityPlayer sender){

@@ -58,7 +58,6 @@ public class States {
 	
 	public static final String VERSION = "@VERSION@";
 	public static final String MODID = "states";
-	public static final String ADMIN_PERM = "states.admin";
 	public static final String PREFIX = "&0[&2States&0]";
 	//
 	public static final TreeMap<ChunkPos, Chunk> CHUNKS = new TreeMap<>();

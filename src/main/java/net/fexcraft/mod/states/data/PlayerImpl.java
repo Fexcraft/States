@@ -16,11 +16,13 @@ import net.fexcraft.mod.fsmm.api.FSMMCapabilities;
 import net.fexcraft.mod.fsmm.util.DataManager;
 import net.fexcraft.mod.states.States;
 import net.fexcraft.mod.states.data.capabilities.PlayerCapability;
+import net.fexcraft.mod.states.util.Perms;
 import net.fexcraft.mod.states.util.StateUtil;
 import net.fexcraft.mod.states.util.TaxSystem;
 import net.minecraft.command.ICommandSender;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.util.math.BlockPos;
+import net.minecraftforge.server.permission.PermissionAPI;
 
 public class PlayerImpl implements PlayerCapability {
 	
@@ -75,7 +77,7 @@ public class PlayerImpl implements PlayerCapability {
 		this.lasttaxcoll = JsonUtil.getIfExists(obj, "last_tax_collection", 0).longValue();
 		this.customtax = JsonUtil.getIfExists(obj, "custom_tax", 0).longValue();
 		this.mailbox = obj.has("mailbox") ? BlockPos.fromLong(obj.get("mailbox").getAsLong()) : null;
-		this.admin = JsonUtil.getIfExists(obj, "admin", false);
+		this.admin = isOnlinePlayer() ?  PermissionAPI.hasPermission(entity, Perms.ADMIN_PERM.get()) : JsonUtil.getIfExists(obj, "admin", false);
 		loaded = true;
 		TaxSystem.processPlayerTax(TaxSystem.getProbableSchedule(), this);
 	}

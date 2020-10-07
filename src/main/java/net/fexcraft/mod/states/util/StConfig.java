@@ -33,7 +33,7 @@ public class StConfig {
 	public static int TRANSIT_ZONE_BOTTOM_LIMIT, TRANSIT_ZONE_TOP_LIMIT;
 	//LIMITS-OTHER
 	public static int MAP_UPDATES_PER_SECOND, CHUNK_PER_CITIZEN, NICKNAME_LENGTH, LOADED_CHUNKS_PER_MUNICIPALITY, CHUNKS_FOR_DISTRICT;
-	public static boolean ALLOW_WILDERNESS_ACCESS, STATES_CHAT, ALLOW_MAILBOX_COLLECT, FORGE_ADMIN_CHECK;
+	public static boolean ALLOW_WILDERNESS_ACCESS, STATES_CHAT, ALLOW_MAILBOX_COLLECT;//, FORGE_ADMIN_CHECK;
 	//CLIENT
 	public static boolean SHOW_MINIMAP;
 	//
@@ -97,7 +97,7 @@ public class StConfig {
 		TRANSIT_ZONE_TOP_LIMIT = config.getInt("temporary_district_top_limit", DEFAULT_CAT, 80, 127, 255, "Max Height value to which blocks in Temporary claimed Chunks can be accessed.");
 		//LIMITS-OTHER
 		PROTLVL = ProtectionLevel.fromString(config.getString("protection_level", DEFAULT_CAT, "basic", "Available: " + ProtectionLevel.allToString()));
-		FORGE_ADMIN_CHECK = config.getBoolean("forge_admin_check", DEFAULT_CAT, true, "If the Forge PermissionsAPI should be used for admin permission checks, when 'false', use '/st-admin toggle' instead!");
+		//FORGE_ADMIN_CHECK = config.getBoolean("forge_admin_check", DEFAULT_CAT, true, "If the Forge PermissionsAPI should be used for admin permission checks, when 'false', use '/st-admin toggle' instead!");
 		ALLOW_WILDERNESS_ACCESS = config.getBoolean("allow_wilderness_access", DEFAULT_CAT, false, "Should players be able to break, place or interact with blocks in Wilderness? (District:-1)");
 		CHUNK_PER_CITIZEN = config.getInt("chunk_per_citizen", DEFAULT_CAT, 16, 1, 4096, "How many chunks a Municipality can CLAIM per citizen inhabiting it.");
 		LOADED_CHUNKS_PER_MUNICIPALITY = config.getInt("loaded_chunks_per_municipality", DEFAULT_CAT, 0, 0, 128, "Amount of max (force) loaded chunks a Municipality can have.");

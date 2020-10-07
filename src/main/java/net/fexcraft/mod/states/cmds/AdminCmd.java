@@ -5,13 +5,13 @@ import org.apache.commons.lang3.math.NumberUtils;
 import net.fexcraft.lib.common.math.Time;
 import net.fexcraft.lib.mc.api.registry.fCommand;
 import net.fexcraft.lib.mc.utils.Print;
-import net.fexcraft.mod.states.States;
 import net.fexcraft.mod.states.data.Chunk;
 import net.fexcraft.mod.states.data.District;
 import net.fexcraft.mod.states.data.capabilities.PlayerCapability;
 import net.fexcraft.mod.states.data.capabilities.StatesCapabilities;
 import net.fexcraft.mod.states.guis.Listener;
 import net.fexcraft.mod.states.util.ImageCache;
+import net.fexcraft.mod.states.util.Perms;
 import net.fexcraft.mod.states.util.StateLogger;
 import net.fexcraft.mod.states.util.StateUtil;
 import net.minecraft.command.CommandBase;
@@ -58,7 +58,8 @@ public class AdminCmd extends CommandBase {
 		EntityPlayer player = getCommandSenderAsPlayer(sender);
 		PlayerCapability cap = player.getCapability(StatesCapabilities.PLAYER, null);
 		Chunk chunk = StateUtil.getChunk(player);
-		if(!PermissionAPI.hasPermission(player, States.ADMIN_PERM)){
+		if(!PermissionAPI.hasPermission(player, Perms.ADMIN_PERM.get())){
+			if(cap.isAdmin()) cap.setAdminMode(false);
 			Print.chat(player, "&7No Permission."); return;
 		}
 		switch(args[0]){

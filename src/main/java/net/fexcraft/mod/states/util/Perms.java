@@ -1,12 +1,12 @@
 package net.fexcraft.mod.states.util;
 
-import net.fexcraft.mod.states.States;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraftforge.server.permission.DefaultPermissionLevel;
 import net.minecraftforge.server.permission.PermissionAPI;
 
 public class Perms {
-	
+
+	public static final Perm ADMIN_PERM = new Perm("states.admin");
 	public static final Perm NICKNAME_CHANGE_SELF = new Perm("states.nickname.change.self");
 	public static final Perm NICKNAME_CHANGE_OTHERS = new Perm("states.nickname.change.others");
 	public static final Perm CREATE_SERVER_SIGN_SHOPS = new Perm("states.create-server-sign-shops");
@@ -15,7 +15,7 @@ public class Perms {
 	public static final Perm CREATE_MUNICIPALITY = new Perm("states.create.municipality");
 
 	public static void init(){
-		PermissionAPI.registerNode(States.ADMIN_PERM, DefaultPermissionLevel.OP, "States Admin Permission");
+		PermissionAPI.registerNode(ADMIN_PERM.get(), DefaultPermissionLevel.OP, "States Admin Permission");
 		PermissionAPI.registerNode(NICKNAME_CHANGE_SELF.get(), DefaultPermissionLevel.ALL, "NickName Management - Self");
 		PermissionAPI.registerNode(NICKNAME_CHANGE_OTHERS.get(), DefaultPermissionLevel.OP, "NickName Management - Others");
 		PermissionAPI.registerNode(CREATE_SERVER_SIGN_SHOPS.get(), DefaultPermissionLevel.OP, "Creation of States (SERVER) Sign Shops");

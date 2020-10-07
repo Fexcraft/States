@@ -291,7 +291,7 @@ public class StateUtil extends TimerTask {
     }
 
 	public static boolean isAdmin(EntityPlayer sender){
-		return StConfig.FORGE_ADMIN_CHECK ? PermissionAPI.hasPermission(sender, States.ADMIN_PERM) : isStateCapAdmin(sender);
+		return (StConfig.FORGE_ADMIN_CHECK ? PermissionAPI.hasPermission(sender, States.ADMIN_PERM) : true) && isStateCapAdmin(sender);
 	}
 
 	private static boolean isStateCapAdmin(EntityPlayer sender){

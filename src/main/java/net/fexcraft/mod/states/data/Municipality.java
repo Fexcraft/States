@@ -30,7 +30,7 @@ import net.minecraft.util.math.BlockPos;
 public class Municipality implements ColorHolder, BuyableType, IconHolder, AccountHolder, MailReceiver, Ruleable, VoteHolder, Abandonable {
 	
 	private int id;
-	private String name, color, icon;
+	private String name, color, icon, title;
 	private long created, changed, price, citizentax, abandonedat;
 	private UUID creator, mayor, abandonedby;
 	private boolean abandoned;
@@ -45,13 +45,14 @@ public class Municipality implements ColorHolder, BuyableType, IconHolder, Accou
 	public final Rule r_OPEN, r_COLOR, r_ICON, r_SET_NAME, r_SET_PRICE, r_SET_MAYOR, r_SET_CITIZENTAX, r_KIB;
 	public final Rule r_EDIT_BL, r_KICK, r_INVITE, r_COUNCIL_KICK, r_COUNCIL_INVITE, r_VOTE_MAYOR;
 	public final Rule r_CREATE_DISTRICT, r_SET_CHUNKRULES, r_CREATE_SIGN_SHOP, r_SET_MAILBOX, r_OPEN_MAILBOX;
-	public final Rule r_FORCE_LOAD_CHUNKS, r_SET_RULESET, r_RESET_MAYOR, r_ABANDON;
+	public final Rule r_FORCE_LOAD_CHUNKS, r_SET_RULESET, r_RESET_MAYOR, r_ABANDON, r_SET_TITLE;
 	private ArrayList<Vote> active_votes = new ArrayList<>();
 	
 	public Municipality(int id){
 		this.id = id;
 		JsonObject obj = StateUtil.getMunicipalityJson(id);
 		name = JsonUtil.getIfExists(obj, "name", "Unnamed Place");
+		title = JsonUtil.getIfExists(obj, "title", "Untitled");
 		created = JsonUtil.getIfExists(obj, "created", Time.getDate()).longValue();
 		creator = UUID.fromString(obj.has("creator") ? obj.get("creator").getAsString() : States.CONSOLE_UUID);
 		changed = JsonUtil.getIfExists(obj, "changed", Time.getDate()).longValue();
@@ -76,6 +77,7 @@ public class Municipality implements ColorHolder, BuyableType, IconHolder, Accou
 		rules.add(r_SET_NAME = new Rule("set.name", null, false, Initiator.COUNCIL_VOTE, Initiator.INCHARGE));
 		rules.add(r_SET_PRICE = new Rule("set.price", null, false, Initiator.COUNCIL_VOTE, Initiator.INCHARGE));
 		rules.add(r_SET_MAYOR = new Rule("set.mayor", null, true, Initiator.COUNCIL_VOTE, Initiator.INCHARGE));
+		rules.add(r_SET_TITLE = new Rule("set.title", null, true, Initiator.COUNCIL_VOTE, Initiator.INCHARGE));
 		rules.add(r_OPEN = new Rule("open_to_join", false, false, Initiator.COUNCIL_VOTE, Initiator.INCHARGE));
 		rules.add(r_COLOR = new Rule("set.color", null, false, Initiator.COUNCIL_VOTE, Initiator.INCHARGE));
 		rules.add(r_ICON = new Rule("set.icon", null, false, Initiator.COUNCIL_VOTE, Initiator.INCHARGE));
@@ -119,6 +121,7 @@ public class Municipality implements ColorHolder, BuyableType, IconHolder, Accou
 		JsonObject obj = new JsonObject();
 		obj.addProperty("id", id);
 		obj.addProperty("name", name);
+		obj.addProperty("title", title);
 		obj.addProperty("created", created);
 		obj.addProperty("creator", creator.toString());
 		obj.addProperty("changed", changed);
@@ -442,6 +445,18 @@ public class Municipality implements ColorHolder, BuyableType, IconHolder, Accou
 
 	public int getChunkLimit(){
 		return citizen.size() * StConfig.CHUNK_PER_CITIZEN;
+	}
+
+	public String getTitle(){
+		return title;
+	}
+
+	public void setTitle(String newtitle){
+		title = newtitle;
+	}
+
+	public String getTitledName(){
+		return "(" + title + ") " + name;
 	}
 
 }

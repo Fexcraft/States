@@ -144,7 +144,7 @@ public class ManagerContainer extends GenericContainer {
 				addKey(list, "state", mun.getState().getName() + " (" + mun.getState().getId() + ")", ViewMode.GOTO);
 				addKey(list, "mayor", mun.getHead() == null ? NOONE : Static.getPlayerNameByUUID(mun.getHead()), ViewMode.EDIT);
 				addKey(list, "price", mun.getPrice() == 0 ? NOTFORSALE : ggas(mun.getPrice()), ViewMode.EDIT);
-				//TODO addKey(list, "type", mun.getType().getTitle(), ViewMode.NONE);
+				addKey(list, "title", mun.getTitle(), ViewMode.EDIT);
 				addKey(list, "color", mun.getColor(), ViewMode.EDIT);
 				addKey(list, "citizen", mun.getCitizen().size(), ViewMode.LIST);
 				addKey(list, "balance", ggas(mun.getAccount().getBalance()), ViewMode.GOTO);
@@ -655,6 +655,26 @@ public class ManagerContainer extends GenericContainer {
 										}
 										catch(Exception e){
 											sendStatus("&cError: &7" + e.getMessage());
+										}
+									}
+									else sendStatus(null);
+									break;
+								}
+								case "title":{
+									if(mun.isAuthorized(mun.r_SET_TITLE.id, cap.getUUID()).isTrue() || bypass(player)){
+										try{
+											if(value.replaceAll("(&.)", "").length() > 16){
+												sendStatus("states.manager_gui.view.title_too_long");
+												break;
+											}
+											mun.setTitle(value);
+											mun.setChanged(Time.getDate());
+											mun.save();
+											sendViewData();
+											Print.log(StateLogger.player(player) + " changed title of " + StateLogger.municipality(mun) + " to " + mun.getTitle() + ".");
+										}
+										catch(Exception e){
+											sendStatus("&2Error: &7" + e.getMessage());
 										}
 									}
 									else sendStatus(null);

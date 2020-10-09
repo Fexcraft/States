@@ -8,7 +8,7 @@ It is composed of (in order): `Chunk -> District -> Municipality -> State`.
 
 Players can create a "Municipality" - technically regard it as a "town" which expands.    
 Municipalities consists of Districts, Chunks are claimed into Districts.    
-This allows to manage a Municipality's terrain better, and even sell huge oieces of    
+This allows to manage a Municipality's terrain better, and even sell huge pieces of    
 land by simply selling the District.
 
 Here an example of how a populated/claimed area could look like:

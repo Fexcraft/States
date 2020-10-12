@@ -20,12 +20,14 @@ import net.fexcraft.mod.fsmm.util.DataManager;
 import net.fexcraft.mod.states.States;
 import net.fexcraft.mod.states.data.capabilities.PlayerCapability;
 import net.fexcraft.mod.states.data.root.*;
+import net.fexcraft.mod.states.events.MunicipalityEvent;
 import net.fexcraft.mod.states.util.ForcedChunksManager;
 import net.fexcraft.mod.states.util.RuleMap;
 import net.fexcraft.mod.states.util.StConfig;
 import net.fexcraft.mod.states.util.StateUtil;
 import net.minecraft.command.ICommandSender;
 import net.minecraft.util.math.BlockPos;
+import net.minecraftforge.common.MinecraftForge;
 
 public class Municipality implements ColorHolder, BuyableType, IconHolder, AccountHolder, MailReceiver, Ruleable, VoteHolder, Abandonable {
 	
@@ -98,6 +100,7 @@ public class Municipality implements ColorHolder, BuyableType, IconHolder, Accou
 		rules.add(r_SET_RULESET = new Rule("set.ruleset-name", null, false, Initiator.COUNCIL_VOTE, Initiator.INCHARGE));
 		rules.add(r_RESET_MAYOR = new Rule("set.mayor.none", null, false, Initiator.CITIZEN_VOTE, Initiator.HIGHERINCHARGE));
 		rules.add(r_ABANDON = new Rule("abandon", null, true, Initiator.INCHARGE, Initiator.INCHARGE));
+		rules.lock();
 		if(obj.has("rules")){
 			JsonObject rls = obj.get("rules").getAsJsonObject();
 			for(Map.Entry<String, JsonElement> entry : rls.entrySet()){
@@ -113,6 +116,14 @@ public class Municipality implements ColorHolder, BuyableType, IconHolder, Accou
 			ArrayList<Integer> list = JsonUtil.jsonArrayToIntegerArray(obj.get("votes").getAsJsonArray());
 			for(int i : list){
 				Vote vote = StateUtil.getVote(this, i); if(vote == null || vote.expired(null)) continue; active_votes.add(vote);
+			}
+		}
+		MinecraftForge.EVENT_BUS.post(new MunicipalityEvent.Load(this));
+		if(obj.has("ex-rules") && rules.hasExternal()){
+			JsonObject rls = obj.get("ex-rules").getAsJsonObject();
+			for(Map.Entry<String, JsonElement> entry : rls.entrySet()){
+				Rule rule = rules.get(entry.getKey());
+				if(rule != null) rule.load(entry.getValue().getAsString());
 			}
 		}
 	}
@@ -143,9 +154,16 @@ public class Municipality implements ColorHolder, BuyableType, IconHolder, Accou
 		if(abandonedby != null) obj.addProperty("abandoned_by", abandonedby.toString());
 		if(abandonedat != 0) obj.addProperty("abandoned_", abandonedat);
 		obj.addProperty("ruleset", ruleset_name);
-		JsonObject rells = new JsonObject();
-		for(Rule rule : rules.values()) rells.addProperty(rule.id, rule.save());
-		obj.add("rules", rells);
+		{
+			JsonObject rells = new JsonObject();
+			for(Rule rule : rules.values()) if(!rule.isExternal()) rells.addProperty(rule.id, rule.save());
+			obj.add("rules", rells);
+		}
+		if(rules.hasExternal()){
+			JsonObject erells = new JsonObject();
+			for(Rule rule : rules.values()) if(rule.isExternal()) erells.addProperty(rule.id, rule.save());
+			obj.add("ex-rules", erells);
+		}
 		if(!active_votes.isEmpty()){
 			JsonArray array = new JsonArray();
 			for(Vote vote : active_votes) array.add(vote.id);

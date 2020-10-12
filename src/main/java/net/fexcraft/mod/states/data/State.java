@@ -23,9 +23,11 @@ import net.fexcraft.mod.states.data.root.IconHolder;
 import net.fexcraft.mod.states.data.root.Initiator;
 import net.fexcraft.mod.states.data.root.MailReceiver;
 import net.fexcraft.mod.states.data.root.Ruleable;
+import net.fexcraft.mod.states.events.StateEvent;
 import net.fexcraft.mod.states.util.RuleMap;
 import net.fexcraft.mod.states.util.StateUtil;
 import net.minecraft.util.math.BlockPos;
+import net.minecraftforge.common.MinecraftForge;
 
 public class State implements ColorHolder, BuyableType, IconHolder, AccountHolder, MailReceiver, Ruleable {
 
@@ -89,6 +91,7 @@ public class State implements ColorHolder, BuyableType, IconHolder, AccountHolde
 		rules.add(r_SET_RULESET = new Rule("set.ruleset-name", null, false, Initiator.COUNCIL_VOTE, Initiator.INCHARGE));
 		rules.add(r_RESET_HEAD = new Rule("set.leader.none", null, false, Initiator.COUNCIL_VOTE, Initiator.INCHARGE));
 		rules.add(r_CLAIM_MUNICIPALITY = new Rule("claim.municipality", null, false, Initiator.COUNCIL_VOTE, Initiator.CITIZEN_ANY));
+		rules.lock();
 		if(obj.has("rules")){
 			JsonObject rls = obj.get("rules").getAsJsonObject();
 			for(Map.Entry<String, JsonElement> entry : rls.entrySet()){
@@ -101,6 +104,14 @@ public class State implements ColorHolder, BuyableType, IconHolder, AccountHolde
 			ArrayList<Integer> list = JsonUtil.jsonArrayToIntegerArray(obj.get("votes").getAsJsonArray());
 			for(int i : list){
 				Vote vote = StateUtil.getVote(this, i); if(vote == null || vote.expired(null)) continue; active_votes.add(vote);
+			}
+		}
+		MinecraftForge.EVENT_BUS.post(new StateEvent.Load(this));
+		if(obj.has("ex-rules") && rules.hasExternal()){
+			JsonObject rls = obj.get("ex-rules").getAsJsonObject();
+			for(Map.Entry<String, JsonElement> entry : rls.entrySet()){
+				Rule rule = rules.get(entry.getKey());
+				if(rule != null) rule.load(entry.getValue().getAsString());
 			}
 		}
 	}
@@ -130,9 +141,16 @@ public class State implements ColorHolder, BuyableType, IconHolder, AccountHolde
 		}
 		if(mailbox != null) obj.addProperty("mailbox", mailbox.toLong());
 		obj.addProperty("ruleset", ruleset);
-		JsonObject rells = new JsonObject();
-		for(Rule rule : rules.values()) rells.addProperty(rule.id, rule.save());
-		obj.add("rules", rells);
+		{
+			JsonObject rells = new JsonObject();
+			for(Rule rule : rules.values()) if(!rule.isExternal()) rells.addProperty(rule.id, rule.save());
+			obj.add("rules", rells);
+		}
+		if(rules.hasExternal()){
+			JsonObject erells = new JsonObject();
+			for(Rule rule : rules.values()) if(rule.isExternal()) erells.addProperty(rule.id, rule.save());
+			obj.add("ex-rules", erells);
+		}
 		if(!active_votes.isEmpty()){
 			JsonArray array = new JsonArray();
 			for(Vote vote : active_votes) array.add(vote.id);

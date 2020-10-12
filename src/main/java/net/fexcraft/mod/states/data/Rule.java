@@ -11,7 +11,7 @@ public class Rule {
 	
 	public final String id, name;
 	private Boolean value;
-	private boolean votable_set;
+	private boolean votable_set, external;
 	public Initiator reviser;
 	public Initiator setter;
 	
@@ -168,6 +168,15 @@ public class Rule {
 	
 	public boolean isVotable(){
 		return votable_set;
+	}
+
+	public Rule setExternal(){
+		external = true;
+		return this;
+	}
+	
+	public boolean isExternal(){
+		return external;
 	}
 
 }

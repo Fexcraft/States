@@ -19,9 +19,11 @@ import net.fexcraft.mod.states.data.root.IconHolder;
 import net.fexcraft.mod.states.data.root.Initiator;
 import net.fexcraft.mod.states.data.root.MailReceiver;
 import net.fexcraft.mod.states.data.root.Ruleable;
+import net.fexcraft.mod.states.events.DistrictEvent;
 import net.fexcraft.mod.states.util.RuleMap;
 import net.fexcraft.mod.states.util.StateUtil;
 import net.minecraft.util.math.BlockPos;
+import net.minecraftforge.common.MinecraftForge;
 
 public class District implements ColorHolder, BuyableType, IconHolder, MailReceiver, Ruleable {
 	
@@ -75,6 +77,7 @@ public class District implements ColorHolder, BuyableType, IconHolder, MailRecei
 		rules.add(r_SET_MAILBOX = new Rule("set.mailbox", null, false, Initiator.COUNCIL_VOTE, Initiator.HIGHERINCHARGE));
 		rules.add(r_OPEN_MAILBOX = new Rule("open.mailbox", null, false, Initiator.COUNCIL_VOTE, Initiator.COUNCIL_ANY));
 		rules.add(r_SET_RULESET = new Rule("set.ruleset-name", null, false, Initiator.COUNCIL_ANY, Initiator.INCHARGE));
+		rules.lock();
 		if(obj.has("rules")){
 			JsonObject rls = obj.get("rules").getAsJsonObject();
 			for(Map.Entry<String, JsonElement> entry : rls.entrySet()){
@@ -90,6 +93,14 @@ public class District implements ColorHolder, BuyableType, IconHolder, MailRecei
 			ArrayList<Integer> list = JsonUtil.jsonArrayToIntegerArray(obj.get("votes").getAsJsonArray());
 			for(int i : list){
 				Vote vote = StateUtil.getVote(this, i); if(vote == null || vote.expired(null)) continue; active_votes.add(vote);
+			}
+		}
+		MinecraftForge.EVENT_BUS.post(new DistrictEvent.Load(this));
+		if(obj.has("ex-rules") && rules.hasExternal()){
+			JsonObject rls = obj.get("ex-rules").getAsJsonObject();
+			for(Map.Entry<String, JsonElement> entry : rls.entrySet()){
+				Rule rule = rules.get(entry.getKey());
+				if(rule != null) rule.load(entry.getValue().getAsString());
 			}
 		}
 	}
@@ -114,9 +125,16 @@ public class District implements ColorHolder, BuyableType, IconHolder, MailRecei
 		//obj.addProperty("unclaim_chunks_if_bankrupt", onbankrupt);
 		if(mailbox != null) obj.addProperty("mailbox", mailbox.toLong());
 		obj.addProperty("ruleset", ruleset);
-		JsonObject rells = new JsonObject();
-		for(Rule rule : rules.values()) rells.addProperty(rule.id, rule.save());
-		obj.add("rules", rells);
+		{
+			JsonObject rells = new JsonObject();
+			for(Rule rule : rules.values()) if(!rule.isExternal()) rells.addProperty(rule.id, rule.save());
+			obj.add("rules", rells);
+		}
+		if(rules.hasExternal()){
+			JsonObject erells = new JsonObject();
+			for(Rule rule : rules.values()) if(rule.isExternal()) erells.addProperty(rule.id, rule.save());
+			obj.add("ex-rules", erells);
+		}
 		if(!active_votes.isEmpty()){
 			JsonArray array = new JsonArray();
 			for(Vote vote : active_votes) array.add(vote.id);

@@ -6,9 +6,10 @@ _A Successor to the FSU "Nations" series._
 Similarly to "Nations" (an old FSU module), it contains a _multi-layer_ protection system.    
 It is composed of (in order): `Chunk -> District -> Municipality -> State`.    
 
-Players can create a "Municipality", technically regard it as a "town" which expands.    
-Depending on it's size it will get various Titles ("Hamlet", "Village", "Town" and so on).    
-You can configure those titles and also limit how many districts a municipality can have in the config.    
+Players can create a "Municipality" - technically regard it as a "town" which expands.    
+Municipalities consists of Districts, Chunks are claimed into Districts.    
+This allows to manage a Municipality's terrain better, and even sell huge pieces of    
+land by simply selling the District.
 
 Here an example of how a populated/claimed area could look like:
 ![STCM](https://i.imgur.com/6KgjMei.png)

@@ -10,6 +10,7 @@ import java.util.List;
 import java.util.Timer;
 import java.util.TreeMap;
 import java.util.UUID;
+import java.util.concurrent.ConcurrentHashMap;
 
 import net.fexcraft.lib.common.math.Time;
 import net.fexcraft.lib.mc.capabilities.sign.SignCapabilitySerializer;
@@ -60,7 +61,7 @@ public class States {
 	public static final String MODID = "states";
 	public static final String PREFIX = "&0[&2States&0]";
 	//
-	public static final TreeMap<ChunkPos, Chunk> CHUNKS = new TreeMap<>();
+	public static final ConcurrentHashMap<ChunkPos, Chunk> CHUNKS = new ConcurrentHashMap<>();
 	public static final TreeMap<Integer, District> DISTRICTS = new TreeMap<>();
 	public static final TreeMap<Integer, Municipality> MUNICIPALITIES = new TreeMap<>();
 	public static final TreeMap<Integer, State> STATES = new TreeMap<>();

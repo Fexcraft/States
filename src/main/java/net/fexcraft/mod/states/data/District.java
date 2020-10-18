@@ -4,6 +4,8 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
+import java.util.TreeMap;
 import java.util.UUID;
 
 import com.google.gson.JsonArray;
@@ -15,6 +17,8 @@ import net.fexcraft.lib.common.math.Time;
 import net.fexcraft.mod.states.States;
 import net.fexcraft.mod.states.data.root.BuyableType;
 import net.fexcraft.mod.states.data.root.ColorHolder;
+import net.fexcraft.mod.states.data.root.ExternalData;
+import net.fexcraft.mod.states.data.root.ExternalDataHolder;
 import net.fexcraft.mod.states.data.root.IconHolder;
 import net.fexcraft.mod.states.data.root.Initiator;
 import net.fexcraft.mod.states.data.root.MailReceiver;
@@ -25,7 +29,7 @@ import net.fexcraft.mod.states.util.StateUtil;
 import net.minecraft.util.math.BlockPos;
 import net.minecraftforge.common.MinecraftForge;
 
-public class District implements ColorHolder, BuyableType, IconHolder, MailReceiver, Ruleable {
+public class District implements ColorHolder, BuyableType, IconHolder, MailReceiver, Ruleable, ExternalDataHolder {
 	
 	private int id, chunks;
 	private DistrictType type;
@@ -35,6 +39,7 @@ public class District implements ColorHolder, BuyableType, IconHolder, MailRecei
 	private String name, color, icon;
 	private Municipality municipality;
 	private BlockPos mailbox;
+	private TreeMap<String, ExternalData> datas = new TreeMap<>();
 	//
 	private RuleMap rules = new RuleMap();
 	private String ruleset;
@@ -103,6 +108,13 @@ public class District implements ColorHolder, BuyableType, IconHolder, MailRecei
 				if(rule != null) rule.load(entry.getValue().getAsString());
 			}
 		}
+		if(obj.has("ex-data") && !datas.isEmpty()){
+			JsonObject external = obj.get("ex-data").getAsJsonObject();
+			for(Entry<String, JsonElement> elm : external.entrySet()){
+				ExternalData data = getExternalData(elm.getKey());
+				if(data != null) data.load(elm.getValue());
+			}
+		}
 	}
 
 	public JsonObject toJsonObject(){
@@ -139,6 +151,13 @@ public class District implements ColorHolder, BuyableType, IconHolder, MailRecei
 			JsonArray array = new JsonArray();
 			for(Vote vote : active_votes) array.add(vote.id);
 			obj.add("votes", array);
+		}
+		if(!datas.isEmpty()){
+			JsonObject external = new JsonObject();
+			for(Entry<String, ExternalData> entry : datas.entrySet()){
+				external.add(entry.getKey(), entry.getValue().save());
+			}
+			obj.add("ex-data", external);
 		}
 		return obj;
 	}
@@ -324,6 +343,21 @@ public class District implements ColorHolder, BuyableType, IconHolder, MailRecei
 	@Override
 	public List<Vote> getActiveVotes(){
 		return active_votes;
+	}
+
+	@Override
+	public <T extends ExternalData> T getExternalData(String id){
+		return (T)datas.get(id);
+	}
+
+	@Override
+	public ExternalData setExternalData(String id, ExternalData obj){
+		return datas.put(id, obj);
+	}
+
+	@Override
+	public Map<String, ExternalData> getExternalObjects(){
+		return datas;
 	}
 
 }

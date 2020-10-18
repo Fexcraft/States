@@ -5,6 +5,8 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
+import java.util.TreeMap;
 import java.util.UUID;
 
 import com.google.gson.JsonArray;
@@ -29,7 +31,7 @@ import net.minecraft.command.ICommandSender;
 import net.minecraft.util.math.BlockPos;
 import net.minecraftforge.common.MinecraftForge;
 
-public class Municipality implements ColorHolder, BuyableType, IconHolder, AccountHolder, MailReceiver, Ruleable, VoteHolder, Abandonable {
+public class Municipality implements ColorHolder, BuyableType, IconHolder, AccountHolder, MailReceiver, Ruleable, VoteHolder, Abandonable, ExternalDataHolder {
 	
 	private int id;
 	private String name, color, icon, title;
@@ -41,6 +43,7 @@ public class Municipality implements ColorHolder, BuyableType, IconHolder, Accou
 	private ArrayList<UUID> citizen, council, pl_blacklist;
 	private State state;
 	private BlockPos mailbox;
+	private TreeMap<String, ExternalData> datas = new TreeMap<>();
 	//
 	private RuleMap rules = new RuleMap();
 	private String ruleset_name;
@@ -126,6 +129,13 @@ public class Municipality implements ColorHolder, BuyableType, IconHolder, Accou
 				if(rule != null) rule.load(entry.getValue().getAsString());
 			}
 		}
+		if(obj.has("ex-data") && !datas.isEmpty()){
+			JsonObject external = obj.get("ex-data").getAsJsonObject();
+			for(Entry<String, JsonElement> elm : external.entrySet()){
+				ExternalData data = getExternalData(elm.getKey());
+				if(data != null) data.load(elm.getValue());
+			}
+		}
 	}
 
 	public JsonObject toJsonObject(){
@@ -168,6 +178,13 @@ public class Municipality implements ColorHolder, BuyableType, IconHolder, Accou
 			JsonArray array = new JsonArray();
 			for(Vote vote : active_votes) array.add(vote.id);
 			obj.add("votes", array);
+		}
+		if(!datas.isEmpty()){
+			JsonObject external = new JsonObject();
+			for(Entry<String, ExternalData> entry : datas.entrySet()){
+				external.add(entry.getKey(), entry.getValue().save());
+			}
+			obj.add("ex-data", external);
 		}
 		return obj;
 	}
@@ -475,6 +492,21 @@ public class Municipality implements ColorHolder, BuyableType, IconHolder, Accou
 
 	public String getTitledName(){
 		return "(" + title + ") " + name;
+	}
+
+	@Override
+	public <T extends ExternalData> T getExternalData(String id){
+		return (T)datas.get(id);
+	}
+
+	@Override
+	public ExternalData setExternalData(String id, ExternalData obj){
+		return datas.put(id, obj);
+	}
+
+	@Override
+	public Map<String, ExternalData> getExternalObjects(){
+		return datas;
 	}
 
 }

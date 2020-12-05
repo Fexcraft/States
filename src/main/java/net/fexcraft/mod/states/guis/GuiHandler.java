@@ -29,7 +29,7 @@ public class GuiHandler implements IGuiHandler{
 	 * */
 	
 	public static final int WELCOME = 0;
-	public static final int REGION_VIEW = 1;
+	//public static final int REGION_VIEW = 1;
 	public static final int RULE_EDITOR = 30;
 	public static final int CLAIM_MAP = 10;
 	public static final int MAILBOX = 20;
@@ -58,7 +58,7 @@ public class GuiHandler implements IGuiHandler{
 		if(ID > 1 && ID < 10) return new ManagerGui(player, ID - 2, x, y, z);
 		switch(ID){
 			case WELCOME: return new WelcomeGui(player, world, x, y, z);
-			case REGION_VIEW: return new AreaView(player, world, x, y, z);
+			//case REGION_VIEW: return new AreaView(player, world, x, y, z);
 			case RULE_EDITOR: return new RulesUI(player, world, x, y, z);
 			//
 			case CLAIM_MAP: return new ClaimMap(player, world, x, y, z);

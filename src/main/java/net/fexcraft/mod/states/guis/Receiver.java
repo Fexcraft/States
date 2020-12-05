@@ -72,10 +72,10 @@ public class Receiver implements IPacketListener<PacketNBTTagCompound> {
 				ClaimMap.update(packet.nbt.hasKey("claimed") && packet.nbt.getBoolean("claimed"), packet.nbt.getString("result"), packet.nbt.getInteger("x"), packet.nbt.getInteger("z"), packet.nbt);
 				return;
 			}
-			case "area_view_list":{
+			/*case "area_view_list":{
 				AreaView.update(packet.nbt);
 				return;
-			}
+			}*/
 			case "update_mailbox":{
 				BlockPos mailbox = BlockPos.fromLong(packet.nbt.getLong("pos"));
 				EntityPlayer player = (EntityPlayer)objs[0];

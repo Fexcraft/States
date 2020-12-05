@@ -24,7 +24,6 @@ import net.fexcraft.mod.states.data.ChunkType;
 import net.fexcraft.mod.states.data.capabilities.PlayerCapability;
 import net.fexcraft.mod.states.data.capabilities.StatesCapabilities;
 import net.fexcraft.mod.states.guis.ManagerContainer;
-import net.fexcraft.mod.states.util.ImageCache;
 import net.fexcraft.mod.states.util.StConfig;
 import net.fexcraft.mod.states.util.StateLogger;
 import net.fexcraft.mod.states.util.StateUtil;
@@ -79,7 +78,7 @@ public class ChunkCmd extends CommandBase {
 			Print.chat(sender, "&7/ck buy");
 			//Print.chat(sender, "&7/ck link <args>");
 			Print.chat(sender, "&7/ck force-load <true/false>");
-			Print.chat(sender, "&7/ck queue");
+			//Print.chat(sender, "&7/ck queue");
 			Print.chat(sender, "&7/ck types");
 			if(StateUtil.isAdmin(player)){
 				Print.chat(sender, "&cAdmin CMDs");
@@ -182,11 +181,11 @@ public class ChunkCmd extends CommandBase {
 				Print.debug("&bCurrently disabled.");
 				return;
 			}
-			case "queue":{
+			/*case "queue":{
 				Print.chat(sender, "&9There are &2" + ImageCache.getQueue().size() + "&9 chunk map updates queued.");
 				Print.chat(sender, "&9Current Config allows for &3" + StConfig.MAP_UPDATES_PER_SECOND + "&9 map updates per second.");
 				return;
-			}
+			}*/
 			case "unclaim":{
 				if(StateUtil.isAdmin(player) || (StConfig.ALLOW_CHUNK_UNCLAIM && playerdata.isMayorOf(chunk.getMunicipality()))){
 					Integer asmun = !StateUtil.isAdmin(player) ? chunk.getMunicipality().getId() : null;
@@ -208,7 +207,7 @@ public class ChunkCmd extends CommandBase {
 						chunk.setType(ChunkType.NORMAL);
 						chunk.setPrice(StConfig.DEFAULT_CHUNK_PRICE);
 						chunk.save();
-						ImageCache.update(player.world, player.world.getChunk(chunk.xCoord(), chunk.zCoord()));
+						//ImageCache.update(player.world, player.world.getChunk(chunk.xCoord(), chunk.zCoord()));
 						Print.chat(sender, "&9Chunk unclaimed and resseted.");
 						Print.log(StateLogger.player(player) + " unclaimed " + StateLogger.chunk(chunk) + ".");
 					}
@@ -243,7 +242,7 @@ public class ChunkCmd extends CommandBase {
 								ck.setPrice(StConfig.DEFAULT_CHUNK_PRICE);
 								ck.save();
 								c++;
-								ImageCache.update(player.world, player.world.getChunk(x, z));
+								//ImageCache.update(player.world, player.world.getChunk(x, z));
 							}
 						}
 						Print.chat(sender, "&2" + c + " &9chunks have been resseted.");

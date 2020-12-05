@@ -8,7 +8,6 @@ import net.fexcraft.mod.states.impl.capabilities.ChunkCapabilityUtil;
 import net.fexcraft.mod.states.impl.capabilities.PlayerCapabilityUtil;
 import net.fexcraft.mod.states.impl.capabilities.WorldCapabilityUtil;
 import net.fexcraft.mod.states.util.ForcedChunksManager;
-import net.fexcraft.mod.states.util.ImageCache;
 import net.fexcraft.mod.states.util.StateUtil;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.util.math.BlockPos;
@@ -25,7 +24,7 @@ public class WorldEvents {
 	@SubscribeEvent(priority = EventPriority.HIGH)
 	public static void onWorldLoad(WorldEvent.Load event){
 		if(event != null && (event.getWorld().provider.getDimension() != 0 || event.getWorld().isRemote)) return;
-		ImageCache.loadQueue();
+		//ImageCache.loadQueue();
 		ForcedChunksManager.load();
 		//event.getWorld().addEventListener(new TestListener());
 	}
@@ -34,7 +33,7 @@ public class WorldEvents {
 	public static void onWorldUnload(WorldEvent.Unload event){
 		if(event.getWorld().provider.getDimension() != 0 || event.getWorld().isRemote) return;
 		StateUtil.unloadAll(); StateUtil.clearAll(); ChunkEvents.LOADED = false;
-		ImageCache.saveQueue();
+		//ImageCache.saveQueue();
 		Print.log("Unloading World...");
 		ForcedChunksManager.unload();
 	}

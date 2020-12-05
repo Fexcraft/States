@@ -39,7 +39,13 @@ import net.fexcraft.mod.states.impl.capabilities.PlayerCapabilityUtil;
 import net.fexcraft.mod.states.impl.capabilities.WorldCapabilityUtil;
 import net.fexcraft.mod.states.packets.ImagePacket;
 import net.fexcraft.mod.states.packets.ImagePacketHandler;
-import net.fexcraft.mod.states.util.*;
+import net.fexcraft.mod.states.util.ForcedChunksManager;
+import net.fexcraft.mod.states.util.MessageSender;
+import net.fexcraft.mod.states.util.Perms;
+import net.fexcraft.mod.states.util.StConfig;
+import net.fexcraft.mod.states.util.StateUtil;
+import net.fexcraft.mod.states.util.TaxSystem;
+import net.fexcraft.mod.states.util.UpdateHandler;
 import net.minecraft.world.World;
 import net.minecraftforge.common.ForgeChunkManager;
 import net.minecraftforge.common.MinecraftForge;
@@ -76,7 +82,7 @@ public class States {
 	//
 	@Mod.Instance(MODID)
 	public static States INSTANCE;
-	private static Timer TAX_TIMER, DATA_MANAGER, IMG_TIMER;
+	private static Timer TAX_TIMER, DATA_MANAGER;//, IMG_TIMER;
 	
 	@Mod.EventHandler
 	public void preInit(FMLPreInitializationEvent event){
@@ -141,12 +147,12 @@ public class States {
 			(DATA_MANAGER = new Timer()).schedule(new StateUtil(), new Date(mid), Static.dev() ? 60000 : Time.MIN_MS * 15);
 		}
 		//
-		if(IMG_TIMER == null){
+		/*if(IMG_TIMER == null){
 			(IMG_TIMER = new Timer()).schedule(new ImageCache(), new Date(mid), 1000);
 			if(event.getSide().isClient()){
 				IMG_TIMER.schedule(new ImageUtil(), new Date(mid), 1000);
 			}
-		}
+		}*/
 	}
 	
 	@Mod.EventHandler

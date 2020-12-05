@@ -13,11 +13,9 @@ import com.google.gson.JsonObject;
 import net.fexcraft.lib.common.json.JsonUtil;
 import net.fexcraft.lib.common.math.Time;
 import net.fexcraft.lib.mc.utils.Print;
-import net.fexcraft.lib.mc.utils.Static;
 import net.fexcraft.mod.states.States;
 import net.fexcraft.mod.states.data.root.BuyableType;
 import net.fexcraft.mod.states.data.root.Taxable;
-import net.fexcraft.mod.states.util.ImageCache;
 import net.fexcraft.mod.states.util.StConfig;
 import net.fexcraft.mod.states.util.StateLogger;
 import net.fexcraft.mod.states.util.StateUtil;
@@ -48,14 +46,14 @@ public class Chunk implements BuyableType, Taxable/*, RuleHolder*/ {
 		if(!getChunkFile().exists() && create){
 			save();
 			//ImageCache.update(world, world.getChunkFromChunkCoords(x, z));
-			if(world == null) world = Static.getServer().getWorld(0);
-			if(world != null) ImageCache.update(world, world.getChunkProvider().getLoadedChunk(x, z));
+			////if(world == null) world = Static.getServer().getWorld(0);
+			////if(world != null) ImageCache.update(world, world.getChunkProvider().getLoadedChunk(x, z));
 		}
-		if(Time.getDate() - JsonUtil.getIfExists(obj, "last_save", 0).longValue() > Time.DAY_MS){
+		/*if(Time.getDate() - JsonUtil.getIfExists(obj, "last_save", 0).longValue() > Time.DAY_MS){
 			//ImageCache.update(world, world.getChunkFromChunkCoords(x, z));
 			if(world == null) world = Static.getServer().getWorld(0);
 			if(world != null) ImageCache.update(world, world.getChunkProvider().getLoadedChunk(x, z));
-		}
+		}*/
 		if(district != null && this.district.getId() == -2 && changed + Time.DAY_MS < Time.getDate()){
 			Print.log(StateLogger.district(-2) + " time of " + StateLogger.chunk(this) + " expired! Setting back to " + StateLogger.district(-1) + "!");
 			this.setDistrict(StateUtil.getDistrict(-1));

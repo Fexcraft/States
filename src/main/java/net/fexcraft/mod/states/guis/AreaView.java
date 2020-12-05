@@ -26,6 +26,7 @@ import net.minecraft.util.math.ChunkPos;
 import net.minecraft.world.World;
 import net.minecraft.world.chunk.Chunk;
 
+@Deprecated
 public class AreaView extends GuiContainer {
 
 	public static final ResourceLocation texture = new ResourceLocation("states:textures/gui/area_view_new.png");

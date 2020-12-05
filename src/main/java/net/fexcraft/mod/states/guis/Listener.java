@@ -3,14 +3,12 @@ package net.fexcraft.mod.states.guis;
 import static net.fexcraft.mod.states.guis.GuiHandler.openGui;
 
 import java.awt.Color;
-import java.awt.image.BufferedImage;
 
 import net.fexcraft.lib.common.math.Time;
 import net.fexcraft.lib.mc.api.packet.IPacketListener;
 import net.fexcraft.lib.mc.network.PacketHandler;
 import net.fexcraft.lib.mc.network.packet.PacketNBTTagCompound;
 import net.fexcraft.lib.mc.utils.Print;
-import net.fexcraft.lib.mc.utils.Static;
 import net.fexcraft.mod.fsmm.api.Account;
 import net.fexcraft.mod.fsmm.api.Bank;
 import net.fexcraft.mod.fsmm.util.Config;
@@ -19,8 +17,6 @@ import net.fexcraft.mod.states.data.Chunk;
 import net.fexcraft.mod.states.data.District;
 import net.fexcraft.mod.states.data.capabilities.PlayerCapability;
 import net.fexcraft.mod.states.data.capabilities.StatesCapabilities;
-import net.fexcraft.mod.states.packets.ImagePacket;
-import net.fexcraft.mod.states.util.ImageCache;
 import net.fexcraft.mod.states.util.StConfig;
 import net.fexcraft.mod.states.util.StateLogger;
 import net.fexcraft.mod.states.util.StateUtil;
@@ -50,7 +46,7 @@ public class Listener implements IPacketListener<PacketNBTTagCompound> {
 				openGui(player, packet.nbt.getInteger("button") + 1, 0, -10, 0);
 				return;
 			}
-			case 1:{
+			/*case 1:{
 				if(packet.nbt.hasKey("terrain")){
 					BufferedImage image = ImageCache.getImage(packet.nbt.getInteger("x"), packet.nbt.getInteger("z"), true);
 					PacketHandler.getInstance().sendTo(new ImagePacket("area_view", image), player);
@@ -131,7 +127,7 @@ public class Listener implements IPacketListener<PacketNBTTagCompound> {
 				compound.setTag("namelist", namelist);
 				PacketHandler.getInstance().sendTo(new PacketNBTTagCompound(compound), player);
 				return;
-			}
+			}*/
 			case 10:{
 				switch(packet.nbt.getString("request")){
 					case "get_map":{
@@ -277,7 +273,7 @@ public class Listener implements IPacketListener<PacketNBTTagCompound> {
 					updateNeighbors(ck);
 					//
 					Print.log(StateLogger.player(player) + " claimed " + StateLogger.chunk(ck) + ", it is now part of " + StateLogger.district(dis) + ".");
-					ImageCache.update(world, ch);
+					//ImageCache.update(world, ch);
 					compound.setString("result", "Chunk Claimed. (" + dis.getId() + ");");
 					compound.setBoolean("claimed", true);
 					compound.setInteger("color", Color.decode(ck.getDistrict().getColor()).getRGB());
@@ -311,7 +307,7 @@ public class Listener implements IPacketListener<PacketNBTTagCompound> {
 			ck.setChanged(Time.getDate());
 			ck.save();
 			Print.log(StateLogger.player(player) + " re-claimed " + StateLogger.chunk(ck) + ", it is now part of " + StateLogger.district(dis) + ".");
-			ImageCache.update(world, ch);
+			//ImageCache.update(world, ch);
 			if(ck.getLinkedChunks().size() > 0){
 				for(int[] loc : ck.getLinkedChunks()){
 					Chunk chunk = StateUtil.getTempChunk(loc);
@@ -320,7 +316,7 @@ public class Listener implements IPacketListener<PacketNBTTagCompound> {
 						chunk.setClaimer(player.getGameProfile().getId());
 						chunk.setChanged(Time.getDate());
 						chunk.save();
-						ImageCache.update(world, world.getChunk(chunk.xCoord(), chunk.zCoord()));
+						//ImageCache.update(world, world.getChunk(chunk.xCoord(), chunk.zCoord()));
 					}
 				}
 			}

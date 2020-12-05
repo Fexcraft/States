@@ -1,8 +1,5 @@
 package net.fexcraft.mod.states.events;
 
-import java.io.File;
-
-import net.fexcraft.lib.common.json.JsonUtil;
 import net.fexcraft.lib.mc.utils.Print;
 import net.fexcraft.mod.fsmm.FSMM;
 import net.fexcraft.mod.states.States;
@@ -11,7 +8,6 @@ import net.fexcraft.mod.states.data.ChunkPos;
 import net.fexcraft.mod.states.data.District;
 import net.fexcraft.mod.states.data.Municipality;
 import net.fexcraft.mod.states.data.State;
-import net.fexcraft.mod.states.util.ImageCache;
 import net.fexcraft.mod.states.util.StateLogger;
 import net.fexcraft.mod.states.util.StateUtil;
 import net.minecraftforge.event.world.ChunkEvent;
@@ -74,16 +70,16 @@ public class ChunkEvents {
     	}
         Chunk chunk = StateUtil.getChunk(event.getChunk());
         //Chunk chunk = event.getChunk().getCapability(StatesCapabilities.CHUNK, null).getStatesChunk(true);
-        if(!(chunk == null)){
+        if(chunk != null){
         	if(!States.CHUNKS.entrySet().removeIf(pre -> pre.getValue().xCoord() == chunk.xCoord() && pre.getValue().zCoord() == chunk.zCoord())){
         		Print.log("Error while trying to remove chunkdata for " + StateLogger.chunk(chunk) + " from main storaging Map.");
         	}
-            File file = chunk.getChunkFile();
-            boolean matches = file.exists() && JsonUtil.get(file).get("changed").getAsLong() == chunk.getChanged();
+            //File file = chunk.getChunkFile();
+            //boolean matches = file.exists() && JsonUtil.get(file).get("changed").getAsLong() == chunk.getChanged();
             chunk.save();
-            if(!matches || chunk.getEdited() > chunk.getChanged()){
+            /*if(!matches || chunk.getEdited() > chunk.getChanged()){
             	ImageCache.update(event.getWorld(), event.getChunk());
-            }
+            }*/
         }
     }
 

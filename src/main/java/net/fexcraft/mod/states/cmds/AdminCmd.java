@@ -10,7 +10,6 @@ import net.fexcraft.mod.states.data.District;
 import net.fexcraft.mod.states.data.capabilities.PlayerCapability;
 import net.fexcraft.mod.states.data.capabilities.StatesCapabilities;
 import net.fexcraft.mod.states.guis.Listener;
-import net.fexcraft.mod.states.util.ImageCache;
 import net.fexcraft.mod.states.util.Perms;
 import net.fexcraft.mod.states.util.StateLogger;
 import net.fexcraft.mod.states.util.StateUtil;
@@ -82,7 +81,7 @@ public class AdminCmd extends CommandBase {
 					Print.chat(sender, String.format("&2&lChunk Claimed. [ %s, %s ]", chunk.xCoord(), chunk.zCoord()));
 					Listener.updateNeighbors(chunk);
 					Print.log(StateLogger.player(player) + " (force-)claimed " + StateLogger.chunk(chunk) + ", it is now part of " + StateLogger.district(dis) + ".");
-					ImageCache.update(player.world, player.world.getChunk(chunk.xCoord(), chunk.zCoord()));
+					//ImageCache.update(player.world, player.world.getChunk(chunk.xCoord(), chunk.zCoord()));
 				}
 				return;
 			}

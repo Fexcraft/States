@@ -11,6 +11,7 @@ import net.fexcraft.mod.states.data.State;
 import net.fexcraft.mod.states.util.StateLogger;
 import net.fexcraft.mod.states.util.StateUtil;
 import net.minecraftforge.event.world.ChunkEvent;
+import net.minecraftforge.fml.common.FMLCommonHandler;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 
@@ -76,7 +77,7 @@ public class ChunkEvents {
         	}
             //File file = chunk.getChunkFile();
             //boolean matches = file.exists() && JsonUtil.get(file).get("changed").getAsLong() == chunk.getChanged();
-            chunk.save();
+        	FMLCommonHandler.instance().getMinecraftServerInstance().addScheduledTask(() -> chunk.save());
             /*if(!matches || chunk.getEdited() > chunk.getChanged()){
             	ImageCache.update(event.getWorld(), event.getChunk());
             }*/

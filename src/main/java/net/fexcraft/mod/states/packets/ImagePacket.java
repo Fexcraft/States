@@ -8,6 +8,7 @@ import net.fexcraft.lib.mc.api.packet.IPacket;
 import net.fexcraft.mod.states.util.ImageCache;
 import net.minecraftforge.fml.common.network.simpleimpl.IMessage;
 
+@SuppressWarnings("deprecation")
 public class ImagePacket implements IPacket, IMessage {
 	
 	public BufferedImage image;

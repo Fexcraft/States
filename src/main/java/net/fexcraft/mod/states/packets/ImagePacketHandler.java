@@ -9,6 +9,7 @@ import net.minecraftforge.fml.common.network.simpleimpl.IMessage;
 import net.minecraftforge.fml.common.network.simpleimpl.IMessageHandler;
 import net.minecraftforge.fml.common.network.simpleimpl.MessageContext;
 
+@SuppressWarnings("deprecation")
 public class ImagePacketHandler {
 	
 	public static class Server implements IMessageHandler<ImagePacket, IMessage> {

@@ -9,13 +9,13 @@ import javax.annotation.Nullable;
 
 import net.fexcraft.lib.common.json.JsonUtil;
 import net.fexcraft.lib.common.math.Time;
-import net.fexcraft.lib.mc.api.registry.fCommand;
 import net.fexcraft.lib.mc.utils.Print;
 import net.fexcraft.lib.mc.utils.Static;
 import net.fexcraft.mod.fsmm.util.Config;
 import net.fexcraft.mod.states.States;
 import net.fexcraft.mod.states.data.Chunk;
 import net.fexcraft.mod.states.data.capabilities.StatesCapabilities;
+import net.fexcraft.mod.states.util.AliasLoader;
 import net.fexcraft.mod.states.util.ForcedChunksManager;
 import net.fexcraft.mod.states.util.StateUtil;
 import net.fexcraft.mod.states.util.UpdateHandler;
@@ -26,18 +26,22 @@ import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.util.math.BlockPos;
 
-@fCommand
 public class DebugCmd extends CommandBase {
     
     @Override
     public String getName(){
-        return "st-debug";
+        return AliasLoader.getOverride("st-debug");
     }
     
     @Override
     public String getUsage(ICommandSender sender){
-        return "/st-debug";
+        return "/" + getName();
     }
+	
+	@Override
+	public List<String> getAliases(){
+		return AliasLoader.getAlias("st-debug");
+	}
     
     @Override
     public List<String> getTabCompletions(MinecraftServer server, ICommandSender sender, String[] args, @Nullable BlockPos targetPos){

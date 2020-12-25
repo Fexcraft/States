@@ -20,6 +20,7 @@ import net.fexcraft.lib.mc.registry.FCLRegistry;
 import net.fexcraft.lib.mc.utils.Static;
 import net.fexcraft.mod.fsmm.api.Account;
 import net.fexcraft.mod.fsmm.util.DataManager;
+import net.fexcraft.mod.states.cmds.*;
 import net.fexcraft.mod.states.data.Chunk;
 import net.fexcraft.mod.states.data.ChunkPos;
 import net.fexcraft.mod.states.data.District;
@@ -39,6 +40,7 @@ import net.fexcraft.mod.states.impl.capabilities.PlayerCapabilityUtil;
 import net.fexcraft.mod.states.impl.capabilities.WorldCapabilityUtil;
 import net.fexcraft.mod.states.packets.ImagePacket;
 import net.fexcraft.mod.states.packets.ImagePacketHandler;
+import net.fexcraft.mod.states.util.AliasLoader;
 import net.fexcraft.mod.states.util.ForcedChunksManager;
 import net.fexcraft.mod.states.util.MessageSender;
 import net.fexcraft.mod.states.util.Perms;
@@ -131,6 +133,19 @@ public class States {
 	public void serverStarting(FMLServerStartingEvent event){
 		StateUtil.loadNameCache();
 		if(MessageSender.RECEIVER == null) StConfig.updateWebHook();
+		//
+		AliasLoader.load();
+		event.registerServerCommand(new AdminCmd());
+		event.registerServerCommand(new ChunkCmd());
+		event.registerServerCommand(new DebugCmd());
+		event.registerServerCommand(new DistrictCmd());
+		event.registerServerCommand(new GuiCmd());
+		event.registerServerCommand(new MailCmd());
+		event.registerServerCommand(new MunicipalityCmd());
+		event.registerServerCommand(new NickCmd());
+		event.registerServerCommand(new RuleCmd());
+		event.registerServerCommand(new StateCmd());
+		event.registerServerCommand(new VoteCmd());
 	}
 	
 	@Mod.EventHandler

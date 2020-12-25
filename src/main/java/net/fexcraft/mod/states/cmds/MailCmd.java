@@ -5,7 +5,6 @@ import java.util.UUID;
 import java.util.stream.Collectors;
 
 import net.fexcraft.lib.common.math.Time;
-import net.fexcraft.lib.mc.api.registry.fCommand;
 import net.fexcraft.lib.mc.capabilities.FCLCapabilities;
 import net.fexcraft.lib.mc.utils.Formatter;
 import net.fexcraft.lib.mc.utils.Print;
@@ -20,9 +19,10 @@ import net.fexcraft.mod.states.data.root.Mailbox.MailType;
 import net.fexcraft.mod.states.data.root.Mailbox.RecipientType;
 import net.fexcraft.mod.states.impl.SignMailbox;
 import net.fexcraft.mod.states.objects.MailItem;
-import net.fexcraft.mod.states.util.StConfig;
+import net.fexcraft.mod.states.util.AliasLoader;
 import net.fexcraft.mod.states.util.MailUtil;
 import net.fexcraft.mod.states.util.Perms;
+import net.fexcraft.mod.states.util.StConfig;
 import net.fexcraft.mod.states.util.StateLogger;
 import net.fexcraft.mod.states.util.StateUtil;
 import net.minecraft.command.CommandBase;
@@ -39,18 +39,22 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.text.TextComponentString;
 import net.minecraft.util.text.event.ClickEvent;
 
-@fCommand
 public class MailCmd extends CommandBase {
 
     @Override
     public String getName(){
-        return "mail";
+        return AliasLoader.getOverride("mail");
     }
 
     @Override
     public String getUsage(ICommandSender sender){
-	return "/mail";
+    	return "/" + getName();
     }
+	
+	@Override
+	public List<String> getAliases(){
+		return AliasLoader.getAlias("mail");
+	}
     
     @Override
     public boolean checkPermission(MinecraftServer server, ICommandSender sender){

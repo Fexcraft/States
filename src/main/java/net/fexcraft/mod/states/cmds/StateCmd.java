@@ -5,12 +5,12 @@ import static net.fexcraft.mod.states.guis.GuiHandler.RULE_EDITOR;
 import static net.fexcraft.mod.states.guis.GuiHandler.openGui;
 
 import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 
 import com.mojang.authlib.GameProfile;
 
 import net.fexcraft.lib.common.math.Time;
-import net.fexcraft.lib.mc.api.registry.fCommand;
 import net.fexcraft.lib.mc.utils.Print;
 import net.fexcraft.lib.mc.utils.Static;
 import net.fexcraft.mod.fsmm.api.Bank;
@@ -27,6 +27,7 @@ import net.fexcraft.mod.states.data.root.AnnounceLevel;
 import net.fexcraft.mod.states.data.root.Mailbox.MailType;
 import net.fexcraft.mod.states.data.root.Mailbox.RecipientType;
 import net.fexcraft.mod.states.guis.ManagerContainer;
+import net.fexcraft.mod.states.util.AliasLoader;
 import net.fexcraft.mod.states.util.MailUtil;
 import net.fexcraft.mod.states.util.Perms;
 import net.fexcraft.mod.states.util.StateLogger;
@@ -37,17 +38,21 @@ import net.minecraft.command.ICommandSender;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.server.MinecraftServer;
 
-@fCommand
 public class StateCmd extends CommandBase {
 	
 	@Override
 	public String getName(){
-		return "st";
+		return AliasLoader.getOverride("st");
 	}
 
 	@Override
 	public String getUsage(ICommandSender sender){
-		return "/st";
+		return "/" + getName();
+	}
+	
+	@Override
+	public List<String> getAliases(){
+		return AliasLoader.getAlias("st");
 	}
 	
 	@Override

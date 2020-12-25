@@ -1,11 +1,11 @@
 package net.fexcraft.mod.states.cmds;
 
+import java.util.List;
 import java.util.UUID;
 
 import com.mojang.authlib.GameProfile;
 
 import net.fexcraft.lib.common.math.Time;
-import net.fexcraft.lib.mc.api.registry.fCommand;
 import net.fexcraft.lib.mc.utils.Formatter;
 import net.fexcraft.lib.mc.utils.Print;
 import net.fexcraft.lib.mc.utils.Static;
@@ -17,6 +17,7 @@ import net.fexcraft.mod.states.data.Vote.VoteType;
 import net.fexcraft.mod.states.data.capabilities.PlayerCapability;
 import net.fexcraft.mod.states.data.capabilities.StatesCapabilities;
 import net.fexcraft.mod.states.data.root.Ruleable;
+import net.fexcraft.mod.states.util.AliasLoader;
 import net.fexcraft.mod.states.util.StateUtil;
 import net.minecraft.command.CommandBase;
 import net.minecraft.command.CommandException;
@@ -26,17 +27,21 @@ import net.minecraft.server.MinecraftServer;
 import net.minecraft.util.text.TextComponentString;
 import net.minecraft.util.text.event.ClickEvent;
 
-@fCommand
 public class VoteCmd extends CommandBase {
 	
 	@Override
 	public String getName(){
-		return "st-vote";
+		return AliasLoader.getOverride("st-vote");
 	}
 
 	@Override
 	public String getUsage(ICommandSender sender){
-		return "/st-vote";
+		return "/" + getName();
+	}
+	
+	@Override
+	public List<String> getAliases(){
+		return AliasLoader.getAlias("st-vote");
 	}
 	
 	@Override

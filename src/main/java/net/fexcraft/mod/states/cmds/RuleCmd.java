@@ -1,10 +1,10 @@
 package net.fexcraft.mod.states.cmds;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import net.fexcraft.lib.common.math.Time;
-import net.fexcraft.lib.mc.api.registry.fCommand;
 import net.fexcraft.lib.mc.utils.Print;
 import net.fexcraft.mod.states.States;
 import net.fexcraft.mod.states.data.Chunk;
@@ -17,6 +17,7 @@ import net.fexcraft.mod.states.data.capabilities.StatesCapabilities;
 import net.fexcraft.mod.states.data.root.AnnounceLevel;
 import net.fexcraft.mod.states.data.root.Initiator;
 import net.fexcraft.mod.states.data.root.Ruleable;
+import net.fexcraft.mod.states.util.AliasLoader;
 import net.fexcraft.mod.states.util.StateUtil;
 import net.minecraft.command.CommandBase;
 import net.minecraft.command.CommandException;
@@ -24,17 +25,21 @@ import net.minecraft.command.ICommandSender;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.server.MinecraftServer;
 
-@fCommand
 public class RuleCmd extends CommandBase {
 	
 	@Override
 	public String getName(){
-		return "st-rule";
+		return AliasLoader.getOverride("st-rule");
 	}
 
 	@Override
 	public String getUsage(ICommandSender sender){
-		return "/st-rule";
+		return "/" + getName();
+	}
+	
+	@Override
+	public List<String> getAliases(){
+		return AliasLoader.getAlias("st-rule");
 	}
 	
 	@Override

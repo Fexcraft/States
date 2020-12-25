@@ -4,12 +4,12 @@ import static net.fexcraft.mod.states.guis.GuiHandler.CLAIM_MAP;
 import static net.fexcraft.mod.states.guis.GuiHandler.MANAGER_CHUNK;
 import static net.fexcraft.mod.states.guis.GuiHandler.openGui;
 
+import java.util.List;
 import java.util.UUID;
 
 import org.apache.commons.lang3.math.NumberUtils;
 
 import net.fexcraft.lib.common.math.Time;
-import net.fexcraft.lib.mc.api.registry.fCommand;
 import net.fexcraft.lib.mc.utils.Print;
 import net.fexcraft.lib.mc.utils.Static;
 import net.fexcraft.mod.fsmm.api.Account;
@@ -24,6 +24,7 @@ import net.fexcraft.mod.states.data.ChunkType;
 import net.fexcraft.mod.states.data.capabilities.PlayerCapability;
 import net.fexcraft.mod.states.data.capabilities.StatesCapabilities;
 import net.fexcraft.mod.states.guis.ManagerContainer;
+import net.fexcraft.mod.states.util.AliasLoader;
 import net.fexcraft.mod.states.util.StConfig;
 import net.fexcraft.mod.states.util.StateLogger;
 import net.fexcraft.mod.states.util.StateUtil;
@@ -34,17 +35,21 @@ import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.util.math.BlockPos;
 
-@fCommand
 public class ChunkCmd extends CommandBase {
 
 	@Override
 	public String getName(){
-		return "ck";
+		return AliasLoader.getOverride("ck");
 	}
 
 	@Override
 	public String getUsage(ICommandSender sender){
-		return "/ck";
+		return "/" + getName();
+	}
+	
+	@Override
+	public List<String> getAliases(){
+		return AliasLoader.getAlias("ck");
 	}
 	
 	@Override

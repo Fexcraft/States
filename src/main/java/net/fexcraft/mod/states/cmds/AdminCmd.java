@@ -1,15 +1,17 @@
 package net.fexcraft.mod.states.cmds;
 
+import java.util.List;
+
 import org.apache.commons.lang3.math.NumberUtils;
 
 import net.fexcraft.lib.common.math.Time;
-import net.fexcraft.lib.mc.api.registry.fCommand;
 import net.fexcraft.lib.mc.utils.Print;
 import net.fexcraft.mod.states.data.Chunk;
 import net.fexcraft.mod.states.data.District;
 import net.fexcraft.mod.states.data.capabilities.PlayerCapability;
 import net.fexcraft.mod.states.data.capabilities.StatesCapabilities;
 import net.fexcraft.mod.states.guis.Listener;
+import net.fexcraft.mod.states.util.AliasLoader;
 import net.fexcraft.mod.states.util.Perms;
 import net.fexcraft.mod.states.util.StateLogger;
 import net.fexcraft.mod.states.util.StateUtil;
@@ -20,17 +22,16 @@ import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.server.MinecraftServer;
 import net.minecraftforge.server.permission.PermissionAPI;
 
-@fCommand
 public class AdminCmd extends CommandBase {
 
     @Override
     public String getName(){
-        return "st-admin";
+        return AliasLoader.getOverride("st-admin");
     }
 
     @Override
     public String getUsage(ICommandSender sender){
-	return "/st-admin <args>";
+	return "/" + getName() + " <args>";
     }
     
     @Override
@@ -42,6 +43,11 @@ public class AdminCmd extends CommandBase {
     public int getRequiredPermissionLevel(){
         return 0;
     }
+	
+	@Override
+	public List<String> getAliases(){
+		return AliasLoader.getAlias("st-admin");
+	}
 
 	@Override
 	public void execute(MinecraftServer server, ICommandSender sender, String[] args) throws CommandException {

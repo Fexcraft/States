@@ -1,11 +1,13 @@
 package net.fexcraft.mod.states.cmds;
 
+import java.util.List;
+
 import org.apache.commons.lang3.StringUtils;
 
-import net.fexcraft.lib.mc.api.registry.fCommand;
 import net.fexcraft.lib.mc.utils.Print;
 import net.fexcraft.mod.states.data.capabilities.PlayerCapability;
 import net.fexcraft.mod.states.data.capabilities.StatesCapabilities;
+import net.fexcraft.mod.states.util.AliasLoader;
 import net.fexcraft.mod.states.util.Perms;
 import net.fexcraft.mod.states.util.StConfig;
 import net.minecraft.command.CommandBase;
@@ -14,17 +16,21 @@ import net.minecraft.command.ICommandSender;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.server.MinecraftServer;
 
-@fCommand
 public class NickCmd extends CommandBase {
 
 	@Override
 	public String getName(){
-		return "st-nick";
+		return AliasLoader.getOverride("st-nick");
 	}
 
 	@Override
 	public String getUsage(ICommandSender sender){
-		return "/st-nick";
+		return "/" + getName();
+	}
+	
+	@Override
+	public List<String> getAliases(){
+		return AliasLoader.getAlias("st-nick");
 	}
 	
 	@Override

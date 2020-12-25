@@ -4,8 +4,9 @@ import static net.fexcraft.mod.states.guis.GuiHandler.MANAGER_DISTRICT;
 import static net.fexcraft.mod.states.guis.GuiHandler.RULE_EDITOR;
 import static net.fexcraft.mod.states.guis.GuiHandler.openGui;
 
+import java.util.List;
+
 import net.fexcraft.lib.common.math.Time;
-import net.fexcraft.lib.mc.api.registry.fCommand;
 import net.fexcraft.lib.mc.utils.Print;
 import net.fexcraft.mod.fsmm.api.Bank;
 import net.fexcraft.mod.states.States;
@@ -18,6 +19,7 @@ import net.fexcraft.mod.states.data.capabilities.PlayerCapability;
 import net.fexcraft.mod.states.data.capabilities.StatesCapabilities;
 import net.fexcraft.mod.states.guis.Listener;
 import net.fexcraft.mod.states.guis.ManagerContainer;
+import net.fexcraft.mod.states.util.AliasLoader;
 import net.fexcraft.mod.states.util.StateLogger;
 import net.fexcraft.mod.states.util.StateUtil;
 import net.minecraft.command.CommandBase;
@@ -26,17 +28,21 @@ import net.minecraft.command.ICommandSender;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.server.MinecraftServer;
 
-@fCommand
 public class DistrictCmd extends CommandBase {
 	
 	@Override
 	public String getName(){
-		return "dis";
+		return AliasLoader.getOverride("dis");
 	}
 
 	@Override
 	public String getUsage(ICommandSender sender){
-		return "/dis";
+		return "/" + getName();
+	}
+	
+	@Override
+	public List<String> getAliases(){
+		return AliasLoader.getAlias("dis");
 	}
 	
 	@Override

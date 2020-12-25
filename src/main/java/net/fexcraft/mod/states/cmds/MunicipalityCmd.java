@@ -6,12 +6,12 @@ import static net.fexcraft.mod.states.guis.GuiHandler.openGui;
 import static net.fexcraft.mod.states.util.StConfig.MUNICIPALITY_ABANDONMENT_PRICE;
 import static net.fexcraft.mod.states.util.StConfig.MUNICIPALITY_CLAIM_PRICE;
 
+import java.util.List;
 import java.util.UUID;
 
 import com.mojang.authlib.GameProfile;
 
 import net.fexcraft.lib.common.math.Time;
-import net.fexcraft.lib.mc.api.registry.fCommand;
 import net.fexcraft.lib.mc.utils.Print;
 import net.fexcraft.lib.mc.utils.Static;
 import net.fexcraft.mod.fsmm.api.Account;
@@ -35,6 +35,7 @@ import net.fexcraft.mod.states.data.root.AnnounceLevel;
 import net.fexcraft.mod.states.data.root.Mailbox.MailType;
 import net.fexcraft.mod.states.data.root.Mailbox.RecipientType;
 import net.fexcraft.mod.states.guis.ManagerContainer;
+import net.fexcraft.mod.states.util.AliasLoader;
 import net.fexcraft.mod.states.util.MailUtil;
 import net.fexcraft.mod.states.util.Perms;
 import net.fexcraft.mod.states.util.StConfig;
@@ -47,17 +48,21 @@ import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.server.MinecraftServer;
 
-@fCommand
 public class MunicipalityCmd extends CommandBase {
 	
 	@Override
 	public String getName(){
-		return "mun";
+		return AliasLoader.getOverride("mun");
 	}
 
 	@Override
 	public String getUsage(ICommandSender sender){
-		return "/mun";
+		return "/" + getName();
+	}
+	
+	@Override
+	public List<String> getAliases(){
+		return AliasLoader.getAlias("mun");
 	}
 	
 	@Override

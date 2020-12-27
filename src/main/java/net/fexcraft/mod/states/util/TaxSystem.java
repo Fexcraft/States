@@ -1,13 +1,13 @@
 package net.fexcraft.mod.states.util;
 
 import java.io.File;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
 import java.util.Map.Entry;
 import java.util.TimerTask;
 import java.util.UUID;
 
-import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.google.gson.JsonObject;
 
@@ -43,7 +43,7 @@ public class TaxSystem extends TimerTask {
 		try{
 			load();
 			long date = Time.getDate();
-			if(last_interval + StConfig.TAX_INTERVAL > date){
+			if(invalidInterval(last_interval, date)){
 				Print.log("Tried to process TAX data, but it is not time for that yet.");
 				Print.log("LTAX: " + last_interval + " + INTERVAL: " + StConfig.TAX_INTERVAL + " > NOW: " + date);
 				return;
@@ -55,13 +55,13 @@ public class TaxSystem extends TimerTask {
 				TaxSystem.processChunkTax(date, chunk);
 			}
 			Print.log("Collecting tax from online players...");
-			ImmutableList<EntityPlayerMP> players = ImmutableList.copyOf(Static.getServer().getPlayerList().getPlayers());
+			ArrayList<EntityPlayerMP> players = new ArrayList<>(Static.getServer().getPlayerList().getPlayers());
 			for(EntityPlayerMP player : players){
 				TaxSystem.processPlayerTax(date, player.getCapability(StatesCapabilities.PLAYER, null));
 			}
 			if(StConfig.TAX_OFFLINE_PLAYERS){
 				Print.log("Collecting tax from offline players...");
-				TaxSystem.processOfflinePlayerTax(date);
+				TaxSystem.processOfflinePlayerTax(players, date);
 			}
 			//
 			Print.log("Collecting tax from force-loaded chunks...");
@@ -77,6 +77,10 @@ public class TaxSystem extends TimerTask {
 			Print.log("An error occured while collecting tax, further collection is halted for this interval.");
 			e.printStackTrace();
 		}
+	}
+
+	private static boolean invalidInterval(long last, long date){
+		return last + StConfig.TAX_INTERVAL - 100 > date;
 	}
 
 	public static void processLoadedChunkTax(long date, Integer key, List<ChunkPos> value){
@@ -100,15 +104,16 @@ public class TaxSystem extends TimerTask {
 		}
 	}
 
-	private static void processOfflinePlayerTax(long date){
+	private static void processOfflinePlayerTax(ArrayList<EntityPlayerMP> players, long date){
 		File folder = new File(States.getSaveDirectory(), "players/");
 		if(folder == null || !folder.exists()){ return; }
 		for(File file : folder.listFiles()){
 			try{
 				UUID uuid = UUID.fromString(file.getName().replace(".json", ""));
-				if(isOnline(uuid)){ continue; }
+				if(isOnline(players, uuid)){ continue; }
 				PlayerImpl player = new PlayerImpl(uuid);
-				processPlayerTax(date, player); player.save();
+				processPlayerTax(date, player);
+				player.save();
 				player.unload();
 			}
 			catch(Exception e){
@@ -117,8 +122,8 @@ public class TaxSystem extends TimerTask {
 		}
 	}
 
-	private static boolean isOnline(UUID uuid){
-		for(EntityPlayerMP player : Static.getServer().getPlayerList().getPlayers()){
+	private static boolean isOnline(ArrayList<EntityPlayerMP> players, UUID uuid){
+		for(EntityPlayerMP player : players){
 			if(player.getGameProfile().getId().equals(uuid)){
 				return true;
 			}
@@ -161,7 +166,7 @@ public class TaxSystem extends TimerTask {
 					Print.log("Tax collection for " + StateLogger.player(cap) + " could not be completed as the player's bank is NULL, additionally, the player didn't have enough money to pay the tax.");
 				}
 			}
-			if(bank.isNull()){
+			else if(bank.isNull()){
 				Print.log("Tax collection for " + StateLogger.player(cap.getEntityPlayer()) + " could not be completed as the player's bank is NULL.");
 			}
 			long statetax = tax > 1000 ? getPercentage(tax, cap.getState().getCitizenTaxPercentage()) : 0;
@@ -171,7 +176,7 @@ public class TaxSystem extends TimerTask {
 				bank.processAction(Bank.Action.TRANSFER, Static.getServer(), account, statetax, state);
 			}
 		}
-		cap.onTaxCollected(date);
+		else cap.onTaxCollected(date);
 	}
 
 	private static String getMayor(Municipality municipality){
@@ -180,7 +185,7 @@ public class TaxSystem extends TimerTask {
 
 	public static void processChunkTax(long date, Chunk value){
 		if(!loaded){ return; }
-		if(value.lastTaxCollection() + StConfig.TAX_INTERVAL > date){ return; }
+		if(invalidInterval(value.lastTaxCollection(), date)){ return; }
 		if(value.getLink() != null){
 			Chunk chunk = StateUtil.getChunk(value.getLink());
 			if(chunk == null ? (chunk = StateUtil.getTempChunk(value.getLink())) != null : true){
@@ -242,7 +247,7 @@ public class TaxSystem extends TimerTask {
 				}
 				return;
 			}
-			if(bank.isNull()){
+			else if(bank.isNull()){
 				Print.log("Tax collection for " + StateLogger.chunk(value) + " could not be completed as the owner's bank is NULL.");
 				return;
 			}
@@ -253,7 +258,7 @@ public class TaxSystem extends TimerTask {
 				bank.processAction(Bank.Action.TRANSFER, Static.getServer(), account, statetax, state);
 			}
 		}
-		value.onTaxCollected(date);
+		else value.onTaxCollected(date);
 	}
 
 	public static long getPercentage(long tax, byte percent){

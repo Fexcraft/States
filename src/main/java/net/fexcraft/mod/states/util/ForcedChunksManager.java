@@ -152,7 +152,7 @@ public class ForcedChunksManager implements LoadingCallback {
 	/** Warning! Does not remove from the "States" loaded-chunk list as of now!*/
 	public static void requestUnload(ChunkPos pos){
 		Ticket ticket = getTicketForChunk(pos);
-		if(ticket != null){ ForgeChunkManager.unforceChunk(ticket, pos); }
+		if(ticket != null) ForgeChunkManager.unforceChunk(ticket, pos);
 		return;
 	}
 	

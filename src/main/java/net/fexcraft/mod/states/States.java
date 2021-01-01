@@ -40,18 +40,12 @@ import net.fexcraft.mod.states.impl.capabilities.PlayerCapabilityUtil;
 import net.fexcraft.mod.states.impl.capabilities.WorldCapabilityUtil;
 import net.fexcraft.mod.states.packets.ImagePacket;
 import net.fexcraft.mod.states.packets.ImagePacketHandler;
-import net.fexcraft.mod.states.util.AliasLoader;
-import net.fexcraft.mod.states.util.ForcedChunksManager;
-import net.fexcraft.mod.states.util.MessageSender;
-import net.fexcraft.mod.states.util.Perms;
-import net.fexcraft.mod.states.util.StConfig;
-import net.fexcraft.mod.states.util.StateUtil;
-import net.fexcraft.mod.states.util.TaxSystem;
-import net.fexcraft.mod.states.util.UpdateHandler;
+import net.fexcraft.mod.states.util.*;
 import net.minecraft.world.World;
 import net.minecraftforge.common.ForgeChunkManager;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.common.capabilities.CapabilityManager;
+import net.minecraftforge.fml.common.FMLCommonHandler;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.event.FMLInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLPostInitializationEvent;
@@ -89,6 +83,7 @@ public class States {
 	@Mod.EventHandler
 	public void preInit(FMLPreInitializationEvent event){
 		StConfig.initialize(event); 
+		FMLCommonHandler.instance().registerCrashCallable(new CrashHook());
 		SignCapabilitySerializer.addListener(SignShop.class);
 		SignCapabilitySerializer.addListener(SignMailbox.class);
 		//CapabilityManager.INSTANCE.register(SignTileEntityCapability.class, new SignTileEntityCapabilityUtil.Storage(), new SignTileEntityCapabilityUtil.Callable());

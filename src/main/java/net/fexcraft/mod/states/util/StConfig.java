@@ -6,7 +6,6 @@ import java.util.List;
 import java.util.UUID;
 
 import net.fexcraft.lib.common.math.Time;
-import net.fexcraft.lib.mc.utils.Static;
 import net.fexcraft.mod.states.States;
 import net.minecraftforge.common.config.ConfigElement;
 import net.minecraftforge.common.config.Configuration;
@@ -118,7 +117,7 @@ public class StConfig {
 		if(MessageSender.RECEIVER != null){
 			MessageSender.RECEIVER.halt();
 		}
-		if(WEBHOOK != null && BOT_PORT != -1 && Static.getServer() != null){
+		if(WEBHOOK != null && BOT_PORT != -1 /*&& Static.getServer() != null*/){
 			MessageSender.RECEIVER = new MessageSender.Receiver();
 			MessageSender.RECEIVER.start();
 		}

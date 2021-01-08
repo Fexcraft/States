@@ -82,6 +82,10 @@ public class SignMailbox implements SignCapability.Listener {
 					case "company": break;//TODO
 					case "player":{
 						String rec = tileentity.signText[2].getUnformattedText().toLowerCase();
+						if(rec == null || rec.length() == 0){
+							Print.chat(event.getEntityPlayer(), "No player name on 3rd line.");
+							return false;
+						}
 						com.mojang.authlib.GameProfile prof = Static.getServer().getPlayerProfileCache().getGameProfileForUsername(rec);
 						if(prof == null){
 							Print.chat(event.getEntityPlayer(), "Couldn't find player UUID in cache.");

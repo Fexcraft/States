@@ -43,7 +43,7 @@ public class MailCmd extends CommandBase {
 
     @Override
     public String getName(){
-        return AliasLoader.getOverride("mail");
+        return AliasLoader.getOverride("st-mail");
     }
 
     @Override
@@ -53,7 +53,7 @@ public class MailCmd extends CommandBase {
 	
 	@Override
 	public List<String> getAliases(){
-		return AliasLoader.getAlias("mail");
+		return AliasLoader.getAlias("st-mail");
 	}
     
     @Override
@@ -69,12 +69,12 @@ public class MailCmd extends CommandBase {
 	@Override
 	public void execute(MinecraftServer server, ICommandSender sender, String[] args) throws CommandException {
 		if(args.length == 0){
-			Print.chat(sender, "&7/mail inbox");
-			Print.chat(sender, "&7/mail read");
-			Print.chat(sender, "&7/mail send <receiver> <msg...>");
-			Print.chat(sender, "&7/mail collect <box-type>");
-			//Print.chat(sender, "&7/mail accept <args...>");
-			//Print.chat(sender, "&7/mail deny <args...>");
+			Print.chat(sender, "&7/st-mail inbox");
+			Print.chat(sender, "&7/st-mail read");
+			Print.chat(sender, "&7/st-mail send <receiver> <msg...>");
+			Print.chat(sender, "&7/st-mail collect <box-type>");
+			//Print.chat(sender, "&7/st-mail accept <args...>");
+			//Print.chat(sender, "&7/st-mail deny <args...>");
 			return;
 		}
 		if(sender instanceof EntityPlayer == false){
@@ -142,9 +142,9 @@ public class MailCmd extends CommandBase {
 					Print.chat(player, "&cExpires: &7" + Time.getAsString(stack.getTagCompound().getLong("Expiry")));
 					if(str.toLowerCase().equals("invite") && stack.getTagCompound().hasKey("StatesData")){
 						TextComponentString text = new TextComponentString(Formatter.format("&a&l[ACCEPT] "));
-						text.getStyle().setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/mail accept"));
+						text.getStyle().setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/st-mail accept"));
 						TextComponentString text2 = new TextComponentString(Formatter.format(" &c&l[DENY]"));
-						text2.getStyle().setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/mail deny"));
+						text2.getStyle().setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/st-mail deny"));
 						sender.sendMessage(text.appendSibling(text2));
 					}
 					Print.chat(player, "&e====-====-====-====-====-====" + States.PREFIX);
@@ -166,7 +166,7 @@ public class MailCmd extends CommandBase {
 			}
 			case "send":{
 				if(args.length < 3){
-					Print.chat(sender, "&7/mail send <receiver> <msg...>");
+					Print.chat(sender, "&7/st-mail send <receiver> <msg...>");
 					return;
 				}
 				try{

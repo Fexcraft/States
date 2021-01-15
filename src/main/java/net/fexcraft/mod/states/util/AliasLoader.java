@@ -13,6 +13,7 @@ public class AliasLoader {
 	
 	public static final HashMap<String, ArrayList<String>> ALIASES = new HashMap<>();
 	public static final HashMap<String, String> OVERRIDES = new HashMap<>();
+	private static final ArrayList<String> NONE = new ArrayList<>();
 
 	public static void load(){
 		File file = new File(StConfig.CONFIG_PATH, "st-cmds.json");
@@ -42,7 +43,7 @@ public class AliasLoader {
 		stgui.add("stgui");
 		stgui.add("stui");
 		als.add("st-gui", stgui);
-		als.add("mail", new JsonArray());
+		als.add("st-mail", new JsonArray());
 		als.add("ck", new JsonArray());
 		als.add("dis", new JsonArray());
 		als.add("mun", new JsonArray());
@@ -61,7 +62,7 @@ public class AliasLoader {
 	}
 
 	public static ArrayList<String> getAlias(String string){
-		return ALIASES.get(string);
+		return ALIASES.containsKey(string) ? ALIASES.get(string) : NONE;
 	}
 
 }

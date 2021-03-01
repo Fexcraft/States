@@ -61,7 +61,7 @@ public class Municipality implements ColorHolder, BuyableType, IconHolder, Accou
 		created = JsonUtil.getIfExists(obj, "created", Time.getDate()).longValue();
 		creator = UUID.fromString(obj.has("creator") ? obj.get("creator").getAsString() : States.CONSOLE_UUID);
 		changed = JsonUtil.getIfExists(obj, "changed", Time.getDate()).longValue();
-		account = DataManager.getAccount("municipality:" + id, false, true);
+		account = DataManager.getAccount("municipality:" + id, false, true).setName(name);
 		mayor = obj.has("mayor") ? UUID.fromString(obj.get("mayor").getAsString()) : null;
 		neighbors = JsonUtil.jsonArrayToIntegerArray(JsonUtil.getIfExists(obj, "neighbors", new JsonArray()).getAsJsonArray());
 		districts = JsonUtil.jsonArrayToIntegerArray(JsonUtil.getIfExists(obj, "districts", new JsonArray()).getAsJsonArray());
@@ -215,6 +215,7 @@ public class Municipality implements ColorHolder, BuyableType, IconHolder, Accou
 
 	public void setName(String new_name){
 		name = new_name;
+		account.setName(new_name);
 	}
 
 	public boolean isCapital(){

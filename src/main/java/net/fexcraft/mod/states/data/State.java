@@ -54,7 +54,7 @@ public class State implements ColorHolder, BuyableType, IconHolder, AccountHolde
 		changed = JsonUtil.getIfExists(obj, "changed", Time.getDate()).longValue();
 		creator = obj.has("creator") ? UUID.fromString(obj.get("creator").getAsString()) : UUID.fromString(States.CONSOLE_UUID);
 		leader = obj.has("leader") ? UUID.fromString(obj.get("leader").getAsString()) : null;
-		account = DataManager.getAccount("state:" + id, false, true);
+		account = DataManager.getAccount("state:" + id, false, true).setName(name);
 		capital = JsonUtil.getIfExists(obj, "capital", -1).intValue();
 		neighbors = JsonUtil.jsonArrayToIntegerArray(JsonUtil.getIfExists(obj, "neighbors", new JsonArray()).getAsJsonArray());
 		municipalities = JsonUtil.jsonArrayToIntegerArray(JsonUtil.getIfExists(obj, "municipalities", new JsonArray()).getAsJsonArray());
@@ -196,6 +196,7 @@ public class State implements ColorHolder, BuyableType, IconHolder, AccountHolde
 
 	public void setName(String new_name){
 		name = new_name;
+		account.setName(new_name);
 	}
 
 	public boolean isUnionCapital(){

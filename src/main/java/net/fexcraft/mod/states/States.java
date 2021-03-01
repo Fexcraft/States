@@ -107,7 +107,8 @@ public class States {
 		NBTTagCompoundPacketHandler.addListener(Side.SERVER, new Listener());
 		NBTTagCompoundPacketHandler.addListener(Side.CLIENT, new Receiver());
 		//
-		Perms.init(); SERVERACCOUNT = DataManager.getAccount("server:states", false, true);
+		Perms.init();
+		SERVERACCOUNT = DataManager.getAccount("server:states", false, true).setName("States (Mod) Server Account");
 		//
 		PacketHandler.getInstance().registerMessage(ImagePacketHandler.Client.class, ImagePacket.class, 29910, Side.CLIENT);
 		PacketHandler.getInstance().registerMessage(ImagePacketHandler.Server.class, ImagePacket.class, 29911, Side.SERVER);

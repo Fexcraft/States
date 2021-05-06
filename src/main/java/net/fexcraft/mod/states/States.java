@@ -23,6 +23,7 @@ import net.fexcraft.mod.fsmm.util.DataManager;
 import net.fexcraft.mod.states.cmds.*;
 import net.fexcraft.mod.states.data.Chunk;
 import net.fexcraft.mod.states.data.ChunkPos;
+import net.fexcraft.mod.states.data.County;
 import net.fexcraft.mod.states.data.District;
 import net.fexcraft.mod.states.data.Municipality;
 import net.fexcraft.mod.states.data.State;
@@ -74,6 +75,7 @@ public class States {
 	public static final ConcurrentHashMap<ChunkPos, Chunk> CHUNKS = new ConcurrentHashMap<>();
 	public static final TreeMap<Integer, District> DISTRICTS = new TreeMap<>();
 	public static final TreeMap<Integer, Municipality> MUNICIPALITIES = new TreeMap<>();
+	public static final TreeMap<Integer, County> COUNTIES = new TreeMap<>();
 	public static final TreeMap<Integer, State> STATES = new TreeMap<>();
 	public static final TreeMap<UUID, PlayerCapability> PLAYERS = new TreeMap<>();
 	public static final TreeMap<Integer, List<ChunkPos>> LOADED_CHUNKS = new TreeMap<>();

@@ -40,7 +40,15 @@ import net.fexcraft.mod.states.impl.capabilities.PlayerCapabilityUtil;
 import net.fexcraft.mod.states.impl.capabilities.WorldCapabilityUtil;
 import net.fexcraft.mod.states.packets.ImagePacket;
 import net.fexcraft.mod.states.packets.ImagePacketHandler;
-import net.fexcraft.mod.states.util.*;
+import net.fexcraft.mod.states.util.AliasLoader;
+import net.fexcraft.mod.states.util.CrashHook;
+import net.fexcraft.mod.states.util.ForcedChunksManager;
+import net.fexcraft.mod.states.util.MessageSender;
+import net.fexcraft.mod.states.util.Perms;
+import net.fexcraft.mod.states.util.StConfig;
+import net.fexcraft.mod.states.util.StateUtil;
+import net.fexcraft.mod.states.util.TaxSystem;
+import net.fexcraft.mod.states.util.UpdateHandler;
 import net.minecraft.world.World;
 import net.minecraftforge.common.ForgeChunkManager;
 import net.minecraftforge.common.MinecraftForge;
@@ -56,7 +64,7 @@ import net.minecraftforge.fml.common.event.FMLServerStoppingEvent;
 import net.minecraftforge.fml.common.network.NetworkRegistry;
 import net.minecraftforge.fml.relauncher.Side;
 
-@Mod(modid = States.MODID, name = "States", version = States.VERSION, dependencies = "required-after:fcl", /*serverSideOnly = true,*/ guiFactory = "net.fexcraft.mod.states.util.GuiFactory", acceptedMinecraftVersions = "*", acceptableRemoteVersions = "*")
+@Mod(modid = States.MODID, name = "States", version = States.VERSION, dependencies = "required-after:fcl", guiFactory = "net.fexcraft.mod.states.util.GuiFactory", acceptedMinecraftVersions = "*", acceptableRemoteVersions = "*")
 public class States {
 	
 	public static final String VERSION = "@VERSION@";
@@ -73,12 +81,12 @@ public class States {
 	//
 	public static final String DEF_UUID = "66e70cb7-1d96-487c-8255-5c2d7a2b6a0e";
 	public static final String CONSOLE_UUID = "f78a4d8d-d51b-4b39-98a3-230f2de0c670";
-	public static final String DEFAULT_ICON = "https://i.imgur.com/LwuKE0b.png";
+	public static final String DEFAULT_ICON = "https://fexcraft.net/files/mod_data/states/default_icon.png";
 	public static Account SERVERACCOUNT;
 	//
 	@Mod.Instance(MODID)
 	public static States INSTANCE;
-	private static Timer TAX_TIMER, DATA_MANAGER;//, IMG_TIMER;
+	private static Timer TAX_TIMER, DATA_MANAGER;
 	
 	@Mod.EventHandler
 	public void preInit(FMLPreInitializationEvent event){
@@ -86,7 +94,6 @@ public class States {
 		FMLCommonHandler.instance().registerCrashCallable(new CrashHook());
 		SignCapabilitySerializer.addListener(SignShop.class);
 		SignCapabilitySerializer.addListener(SignMailbox.class);
-		//CapabilityManager.INSTANCE.register(SignTileEntityCapability.class, new SignTileEntityCapabilityUtil.Storage(), new SignTileEntityCapabilityUtil.Callable());
 		CapabilityManager.INSTANCE.register(ChunkCapability.class, new ChunkCapabilityUtil.Storage(), new ChunkCapabilityUtil.Callable());
 		CapabilityManager.INSTANCE.register(WorldCapability.class, new WorldCapabilityUtil.Storage(), new WorldCapabilityUtil.Callable());
 		CapabilityManager.INSTANCE.register(PlayerCapability.class, new PlayerCapabilityUtil.Storage(), new PlayerCapabilityUtil.Callable());
@@ -157,13 +164,6 @@ public class States {
 		if(DATA_MANAGER == null){
 			(DATA_MANAGER = new Timer()).schedule(new StateUtil(), new Date(mid), Static.dev() ? 60000 : Time.MIN_MS * 15);
 		}
-		//
-		/*if(IMG_TIMER == null){
-			(IMG_TIMER = new Timer()).schedule(new ImageCache(), new Date(mid), 1000);
-			if(event.getSide().isClient()){
-				IMG_TIMER.schedule(new ImageUtil(), new Date(mid), 1000);
-			}
-		}*/
 	}
 	
 	@Mod.EventHandler

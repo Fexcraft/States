@@ -73,7 +73,7 @@ public class PlayerEvents {
 		if(player.getMailbox() == null) Print.chat(event.player, StateUtil.translate("states.welcome_msg.no_mailbox"));
 		if(player.hasRelevantVotes()) Print.chat(event.player, StateUtil.translate("states.welcome_msg.pending_votes", player.getRelevantVotes().size())); 
 		Print.chat(event.player, "&e====-====-====-====-====-====" + States.PREFIX);
-		sendLocationUpdate(event.player, null, StateUtil.translate("states.welcome_msg.welcome_back", player.getFormattedNickname()), "", "", 3);
+		sendLocationUpdate(event.player, null, StateUtil.translate("states.welcome_msg.welcome_back", player.getFormattedNickname()), "", "", "", 3);
 		if(UpdateHandler.STATE != null){
 			Print.chat(event.player, UpdateHandler.STATE);
 		}
@@ -328,21 +328,23 @@ public class PlayerEvents {
 			}
 			if(player.getCurrentChunk().getDistrict() != player.getLastChunk().getDistrict()){
 				Chunk chunk = player.getCurrentChunk();
-				sendLocationUpdate(event.player, chunk, chunk.getDistrict().getMunicipality().getState().getName(), chunk.getDistrict().getMunicipality().getName(), chunk.getDistrict().getName(), 0);
+				sendLocationUpdate(event.player, chunk, chunk.getDistrict().getMunicipality().getState().getName(), chunk.getDistrict().getMunicipality().getName(), chunk.getDistrict().getName(), "placeholder", 0);
 			}
 		}
 	}
 	
-	public static void sendLocationUpdate(EntityPlayer player, Chunk chunk, String line0, String line1, String line2, int time){
+	public static void sendLocationUpdate(EntityPlayer player, Chunk chunk, String line0, String line1, String line2, String line3, int time){
 		NBTTagCompound nbt = new NBTTagCompound();
 		nbt.setString("target_listener", "states:gui");
 		nbt.setString("task", "show_location_update");
-		writeIcon(nbt, chunk == null ? "" : chunk.getDistrict().getMunicipality().getState().getIcon(), 0, "red");
-		writeIcon(nbt, chunk == null ? "" : chunk.getDistrict().getMunicipality().getIcon(), 1, "green");
-		writeIcon(nbt, chunk == null ? "" : chunk.getDistrict().getIcon(), 2, "blue");
+		writeIcon(nbt, chunk == null ? "" : chunk.getDistrict().getMunicipality().getState().getIcon(), 0, "yellow");
+		writeIcon(nbt, chunk == null ? "" : chunk.getDistrict().getMunicipality().getState().getIcon(), 1, "red");
+		writeIcon(nbt, chunk == null ? "" : chunk.getDistrict().getMunicipality().getIcon(), 2, "green");
+		writeIcon(nbt, chunk == null ? "" : chunk.getDistrict().getIcon(), 3, "blue");
 		nbt.setString("line0", line0 == null ? " " : line0);
 		nbt.setString("line1", line1 == null ? " " : line1);
 		nbt.setString("line2", line2 == null ? " " : line2);
+		nbt.setString("line3", line3 == null ? " " : line3);
 		if(time > 0){ nbt.setInteger("time", time); }
 		PacketHandler.getInstance().sendTo(new PacketNBTTagCompound(nbt), (EntityPlayerMP)player);
 	}

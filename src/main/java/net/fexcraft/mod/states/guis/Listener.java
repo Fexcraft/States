@@ -151,7 +151,7 @@ public class Listener implements IPacketListener<PacketNBTTagCompound> {
 									compound.setLong("price", 0l);
 								}
 								else{
-									compound.setInteger("color", Color.decode(ck.getDistrict().getColor()).getRGB());
+									compound.setInteger("color", ck.getDistrict().color.getInteger());
 									compound.setBoolean("claimable", ck.getDistrict().getId() < 0);
 									compound.setInteger("district", ck.getDistrict().getId());
 									compound.setInteger("x", ck.xCoord());
@@ -276,7 +276,7 @@ public class Listener implements IPacketListener<PacketNBTTagCompound> {
 					//ImageCache.update(world, ch);
 					compound.setString("result", "Chunk Claimed. (" + dis.getId() + ");");
 					compound.setBoolean("claimed", true);
-					compound.setInteger("color", Color.decode(ck.getDistrict().getColor()).getRGB());
+					compound.setInteger("color", ck.getDistrict().color.getInteger());
 					compound.setBoolean("owned", ck.getOwner() != null && !ck.getOwner().equals("null"));
 					if(compound.getBoolean("owned")){
 						compound.setString("owner", ck.getOwner());
@@ -322,7 +322,7 @@ public class Listener implements IPacketListener<PacketNBTTagCompound> {
 			}
 			compound.setString("result", "Chunk Reclaimed. (" + dis.getId() + ");");
 			compound.setBoolean("claimed", true);
-			compound.setInteger("color", Color.decode(ck.getDistrict().getColor()).getRGB());
+			compound.setInteger("color", ck.getDistrict().color.getInteger());
 			compound.setBoolean("owned", ck.getOwner() != null && !ck.getOwner().equals("null"));
 			if(compound.getBoolean("owned")){
 				compound.setString("owner", ck.getOwner());

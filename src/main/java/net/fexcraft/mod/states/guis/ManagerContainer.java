@@ -3,7 +3,6 @@ package net.fexcraft.mod.states.guis;
 import static net.fexcraft.mod.states.util.StateUtil.bypass;
 import static net.fexcraft.mod.states.util.StateUtil.translate;
 
-import java.awt.Color;
 import java.util.ArrayList;
 import java.util.UUID;
 
@@ -29,6 +28,7 @@ import net.fexcraft.mod.states.data.capabilities.StatesCapabilities;
 import net.fexcraft.mod.states.data.root.AnnounceLevel;
 import net.fexcraft.mod.states.data.root.Mailbox.MailType;
 import net.fexcraft.mod.states.data.root.Mailbox.RecipientType;
+import net.fexcraft.mod.states.data.sub.ColorData;
 import net.fexcraft.mod.states.util.MailUtil;
 import net.fexcraft.mod.states.util.Perms;
 import net.fexcraft.mod.states.util.StConfig;
@@ -119,7 +119,7 @@ public class ManagerContainer extends GenericContainer {
 				addKey(list, "manager", dis.getHead() == null ? NOONE : Static.getPlayerNameByUUID(dis.getHead()), ViewMode.EDIT);
 				addKey(list, "price", dis.getPrice() == 0 ? NOTFORSALE : ggas(dis.getPrice()), ViewMode.EDIT);
 				addKey(list, "type", dis.getType().name().toLowerCase(), ViewMode.EDIT);
-				addKey(list, "color", dis.getColor(), ViewMode.EDIT);
+				addKey(list, "color", dis.color.getString(), ViewMode.EDIT);
 				addKey(list, "chunk_tax", dis.getChunkTax() > 0 ? ggas(dis.getChunkTax()) : NOTAX, ViewMode.EDIT);
 				addKey(list, "last_edited", time(dis.getChanged()), ViewMode.NONE);
 				addKey(list, "neighbors", dis.getNeighbors().size(), ViewMode.LIST);
@@ -145,7 +145,7 @@ public class ManagerContainer extends GenericContainer {
 				addKey(list, "mayor", mun.getHead() == null ? NOONE : Static.getPlayerNameByUUID(mun.getHead()), ViewMode.EDIT);
 				addKey(list, "price", mun.getPrice() == 0 ? NOTFORSALE : ggas(mun.getPrice()), ViewMode.EDIT);
 				addKey(list, "title", mun.getTitle(), ViewMode.EDIT);
-				addKey(list, "color", mun.getColor(), ViewMode.EDIT);
+				addKey(list, "color", mun.color.getString(), ViewMode.EDIT);
 				addKey(list, "citizen", mun.getCitizen().size(), ViewMode.LIST);
 				addKey(list, "balance", ggas(mun.getAccount().getBalance()), ViewMode.GOTO);
 				addKey(list, "citizen_tax", mun.getCitizenTax() > 0 ? ggas(mun.getCitizenTax()) : NOTAX, ViewMode.EDIT);
@@ -173,7 +173,7 @@ public class ManagerContainer extends GenericContainer {
 				addKey(list, "capital", StateUtil.getMunicipality(state.getCapitalId()).getName() + " (" + state.getCapitalId() + ")", ViewMode.EDIT);
 				addKey(list, "leader", state.getHead() == null ? NOONE : Static.getPlayerNameByUUID(state.getHead()), ViewMode.EDIT);
 				addKey(list, "price", state.getPrice() > 0 ? ggas(state.getPrice()) : NOTFORSALE, ViewMode.EDIT);
-				addKey(list, "color", state.getColor(), ViewMode.EDIT);
+				addKey(list, "color", state.color.getString(), ViewMode.EDIT);
 				addKey(list, "citizen", getCitizens(state).size(), ViewMode.LIST);
 				addKey(list, "balance", ggas(state.getAccount().getBalance()), ViewMode.GOTO);
 				addKey(list, "chunk_tax", state.getChunkTaxPercentage() + "%", ViewMode.EDIT);
@@ -464,17 +464,15 @@ public class ManagerContainer extends GenericContainer {
 									if(dis.isAuthorized(dis.r_SET_COLOR.id, cap.getUUID()).isTrue() || bypass(player)){
 										try{
 											String str = value;
-											if(str.replace("#", "").length() != 6){
+											if(!ColorData.validString(null, str)){
 												sendStatus("states.manager_gui.view.invalid_hex");
 												break;
 											}
-											str = str.startsWith("#") ? str : "#" + str;
-											Color.decode(str);
-											dis.setColor(str);
+											dis.color.set(str);
 											dis.setChanged(Time.getDate());
 											dis.save();
 											sendViewData();
-											Print.log(StateLogger.player(player) + " changed color of " + StateLogger.district(dis) + " to " + dis.getColor() + ".");
+											Print.log(StateLogger.player(player) + " changed color of " + StateLogger.district(dis) + " to " + dis.color.getString() + ".");
 										}
 										catch(Exception e){
 											sendStatus("&2Error: &7" + e.getMessage());
@@ -684,17 +682,15 @@ public class ManagerContainer extends GenericContainer {
 									if(mun.isAuthorized(mun.r_COLOR.id, cap.getUUID()).isTrue() || bypass(player)){
 										try{
 											String str = value;
-											if(str.replace("#", "").length() != 6){
+											if(!ColorData.validString(null, str)){
 												sendStatus("states.manager_gui.view.invalid_hex");
 												break;
 											}
-											str = str.startsWith("#") ? str : "#" + str;
-											Color.decode(str);
-											mun.setColor(str);
+											mun.color.set(str);
 											mun.setChanged(Time.getDate());
 											mun.save();
 											sendViewData();
-											Print.log(StateLogger.player(player) + " changed color of " + StateLogger.municipality(mun) + " to " + mun.getColor() + ".");
+											Print.log(StateLogger.player(player) + " changed color of " + StateLogger.municipality(mun) + " to " + mun.color.getString() + ".");
 										}
 										catch(Exception e){
 											sendStatus("&2Error: &7" + e.getMessage());
@@ -902,17 +898,15 @@ public class ManagerContainer extends GenericContainer {
 									if(state.isAuthorized(state.r_SET_COLOR.id, cap.getUUID()).isTrue() || bypass(player)){
 										try{
 											String str = value;
-											if(str.replace("#", "").length() != 6){
+											if(!ColorData.validString(null, str)){
 												sendStatus("states.manager_gui.view.invalid_hex");
 												break;
 											}
-											str = str.startsWith("#") ? str : "#" + str;
-											Color.decode(str);
-											state.setColor(str);
+											state.color.set(str);
 											state.setChanged(Time.getDate());
 											state.save();
 											sendViewData();
-											Print.log(StateLogger.player(player) + " set the color of " + StateLogger.state(state) + " to " + state.getColor());
+											Print.log(StateLogger.player(player) + " set the color of " + StateLogger.state(state) + " to " + state.color.getString());
 										}
 										catch(Exception e){
 											sendStatus("&2Error: &7" + e.getMessage());

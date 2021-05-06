@@ -16,27 +16,28 @@ import net.fexcraft.lib.common.json.JsonUtil;
 import net.fexcraft.lib.common.math.Time;
 import net.fexcraft.mod.states.States;
 import net.fexcraft.mod.states.data.root.BuyableType;
-import net.fexcraft.mod.states.data.root.ColorHolder;
 import net.fexcraft.mod.states.data.root.ExternalData;
 import net.fexcraft.mod.states.data.root.ExternalDataHolder;
 import net.fexcraft.mod.states.data.root.IconHolder;
 import net.fexcraft.mod.states.data.root.Initiator;
 import net.fexcraft.mod.states.data.root.MailReceiver;
 import net.fexcraft.mod.states.data.root.Ruleable;
+import net.fexcraft.mod.states.data.sub.ColorData;
 import net.fexcraft.mod.states.events.DistrictEvent;
 import net.fexcraft.mod.states.util.RuleMap;
 import net.fexcraft.mod.states.util.StateUtil;
 import net.minecraft.util.math.BlockPos;
 import net.minecraftforge.common.MinecraftForge;
 
-public class District implements ColorHolder, BuyableType, IconHolder, MailReceiver, Ruleable, ExternalDataHolder {
+public class District implements BuyableType, IconHolder, MailReceiver, Ruleable, ExternalDataHolder {
 	
 	private int id, chunks;
 	private DistrictType type;
 	private long created, changed, price, chunktax;
 	private UUID creator, manager;
 	private ArrayList<Integer> neighbors;
-	private String name, color, icon;
+	private String name, icon;
+	public ColorData color = new ColorData();
 	private Municipality municipality;
 	private BlockPos mailbox;
 	private TreeMap<String, ExternalData> datas = new TreeMap<>();
@@ -59,7 +60,7 @@ public class District implements ColorHolder, BuyableType, IconHolder, MailRecei
 		name = JsonUtil.getIfExists(obj, "name", "Unnamed District");
 		municipality = StateUtil.getMunicipality(JsonUtil.getIfExists(obj, "municipality", -1).intValue());
 		manager = obj.has("manager") ? UUID.fromString(obj.get("manager").getAsString()) : null;
-		color = obj.has("color") ? obj.get("color").getAsString() : "#ffffff";
+		color.load(obj);
 		price = JsonUtil.getIfExists(obj, "price", 0).longValue();
 		icon = JsonUtil.getIfExists(obj, "icon", States.DEFAULT_ICON);
 		chunks = JsonUtil.getIfExists(obj, "chunks", 0).intValue();
@@ -128,7 +129,7 @@ public class District implements ColorHolder, BuyableType, IconHolder, MailRecei
 		obj.addProperty("municipality", municipality == null ? -1 : municipality.getId());
 		obj.add("neighbors", JsonUtil.getArrayFromIntegerList(neighbors));
 		if(!(manager == null)){ obj.addProperty("manager", manager.toString()); }
-		obj.addProperty("color", color);
+		color.save(obj);
 		//obj.addProperty("can_foreigners_settle", cfs);
 		obj.addProperty("price", price);
 		if(icon != null){ obj.addProperty("icon", icon); }
@@ -238,16 +239,6 @@ public class District implements ColorHolder, BuyableType, IconHolder, MailRecei
 
 	public void setType(DistrictType new_type){
 		type = new_type;
-	}
-
-	@Override
-	public String getColor(){
-		return color;
-	}
-
-	@Override
-	public void setColor(String newcolor){
-		color = newcolor;
 	}
 
 	@Override

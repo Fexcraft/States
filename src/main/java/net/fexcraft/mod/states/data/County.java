@@ -18,7 +18,16 @@ import net.fexcraft.mod.fsmm.api.Account;
 import net.fexcraft.mod.fsmm.api.Bank;
 import net.fexcraft.mod.fsmm.util.DataManager;
 import net.fexcraft.mod.states.States;
-import net.fexcraft.mod.states.data.root.*;
+import net.fexcraft.mod.states.data.root.AccountHolder;
+import net.fexcraft.mod.states.data.root.BuyableType;
+import net.fexcraft.mod.states.data.root.ExternalData;
+import net.fexcraft.mod.states.data.root.ExternalDataHolder;
+import net.fexcraft.mod.states.data.root.IconHolder;
+import net.fexcraft.mod.states.data.root.Initiator;
+import net.fexcraft.mod.states.data.root.MailReceiver;
+import net.fexcraft.mod.states.data.root.Ruleable;
+import net.fexcraft.mod.states.data.root.VoteHolder;
+import net.fexcraft.mod.states.data.sub.ColorData;
 import net.fexcraft.mod.states.events.CountyEvent;
 import net.fexcraft.mod.states.util.RuleMap;
 import net.fexcraft.mod.states.util.StConfig;
@@ -26,10 +35,11 @@ import net.fexcraft.mod.states.util.StateUtil;
 import net.minecraft.util.math.BlockPos;
 import net.minecraftforge.common.MinecraftForge;
 
-public class County implements ColorHolder, BuyableType, IconHolder, AccountHolder, MailReceiver, Ruleable, VoteHolder, ExternalDataHolder {
+public class County implements BuyableType, IconHolder, AccountHolder, MailReceiver, Ruleable, VoteHolder, ExternalDataHolder {
 	
 	private int id;
-	private String name, color, icon;
+	private String name, icon;
+	public ColorData color = new ColorData();
 	private long created, changed, price, citizentax;
 	private UUID creator, manager;
 	private Account account;
@@ -62,7 +72,7 @@ public class County implements ColorHolder, BuyableType, IconHolder, AccountHold
 		direct_citizen = JsonUtil.jsonArrayToUUIDArray(JsonUtil.getIfExists(obj, "citizen", new JsonArray()).getAsJsonArray());
 		council = JsonUtil.jsonArrayToUUIDArray(JsonUtil.getIfExists(obj, "council", new JsonArray()).getAsJsonArray());
 		state = StateUtil.getState(JsonUtil.getIfExists(obj, "state", -1).intValue());
-		color = JsonUtil.getIfExists(obj, "color", "#ffffff");
+		color.load(obj);
 		price = JsonUtil.getIfExists(obj, "price", 0).longValue();
 		icon = JsonUtil.getIfExists(obj, "icon", States.DEFAULT_ICON);
 		citizentax = JsonUtil.getIfExists(obj, "citizen_tax", 0).longValue();
@@ -139,7 +149,7 @@ public class County implements ColorHolder, BuyableType, IconHolder, AccountHold
 		obj.add("council", JsonUtil.getArrayFromUUIDList(council));
 		obj.addProperty("state", state.getId());
 		obj.addProperty("balance", account.getBalance());
-		obj.addProperty("color", color);
+		color.save(obj);
 		//obj.addProperty("open", open);
 		obj.addProperty("price", price);
 		if(icon != null){ obj.addProperty("icon", icon); }
@@ -269,16 +279,6 @@ public class County implements ColorHolder, BuyableType, IconHolder, AccountHold
 		state.getMunicipalities().removeIf(pre -> pre == this.getId());
 		state = new_state;
 		state.getMunicipalities().add(this.getId());
-	}
-	
-	@Override
-	public String getColor(){
-		return color;
-	}
-
-	@Override
-	public void setColor(String newcolor){
-		color = newcolor;
 	}
 
 	@Override

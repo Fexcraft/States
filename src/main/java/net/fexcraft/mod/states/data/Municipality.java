@@ -22,6 +22,7 @@ import net.fexcraft.mod.fsmm.util.DataManager;
 import net.fexcraft.mod.states.States;
 import net.fexcraft.mod.states.data.capabilities.PlayerCapability;
 import net.fexcraft.mod.states.data.root.*;
+import net.fexcraft.mod.states.data.sub.ColorData;
 import net.fexcraft.mod.states.events.MunicipalityEvent;
 import net.fexcraft.mod.states.util.ForcedChunksManager;
 import net.fexcraft.mod.states.util.RuleMap;
@@ -31,10 +32,11 @@ import net.minecraft.command.ICommandSender;
 import net.minecraft.util.math.BlockPos;
 import net.minecraftforge.common.MinecraftForge;
 
-public class Municipality implements ColorHolder, BuyableType, IconHolder, AccountHolder, MailReceiver, Ruleable, VoteHolder, Abandonable, ExternalDataHolder {
+public class Municipality implements BuyableType, IconHolder, AccountHolder, MailReceiver, Ruleable, VoteHolder, Abandonable, ExternalDataHolder {
 	
 	private int id;
-	private String name, color, icon, title;
+	private String name, icon, title;
+	public ColorData color = new ColorData();
 	private long created, changed, price, citizentax, abandonedat;
 	private UUID creator, mayor, abandonedby;
 	private boolean abandoned;
@@ -68,7 +70,7 @@ public class Municipality implements ColorHolder, BuyableType, IconHolder, Accou
 		citizen = JsonUtil.jsonArrayToUUIDArray(JsonUtil.getIfExists(obj, "citizen", new JsonArray()).getAsJsonArray());
 		council = JsonUtil.jsonArrayToUUIDArray(JsonUtil.getIfExists(obj, "council", new JsonArray()).getAsJsonArray());
 		state = StateUtil.getState(JsonUtil.getIfExists(obj, "state", -1).intValue());
-		color = JsonUtil.getIfExists(obj, "color", "#ffffff");
+		color.load(obj);
 		com_blacklist = JsonUtil.jsonArrayToIntegerArray(JsonUtil.getIfExists(obj, "company_blacklist", new JsonArray()).getAsJsonArray());
 		pl_blacklist = JsonUtil.jsonArrayToUUIDArray(JsonUtil.getIfExists(obj, "player_blacklist", new JsonArray()).getAsJsonArray());
 		price = JsonUtil.getIfExists(obj, "price", 0).longValue();
@@ -153,7 +155,7 @@ public class Municipality implements ColorHolder, BuyableType, IconHolder, Accou
 		obj.add("council", JsonUtil.getArrayFromUUIDList(council));
 		obj.addProperty("state", state.getId());
 		obj.addProperty("balance", account.getBalance());
-		obj.addProperty("color", color);
+		color.save(obj);
 		//obj.addProperty("open", open);
 		obj.addProperty("price", price);
 		if(icon != null){ obj.addProperty("icon", icon); }
@@ -282,16 +284,6 @@ public class Municipality implements ColorHolder, BuyableType, IconHolder, Accou
 		state.getMunicipalities().removeIf(pre -> pre == this.getId());
 		state = new_state;
 		state.getMunicipalities().add(this.getId());
-	}
-	
-	@Override
-	public String getColor(){
-		return color;
-	}
-
-	@Override
-	public void setColor(String newcolor){
-		color = newcolor;
 	}
 
 	public List<UUID> getPlayerBlacklist(){

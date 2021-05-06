@@ -1,8 +1,6 @@
 package net.fexcraft.mod.states.data;
 
-import net.fexcraft.mod.states.data.root.ColorHolder;
-
-public enum ChunkType implements ColorHolder {
+public enum ChunkType {
 	
 	NORMAL("#003600"),
 	PUBLIC("#703DFF"),
@@ -20,14 +18,8 @@ public enum ChunkType implements ColorHolder {
 		this.color = color;
 	}
 
-	@Override
 	public String getColor(){
 		return color;
-	}
-
-	@Override
-	public void setColor(String newcolor){
-		//haha.. this an enum.
 	}
 	
 	@Override

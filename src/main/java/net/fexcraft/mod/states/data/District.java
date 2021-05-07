@@ -23,6 +23,7 @@ import net.fexcraft.mod.states.data.root.Layer;
 import net.fexcraft.mod.states.data.root.Ruleable;
 import net.fexcraft.mod.states.data.sub.Buyable;
 import net.fexcraft.mod.states.data.sub.ColorData;
+import net.fexcraft.mod.states.data.sub.Createable;
 import net.fexcraft.mod.states.data.sub.IconHolder;
 import net.fexcraft.mod.states.data.sub.MailData;
 import net.fexcraft.mod.states.events.DistrictEvent;
@@ -34,14 +35,15 @@ public class District implements ChildLayer, Ruleable, ExternalDataHolder {
 	
 	private int id, chunks;
 	private DistrictType type;
-	private long created, changed, chunktax;
-	private UUID creator, manager;
+	private long chunktax;
+	private UUID manager;
 	private ArrayList<Integer> neighbors;
 	private String name;
 	public IconHolder icon = new IconHolder();
 	public ColorData color = new ColorData();
 	public Buyable price = new Buyable(this, Layer.DISTRICT);
 	public MailData mailbox = new MailData();
+	public Createable created = new Createable();
 	private Municipality municipality;
 	private TreeMap<String, ExternalData> datas = new TreeMap<>();
 	//
@@ -56,9 +58,7 @@ public class District implements ChildLayer, Ruleable, ExternalDataHolder {
 	public District(int id){
 		this.id = id; JsonObject obj = StateUtil.getDistrictJson(id);
 		type = DistrictType.valueOf(JsonUtil.getIfExists(obj, "type", DistrictType.WILDERNESS.name()));
-		created = JsonUtil.getIfExists(obj, "created", Time.getDate()).longValue();
-		creator = UUID.fromString(obj.has("creator") ? obj.get("creator").getAsString() : States.CONSOLE_UUID);
-		changed = JsonUtil.getIfExists(obj, "changed", Time.getDate()).longValue();
+		created.load(obj);
 		neighbors = JsonUtil.jsonArrayToIntegerArray(JsonUtil.getIfExists(obj, "neighbors", new JsonArray()).getAsJsonArray());
 		name = JsonUtil.getIfExists(obj, "name", "Unnamed District");
 		municipality = StateUtil.getMunicipality(JsonUtil.getIfExists(obj, "municipality", -1).intValue());
@@ -125,9 +125,7 @@ public class District implements ChildLayer, Ruleable, ExternalDataHolder {
 		JsonObject obj = new JsonObject();
 		obj.addProperty("id", id);
 		obj.addProperty("type", type.name());
-		obj.addProperty("created", created);
-		obj.addProperty("creator", creator.toString());
-		obj.addProperty("changed", changed);
+		created.save(obj);
 		obj.addProperty("name", name);
 		obj.addProperty("municipality", municipality == null ? -1 : municipality.getId());
 		obj.add("neighbors", JsonUtil.getArrayFromIntegerList(neighbors));
@@ -193,33 +191,8 @@ public class District implements ChildLayer, Ruleable, ExternalDataHolder {
 	public DistrictType getType(){
 		return type;
 	}
-
-	public long getCreated(){
-		return created;
-	}
-
-	public void setCreated(long date){
-		created = date;
-	}
-
-	public UUID getCreator(){
-		return creator;
-	}
-
-	public void setCreator(UUID uuid){
-		creator = uuid;
-	}
-
-	public long getChanged(){
-		return changed;
-	}
-
 	public List<Integer> getNeighbors(){
 		return neighbors;
-	}
-
-	public void setChanged(long new_change){
-		changed = new_change;
 	}
 
 	public String getName(){

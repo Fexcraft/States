@@ -18,6 +18,7 @@ import net.fexcraft.mod.states.data.root.ChildLayer;
 import net.fexcraft.mod.states.data.root.Layer;
 import net.fexcraft.mod.states.data.root.Taxable;
 import net.fexcraft.mod.states.data.sub.Buyable;
+import net.fexcraft.mod.states.data.sub.Createable;
 import net.fexcraft.mod.states.util.StConfig;
 import net.fexcraft.mod.states.util.StateLogger;
 import net.fexcraft.mod.states.util.StateUtil;
@@ -27,11 +28,11 @@ import net.minecraft.world.World;
 public class Chunk implements ChildLayer, Taxable/*, RuleHolder*/ {
 	
 	private District district;
-	private long created, changed, edited, lasttaxcheck, ctax;
+	private long edited, lasttaxcheck, ctax;
 	public Buyable price = new Buyable(this, Layer.CHUNK);
+	public Createable created = new Createable();
 	private int x, z;
 	private ChunkPos link, pos;
-	private UUID creator;
 	private ArrayList<int[]> linked = new ArrayList<>();
 	private ChunkType type;
 	private String owner;
@@ -57,7 +58,7 @@ public class Chunk implements ChildLayer, Taxable/*, RuleHolder*/ {
 			if(world == null) world = Static.getServer().getWorld(0);
 			if(world != null) ImageCache.update(world, world.getChunkProvider().getLoadedChunk(x, z));
 		}*/
-		if(district != null && this.district.getId() == -2 && changed + Time.DAY_MS < Time.getDate()){
+		if(district != null && this.district.getId() == -2 && created.getChanged() + Time.DAY_MS < Time.getDate()){
 			Print.log(StateLogger.district(-2) + " time of " + StateLogger.chunk(this) + " expired! Setting back to " + StateLogger.district(-1) + "!");
 			this.setDistrict(StateUtil.getDistrict(-1));
 			save();
@@ -72,9 +73,7 @@ public class Chunk implements ChildLayer, Taxable/*, RuleHolder*/ {
 	protected void parseJson(JsonObject obj){
 		price.load(obj);
 		district = StateUtil.getDistrict(JsonUtil.getIfExists(obj, "district", -1).intValue());
-		created = JsonUtil.getIfExists(obj, "created", Time.getDate()).longValue();
-		creator = UUID.fromString(obj.has("creator") ? obj.get("creator").getAsString() : States.CONSOLE_UUID);
-		changed = JsonUtil.getIfExists(obj, "changed", Time.getDate()).longValue();
+		created.load(obj);
 		if(obj.has("linked")){
 			JsonArray array = obj.get("linked").getAsJsonArray();
 			array.forEach(elm -> {
@@ -137,9 +136,7 @@ public class Chunk implements ChildLayer, Taxable/*, RuleHolder*/ {
 		obj.addProperty("z", z);
 		price.save(obj);
 		obj.addProperty("district", district == null ? -1 : district.getId());
-		obj.addProperty("created", created);
-		obj.addProperty("creator", creator.toString());
-		obj.addProperty("changed", changed);
+		created.save(obj);
 		obj.addProperty("type", type.toString());
 		obj.addProperty("owner", owner == null ? "null" : owner);
 		if(link != null){
@@ -185,26 +182,6 @@ public class Chunk implements ChildLayer, Taxable/*, RuleHolder*/ {
 
 	public District getDistrict(){
 		return district;
-	}
-
-	public long getCreated(){
-		return created;
-	}
-
-	public UUID getClaimer(){
-		return creator;
-	}
-
-	public void setClaimer(UUID id){
-		creator = UUID.fromString(id.toString());
-	}
-
-	public long getChanged(){
-		return changed;
-	}
-
-	public void setChanged(long new_change){
-		changed = new_change;
 	}
 
 	public List<int[]> getLinkedChunks(){

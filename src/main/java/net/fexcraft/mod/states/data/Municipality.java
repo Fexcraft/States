@@ -32,6 +32,7 @@ import net.fexcraft.mod.states.data.root.Ruleable;
 import net.fexcraft.mod.states.data.root.VoteHolder;
 import net.fexcraft.mod.states.data.sub.Buyable;
 import net.fexcraft.mod.states.data.sub.ColorData;
+import net.fexcraft.mod.states.data.sub.Createable;
 import net.fexcraft.mod.states.data.sub.IconHolder;
 import net.fexcraft.mod.states.data.sub.MailData;
 import net.fexcraft.mod.states.events.MunicipalityEvent;
@@ -50,8 +51,9 @@ public class Municipality implements ChildLayer, AccountHolder, Ruleable, VoteHo
 	public ColorData color = new ColorData();
 	public Buyable price = new Buyable(this, Layer.MUNICIPALITY);
 	public MailData mailbox = new MailData();
-	private long created, changed, citizentax, abandonedat;
-	private UUID creator, mayor, abandonedby;
+	public Createable created = new Createable();
+	private long citizentax, abandonedat;
+	private UUID mayor, abandonedby;
 	private boolean abandoned;
 	private Account account;
 	private ArrayList<Integer> neighbors, districts, com_blacklist;
@@ -72,9 +74,7 @@ public class Municipality implements ChildLayer, AccountHolder, Ruleable, VoteHo
 		JsonObject obj = StateUtil.getMunicipalityJson(id);
 		name = JsonUtil.getIfExists(obj, "name", "Unnamed Place");
 		title = JsonUtil.getIfExists(obj, "title", "Untitled");
-		created = JsonUtil.getIfExists(obj, "created", Time.getDate()).longValue();
-		creator = UUID.fromString(obj.has("creator") ? obj.get("creator").getAsString() : States.CONSOLE_UUID);
-		changed = JsonUtil.getIfExists(obj, "changed", Time.getDate()).longValue();
+		created.load(obj);
 		account = DataManager.getAccount("municipality:" + id, false, true).setName(name);
 		mayor = obj.has("mayor") ? UUID.fromString(obj.get("mayor").getAsString()) : null;
 		neighbors = JsonUtil.jsonArrayToIntegerArray(JsonUtil.getIfExists(obj, "neighbors", new JsonArray()).getAsJsonArray());
@@ -157,9 +157,7 @@ public class Municipality implements ChildLayer, AccountHolder, Ruleable, VoteHo
 		obj.addProperty("id", id);
 		obj.addProperty("name", name);
 		obj.addProperty("title", title);
-		obj.addProperty("created", created);
-		obj.addProperty("creator", creator.toString());
-		obj.addProperty("changed", changed);
+		created.save(obj);
 		if(mayor != null) obj.addProperty("mayor", mayor.toString());
 		obj.add("neighbors", JsonUtil.getArrayFromIntegerList(neighbors));
 		obj.add("districts", JsonUtil.getArrayFromIntegerList(districts));
@@ -236,32 +234,12 @@ public class Municipality implements ChildLayer, AccountHolder, Ruleable, VoteHo
 		return this.getState().getCapitalId() == this.getId();
 	}
 
-	public void setChanged(long new_change){
-		changed = new_change;
-	}
-
 	public List<Integer> getNeighbors(){
 		return neighbors;
 	}
 
 	public List<Integer> getDistricts(){
 		return districts;
-	}
-
-	public long getCreated(){
-		return created;
-	}
-
-	public UUID getCreator(){
-		return creator;
-	}
-	
-	public void setCreator(UUID uuid){
-		creator = uuid;
-	}
-
-	public long getChanged(){
-		return changed;
 	}
 
 	public List<UUID> getCitizen(){

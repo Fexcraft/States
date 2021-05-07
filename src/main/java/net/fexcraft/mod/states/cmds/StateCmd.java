@@ -185,13 +185,12 @@ public class StateCmd extends CommandBase {
 						throw new Exception("Tried to create new State with ID '" + newstate.getId() + "', but savefile already exists.");
 					}
 					else{
-						newstate.setCreator(ply.getUUID());
+						newstate.created.create(ply.getUUID());
 						newstate.setName(name);
 						newstate.setHead(ply.getUUID());
 						newstate.setCapitalId(ply.getMunicipality().getId());
 						newstate.price.reset();
 						newstate.getCouncil().add(ply.getUUID());
-						newstate.setChanged(Time.getDate());
 						//
 						//Now let's save stuff.
 						long halfprice = price / 2;
@@ -199,7 +198,7 @@ public class StateCmd extends CommandBase {
 							bank.processAction(Bank.Action.TRANSFER, null, ply.getMunicipality().getAccount(), halfprice, newstate.getAccount());
 							newstate.save(); States.STATES.put(newstate.getId(), newstate);
 							ply.getMunicipality().setState(newstate);
-							ply.getMunicipality().setChanged(Time.getDate());
+							ply.getMunicipality().created.update();
 							ply.getMunicipality().save();
 							StateUtil.announce(server, "&9New State was created!");
 							StateUtil.announce(server, "&9Created by " + ply.getFormattedNickname());

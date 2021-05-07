@@ -4,7 +4,6 @@ import java.util.List;
 
 import org.apache.commons.lang3.math.NumberUtils;
 
-import net.fexcraft.lib.common.math.Time;
 import net.fexcraft.lib.mc.utils.Print;
 import net.fexcraft.mod.states.data.Chunk;
 import net.fexcraft.mod.states.data.District;
@@ -81,8 +80,7 @@ public class AdminCmd extends CommandBase {
 						Print.chat(sender, "&4&lCannot force claim into IDs bellow 0!"); return;
 					}
 					chunk.setDistrict(dis);
-					chunk.setClaimer(player.getGameProfile().getId());
-					chunk.setChanged(Time.getDate());
+					chunk.created.setClaimer(player.getGameProfile().getId());
 					chunk.price.set(0);
 					chunk.save();
 					Print.chat(sender, String.format("&2&lChunk Claimed. [ %s, %s ]", chunk.xCoord(), chunk.zCoord()));

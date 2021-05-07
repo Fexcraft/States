@@ -151,7 +151,7 @@ public class MunicipalityCmd extends CommandBase {
 						if(mun.isCapital()){
 							if(mun.getState().getMunicipalities().size() > 0){
 								mun.getState().setCapitalId(-1);
-								mun.getState().setChanged(Time.getDate());
+								mun.getState().created.update();
 								mun.getState().save();
 							}
 							else{
@@ -160,7 +160,7 @@ public class MunicipalityCmd extends CommandBase {
 						}
 						mun.setState(playerstate);
 						mun.getCouncil().clear();
-						mun.setChanged(Time.getDate());
+						mun.created.update();
 						mun.setHead(null);
 						mun.price.reset();
 						mun.save();
@@ -185,7 +185,7 @@ public class MunicipalityCmd extends CommandBase {
 					return;
 				}
 				mun.getCouncil().remove(ply.getUUID());
-				mun.setChanged(Time.getDate());
+				mun.created.update();
 				mun.save();
 				StateUtil.announce(server, AnnounceLevel.MUNICIPALITY, ply.getFormattedNickname() + " &9left the Municipality Council!", mun.getId());
 				Print.log(StateLogger.player(player) + " left of the council of " + StateLogger.municipality(mun) + ".");
@@ -405,13 +405,12 @@ public class MunicipalityCmd extends CommandBase {
 						throw new Exception("Tried to create new Municipality with ID '" + newmun.getId() + "', but savefile already exists.");
 					}
 					else{
-						newmun.setCreator(ply.getUUID());
+						newmun.created.create(ply.getUUID());
 						newmun.setName(name);
 						newmun.setHead(ply.getUUID());
 						newmun.r_OPEN.set(false);
 						newmun.price.reset();
 						newmun.getCitizen().add(ply.getUUID());
-						newmun.setChanged(Time.getDate());
 						newmun.getCouncil().add(ply.getUUID());
 						newmun.setState(ply.getState());
 						//
@@ -420,14 +419,13 @@ public class MunicipalityCmd extends CommandBase {
 							throw new Exception("Tried to create new District with ID '" + newmun.getId() + "', but savefile already exists.");
 						}
 						else{
-							newdis.setCreator(ply.getUUID());
+							newdis.created.create(ply.getUUID());
 							newdis.setName("Center");
 							newdis.setHead(ply.getUUID());
 							newdis.r_CFS.set(false);
 							newdis.setMunicipality(newmun);
 							newdis.price.reset();
 							newdis.setType(DistrictType.VILLAGE);
-							newdis.setChanged(Time.getDate());
 							//
 							//Now let's save stuff.
 							long halfprice = price / 2;
@@ -437,9 +435,8 @@ public class MunicipalityCmd extends CommandBase {
 								newdis.save(); States.DISTRICTS.put(newdis.getId(), newdis);
 								chunk.setDistrict(newdis); chunk.save();
 								chunk.setType(ChunkType.MUNICIPAL);
-								chunk.setChanged(Time.getDate());
 								chunk.price.reset();
-								chunk.setClaimer(ply.getUUID());
+								chunk.created.setClaimer(ply.getUUID());
 								ply.setMunicipality(newmun);
 								StateUtil.announce(server, "&9New Municipality and District was created!");
 								StateUtil.announce(server, "&9Created by " + ply.getFormattedNickname());

@@ -230,7 +230,7 @@ public class PlayerEvents {
 				return false;
 			}
 			else if(chunk.getDistrict().getId() == -2){
-				if(chunk.getChanged() + Time.DAY_MS < Time.getDate()){
+				if(chunk.created.getChanged() + Time.DAY_MS < Time.getDate()){
 					chunk.setDistrict(StateUtil.getDistrict(-1));
 					chunk.save();
 					Print.chat(player, "Updating chunk...");

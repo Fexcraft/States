@@ -6,7 +6,6 @@ import static net.fexcraft.mod.states.guis.GuiHandler.openGui;
 
 import java.util.List;
 
-import net.fexcraft.lib.common.math.Time;
 import net.fexcraft.lib.mc.utils.Print;
 import net.fexcraft.mod.fsmm.api.Bank;
 import net.fexcraft.mod.states.States;
@@ -142,12 +141,10 @@ public class DistrictCmd extends CommandBase {
 							long halfprice = price / 2;
 							if(halfprice == 0 || bank.processAction(Bank.Action.TRANSFER, sender, ply.getMunicipality().getAccount(), halfprice, States.SERVERACCOUNT)){
 								bank.processAction(Bank.Action.TRANSFER, null, ply.getMunicipality().getAccount(), halfprice, States.SERVERACCOUNT);
-								newdis.setCreator(ply.getUUID());
+								newdis.created.create(ply.getUUID());
 								newdis.setClaimedChunks(1);
 								newdis.setName(name);
 								newdis.r_CFS.set(false);
-								newdis.setCreated(Time.getDate());
-								newdis.setChanged(Time.getDate());
 								newdis.setHead(ply.getUUID());
 								newdis.setMunicipality(ply.getMunicipality());
 								newdis.price.reset();

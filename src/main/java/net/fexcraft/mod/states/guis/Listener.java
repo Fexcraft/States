@@ -4,7 +4,6 @@ import static net.fexcraft.mod.states.guis.GuiHandler.openGui;
 
 import java.awt.Color;
 
-import net.fexcraft.lib.common.math.Time;
 import net.fexcraft.lib.mc.api.packet.IPacketListener;
 import net.fexcraft.lib.mc.network.PacketHandler;
 import net.fexcraft.lib.mc.network.packet.PacketNBTTagCompound;
@@ -264,8 +263,7 @@ public class Listener implements IPacketListener<PacketNBTTagCompound> {
 						}
 					}
 					ck.setDistrict(dis);
-					ck.setClaimer(player.getGameProfile().getId());
-					ck.setChanged(Time.getDate());
+					ck.created.setClaimer(player.getGameProfile().getId());
 					if(dis.getId() != -2){
 						ck.price.set(0);
 					}
@@ -303,8 +301,7 @@ public class Listener implements IPacketListener<PacketNBTTagCompound> {
 				return compound;
 			}
 			ck.setDistrict(dis);
-			ck.setClaimer(player.getGameProfile().getId());
-			ck.setChanged(Time.getDate());
+			ck.created.setClaimer(player.getGameProfile().getId());
 			ck.save();
 			Print.log(StateLogger.player(player) + " re-claimed " + StateLogger.chunk(ck) + ", it is now part of " + StateLogger.district(dis) + ".");
 			//ImageCache.update(world, ch);
@@ -313,8 +310,7 @@ public class Listener implements IPacketListener<PacketNBTTagCompound> {
 					Chunk chunk = StateUtil.getTempChunk(loc);
 					if(chunk != null){
 						chunk.setDistrict(dis);
-						chunk.setClaimer(player.getGameProfile().getId());
-						chunk.setChanged(Time.getDate());
+						chunk.created.setClaimer(player.getGameProfile().getId());
 						chunk.save();
 						//ImageCache.update(world, world.getChunk(chunk.xCoord(), chunk.zCoord()));
 					}

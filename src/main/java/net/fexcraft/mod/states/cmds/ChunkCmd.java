@@ -206,9 +206,8 @@ public class ChunkCmd extends CommandBase {
 								return;
 							}
 						}
-						chunk.setClaimer(player.getGameProfile().getId());
+						chunk.created.setClaimer(player.getGameProfile().getId());
 						chunk.setDistrict(StateUtil.getDistrict(-1));
-						chunk.setChanged(Time.getDate());
 						chunk.setType(ChunkType.NORMAL);
 						chunk.price.reset();
 						chunk.save();
@@ -240,9 +239,8 @@ public class ChunkCmd extends CommandBase {
 										}
 									}
 								}
-								ck.setClaimer(player.getGameProfile().getId());
+								ck.created.setClaimer(player.getGameProfile().getId());
 								ck.setDistrict(StateUtil.getDistrict(-1));
-								ck.setChanged(Time.getDate());
 								ck.setType(ChunkType.NORMAL);
 								ck.price.reset();
 								ck.save();
@@ -343,7 +341,7 @@ public class ChunkCmd extends CommandBase {
 					chunk.setOwner(player.getGameProfile().getId().toString());
 					chunk.price.reset();
 					chunk.setType(ChunkType.PRIVATE);
-					chunk.setChanged(time);
+					chunk.created.update(time);
 					chunk.save();
 					Print.chat(sender, "&aChunk bought!");
 					Print.log(StateLogger.player(player) + " bought the " + StateLogger.chunk(chunk) + "!");
@@ -353,7 +351,7 @@ public class ChunkCmd extends CommandBase {
 							ck.setOwner(player.getGameProfile().getId().toString());
 							ck.price.reset();
 							ck.setType(ChunkType.PRIVATE);
-							ck.setChanged(time);
+							ck.created.update(time);
 							ck.save();
 							Print.log(StateLogger.player(player) + " received the " + StateLogger.chunk(ck) + " which was linked to " + StateLogger.chunk(chunk) + "!");
 						}

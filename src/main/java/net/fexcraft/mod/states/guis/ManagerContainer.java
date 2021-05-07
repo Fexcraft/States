@@ -120,13 +120,13 @@ public class ManagerContainer extends GenericContainer {
 				addKey(list, "type", dis.getType().name().toLowerCase(), ViewMode.EDIT);
 				addKey(list, "color", dis.color.getString(), ViewMode.EDIT);
 				addKey(list, "chunk_tax", dis.getChunkTax() > 0 ? ggas(dis.getChunkTax()) : NOTAX, ViewMode.EDIT);
-				addKey(list, "last_edited", time(dis.getChanged()), ViewMode.NONE);
+				addKey(list, "last_edited", time(dis.created.getChanged()), ViewMode.NONE);
 				addKey(list, "neighbors", dis.getNeighbors().size(), ViewMode.LIST);
 				addKey(list, "chunks", dis.getClaimedChunks(), ViewMode.NONE);
 				addKey(list, "canforsettle", dis.r_CFS.get(), ViewMode.BOOL);
 				addKey(list, "unifbank", dis.r_ONBANKRUPT.get(), ViewMode.BOOL);
-				addKey(list, "creator", Static.getPlayerNameByUUID(dis.getCreator()), ViewMode.NONE);
-				addKey(list, "created", time(dis.getCreated()), ViewMode.NONE);
+				addKey(list, "creator", Static.getPlayerNameByUUID(dis.created.getCreator()), ViewMode.NONE);
+				addKey(list, "created", time(dis.created.getCreated()), ViewMode.NONE);
 				addKey(list, "ruleset", dis.getRulesetTitle(), ViewMode.EDIT);
 				addKey(list, "mailbox", dis.mailbox.asString(), ViewMode.RESET);
 				addKey(list, "icon", dis.icon.getn(), ViewMode.EDIT);
@@ -148,15 +148,15 @@ public class ManagerContainer extends GenericContainer {
 				addKey(list, "citizen", mun.getCitizen().size(), ViewMode.LIST);
 				addKey(list, "balance", ggas(mun.getAccount().getBalance()), ViewMode.GOTO);
 				addKey(list, "citizen_tax", mun.getCitizenTax() > 0 ? ggas(mun.getCitizenTax()) : NOTAX, ViewMode.EDIT);
-				addKey(list, "last_edited", time(mun.getChanged()), ViewMode.NONE);
+				addKey(list, "last_edited", time(mun.created.getChanged()), ViewMode.NONE);
 				addKey(list, "council", mun.getCouncil().size(), ViewMode.LIST);
 				addKey(list, "districts", mun.getDistricts().size() + " / " + mun.getDistrictLimit(), ViewMode.LIST);
 				addKey(list, "neighbors", mun.getNeighbors().size(), ViewMode.LIST);
 				addKey(list, "opentojoin", mun.r_OPEN.get(), ViewMode.BOOL);
 				addKey(list, "kickbankrupt", mun.r_KIB.get(), ViewMode.BOOL);
 				addKey(list, "chunks", mun.getClaimedChunks() + "/" + mun.getChunkLimit(), ViewMode.NONE);
-				addKey(list, "creator", Static.getPlayerNameByUUID(mun.getCreator()), ViewMode.NONE);
-				addKey(list, "created", time(mun.getCreated()), ViewMode.NONE);
+				addKey(list, "creator", Static.getPlayerNameByUUID(mun.created.getCreator()), ViewMode.NONE);
+				addKey(list, "created", time(mun.created.getCreated()), ViewMode.NONE);
 				addKey(list, "forcechunks", mun.getForceLoadedChunks() == null ? NONE : mun.getForceLoadedChunks().size(), ViewMode.NONE);
 				addKey(list, "ruleset", mun.getRulesetTitle(), ViewMode.EDIT);
 				addKey(list, "mailbox", mun.mailbox.asString(), ViewMode.RESET);
@@ -177,12 +177,12 @@ public class ManagerContainer extends GenericContainer {
 				addKey(list, "balance", ggas(state.getAccount().getBalance()), ViewMode.GOTO);
 				addKey(list, "chunk_tax", state.getChunkTaxPercentage() + "%", ViewMode.EDIT);
 				addKey(list, "citizen_tax", state.getCitizenTaxPercentage() + "%", ViewMode.EDIT);
-				addKey(list, "last_edited", time(state.getChanged()), ViewMode.NONE);
+				addKey(list, "last_edited", time(state.created.getChanged()), ViewMode.NONE);
 				addKey(list, "council", state.getCouncil().size(), ViewMode.LIST);
 				addKey(list, "municipalities", state.getMunicipalities().size(), ViewMode.LIST);
 				addKey(list, "neighbors", state.getNeighbors().size(), ViewMode.LIST);
-				addKey(list, "creator", Static.getPlayerNameByUUID(state.getCreator()), ViewMode.NONE);
-				addKey(list, "created", time(state.getCreated()), ViewMode.NONE);
+				addKey(list, "creator", Static.getPlayerNameByUUID(state.created.getCreator()), ViewMode.NONE);
+				addKey(list, "created", time(state.created.getCreated()), ViewMode.NONE);
 				addKey(list, "ruleset", state.getRulesetTitle(), ViewMode.EDIT);
 				addKey(list, "mailbox", state.mailbox.asString(), ViewMode.RESET);
 				addKey(list, "blacklist", state.getBlacklist().size(), ViewMode.LIST);
@@ -210,16 +210,16 @@ public class ManagerContainer extends GenericContainer {
 				addKey(list, "price", chunk.price.asString(), ViewMode.EDIT);
 				addKey(list, "tax", chunk.getCustomTax() > 0 ? ggas(chunk.getCustomTax()) + "c" : chunk.getDistrict().getChunkTax() > 0 ? ggas(chunk.getDistrict().getChunkTax()) + "d" : NOTAX, ViewMode.EDIT);
 				addKey(list, "type", chunk.getType().name().toLowerCase(), ViewMode.EDIT);
-				addKey(list, "last_edited", time(chunk.getChanged()), ViewMode.NONE);
+				addKey(list, "last_edited", time(chunk.created.getChanged()), ViewMode.NONE);
 				addKey(list, "last_taxcoll", time(chunk.lastTaxCollection()), ViewMode.NONE);
 				addKey(list, "linked_chunks", chunk.getLinkedChunks().size() > 0 ? chunk.getLinkedChunks().size() : NONE, ViewMode.LIST);
 				addKey(list, "linked_to", chunk.getLink() == null ? NOTHING : chunk.getLink().x + ", " + chunk.getLink().z, ViewMode.GOTO);
 				addKey(list, "whitelist", chunk.getPlayerWhitelist().size(), ViewMode.LIST);
 				addKey(list, chunk.getType().interactPrefix() + "_interact", chunk.interact(), ViewMode.BOOL);
-				addKey(list, "claimed_by", Static.getPlayerNameByUUID(chunk.getClaimer()), ViewMode.NONE);
-				addKey(list, "claimed_at", time(chunk.getCreated()), ViewMode.NONE);
+				addKey(list, "claimed_by", Static.getPlayerNameByUUID(chunk.created.getClaimer()), ViewMode.NONE);
+				addKey(list, "claimed_at", time(chunk.created.getCreated()), ViewMode.NONE);
 				if(chunk.getDistrict().getId() == -2){
-					addKey(list, "transit", time(chunk.getChanged() + Time.DAY_MS), ViewMode.NONE);
+					addKey(list, "transit", time(chunk.created.getChanged() + Time.DAY_MS), ViewMode.NONE);
 				}
 				if(chunk.isForceLoaded()){
 					addKey(list, "forceloaded", "true", ViewMode.NONE);
@@ -394,7 +394,7 @@ public class ManagerContainer extends GenericContainer {
 											break;
 										}
 										dis.setName(value);
-										dis.setChanged(Time.getDate());
+										dis.created.update();
 										dis.save();
 										sendViewData();
 										Print.log(StateLogger.player(player) + " changed name of " + StateLogger.district(dis) + " to " + dis.getName() + ".");
@@ -414,7 +414,7 @@ public class ManagerContainer extends GenericContainer {
 											break;
 										}
 										dis.setHead(gp.getId());
-										dis.setChanged(Time.getDate());
+										dis.created.update();
 										dis.save();
 										sendViewData();
 										Print.log(StateLogger.player(player) + " changed manager of " + StateLogger.district(dis) + " to " + StateLogger.player(gp) + ".");
@@ -428,7 +428,7 @@ public class ManagerContainer extends GenericContainer {
 											Long price = Long.parseLong(value);
 											if(price < 0){ price = 0l; }
 											dis.price.set(price);
-											dis.setChanged(Time.getDate());
+											dis.created.update();
 											dis.save();
 											sendViewData();
 											Print.log(StateLogger.player(player) + " changed price of " + StateLogger.district(dis) + " to " + dis.price.asWorth() + ".");
@@ -446,7 +446,7 @@ public class ManagerContainer extends GenericContainer {
 											DistrictType type = DistrictType.valueOf(value.toUpperCase());
 											if(type != null){
 												dis.setType(type);
-												dis.setChanged(Time.getDate());
+												dis.created.update();
 												dis.save();
 											}
 											sendViewData();
@@ -468,7 +468,7 @@ public class ManagerContainer extends GenericContainer {
 												break;
 											}
 											dis.color.set(str);
-											dis.setChanged(Time.getDate());
+											dis.created.update();
 											dis.save();
 											sendViewData();
 											Print.log(StateLogger.player(player) + " changed color of " + StateLogger.district(dis) + " to " + dis.color.getString() + ".");
@@ -484,14 +484,14 @@ public class ManagerContainer extends GenericContainer {
 									if(dis.isAuthorized(dis.r_SET_CHUNKTAX.id, cap.getUUID()).isTrue() || bypass(player)){
 										if(value.equals("reset") || value.equals("disable")){
 											dis.setChunkTax(0);
-											dis.setChanged(Time.getDate());
+											dis.created.update();
 											dis.save();
 											sendViewData();
 											Print.log(StateLogger.player(player) + " set the 'chunk-tax' of " + StateLogger.district(dis) + " to " + dis.getChunkTax());
 										}
 										else if(NumberUtils.isCreatable(value)){
 											dis.setChunkTax(Long.parseLong(value));
-											dis.setChanged(Time.getDate());
+											dis.created.update();
 											dis.save();
 											sendViewData();
 											Print.log(StateLogger.player(player) + " set the 'chunk-tax' of " + StateLogger.district(dis) + " to " + dis.getChunkTax());
@@ -510,7 +510,7 @@ public class ManagerContainer extends GenericContainer {
 								case "canforsettle":{
 									if(dis.isAuthorized(dis.r_CFS.id, cap.getUUID()).isTrue() || bypass(player)){
 										dis.r_CFS.set(!dis.r_CFS.get());
-										dis.setChanged(Time.getDate());
+										dis.created.update();
 										dis.save();
 										this.sendViewData();
 										Print.log(StateLogger.player(player) + " changed 'can-foreigners-settle' of " + StateLogger.district(dis) + " to " + dis.r_CFS.get() + ".");
@@ -521,7 +521,8 @@ public class ManagerContainer extends GenericContainer {
 								case "unifbank":{
 									if(dis.isAuthorized(dis.r_ONBANKRUPT.id, cap.getUUID()).isTrue() || bypass(player)){
 										dis.r_ONBANKRUPT.set(!dis.r_ONBANKRUPT.get());
-										dis.setChanged(Time.getDate()); dis.save();
+										dis.created.update();
+										dis.save();
 										this.sendViewData();
 										Print.log(StateLogger.player(player) + " changed 'unclaim-if-brankrupt' of " + StateLogger.district(dis) + " to " + dis.r_ONBANKRUPT.get() + ".");
 									}
@@ -536,7 +537,7 @@ public class ManagerContainer extends GenericContainer {
 											break;
 										}
 										dis.setRulesetTitle(value);
-										dis.setChanged(Time.getDate());
+										dis.created.update();
 										dis.save();
 										sendViewData();
 										Print.log(StateLogger.player(player) + " changed ruleset name of " + StateLogger.district(dis) + " to " + dis.getName() + ".");
@@ -547,7 +548,7 @@ public class ManagerContainer extends GenericContainer {
 								case "mailbox":{
 									if(dis.isAuthorized(dis.r_SET_MAILBOX.id, cap.getUUID()).isTrue() || bypass(player)){
 										dis.mailbox.reset();
-										dis.setChanged(Time.getDate());
+										dis.created.update();
 										dis.save();
 										sendViewData();
 										Print.log(StateLogger.player(player) + " reset mailbox location of" + StateLogger.district(dis) + ".");
@@ -559,7 +560,7 @@ public class ManagerContainer extends GenericContainer {
 									if(dis.isAuthorized(dis.r_SET_ICON.id, cap.getUUID()).isTrue() || bypass(player)){
 										try{
 											dis.icon.set(value);
-											dis.setChanged(Time.getDate());
+											dis.created.update();
 											dis.save();
 											sendViewData();
 											Print.log(StateLogger.player(player) + " changed icon of " + StateLogger.district(dis) + " to " + dis.icon.getn() + ".");
@@ -574,7 +575,7 @@ public class ManagerContainer extends GenericContainer {
 								case "explosion":{
 									if(dis.isAuthorized(dis.r_ALLOW_EXPLOSIONS.id, cap.getUUID()).isTrue() || bypass(player)){
 										dis.r_ALLOW_EXPLOSIONS.set(!dis.r_ALLOW_EXPLOSIONS.get());
-										dis.setChanged(Time.getDate());
+										dis.created.update();
 										dis.save();
 										this.sendViewData();
 										Print.log(StateLogger.player(player) + " changed 'allow-explosions' of " + StateLogger.district(dis) + " to " + dis.r_ALLOW_EXPLOSIONS.get() + ".");
@@ -595,7 +596,7 @@ public class ManagerContainer extends GenericContainer {
 											break;
 										}
 										mun.setName(value);
-										mun.setChanged(Time.getDate());
+										mun.created.update();
 										mun.save();
 										sendViewData();
 										Print.log(StateLogger.player(player) + " changed name of " + StateLogger.municipality(mun) + " to " + mun.getName() + ".");
@@ -631,7 +632,7 @@ public class ManagerContainer extends GenericContainer {
 											break;
 										}
 										mun.setHead(gp.getId());
-										mun.setChanged(Time.getDate());
+										mun.created.update();
 										mun.save();
 										sendViewData();
 										Print.log(StateLogger.player(player) + " changed mayor of " + StateLogger.municipality(mun) + " to " + StateLogger.player(gp) + ".");
@@ -645,7 +646,7 @@ public class ManagerContainer extends GenericContainer {
 											Long price = Long.parseLong(value);
 											if(price < 0){ price = 0l; }
 											mun.price.set(price);
-											mun.setChanged(Time.getDate());
+											mun.created.update();
 											mun.save();
 											sendViewData();
 											Print.log(StateLogger.player(player) + " changed price of " + StateLogger.municipality(mun) + " to " + mun.price.asWorth() + ".");
@@ -665,7 +666,7 @@ public class ManagerContainer extends GenericContainer {
 												break;
 											}
 											mun.setTitle(value);
-											mun.setChanged(Time.getDate());
+											mun.created.update();
 											mun.save();
 											sendViewData();
 											Print.log(StateLogger.player(player) + " changed title of " + StateLogger.municipality(mun) + " to " + mun.getTitle() + ".");
@@ -686,7 +687,7 @@ public class ManagerContainer extends GenericContainer {
 												break;
 											}
 											mun.color.set(str);
-											mun.setChanged(Time.getDate());
+											mun.created.update();
 											mun.save();
 											sendViewData();
 											Print.log(StateLogger.player(player) + " changed color of " + StateLogger.municipality(mun) + " to " + mun.color.getString() + ".");
@@ -706,14 +707,14 @@ public class ManagerContainer extends GenericContainer {
 									if(mun.isAuthorized(mun.r_SET_CITIZENTAX.id, cap.getUUID()).isTrue() || bypass(player)){
 										if(value.equals("reset") || value.equals("disable")){
 											mun.setCitizenTax(0);
-											mun.setChanged(Time.getDate());
+											mun.created.update();
 											mun.save();
 											sendViewData();
 											Print.log(StateLogger.player(player) + " set the 'citizen-tax' of " + StateLogger.municipality(mun) + " to " + mun.getCitizenTax());
 										}
 										else if(NumberUtils.isCreatable(value)){
 											mun.setCitizenTax(Long.parseLong(value));
-											mun.setChanged(Time.getDate());
+											mun.created.update();
 											mun.save();
 											sendViewData();
 											Print.log(StateLogger.player(player) + " set the 'citizen-tax' of " + StateLogger.municipality(mun) + " to " + mun.getCitizenTax());
@@ -740,7 +741,7 @@ public class ManagerContainer extends GenericContainer {
 								case "opentojoin":{
 									if(mun.isAuthorized(mun.r_OPEN.id, cap.getUUID()).isTrue() || bypass(player)){
 										mun.r_OPEN.set(!mun.r_OPEN.get());
-										mun.setChanged(Time.getDate());
+										mun.created.update();
 										mun.save();
 										sendViewData();
 										Print.log(StateLogger.player(player) + " set " + StateLogger.municipality(mun) + " to " + (mun.r_OPEN.get() ? "OPEN" : "CLOSED") + ".");
@@ -751,7 +752,7 @@ public class ManagerContainer extends GenericContainer {
 								case "kickbankrupt":{
 									if(mun.isAuthorized(mun.r_KIB.id, cap.getUUID()).isTrue() || bypass(player)){
 										mun.r_KIB.set(!mun.r_KIB.get());
-										mun.setChanged(Time.getDate());
+										mun.created.update();
 										mun.save();
 										sendViewData();
 										Print.log(StateLogger.player(player) + " changed 'kick-if-brankrupt' of " + StateLogger.municipality(mun) + " to " + mun.r_OPEN.get() + ".");
@@ -767,7 +768,7 @@ public class ManagerContainer extends GenericContainer {
 											break;
 										}
 										mun.setRulesetTitle(value);
-										mun.setChanged(Time.getDate());
+										mun.created.update();
 										mun.save();
 										sendViewData();
 										Print.log(StateLogger.player(player) + " changed ruleset name of " + StateLogger.municipality(mun) + " to " + mun.getName() + ".");
@@ -778,7 +779,7 @@ public class ManagerContainer extends GenericContainer {
 								case "mailbox":{
 									if(mun.isAuthorized(mun.r_SET_MAILBOX.id, cap.getUUID()).isTrue() || bypass(player)){
 										mun.mailbox.reset();
-										mun.setChanged(Time.getDate());
+										mun.created.update();
 										mun.save();
 										sendViewData();
 										Print.log(StateLogger.player(player) + " reset mailbox location of" + StateLogger.municipality(mun) + ".");
@@ -794,7 +795,7 @@ public class ManagerContainer extends GenericContainer {
 									if(mun.isAuthorized(mun.r_ICON.id, cap.getUUID()).isTrue() || bypass(player)){
 										try{
 											mun.icon.set(value);
-											mun.setChanged(Time.getDate());
+											mun.created.update();
 											mun.save();
 											sendViewData();
 											Print.log(StateLogger.player(player) + " changed icon of " + StateLogger.municipality(mun) + " to " + mun.icon.getn() + ".");
@@ -817,7 +818,7 @@ public class ManagerContainer extends GenericContainer {
 											break;
 										}
 										state.setName(value);
-										state.setChanged(Time.getDate());
+										state.created.update();
 										state.save();
 										sendViewData();
 										Print.log(StateLogger.player(player) + " set the name of " + StateLogger.state(state) + " to " + state.getName());
@@ -833,7 +834,7 @@ public class ManagerContainer extends GenericContainer {
 											break;
 										}
 										state.setCapitalId(mun.getId());
-										state.setChanged(Time.getDate());
+										state.created.update();
 										state.save();
 										sendViewData();
 										StateUtil.announce(null, AnnounceLevel.STATE_ALL, translate("states.announce.state.new_capital", mun.getId()), state.getId());
@@ -867,7 +868,7 @@ public class ManagerContainer extends GenericContainer {
 											break;
 										}
 										state.setHead(gp.getId());
-										state.setChanged(Time.getDate());
+										state.created.update();
 										state.save();
 										sendViewData();
 										Print.log(StateLogger.player(player) + " changed leader of " + StateLogger.state(state) + " to " + StateLogger.player(gp) + ".");
@@ -881,7 +882,7 @@ public class ManagerContainer extends GenericContainer {
 											Long price = Long.parseLong(value);
 											if(price < 0){ price = 0l; }
 											state.price.set(price);
-											state.setChanged(Time.getDate());
+											state.created.update();
 											state.save();
 											sendViewData();
 											Print.log(StateLogger.player(player) + " set the price of " + StateLogger.state(state) + " to " + state.price.asWorth());
@@ -902,7 +903,7 @@ public class ManagerContainer extends GenericContainer {
 												break;
 											}
 											state.color.set(str);
-											state.setChanged(Time.getDate());
+											state.created.update();
 											state.save();
 											sendViewData();
 											Print.log(StateLogger.player(player) + " set the color of " + StateLogger.state(state) + " to " + state.color.getString());
@@ -922,7 +923,7 @@ public class ManagerContainer extends GenericContainer {
 									if(state.isAuthorized(state.r_SET_CHUNK_TAX_PERCENT.id, cap.getUUID()).isTrue() || bypass(player)){
 										if(value.equals("reset") || value.equals("disable")){
 											state.setChunkTaxPercentage((byte)0);
-											state.setChanged(Time.getDate());
+											state.created.update();
 											state.save();
 											sendViewData();
 											Print.log(StateLogger.player(player) + " set the 'chunk-tax-percentage' of " + StateLogger.state(state) + " to " + state.getChunkTaxPercentage());
@@ -931,7 +932,7 @@ public class ManagerContainer extends GenericContainer {
 											byte byt = Byte.parseByte(value);
 											if(byt > 100){ byt = 100; } if(byt < 0){ byt = 0; }
 											state.setChunkTaxPercentage(byt);
-											state.setChanged(Time.getDate());
+											state.created.update();
 											state.save();
 											sendViewData();
 											Print.log(StateLogger.player(player) + " set the 'chunk-tax-percentage' of " + StateLogger.state(state) + " to " + state.getChunkTaxPercentage());
@@ -947,7 +948,7 @@ public class ManagerContainer extends GenericContainer {
 									if(state.isAuthorized(state.r_SET_CITIZEN_TAX_PERCENT.id, cap.getUUID()).isTrue() || bypass(player)){
 										if(value.equals("reset") || value.equals("disable")){
 											state.setCitizenTaxPercentage((byte)0);
-											state.setChanged(Time.getDate());
+											state.created.update();
 											state.save();
 											sendViewData();Print.log(StateLogger.player(player) + " set the 'citizen-tax-percentage' of " + StateLogger.state(state) + " to " + state.getChunkTaxPercentage());
 										}
@@ -955,7 +956,7 @@ public class ManagerContainer extends GenericContainer {
 											byte byt = Byte.parseByte(value);
 											if(byt > 100){ byt = 100; } if(byt < 0){ byt = 0; }
 											state.setCitizenTaxPercentage(byt);
-											state.setChanged(Time.getDate());
+											state.created.update();
 											state.save();
 											sendViewData();
 											Print.log(StateLogger.player(player) + " set the 'citizen-tax-percentage' of " + StateLogger.state(state) + " to " + state.getChunkTaxPercentage());
@@ -986,7 +987,7 @@ public class ManagerContainer extends GenericContainer {
 											break;
 										}
 										state.setRulesetTitle(value);
-										state.setChanged(Time.getDate());
+										state.created.update();
 										state.save();
 										sendViewData();
 										Print.log(StateLogger.player(player) + " set the ruleset name of " + StateLogger.state(state) + " to " + state.getName());
@@ -997,7 +998,7 @@ public class ManagerContainer extends GenericContainer {
 								case "mailbox":{
 									if(state.isAuthorized(state.r_SET_MAILBOX.id, cap.getUUID()).isTrue() || bypass(player)){
 										state.mailbox.reset();
-										state.setChanged(Time.getDate());
+										state.created.update();
 										state.save();
 										sendViewData();
 										Print.log(StateLogger.player(player) + " reset mailbox location of" + StateLogger.state(state) + ".");
@@ -1013,7 +1014,7 @@ public class ManagerContainer extends GenericContainer {
 									if(state.isAuthorized(state.r_SET_ICON.id, cap.getUUID()).isTrue() || bypass(player)){
 										try{
 											state.icon.set(value);
-											state.setChanged(Time.getDate());
+											state.created.update();
 											state.save();
 											sendViewData();
 											Print.log(StateLogger.player(player) + " set the icon of " + StateLogger.state(state) + " to " + state.icon.getn());
@@ -1106,7 +1107,7 @@ public class ManagerContainer extends GenericContainer {
 										try{
 											Long price = Long.parseLong(value);
 											chunk.price.set(price);
-											chunk.setChanged(Time.getDate());
+											chunk.created.update();
 											chunk.save();
 											sendViewData();
 											Print.log(StateLogger.player(player) + " set the price of the " + StateLogger.chunk(chunk) + " to " + chunk.price.asWorth() + ".");
@@ -1160,13 +1161,13 @@ public class ManagerContainer extends GenericContainer {
 													chunk.setType(type);
 													chunk.setOwner(null);
 													chunk.price.set(0);
-													chunk.setChanged(time);
+													chunk.created.update(time);
 													chunk.getLinkedChunks().forEach(link -> {
 														Chunk ck = StateUtil.getTempChunk(link);
 														ck.setType(type);
 														ck.setOwner(null);
 														ck.price.set(0);
-														ck.setChanged(time);
+														ck.created.update(time);
 														ck.save();
 														Print.log(StateLogger.player(player) + " gave the linked " + StateLogger.chunk(ck) + " to the " + to + ".");
 													});
@@ -1181,11 +1182,11 @@ public class ManagerContainer extends GenericContainer {
 												}
 												case PUBLIC:{
 													chunk.setType(type);
-													chunk.setChanged(time);
+													chunk.created.update(time);
 													chunk.getLinkedChunks().forEach(link -> {
 														Chunk ck = StateUtil.getTempChunk(link);
 														ck.setType(type);
-														ck.setChanged(time);
+														ck.created.update(time);
 														ck.save();
 														Print.log(StateLogger.player(player) + " set the type of linked " + StateLogger.chunk(ck) + " to PUBLIC.");
 													});
@@ -1223,7 +1224,7 @@ public class ManagerContainer extends GenericContainer {
 								case "interact":{
 									if(isPermitted(chunk, player, true)){
 										chunk.interact(!chunk.interact());
-										chunk.setChanged(Time.getDate());
+										chunk.created.update();
 										chunk.save();
 										sendViewData();
 										Print.log(StateLogger.player(player) + " set '" + chunk.getType().interactPrefix() + "_interact' of the " + StateLogger.chunk(chunk) + " to " + chunk.interact() + ".");
@@ -1383,10 +1384,10 @@ public class ManagerContainer extends GenericContainer {
 									return;
 								}
 								kicktar.setState(StateUtil.getState(-1));
-								kicktar.setChanged(Time.getDate());
+								kicktar.created.update();
 								kicktar.save();
 								state.getMunicipalities().removeIf(val -> val == kicktar.getId());
-								state.setChanged(Time.getDate());
+								state.created.update();
 								state.save();
 								StateUtil.announce(null, AnnounceLevel.STATE, "Municipality of " + kicktar.getName() + " was removed from our State!", state.getId());
 								Print.log(StateLogger.player(player) + " kicked " + StateLogger.municipality(kicktar) + " from the State of " + StateLogger.state(state));
@@ -1405,7 +1406,7 @@ public class ManagerContainer extends GenericContainer {
 									return;
 								}
 								mun.getCouncil().remove((UUID)list_values[index]);
-								mun.setChanged(Time.getDate());
+								mun.created.update();
 								mun.save();
 								String name = Static.getPlayerNameByUUID((UUID)list_values[index]);
 								StateUtil.announce(null, AnnounceLevel.MUNICIPALITY, name + " &9was removed from the Municipality Council!", mun.getId());
@@ -1425,7 +1426,7 @@ public class ManagerContainer extends GenericContainer {
 									return;
 								}
 								state.getCouncil().remove((UUID)list_values[index]);
-								state.setChanged(Time.getDate());
+								state.created.update();
 								state.save();
 								String name = Static.getPlayerNameByUUID((UUID)list_values[index]);
 								StateUtil.announce(null, AnnounceLevel.MUNICIPALITY, name + " &9was removed from the State Council!", state.getId());
@@ -1555,10 +1556,10 @@ public class ManagerContainer extends GenericContainer {
 									return;
 								}
 								ck.setLink(chunk.getChunkPos());
-								ck.setChanged(Time.getDate());
+								ck.created.update();
 								ck.save();
 								chunk.getLinkedChunks().add(new int[]{ x, z });
-								chunk.setChanged(Time.getDate());
+								chunk.created.update();
 								chunk.save();
 								Print.log(StateLogger.player(player) + " linked " + StateLogger.chunk(ck) + " to " + StateLogger.chunk(chunk) + ".");
 								sendListData();

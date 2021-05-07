@@ -29,7 +29,6 @@ import net.fexcraft.mod.states.data.root.ExternalDataHolder;
 import net.fexcraft.mod.states.data.root.Initiator;
 import net.fexcraft.mod.states.data.root.Layer;
 import net.fexcraft.mod.states.data.root.Ruleable;
-import net.fexcraft.mod.states.data.root.VoteHolder;
 import net.fexcraft.mod.states.data.sub.Buyable;
 import net.fexcraft.mod.states.data.sub.ColorData;
 import net.fexcraft.mod.states.data.sub.Createable;
@@ -43,7 +42,7 @@ import net.fexcraft.mod.states.util.StateUtil;
 import net.minecraft.command.ICommandSender;
 import net.minecraftforge.common.MinecraftForge;
 
-public class Municipality implements ChildLayer, AccountHolder, Ruleable, VoteHolder, Abandonable, ExternalDataHolder {
+public class Municipality implements ChildLayer, AccountHolder, Ruleable, Abandonable, ExternalDataHolder {
 	
 	private int id;
 	private String name, title;

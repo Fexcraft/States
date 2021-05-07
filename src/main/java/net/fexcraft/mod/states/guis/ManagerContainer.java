@@ -135,10 +135,10 @@ public class ManagerContainer extends GenericContainer {
 			case MUNICIPALITY:
 				addKey(list, "id", mun.getId(), ViewMode.NONE);
 				addKey(list, "name", mun.getName(), ViewMode.EDIT);
-				if(mun.isAbandoned()){
-					addKey(list, "abandoned", mun.isAbandoned(), ViewMode.NONE);
-					addKey(list, "abandoned_since", mun.getAbandonedSince() == 0 ? UNKNOWN : time(mun.getAbandonedSince()), ViewMode.NONE);
-					addKey(list, "abandoned_by", mun.getAbandonedBy() == null ? UNKNOWN : Static.getPlayerNameByUUID(mun.getAbandonedBy()), ViewMode.NONE);
+				if(mun.abandon.isAbandoned()){
+					addKey(list, "abandoned", true, ViewMode.NONE);
+					addKey(list, "abandoned_since", mun.abandon.getSince() == 0 ? UNKNOWN : time(mun.abandon.getSince()), ViewMode.NONE);
+					addKey(list, "abandoned_by", mun.abandon.getBy() == null ? UNKNOWN : Static.getPlayerNameByUUID(mun.abandon.getBy()), ViewMode.NONE);
 				}
 				addKey(list, "state", mun.getState().getName() + " (" + mun.getState().getId() + ")", ViewMode.GOTO);
 				addKey(list, "mayor", mun.getHead() == null ? NOONE : Static.getPlayerNameByUUID(mun.getHead()), ViewMode.EDIT);
@@ -162,8 +162,8 @@ public class ManagerContainer extends GenericContainer {
 				addKey(list, "mailbox", mun.mailbox.asString(), ViewMode.RESET);
 				addKey(list, "blacklist", mun.getPlayerBlacklist().size(), ViewMode.LIST);
 				addKey(list, "icon", mun.icon.getn(), ViewMode.EDIT);
-				if(!mun.isAbandoned()){
-					addKey(list, "abandoned", mun.isAbandoned(), ViewMode.NONE);
+				if(!mun.abandon.isAbandoned()){
+					addKey(list, "abandoned", false, ViewMode.NONE);
 				}
 				break;
 			case STATE:

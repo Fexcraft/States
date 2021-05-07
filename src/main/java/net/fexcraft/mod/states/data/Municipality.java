@@ -21,7 +21,6 @@ import net.fexcraft.mod.fsmm.api.Bank;
 import net.fexcraft.mod.fsmm.util.DataManager;
 import net.fexcraft.mod.states.States;
 import net.fexcraft.mod.states.data.capabilities.PlayerCapability;
-import net.fexcraft.mod.states.data.root.Abandonable;
 import net.fexcraft.mod.states.data.root.AccountHolder;
 import net.fexcraft.mod.states.data.root.ChildLayer;
 import net.fexcraft.mod.states.data.root.ExternalData;
@@ -29,6 +28,7 @@ import net.fexcraft.mod.states.data.root.ExternalDataHolder;
 import net.fexcraft.mod.states.data.root.Initiator;
 import net.fexcraft.mod.states.data.root.Layer;
 import net.fexcraft.mod.states.data.root.Ruleable;
+import net.fexcraft.mod.states.data.sub.Abandonable;
 import net.fexcraft.mod.states.data.sub.Buyable;
 import net.fexcraft.mod.states.data.sub.ColorData;
 import net.fexcraft.mod.states.data.sub.Createable;
@@ -42,7 +42,7 @@ import net.fexcraft.mod.states.util.StateUtil;
 import net.minecraft.command.ICommandSender;
 import net.minecraftforge.common.MinecraftForge;
 
-public class Municipality implements ChildLayer, AccountHolder, Ruleable, Abandonable, ExternalDataHolder {
+public class Municipality implements ChildLayer, AccountHolder, Ruleable, ExternalDataHolder {
 	
 	private int id;
 	private String name, title;
@@ -51,9 +51,9 @@ public class Municipality implements ChildLayer, AccountHolder, Ruleable, Abando
 	public Buyable price = new Buyable(this, Layer.MUNICIPALITY);
 	public MailData mailbox = new MailData();
 	public Createable created = new Createable();
-	private long citizentax, abandonedat;
-	private UUID mayor, abandonedby;
-	private boolean abandoned;
+	public Abandonable abandon;
+	private long citizentax;
+	private UUID mayor;
 	private Account account;
 	private ArrayList<Integer> neighbors, districts, com_blacklist;
 	private ArrayList<UUID> citizen, council, pl_blacklist;
@@ -88,9 +88,28 @@ public class Municipality implements ChildLayer, AccountHolder, Ruleable, Abando
 		icon.load(obj);
 		citizentax = JsonUtil.getIfExists(obj, "citizen_tax", 0).longValue();
 		mailbox.load(obj);
-		abandoned = JsonUtil.getIfExists(obj, "abandoned", false);
-		abandonedby = obj.has("abandoned_by") ? UUID.fromString(obj.get("abandoned_by").getAsString()) : null;
-		abandonedat = JsonUtil.getIfExists(obj, "abandoned_at", 0).longValue();
+		abandon = new Abandonable(this, mun -> {
+			council.clear();
+			ArrayList<UUID> list = (ArrayList<UUID>)citizen.clone();
+			list.forEach(citizen -> {
+				PlayerCapability cap = StateUtil.getPlayer(citizen, true);
+				cap.setMunicipality(StateUtil.getMunicipality(-1));
+				cap.save();
+			});
+			citizen.clear();
+			mayor = null;
+			save();
+		}, by -> {
+			council.clear();
+			council.add(by.getUUID());
+			citizen.clear();
+			citizen.add(by.getUUID());
+			setState(by.getState());
+			by.setMunicipality(this);
+			mayor = by.getUUID();
+			save();
+		});
+		abandon.load(obj);
 		ruleset_name = JsonUtil.getIfExists(obj, "ruleset", "Standard Ruleset");
 		rules.add(r_SET_NAME = new Rule("set.name", null, false, Initiator.COUNCIL_VOTE, Initiator.INCHARGE));
 		rules.add(r_SET_PRICE = new Rule("set.price", null, false, Initiator.COUNCIL_VOTE, Initiator.INCHARGE));
@@ -171,9 +190,7 @@ public class Municipality implements ChildLayer, AccountHolder, Ruleable, Abando
 		//obj.addProperty("kick_if_bankrupt", kib);
 		obj.addProperty("citizen_tax", citizentax);
 		mailbox.save(obj);
-		obj.addProperty("abandoned", abandoned);
-		if(abandonedby != null) obj.addProperty("abandoned_by", abandonedby.toString());
-		if(abandonedat != 0) obj.addProperty("abandoned_", abandonedat);
+		abandon.save(obj);
 		obj.addProperty("ruleset", ruleset_name);
 		{
 			JsonObject rells = new JsonObject();
@@ -377,53 +394,6 @@ public class Municipality implements ChildLayer, AccountHolder, Ruleable, Abando
 	@Override
 	public List<Vote> getActiveVotes(){
 		return active_votes;
-	}
-
-	@Override
-	public boolean isAbandoned(){
-		return abandoned;
-	}
-
-	@Override
-	public void setAbandoned(UUID by){
-		abandonedby = by;
-		abandonedat = Time.getDate();
-		abandoned = true;
-		council.clear();
-		ArrayList<UUID> list = (ArrayList<UUID>)citizen.clone();
-		list.forEach(citizen -> {
-			PlayerCapability cap = StateUtil.getPlayer(citizen, true);
-			cap.setMunicipality(StateUtil.getMunicipality(-1));
-			cap.save();
-		});
-		citizen.clear();
-		mayor = null;
-		save();
-	}
-
-	@Override
-	public long getAbandonedSince(){
-		return abandonedat;
-	}
-
-	@Override
-	public UUID getAbandonedBy(){
-		return abandonedby;
-	}
-
-	@Override
-	public void getAbandoned(PlayerCapability by){
-		abandonedby = null;
-		abandonedat = Time.getDate();
-		abandoned = false;
-		council.clear();
-		council.add(by.getUUID());
-		citizen.clear();
-		citizen.add(by.getUUID());
-		setState(by.getState());
-		by.setMunicipality(this);
-		mayor = by.getUUID();
-		save();
 	}
 
 	public int getDistrictLimit(){

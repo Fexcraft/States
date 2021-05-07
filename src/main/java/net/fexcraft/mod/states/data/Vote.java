@@ -335,7 +335,7 @@ public class Vote {
 				}
 				else{
 					Municipality mun = (Municipality)holder;
-					mun.setAbandoned(this.beginner);
+					mun.abandon.abandon(this.beginner);
 					StateUtil.announce(null, "&9A Municipality was voted to be abandoned!");
 					StateUtil.announce(null, "&9Name&0: &7" + mun.getName() + " &3(&6" + mun.getId() + "&3)");
 					StateUtil.announce(null, "&9By " + cap.getFormattedNickname());

@@ -463,7 +463,7 @@ public class MunicipalityCmd extends CommandBase {
 					Print.chat(player, "&cYou cannot abandon system municipalities.");
 					return;
 				}
-				if(mun.isAbandoned()){
+				if(mun.abandon.isAbandoned()){
 					Print.chat(player, "&cMunicipality is marked as abandoned already.");
 					return;
 				}
@@ -504,7 +504,7 @@ public class MunicipalityCmd extends CommandBase {
 					else{
 						Bank bank = DataManager.getBank(mun.getAccount().getBankId(), true, false);
 						if(MUNICIPALITY_ABANDONMENT_PRICE <= 0 || bank.processAction(Action.TRANSFER, player, mun.getAccount(), MUNICIPALITY_ABANDONMENT_PRICE, States.SERVERACCOUNT)){
-							mun.setAbandoned(player.getGameProfile().getId());
+							mun.abandon.abandon(player.getGameProfile().getId());
 							StateUtil.announce(server, "&9A Municipality became abandoned!");
 							StateUtil.announce(server, "&9Name&0: &7" + mun.getName() + " &3(&6" + mun.getId() + "&3)");
 							StateUtil.announce(server, "&9By " + ply.getFormattedNickname());
@@ -527,7 +527,7 @@ public class MunicipalityCmd extends CommandBase {
 					Print.chat(player, "&cYou cannot claim system municipalities.");
 					return;
 				}
-				if(!mun.isAbandoned()){
+				if(!mun.abandon.isAbandoned()){
 					Print.chat(player, "&cMunicipality is not marked as abandoned.");
 					return;
 				}
@@ -538,7 +538,7 @@ public class MunicipalityCmd extends CommandBase {
 					}
 					Bank bank = DataManager.getBank(mun.getAccount().getBankId(), true, false);
 					if(MUNICIPALITY_CLAIM_PRICE <= 0 || bank.processAction(Action.TRANSFER, player, ply.getAccount(), MUNICIPALITY_CLAIM_PRICE, States.SERVERACCOUNT)){
-						mun.getAbandoned(ply);
+						mun.abandon.claim(ply);
 						StateUtil.announce(server, "&9A Municipality has been claimed!");
 						StateUtil.announce(server, "&9Name&0: &7" + mun.getName() + " &3(&6" + mun.getId() + "&3)");
 						StateUtil.announce(server, "&9By " + ply.getFormattedNickname());

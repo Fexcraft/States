@@ -4,6 +4,7 @@ import net.fexcraft.lib.mc.gui.GenericGui;
 import net.fexcraft.lib.mc.utils.Formatter;
 import net.fexcraft.mod.states.data.root.Layer;
 import net.fexcraft.mod.states.data.sub.Buyable;
+import net.fexcraft.mod.states.data.sub.MailData;
 import net.fexcraft.mod.states.guis.ManagerContainer.Mode;
 import net.fexcraft.mod.states.guis.ManagerContainer.ViewMode;
 import net.minecraft.block.material.MapColor;
@@ -255,7 +256,7 @@ public class ManagerGui extends GenericGui<ManagerContainer> {
 						field.setText(I18n.format("states.manager_gui.view.no_tax"));
 						break;
 					}
-					case ManagerContainer.NOMAILBOX:{
+					case MailData.NOMAILBOX:{
 						field.setText(I18n.format("states.manager_gui.view.no_mailbox"));
 						break;
 					}

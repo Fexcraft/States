@@ -327,7 +327,7 @@ public class MailCmd extends CommandBase {
 					case "central":
 					case "state":{
 						State state = args[1].equals("state") ? cap.getState() : StateUtil.getState(-1);
-						if(state.getMailbox() == null){
+						if(state.mailbox.missing()){
 							if(args[1].equals("state")){
 								Print.chat(player, "&c&oState has no Mailbox set!");
 							}
@@ -336,15 +336,15 @@ public class MailCmd extends CommandBase {
 							}
 							return;
 						}
-						mailbox = state.getMailbox();
+						mailbox = state.mailbox.get();
 						break;
 					}
 					case "municipality":{
-						if(cap.getMunicipality().getMailbox() == null){
+						if(cap.getMunicipality().mailbox.missing()){
 							Print.chat(player, "&c&oMunicipality has no Mailbox set!");
 							return;
 						}
-						mailbox = cap.getMunicipality().getMailbox();
+						mailbox = cap.getMunicipality().mailbox.get();
 						break;
 					}
 					default:{

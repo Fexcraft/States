@@ -115,21 +115,21 @@ public class SignMailbox implements SignCapability.Listener {
 				tileentity.signText[0] = Formatter.newTextComponentString("&0[&3Mailbox&0]");
 				try{
 					switch(type){
-						case "state": chunk.getState().setMailbox(tileentity.getPos()); break;
-						case "municipality": chunk.getMunicipality().setMailbox(tileentity.getPos()); break;
-						case "district": chunk.getDistrict().setMailbox(tileentity.getPos()); break;
+						case "state": chunk.getState().mailbox.set(tileentity.getPos()); break;
+						case "municipality": chunk.getMunicipality().mailbox.set(tileentity.getPos()); break;
+						case "district": chunk.getDistrict().mailbox.set(tileentity.getPos()); break;
 						case "company": break;//TODO
 						case "player":{
 							if(event.getEntityPlayer().getGameProfile().getId().toString().equals(reci)){
-								event.getEntityPlayer().getCapability(StatesCapabilities.PLAYER, null).setMailbox(tileentity.getPos());
+								event.getEntityPlayer().getCapability(StatesCapabilities.PLAYER, null).getMailbox().set(tileentity.getPos());
 							}
 							else{
-								StateUtil.getPlayer(reci, true).setMailbox(tileentity.getPos());
+								StateUtil.getPlayer(reci, true).getMailbox().set(tileentity.getPos());
 							}
 							break;
 						}
 						case "central": case "fallback":{
-							StateUtil.getState(-1).setMailbox(tileentity.getPos());
+							StateUtil.getState(-1).mailbox.set(tileentity.getPos());
 							break;
 						}
 					}

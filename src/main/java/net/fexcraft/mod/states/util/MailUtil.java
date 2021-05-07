@@ -42,7 +42,8 @@ public class MailUtil {
 		try{//This was initially intended to run on a separate thread.
 			World world = Static.getServer().getWorld(0);
 			if(world == null){
-				printFailure(ics, 0, rectype, receiver, sender, message, type, expiry, compound, null, null); return false;
+				printFailure(ics, 0, rectype, receiver, sender, message, type, expiry, compound, null, null);
+				return false;
 			}
 			if(sender == null) sender = States.CONSOLE_UUID;
 			BlockPos mailbox = null; RecipientType rety = rectype; String rec = receiver.toString();
@@ -51,40 +52,52 @@ public class MailUtil {
 					case COMPANY: return false;//TODO
 					case DISTRICT:{
 						District dis = StateUtil.getDistrict(Integer.parseInt(rec));
-						if(dis.getMailbox() == null){
+						if(dis.mailbox.missing()){
 							rety = RecipientType.MUNICIPALITY; rec = dis.getMunicipality().getId() + "";
-							Print.chatnn(ics, "&c&oDistrict &7&oMailbox not found, redirecting to &a&oMunicipality&7&o."); continue;
-						} else mailbox = dis.getMailbox();
+							Print.chatnn(ics, "&c&oDistrict &7&oMailbox not found, redirecting to &a&oMunicipality&7&o.");
+							continue;
+						}
+						else mailbox = dis.mailbox.get();
 						break;
 					}
 					case MUNICIPALITY:{
 						Municipality mun = StateUtil.getMunicipality(Integer.parseInt(rec));
-						if(mun.getMailbox() == null){
+						if(mun.mailbox.missing()){
 							rety = RecipientType.STATE; rec = mun.getState().getId() + "";
-							Print.chatnn(ics, "&c&oMunicipality &7&oMailbox not found, redirecting to &a&oState&7&o."); continue;
-						} else mailbox = mun.getMailbox();
+							Print.chatnn(ics, "&c&oMunicipality &7&oMailbox not found, redirecting to &a&oState&7&o.");
+							continue;
+						}
+						else mailbox = mun.mailbox.get();
 						break;
 					}
 					case PLAYER:{
 						PlayerCapability cap = StateUtil.getPlayer(rec.toString(), true);
-						if(cap == null){ printFailure(ics, 1, rectype, receiver, sender, message, type, expiry, compound, rety, rec); return false; }
-						if(cap.getMailbox() == null){
+						if(cap == null){
+							printFailure(ics, 1, rectype, receiver, sender, message, type, expiry, compound, rety, rec);
+							return false;
+						}
+						if(cap.getMailbox().missing()){
 							rety = RecipientType.MUNICIPALITY; rec = cap.getMunicipality().getId() + "";
-							Print.chatnn(ics, "&c&oPlayer &7&oMailbox not found, redirecting to &a&oMunicipality&7&o."); continue;
-						} else mailbox = cap.getMailbox();
+							Print.chatnn(ics, "&c&oPlayer &7&oMailbox not found, redirecting to &a&oMunicipality&7&o.");
+							continue;
+						}
+						else mailbox = cap.getMailbox().get();
 						break;
 					}
 					case STATE:{
 						State state = StateUtil.getState(Integer.parseInt(rec));
-						if(state.getMailbox() == null){
+						if(state.mailbox.missing()){
 							if(state.getId() >= 0){
 								rety = RecipientType.STATE; rec = "-1";
-								Print.chatnn(ics, "&c&oState &7&oMailbox not found, redirecting to &a&oServer/Fallback&7&o."); continue;
+								Print.chatnn(ics, "&c&oState &7&oMailbox not found, redirecting to &a&oServer/Fallback&7&o.");
+								continue;
 							}
 							else{
-								printFailure(ics, 1, rectype, receiver, sender, message, type, expiry, compound, rety, rec); return false;
+								printFailure(ics, 1, rectype, receiver, sender, message, type, expiry, compound, rety, rec);
+								return false;
 							}
-						} else mailbox = state.getMailbox();
+						}
+						else mailbox = state.mailbox.get();
 						break;
 					}
 				}
@@ -92,7 +105,8 @@ public class MailUtil {
 			if(world.isBlockLoaded(mailbox)){
 				TileEntity tile = Static.getServer().getWorld(0).getTileEntity(mailbox);
 				if(tile == null){
-					printFailure(ics, 2, rectype, receiver, sender, message, type, expiry, compound, null, null); return false;
+					printFailure(ics, 2, rectype, receiver, sender, message, type, expiry, compound, null, null);
+					return false;
 				}
 				SignMailbox sign = tile.getCapability(FCLCapabilities.SIGN_CAPABILITY, null).getListener(SignMailbox.class, SignMailbox.RESLOC);
 				if(!insert(null, sign, rectype, receiver.toString(), sender, message, type, expiry, compound)){

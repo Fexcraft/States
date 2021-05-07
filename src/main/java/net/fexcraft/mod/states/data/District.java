@@ -20,18 +20,17 @@ import net.fexcraft.mod.states.data.root.ExternalData;
 import net.fexcraft.mod.states.data.root.ExternalDataHolder;
 import net.fexcraft.mod.states.data.root.Initiator;
 import net.fexcraft.mod.states.data.root.Layer;
-import net.fexcraft.mod.states.data.root.MailReceiver;
 import net.fexcraft.mod.states.data.root.Ruleable;
 import net.fexcraft.mod.states.data.sub.Buyable;
 import net.fexcraft.mod.states.data.sub.ColorData;
 import net.fexcraft.mod.states.data.sub.IconHolder;
+import net.fexcraft.mod.states.data.sub.MailData;
 import net.fexcraft.mod.states.events.DistrictEvent;
 import net.fexcraft.mod.states.util.RuleMap;
 import net.fexcraft.mod.states.util.StateUtil;
-import net.minecraft.util.math.BlockPos;
 import net.minecraftforge.common.MinecraftForge;
 
-public class District implements ChildLayer, MailReceiver, Ruleable, ExternalDataHolder {
+public class District implements ChildLayer, Ruleable, ExternalDataHolder {
 	
 	private int id, chunks;
 	private DistrictType type;
@@ -42,8 +41,8 @@ public class District implements ChildLayer, MailReceiver, Ruleable, ExternalDat
 	public IconHolder icon = new IconHolder();
 	public ColorData color = new ColorData();
 	public Buyable price = new Buyable(this, Layer.DISTRICT);
+	public MailData mailbox = new MailData();
 	private Municipality municipality;
-	private BlockPos mailbox;
 	private TreeMap<String, ExternalData> datas = new TreeMap<>();
 	//
 	private RuleMap rules = new RuleMap();
@@ -69,7 +68,7 @@ public class District implements ChildLayer, MailReceiver, Ruleable, ExternalDat
 		icon.load(obj);
 		chunks = JsonUtil.getIfExists(obj, "chunks", 0).intValue();
 		chunktax = JsonUtil.getIfExists(obj, "chunktax", 0).longValue();
-		mailbox = obj.has("mailbox") ? BlockPos.fromLong(obj.get("mailbox").getAsLong()) : null;
+		mailbox.load(obj);
 		ruleset = JsonUtil.getIfExists(obj, "ruleset", "Standard Ruleset");
 		rules.add(r_CFS = new Rule("can_foreigners_settle", false, false, Initiator.COUNCIL_ANY, Initiator.INCHARGE));
 		rules.add(r_ONBANKRUPT = new Rule("unclaim_chunks_if_bankrupt", false, false, Initiator.COUNCIL_ANY, Initiator.INCHARGE));
@@ -140,7 +139,7 @@ public class District implements ChildLayer, MailReceiver, Ruleable, ExternalDat
 		obj.addProperty("chunks", chunks);
 		if(chunktax > 0){ obj.addProperty("chunktax", chunktax); }
 		//obj.addProperty("unclaim_chunks_if_bankrupt", onbankrupt);
-		if(mailbox != null) obj.addProperty("mailbox", mailbox.toLong());
+		mailbox.save(obj);
 		obj.addProperty("ruleset", ruleset);
 		{
 			JsonObject rells = new JsonObject();
@@ -259,16 +258,6 @@ public class District implements ChildLayer, MailReceiver, Ruleable, ExternalDat
 
 	public void setChunkTax(long tax){
 		chunktax = tax;
-	}
-
-	@Override
-	public BlockPos getMailbox(){
-		return mailbox;
-	}
-
-	@Override
-	public void setMailbox(BlockPos pos){
-		this.mailbox = pos;
 	}
 
 	public State getState(){

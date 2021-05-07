@@ -21,26 +21,35 @@ import net.fexcraft.mod.fsmm.api.Bank;
 import net.fexcraft.mod.fsmm.util.DataManager;
 import net.fexcraft.mod.states.States;
 import net.fexcraft.mod.states.data.capabilities.PlayerCapability;
-import net.fexcraft.mod.states.data.root.*;
+import net.fexcraft.mod.states.data.root.Abandonable;
+import net.fexcraft.mod.states.data.root.AccountHolder;
+import net.fexcraft.mod.states.data.root.ChildLayer;
+import net.fexcraft.mod.states.data.root.ExternalData;
+import net.fexcraft.mod.states.data.root.ExternalDataHolder;
+import net.fexcraft.mod.states.data.root.Initiator;
+import net.fexcraft.mod.states.data.root.Layer;
+import net.fexcraft.mod.states.data.root.Ruleable;
+import net.fexcraft.mod.states.data.root.VoteHolder;
 import net.fexcraft.mod.states.data.sub.Buyable;
 import net.fexcraft.mod.states.data.sub.ColorData;
 import net.fexcraft.mod.states.data.sub.IconHolder;
+import net.fexcraft.mod.states.data.sub.MailData;
 import net.fexcraft.mod.states.events.MunicipalityEvent;
 import net.fexcraft.mod.states.util.ForcedChunksManager;
 import net.fexcraft.mod.states.util.RuleMap;
 import net.fexcraft.mod.states.util.StConfig;
 import net.fexcraft.mod.states.util.StateUtil;
 import net.minecraft.command.ICommandSender;
-import net.minecraft.util.math.BlockPos;
 import net.minecraftforge.common.MinecraftForge;
 
-public class Municipality implements ChildLayer, AccountHolder, MailReceiver, Ruleable, VoteHolder, Abandonable, ExternalDataHolder {
+public class Municipality implements ChildLayer, AccountHolder, Ruleable, VoteHolder, Abandonable, ExternalDataHolder {
 	
 	private int id;
 	private String name, title;
 	public IconHolder icon = new IconHolder();
 	public ColorData color = new ColorData();
 	public Buyable price = new Buyable(this, Layer.MUNICIPALITY);
+	public MailData mailbox = new MailData();
 	private long created, changed, citizentax, abandonedat;
 	private UUID creator, mayor, abandonedby;
 	private boolean abandoned;
@@ -48,7 +57,6 @@ public class Municipality implements ChildLayer, AccountHolder, MailReceiver, Ru
 	private ArrayList<Integer> neighbors, districts, com_blacklist;
 	private ArrayList<UUID> citizen, council, pl_blacklist;
 	private State state;
-	private BlockPos mailbox;
 	private TreeMap<String, ExternalData> datas = new TreeMap<>();
 	//
 	private RuleMap rules = new RuleMap();
@@ -80,7 +88,7 @@ public class Municipality implements ChildLayer, AccountHolder, MailReceiver, Ru
 		price.load(obj);
 		icon.load(obj);
 		citizentax = JsonUtil.getIfExists(obj, "citizen_tax", 0).longValue();
-		mailbox = obj.has("mailbox") ? BlockPos.fromLong(obj.get("mailbox").getAsLong()) : null;
+		mailbox.load(obj);
 		abandoned = JsonUtil.getIfExists(obj, "abandoned", false);
 		abandonedby = obj.has("abandoned_by") ? UUID.fromString(obj.get("abandoned_by").getAsString()) : null;
 		abandonedat = JsonUtil.getIfExists(obj, "abandoned_at", 0).longValue();
@@ -165,7 +173,7 @@ public class Municipality implements ChildLayer, AccountHolder, MailReceiver, Ru
 		icon.save(obj);
 		//obj.addProperty("kick_if_bankrupt", kib);
 		obj.addProperty("citizen_tax", citizentax);
-		if(mailbox != null) obj.addProperty("mailbox", mailbox.toLong());
+		mailbox.save(obj);
 		obj.addProperty("abandoned", abandoned);
 		if(abandonedby != null) obj.addProperty("abandoned_by", abandonedby.toString());
 		if(abandonedat != 0) obj.addProperty("abandoned_", abandonedat);
@@ -367,16 +375,6 @@ public class Municipality implements ChildLayer, AccountHolder, MailReceiver, Ru
 	@Override
 	public Bank getBank(){
 		return DataManager.getBank(account.getBankId(), true, true);
-	}
-
-	@Override
-	public BlockPos getMailbox(){
-		return mailbox;
-	}
-
-	@Override
-	public void setMailbox(BlockPos pos){
-		this.mailbox = pos;
 	}
 
 	@Override

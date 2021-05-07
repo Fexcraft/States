@@ -159,22 +159,25 @@ public class PlayerEvents {
 				switch(sign.getType()){
 					case "state":{
 						State state = chunk.getState();
-						if(state.getMailbox() != null && state.getMailbox().equals(event.getPos())){
-							state.setMailbox(null); state.save();
+						if(state.mailbox.exists() && state.mailbox.get().equals(event.getPos())){
+							state.mailbox.reset();
+							state.save();
 						}
 						return;
 					}
 					case "municipality":{
 						Municipality mun = chunk.getMunicipality();
-						if(mun.getMailbox() != null && mun.getMailbox().equals(event.getPos())){
-							mun.setMailbox(null); mun.save();
+						if(mun.mailbox.exists() && mun.mailbox.get().equals(event.getPos())){
+							mun.mailbox.reset();
+							mun.save();
 						}
 						return;
 					}
 					case "district":{
 						District dis = chunk.getDistrict();
-						if(dis.getMailbox() != null && dis.getMailbox().equals(event.getPos())){
-							dis.setMailbox(null); dis.save();
+						if(dis.mailbox.exists() && dis.mailbox.get().equals(event.getPos())){
+							dis.mailbox.reset();
+							dis.save();
 						}
 						return;
 					}
@@ -182,15 +185,17 @@ public class PlayerEvents {
 					case "player":{
 						UUID uuid = UUID.fromString(sign.getReceiver());
 						PlayerCapability playercap = StateUtil.getPlayer(uuid, true);
-						if(playercap.getMailbox() != null && playercap.getMailbox().equals(event.getPos())){
-							playercap.setMailbox(null); playercap.save();
+						if(playercap.getMailbox().exists() && playercap.getMailbox().get().equals(event.getPos())){
+							playercap.getMailbox().reset();
+							playercap.save();
 						}
 						return;
 					}
 					case "central": case "fallback":{
 						State state = StateUtil.getState(-1);
-						if(state.getMailbox() != null && state.getMailbox().equals(event.getPos())){
-							state.setMailbox(null); state.save();
+						if(state.mailbox.exists() && state.mailbox.get().equals(event.getPos())){
+							state.mailbox.reset();
+							state.save();
 						}
 						return;
 					}

@@ -24,31 +24,30 @@ import net.fexcraft.mod.states.data.root.ExternalData;
 import net.fexcraft.mod.states.data.root.ExternalDataHolder;
 import net.fexcraft.mod.states.data.root.Initiator;
 import net.fexcraft.mod.states.data.root.Layer;
-import net.fexcraft.mod.states.data.root.MailReceiver;
 import net.fexcraft.mod.states.data.root.Ruleable;
 import net.fexcraft.mod.states.data.sub.Buyable;
 import net.fexcraft.mod.states.data.sub.ColorData;
 import net.fexcraft.mod.states.data.sub.IconHolder;
+import net.fexcraft.mod.states.data.sub.MailData;
 import net.fexcraft.mod.states.events.StateEvent;
 import net.fexcraft.mod.states.util.RuleMap;
 import net.fexcraft.mod.states.util.StateUtil;
-import net.minecraft.util.math.BlockPos;
 import net.minecraftforge.common.MinecraftForge;
 
-public class State implements ChildLayer, AccountHolder, MailReceiver, Ruleable, ExternalDataHolder {
+public class State implements ChildLayer, AccountHolder, Ruleable, ExternalDataHolder {
 
 	private int id, capital;
 	private String name;
 	public IconHolder icon = new IconHolder();
 	public ColorData color = new ColorData();
 	public Buyable price = new Buyable(this, Layer.UNION);
+	public MailData mailbox = new MailData();
 	private long created, changed;
 	private UUID creator, leader;
 	private Account account;
 	private ArrayList<Integer> neighbors, municipalities, blacklist;
 	private ArrayList<UUID> council;
 	private byte chunktaxpercent, citizentaxpercent;
-	private BlockPos mailbox;
 	private TreeMap<String, ExternalData> datas = new TreeMap<>();
 	//
 	private String ruleset;
@@ -78,7 +77,7 @@ public class State implements ChildLayer, AccountHolder, MailReceiver, Ruleable,
 		icon.load(obj);
 		chunktaxpercent = JsonUtil.getIfExists(obj, "chunk_tax_percent", 0).byteValue();
 		citizentaxpercent = JsonUtil.getIfExists(obj, "citizen_tax_percent", 0).byteValue();
-		mailbox = obj.has("mailbox") ? BlockPos.fromLong(obj.get("mailbox").getAsLong()) : null;
+		mailbox.load(obj);
 		ruleset = JsonUtil.getIfExists(obj, "ruleset", "Standard Ruleset");
 		rules.add(r_CREATE_SIGN_SHOP = new Rule("create.sign-shops", null, false, Initiator.INCHARGE, Initiator.COUNCIL_ANY));
 		rules.add(r_SET_MAILBOX = new Rule("set.mailbox", null, false, Initiator.COUNCIL_VOTE, Initiator.INCHARGE));
@@ -156,7 +155,7 @@ public class State implements ChildLayer, AccountHolder, MailReceiver, Ruleable,
 		if(citizentaxpercent > 0){
 			obj.addProperty("citizen_tax_percent", citizentaxpercent);
 		}
-		if(mailbox != null) obj.addProperty("mailbox", mailbox.toLong());
+		mailbox.save(obj);
 		obj.addProperty("ruleset", ruleset);
 		{
 			JsonObject rells = new JsonObject();
@@ -292,16 +291,6 @@ public class State implements ChildLayer, AccountHolder, MailReceiver, Ruleable,
 	@Override
 	public Bank getBank(){
 		return DataManager.getBank(account.getBankId(), true, true);
-	}
-
-	@Override
-	public BlockPos getMailbox(){
-		return mailbox;
-	}
-
-	@Override
-	public void setMailbox(BlockPos pos){
-		this.mailbox = pos;
 	}
 
 	@Override

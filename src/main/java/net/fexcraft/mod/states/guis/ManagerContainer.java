@@ -44,7 +44,6 @@ import net.minecraftforge.fml.relauncher.Side;
 public class ManagerContainer extends GenericContainer {
 	
 	protected static final String NOTAX = "no_tax";
-	protected static final String NOMAILBOX = "no_mailbox";
 	protected static final String NOONE = "no_one";
 	protected static final String NONE = "none";
 	protected static final String UNKNOWN = "unknown";
@@ -129,7 +128,7 @@ public class ManagerContainer extends GenericContainer {
 				addKey(list, "creator", Static.getPlayerNameByUUID(dis.getCreator()), ViewMode.NONE);
 				addKey(list, "created", time(dis.getCreated()), ViewMode.NONE);
 				addKey(list, "ruleset", dis.getRulesetTitle(), ViewMode.EDIT);
-				addKey(list, "mailbox", dis.getMailbox() == null ? NOMAILBOX : dis.getMailbox().toString(), ViewMode.RESET);
+				addKey(list, "mailbox", dis.mailbox.asString(), ViewMode.RESET);
 				addKey(list, "icon", dis.icon.getn(), ViewMode.EDIT);
 				addKey(list, "explosion", dis.r_ALLOW_EXPLOSIONS.get(), ViewMode.BOOL);
 				break;
@@ -160,7 +159,7 @@ public class ManagerContainer extends GenericContainer {
 				addKey(list, "created", time(mun.getCreated()), ViewMode.NONE);
 				addKey(list, "forcechunks", mun.getForceLoadedChunks() == null ? NONE : mun.getForceLoadedChunks().size(), ViewMode.NONE);
 				addKey(list, "ruleset", mun.getRulesetTitle(), ViewMode.EDIT);
-				addKey(list, "mailbox", mun.getMailbox() == null ? NOMAILBOX : mun.getMailbox().toString(), ViewMode.RESET);
+				addKey(list, "mailbox", mun.mailbox.asString(), ViewMode.RESET);
 				addKey(list, "blacklist", mun.getPlayerBlacklist().size(), ViewMode.LIST);
 				addKey(list, "icon", mun.icon.getn(), ViewMode.EDIT);
 				if(!mun.isAbandoned()){
@@ -185,7 +184,7 @@ public class ManagerContainer extends GenericContainer {
 				addKey(list, "creator", Static.getPlayerNameByUUID(state.getCreator()), ViewMode.NONE);
 				addKey(list, "created", time(state.getCreated()), ViewMode.NONE);
 				addKey(list, "ruleset", state.getRulesetTitle(), ViewMode.EDIT);
-				addKey(list, "mailbox", state.getMailbox() == null ? NOMAILBOX : state.getMailbox().toString(), ViewMode.RESET);
+				addKey(list, "mailbox", state.mailbox.asString(), ViewMode.RESET);
 				addKey(list, "blacklist", state.getBlacklist().size(), ViewMode.LIST);
 				addKey(list, "icon", state.icon.getn(), ViewMode.EDIT);
 				break;
@@ -202,7 +201,7 @@ public class ManagerContainer extends GenericContainer {
 				addKey(list, "custom_tax", cap.getCustomTax() > 0 ? ggas(cap.getCustomTax()) : NONE, ViewMode.RESET);
 				addKey(list, "balance", ggas(cap.getAccount().getBalance()), ViewMode.GOTO);
 				addKey(list, "bank", cap.getBank().getName(), ViewMode.GOTO);
-				addKey(list, "mailbox", cap.getMailbox() == null ? NOMAILBOX : cap.getMailbox().toString(), ViewMode.RESET);
+				addKey(list, "mailbox", cap.getMailbox().asString(), ViewMode.RESET);
 				break;
 			case CHUNK:
 				addKey(list, "coords", chunk.xCoord() + ", " + chunk.zCoord(), ViewMode.NONE);
@@ -547,7 +546,7 @@ public class ManagerContainer extends GenericContainer {
 								}
 								case "mailbox":{
 									if(dis.isAuthorized(dis.r_SET_MAILBOX.id, cap.getUUID()).isTrue() || bypass(player)){
-										dis.setMailbox(null);
+										dis.mailbox.reset();
 										dis.setChanged(Time.getDate());
 										dis.save();
 										sendViewData();
@@ -778,7 +777,7 @@ public class ManagerContainer extends GenericContainer {
 								}
 								case "mailbox":{
 									if(mun.isAuthorized(mun.r_SET_MAILBOX.id, cap.getUUID()).isTrue() || bypass(player)){
-										mun.setMailbox(null);
+										mun.mailbox.reset();
 										mun.setChanged(Time.getDate());
 										mun.save();
 										sendViewData();
@@ -997,7 +996,7 @@ public class ManagerContainer extends GenericContainer {
 								}
 								case "mailbox":{
 									if(state.isAuthorized(state.r_SET_MAILBOX.id, cap.getUUID()).isTrue() || bypass(player)){
-										state.setMailbox(null);
+										state.mailbox.reset();
 										state.setChanged(Time.getDate());
 										state.save();
 										sendViewData();
@@ -1067,7 +1066,7 @@ public class ManagerContainer extends GenericContainer {
 									break;
 								}
 								case "mailbox":{
-									cap.setMailbox(null);
+									cap.getMailbox().reset();
 									cap.save();
 									sendViewData();
 									break;

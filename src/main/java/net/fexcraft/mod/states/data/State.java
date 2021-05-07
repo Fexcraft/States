@@ -302,8 +302,7 @@ public class State implements ChildLayer, AccountHolder, Ruleable, ExternalDataH
 
 	@Override
 	public List<Vote> getActiveVotes(){
-		// TODO Auto-generated method stub
-		return null;
+		return active_votes;
 	}
 
 	@Override

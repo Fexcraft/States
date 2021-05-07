@@ -15,13 +15,15 @@ import com.google.gson.JsonObject;
 import net.fexcraft.lib.common.json.JsonUtil;
 import net.fexcraft.lib.common.math.Time;
 import net.fexcraft.mod.states.States;
-import net.fexcraft.mod.states.data.root.BuyableType;
+import net.fexcraft.mod.states.data.root.ChildLayer;
 import net.fexcraft.mod.states.data.root.ExternalData;
 import net.fexcraft.mod.states.data.root.ExternalDataHolder;
 import net.fexcraft.mod.states.data.root.IconHolder;
 import net.fexcraft.mod.states.data.root.Initiator;
+import net.fexcraft.mod.states.data.root.Layer;
 import net.fexcraft.mod.states.data.root.MailReceiver;
 import net.fexcraft.mod.states.data.root.Ruleable;
+import net.fexcraft.mod.states.data.sub.Buyable;
 import net.fexcraft.mod.states.data.sub.ColorData;
 import net.fexcraft.mod.states.events.DistrictEvent;
 import net.fexcraft.mod.states.util.RuleMap;
@@ -29,15 +31,16 @@ import net.fexcraft.mod.states.util.StateUtil;
 import net.minecraft.util.math.BlockPos;
 import net.minecraftforge.common.MinecraftForge;
 
-public class District implements BuyableType, IconHolder, MailReceiver, Ruleable, ExternalDataHolder {
+public class District implements ChildLayer, IconHolder, MailReceiver, Ruleable, ExternalDataHolder {
 	
 	private int id, chunks;
 	private DistrictType type;
-	private long created, changed, price, chunktax;
+	private long created, changed, chunktax;
 	private UUID creator, manager;
 	private ArrayList<Integer> neighbors;
 	private String name, icon;
 	public ColorData color = new ColorData();
+	public Buyable price = new Buyable(this, Layer.DISTRICT);
 	private Municipality municipality;
 	private BlockPos mailbox;
 	private TreeMap<String, ExternalData> datas = new TreeMap<>();
@@ -61,7 +64,7 @@ public class District implements BuyableType, IconHolder, MailReceiver, Ruleable
 		municipality = StateUtil.getMunicipality(JsonUtil.getIfExists(obj, "municipality", -1).intValue());
 		manager = obj.has("manager") ? UUID.fromString(obj.get("manager").getAsString()) : null;
 		color.load(obj);
-		price = JsonUtil.getIfExists(obj, "price", 0).longValue();
+		price.load(obj);
 		icon = JsonUtil.getIfExists(obj, "icon", States.DEFAULT_ICON);
 		chunks = JsonUtil.getIfExists(obj, "chunks", 0).intValue();
 		chunktax = JsonUtil.getIfExists(obj, "chunktax", 0).longValue();
@@ -131,7 +134,7 @@ public class District implements BuyableType, IconHolder, MailReceiver, Ruleable
 		if(!(manager == null)){ obj.addProperty("manager", manager.toString()); }
 		color.save(obj);
 		//obj.addProperty("can_foreigners_settle", cfs);
-		obj.addProperty("price", price);
+		price.save(obj);
 		if(icon != null){ obj.addProperty("icon", icon); }
 		obj.addProperty("chunks", chunks);
 		if(chunktax > 0){ obj.addProperty("chunktax", chunktax); }
@@ -242,16 +245,6 @@ public class District implements BuyableType, IconHolder, MailReceiver, Ruleable
 	}
 
 	@Override
-	public long getPrice(){
-		return price;
-	}
-
-	@Override
-	public void setPrice(long new_price){
-		price = new_price;
-	}
-
-	@Override
 	public String getIcon(){
 		return icon;
 	}
@@ -349,6 +342,16 @@ public class District implements BuyableType, IconHolder, MailReceiver, Ruleable
 	@Override
 	public Map<String, ExternalData> getExternalObjects(){
 		return datas;
+	}
+
+	@Override
+	public int getParentId(){
+		return municipality.getId();
+	}
+
+	@Override
+	public Layer getParentLayer(){
+		return Layer.MUNICIPALITY;
 	}
 
 }

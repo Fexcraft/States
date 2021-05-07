@@ -14,18 +14,21 @@ import net.fexcraft.lib.common.json.JsonUtil;
 import net.fexcraft.lib.common.math.Time;
 import net.fexcraft.lib.mc.utils.Print;
 import net.fexcraft.mod.states.States;
-import net.fexcraft.mod.states.data.root.BuyableType;
+import net.fexcraft.mod.states.data.root.ChildLayer;
+import net.fexcraft.mod.states.data.root.Layer;
 import net.fexcraft.mod.states.data.root.Taxable;
+import net.fexcraft.mod.states.data.sub.Buyable;
 import net.fexcraft.mod.states.util.StConfig;
 import net.fexcraft.mod.states.util.StateLogger;
 import net.fexcraft.mod.states.util.StateUtil;
 import net.fexcraft.mod.states.util.TaxSystem;
 import net.minecraft.world.World;
 
-public class Chunk implements BuyableType, Taxable/*, RuleHolder*/ {
+public class Chunk implements ChildLayer, Taxable/*, RuleHolder*/ {
 	
 	private District district;
-	private long price, created, changed, edited, lasttaxcheck, ctax;
+	private long created, changed, edited, lasttaxcheck, ctax;
+	public Buyable price = new Buyable(this, Layer.CHUNK);
 	private int x, z;
 	private ChunkPos link, pos;
 	private UUID creator;
@@ -67,7 +70,7 @@ public class Chunk implements BuyableType, Taxable/*, RuleHolder*/ {
 	}
 	
 	protected void parseJson(JsonObject obj){
-		price = JsonUtil.getIfExists(obj, "price", StConfig.DEFAULT_CHUNK_PRICE).longValue();
+		price.load(obj);
 		district = StateUtil.getDistrict(JsonUtil.getIfExists(obj, "district", -1).intValue());
 		created = JsonUtil.getIfExists(obj, "created", Time.getDate()).longValue();
 		creator = UUID.fromString(obj.has("creator") ? obj.get("creator").getAsString() : States.CONSOLE_UUID);
@@ -132,7 +135,7 @@ public class Chunk implements BuyableType, Taxable/*, RuleHolder*/ {
 		JsonObject obj = new JsonObject();
 		obj.addProperty("x", x);
 		obj.addProperty("z", z);
-		obj.addProperty("price", price);
+		price.save(obj);
 		obj.addProperty("district", district == null ? -1 : district.getId());
 		obj.addProperty("created", created);
 		obj.addProperty("creator", creator.toString());
@@ -176,14 +179,8 @@ public class Chunk implements BuyableType, Taxable/*, RuleHolder*/ {
 		return z;
 	}
 
-	@Override
-	public long getPrice(){
-		return this.getDistrict().getId() == -1 ? StConfig.DEFAULT_CHUNK_PRICE : price;
-	}
-
-	@Override
-	public void setPrice(long new_price){
-		price = new_price;
+	public long getCurrentPrice(){
+		return this.getDistrict().getId() == -1 ? StConfig.DEFAULT_CHUNK_PRICE : price.get();
 	}
 
 	public District getDistrict(){
@@ -352,6 +349,16 @@ public class Chunk implements BuyableType, Taxable/*, RuleHolder*/ {
 
 	public boolean interact(boolean bool){
 		return interact = bool;
+	}
+
+	@Override
+	public int getParentId(){
+		return district.getId();
+	}
+
+	@Override
+	public Layer getParentLayer(){
+		return Layer.DISTRICT;
 	}
 
 }

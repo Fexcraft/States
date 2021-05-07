@@ -189,7 +189,7 @@ public class StateCmd extends CommandBase {
 						newstate.setName(name);
 						newstate.setHead(ply.getUUID());
 						newstate.setCapitalId(ply.getMunicipality().getId());
-						newstate.setPrice(0);
+						newstate.price.reset();
 						newstate.getCouncil().add(ply.getUUID());
 						newstate.setChanged(Time.getDate());
 						//

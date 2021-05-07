@@ -19,13 +19,15 @@ import net.fexcraft.mod.fsmm.api.Bank;
 import net.fexcraft.mod.fsmm.util.DataManager;
 import net.fexcraft.mod.states.States;
 import net.fexcraft.mod.states.data.root.AccountHolder;
-import net.fexcraft.mod.states.data.root.BuyableType;
+import net.fexcraft.mod.states.data.root.ChildLayer;
 import net.fexcraft.mod.states.data.root.ExternalData;
 import net.fexcraft.mod.states.data.root.ExternalDataHolder;
 import net.fexcraft.mod.states.data.root.IconHolder;
 import net.fexcraft.mod.states.data.root.Initiator;
+import net.fexcraft.mod.states.data.root.Layer;
 import net.fexcraft.mod.states.data.root.MailReceiver;
 import net.fexcraft.mod.states.data.root.Ruleable;
+import net.fexcraft.mod.states.data.sub.Buyable;
 import net.fexcraft.mod.states.data.sub.ColorData;
 import net.fexcraft.mod.states.events.StateEvent;
 import net.fexcraft.mod.states.util.RuleMap;
@@ -33,12 +35,13 @@ import net.fexcraft.mod.states.util.StateUtil;
 import net.minecraft.util.math.BlockPos;
 import net.minecraftforge.common.MinecraftForge;
 
-public class State implements BuyableType, IconHolder, AccountHolder, MailReceiver, Ruleable, ExternalDataHolder {
+public class State implements ChildLayer, IconHolder, AccountHolder, MailReceiver, Ruleable, ExternalDataHolder {
 
 	private int id, capital;
 	private String name, icon;
 	public ColorData color = new ColorData();
-	private long created, changed, price;
+	public Buyable price = new Buyable(this, Layer.UNION);
+	private long created, changed;
 	private UUID creator, leader;
 	private Account account;
 	private ArrayList<Integer> neighbors, municipalities, blacklist;
@@ -70,7 +73,7 @@ public class State implements BuyableType, IconHolder, AccountHolder, MailReceiv
 		council = JsonUtil.jsonArrayToUUIDArray(JsonUtil.getIfExists(obj, "council", new JsonArray()).getAsJsonArray());
 		color.load(obj);
 		blacklist = JsonUtil.jsonArrayToIntegerArray(JsonUtil.getIfExists(obj, "blacklist", new JsonArray()).getAsJsonArray());
-		price = JsonUtil.getIfExists(obj, "price", 0).longValue();
+		price.load(obj);
 		icon = JsonUtil.getIfExists(obj, "icon", States.DEFAULT_ICON);
 		chunktaxpercent = JsonUtil.getIfExists(obj, "chunk_tax_percent", 0).byteValue();
 		citizentaxpercent = JsonUtil.getIfExists(obj, "citizen_tax_percent", 0).byteValue();
@@ -144,7 +147,7 @@ public class State implements BuyableType, IconHolder, AccountHolder, MailReceiv
 		obj.addProperty("balance", account.getBalance());
 		color.save(obj);
 		obj.add("blacklist", JsonUtil.getArrayFromIntegerList(blacklist));
-		obj.addProperty("price", price);
+		price.save(obj);
 		if(icon != null){ obj.addProperty("icon", icon); }
 		if(chunktaxpercent > 0){
 			obj.addProperty("chunk_tax_percent", chunktaxpercent);
@@ -262,16 +265,6 @@ public class State implements BuyableType, IconHolder, AccountHolder, MailReceiv
 	}
 
 	@Override
-	public long getPrice(){
-		return price;
-	}
-
-	@Override
-	public void setPrice(long new_price){
-		price = new_price;
-	}
-
-	@Override
 	public String getIcon(){
 		return icon;
 	}
@@ -369,6 +362,16 @@ public class State implements BuyableType, IconHolder, AccountHolder, MailReceiv
 	@Override
 	public Map<String, ExternalData> getExternalObjects(){
 		return datas;
+	}
+
+	@Override
+	public int getParentId(){
+		return 0;
+	}
+
+	@Override
+	public Layer getParentLayer(){
+		return Layer.UNION;
 	}
 	
 }

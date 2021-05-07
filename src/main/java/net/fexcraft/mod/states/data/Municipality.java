@@ -22,6 +22,7 @@ import net.fexcraft.mod.fsmm.util.DataManager;
 import net.fexcraft.mod.states.States;
 import net.fexcraft.mod.states.data.capabilities.PlayerCapability;
 import net.fexcraft.mod.states.data.root.*;
+import net.fexcraft.mod.states.data.sub.Buyable;
 import net.fexcraft.mod.states.data.sub.ColorData;
 import net.fexcraft.mod.states.events.MunicipalityEvent;
 import net.fexcraft.mod.states.util.ForcedChunksManager;
@@ -32,12 +33,13 @@ import net.minecraft.command.ICommandSender;
 import net.minecraft.util.math.BlockPos;
 import net.minecraftforge.common.MinecraftForge;
 
-public class Municipality implements BuyableType, IconHolder, AccountHolder, MailReceiver, Ruleable, VoteHolder, Abandonable, ExternalDataHolder {
+public class Municipality implements ChildLayer, IconHolder, AccountHolder, MailReceiver, Ruleable, VoteHolder, Abandonable, ExternalDataHolder {
 	
 	private int id;
 	private String name, icon, title;
 	public ColorData color = new ColorData();
-	private long created, changed, price, citizentax, abandonedat;
+	public Buyable price = new Buyable(this, Layer.MUNICIPALITY);
+	private long created, changed, citizentax, abandonedat;
 	private UUID creator, mayor, abandonedby;
 	private boolean abandoned;
 	private Account account;
@@ -73,7 +75,7 @@ public class Municipality implements BuyableType, IconHolder, AccountHolder, Mai
 		color.load(obj);
 		com_blacklist = JsonUtil.jsonArrayToIntegerArray(JsonUtil.getIfExists(obj, "company_blacklist", new JsonArray()).getAsJsonArray());
 		pl_blacklist = JsonUtil.jsonArrayToUUIDArray(JsonUtil.getIfExists(obj, "player_blacklist", new JsonArray()).getAsJsonArray());
-		price = JsonUtil.getIfExists(obj, "price", 0).longValue();
+		price.load(obj);
 		icon = JsonUtil.getIfExists(obj, "icon", States.DEFAULT_ICON);
 		citizentax = JsonUtil.getIfExists(obj, "citizen_tax", 0).longValue();
 		mailbox = obj.has("mailbox") ? BlockPos.fromLong(obj.get("mailbox").getAsLong()) : null;
@@ -157,7 +159,7 @@ public class Municipality implements BuyableType, IconHolder, AccountHolder, Mai
 		obj.addProperty("balance", account.getBalance());
 		color.save(obj);
 		//obj.addProperty("open", open);
-		obj.addProperty("price", price);
+		price.save(obj);
 		if(icon != null){ obj.addProperty("icon", icon); }
 		//obj.addProperty("kick_if_bankrupt", kib);
 		obj.addProperty("citizen_tax", citizentax);
@@ -292,16 +294,6 @@ public class Municipality implements BuyableType, IconHolder, AccountHolder, Mai
 
 	public List<Integer> getCompanyBlacklist(){
 		return com_blacklist;
-	}
-
-	@Override
-	public long getPrice(){
-		return price;
-	}
-
-	@Override
-	public void setPrice(long new_price){
-		price = new_price;
 	}
 
 	@Override
@@ -500,6 +492,16 @@ public class Municipality implements BuyableType, IconHolder, AccountHolder, Mai
 	@Override
 	public Map<String, ExternalData> getExternalObjects(){
 		return datas;
+	}
+
+	@Override
+	public int getParentId(){
+		return state.getId();
+	}
+
+	@Override
+	public Layer getParentLayer(){
+		return Layer.STATE;
 	}
 
 }

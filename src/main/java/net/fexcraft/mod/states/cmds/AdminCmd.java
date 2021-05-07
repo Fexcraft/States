@@ -83,7 +83,8 @@ public class AdminCmd extends CommandBase {
 					chunk.setDistrict(dis);
 					chunk.setClaimer(player.getGameProfile().getId());
 					chunk.setChanged(Time.getDate());
-					chunk.setPrice(0); chunk.save();
+					chunk.price.set(0);
+					chunk.save();
 					Print.chat(sender, String.format("&2&lChunk Claimed. [ %s, %s ]", chunk.xCoord(), chunk.zCoord()));
 					Listener.updateNeighbors(chunk);
 					Print.log(StateLogger.player(player) + " (force-)claimed " + StateLogger.chunk(chunk) + ", it is now part of " + StateLogger.district(dis) + ".");

@@ -210,7 +210,7 @@ public class ChunkCmd extends CommandBase {
 						chunk.setDistrict(StateUtil.getDistrict(-1));
 						chunk.setChanged(Time.getDate());
 						chunk.setType(ChunkType.NORMAL);
-						chunk.setPrice(StConfig.DEFAULT_CHUNK_PRICE);
+						chunk.price.reset();
 						chunk.save();
 						//ImageCache.update(player.world, player.world.getChunk(chunk.xCoord(), chunk.zCoord()));
 						Print.chat(sender, "&9Chunk unclaimed and resseted.");
@@ -244,7 +244,7 @@ public class ChunkCmd extends CommandBase {
 								ck.setDistrict(StateUtil.getDistrict(-1));
 								ck.setChanged(Time.getDate());
 								ck.setType(ChunkType.NORMAL);
-								ck.setPrice(StConfig.DEFAULT_CHUNK_PRICE);
+								ck.price.reset();
 								ck.save();
 								c++;
 								//ImageCache.update(player.world, player.world.getChunk(x, z));
@@ -304,7 +304,7 @@ public class ChunkCmd extends CommandBase {
 					Print.chat(sender, "&cPlayers from your State can not buy chunks here.");
 					return;
 				}
-				if(chunk.getPrice() <= 0){
+				if(!chunk.price.forSale()){
 					Print.chat(sender, "&cChunk isn't for sale.");
 				}
 				else{
@@ -336,12 +336,12 @@ public class ChunkCmd extends CommandBase {
 						}
 					}
 					Account ac_sender = playerdata.getAccount();
-					if(!playerdata.getBank().processAction(Bank.Action.TRANSFER, sender, ac_sender, chunk.getPrice(), receiver)){
+					if(!playerdata.getBank().processAction(Bank.Action.TRANSFER, sender, ac_sender, chunk.price.get(), receiver)){
 						return;
 					}
 					long time = Time.getDate();
 					chunk.setOwner(player.getGameProfile().getId().toString());
-					chunk.setPrice(0);
+					chunk.price.reset();
 					chunk.setType(ChunkType.PRIVATE);
 					chunk.setChanged(time);
 					chunk.save();
@@ -351,7 +351,7 @@ public class ChunkCmd extends CommandBase {
 						for(int[] ckpos : chunk.getLinkedChunks()){
 							Chunk ck = StateUtil.getTempChunk(ckpos);
 							ck.setOwner(player.getGameProfile().getId().toString());
-							ck.setPrice(0);
+							ck.price.reset();
 							ck.setType(ChunkType.PRIVATE);
 							ck.setChanged(time);
 							ck.save();

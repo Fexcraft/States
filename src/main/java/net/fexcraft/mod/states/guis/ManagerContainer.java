@@ -26,6 +26,7 @@ import net.fexcraft.mod.states.data.State;
 import net.fexcraft.mod.states.data.capabilities.PlayerCapability;
 import net.fexcraft.mod.states.data.capabilities.StatesCapabilities;
 import net.fexcraft.mod.states.data.root.AnnounceLevel;
+import net.fexcraft.mod.states.data.root.Layer;
 import net.fexcraft.mod.states.data.root.Mailbox.MailType;
 import net.fexcraft.mod.states.data.root.Mailbox.RecipientType;
 import net.fexcraft.mod.states.data.sub.ColorData;
@@ -45,7 +46,6 @@ public class ManagerContainer extends GenericContainer {
 	protected static final String NOTAX = "no_tax";
 	protected static final String NOMAILBOX = "no_mailbox";
 	protected static final String NOONE = "no_one";
-	protected static final String NOTFORSALE = "not_for_sale";
 	protected static final String NONE = "none";
 	protected static final String UNKNOWN = "unknown";
 	protected static final String NOTHING = "nothing";
@@ -117,7 +117,7 @@ public class ManagerContainer extends GenericContainer {
 				addKey(list, "name", dis.getName(), ViewMode.EDIT);
 				addKey(list, "municipality", dis.getMunicipality().getName() + " (" + dis.getMunicipality().getId() + ")", ViewMode.GOTO);
 				addKey(list, "manager", dis.getHead() == null ? NOONE : Static.getPlayerNameByUUID(dis.getHead()), ViewMode.EDIT);
-				addKey(list, "price", dis.getPrice() == 0 ? NOTFORSALE : ggas(dis.getPrice()), ViewMode.EDIT);
+				addKey(list, "price", dis.price.asString(), ViewMode.EDIT);
 				addKey(list, "type", dis.getType().name().toLowerCase(), ViewMode.EDIT);
 				addKey(list, "color", dis.color.getString(), ViewMode.EDIT);
 				addKey(list, "chunk_tax", dis.getChunkTax() > 0 ? ggas(dis.getChunkTax()) : NOTAX, ViewMode.EDIT);
@@ -143,7 +143,7 @@ public class ManagerContainer extends GenericContainer {
 				}
 				addKey(list, "state", mun.getState().getName() + " (" + mun.getState().getId() + ")", ViewMode.GOTO);
 				addKey(list, "mayor", mun.getHead() == null ? NOONE : Static.getPlayerNameByUUID(mun.getHead()), ViewMode.EDIT);
-				addKey(list, "price", mun.getPrice() == 0 ? NOTFORSALE : ggas(mun.getPrice()), ViewMode.EDIT);
+				addKey(list, "price", mun.price.asString(), ViewMode.EDIT);
 				addKey(list, "title", mun.getTitle(), ViewMode.EDIT);
 				addKey(list, "color", mun.color.getString(), ViewMode.EDIT);
 				addKey(list, "citizen", mun.getCitizen().size(), ViewMode.LIST);
@@ -172,7 +172,7 @@ public class ManagerContainer extends GenericContainer {
 				addKey(list, "name", state.getName(), ViewMode.EDIT);
 				addKey(list, "capital", StateUtil.getMunicipality(state.getCapitalId()).getName() + " (" + state.getCapitalId() + ")", ViewMode.EDIT);
 				addKey(list, "leader", state.getHead() == null ? NOONE : Static.getPlayerNameByUUID(state.getHead()), ViewMode.EDIT);
-				addKey(list, "price", state.getPrice() > 0 ? ggas(state.getPrice()) : NOTFORSALE, ViewMode.EDIT);
+				addKey(list, "price", state.price.asString(), ViewMode.EDIT);
 				addKey(list, "color", state.color.getString(), ViewMode.EDIT);
 				addKey(list, "citizen", getCitizens(state).size(), ViewMode.LIST);
 				addKey(list, "balance", ggas(state.getAccount().getBalance()), ViewMode.GOTO);
@@ -208,7 +208,7 @@ public class ManagerContainer extends GenericContainer {
 				addKey(list, "coords", chunk.xCoord() + ", " + chunk.zCoord(), ViewMode.NONE);
 				addKey(list, "district", chunk.getDistrict().getName() + " (" + chunk.getDistrict().getId() + ")", ViewMode.GOTO);
 				addKey(list, "owner", chunk.getType() == ChunkType.PRIVATE ? Static.getPlayerNameByUUID(chunk.getOwner()) : chunk.getOwner(), chunk.getType() == ChunkType.PRIVATE ? ViewMode.NONE : ViewMode.GOTO);
-				addKey(list, "price", chunk.getPrice() > 0 ? ggas(chunk.getPrice()) : NOTFORSALE, ViewMode.EDIT);
+				addKey(list, "price", chunk.price.asString(), ViewMode.EDIT);
 				addKey(list, "tax", chunk.getCustomTax() > 0 ? ggas(chunk.getCustomTax()) + "c" : chunk.getDistrict().getChunkTax() > 0 ? ggas(chunk.getDistrict().getChunkTax()) + "d" : NOTAX, ViewMode.EDIT);
 				addKey(list, "type", chunk.getType().name().toLowerCase(), ViewMode.EDIT);
 				addKey(list, "last_edited", time(chunk.getChanged()), ViewMode.NONE);
@@ -428,11 +428,11 @@ public class ManagerContainer extends GenericContainer {
 										try{
 											Long price = Long.parseLong(value);
 											if(price < 0){ price = 0l; }
-											dis.setPrice(price);
+											dis.price.set(price);
 											dis.setChanged(Time.getDate());
 											dis.save();
 											sendViewData();
-											Print.log(StateLogger.player(player) + " changed price of " + StateLogger.district(dis) + " to " + dis.getPrice() + ".");
+											Print.log(StateLogger.player(player) + " changed price of " + StateLogger.district(dis) + " to " + dis.price.asWorth() + ".");
 										}
 										catch(Exception e){
 											sendStatus("&cError: &7" + e.getMessage());
@@ -645,11 +645,11 @@ public class ManagerContainer extends GenericContainer {
 										try{
 											Long price = Long.parseLong(value);
 											if(price < 0){ price = 0l; }
-											mun.setPrice(price);
+											mun.price.set(price);
 											mun.setChanged(Time.getDate());
 											mun.save();
 											sendViewData();
-											Print.log(StateLogger.player(player) + " changed price of " + StateLogger.municipality(mun) + " to " + mun.getPrice() + ".");
+											Print.log(StateLogger.player(player) + " changed price of " + StateLogger.municipality(mun) + " to " + mun.price.asWorth() + ".");
 										}
 										catch(Exception e){
 											sendStatus("&cError: &7" + e.getMessage());
@@ -881,11 +881,11 @@ public class ManagerContainer extends GenericContainer {
 										try{
 											Long price = Long.parseLong(value);
 											if(price < 0){ price = 0l; }
-											state.setPrice(price);
+											state.price.set(price);
 											state.setChanged(Time.getDate());
 											state.save();
 											sendViewData();
-											Print.log(StateLogger.player(player) + " set the price of " + StateLogger.state(state) + " to " + state.getPrice());
+											Print.log(StateLogger.player(player) + " set the price of " + StateLogger.state(state) + " to " + state.price.asWorth());
 										}
 										catch(Exception e){
 											sendStatus("&cError: &7" + e.getMessage());
@@ -1106,11 +1106,11 @@ public class ManagerContainer extends GenericContainer {
 									if(isPermitted(chunk, player)){
 										try{
 											Long price = Long.parseLong(value);
-											chunk.setPrice(price);
+											chunk.price.set(price);
 											chunk.setChanged(Time.getDate());
 											chunk.save();
 											sendViewData();
-											Print.log(StateLogger.player(player) + " set the price of the " + StateLogger.chunk(chunk) + " to " + chunk.getPrice() + ".");
+											Print.log(StateLogger.player(player) + " set the price of the " + StateLogger.chunk(chunk) + " to " + chunk.price.asWorth() + ".");
 										}
 										catch(Exception e){
 											sendStatus("&9Error: &7" + e.getMessage());
@@ -1160,13 +1160,13 @@ public class ManagerContainer extends GenericContainer {
 													String to = type == ChunkType.NORMAL || type == ChunkType.DISTRICT ? "District" : type == ChunkType.MUNICIPAL ? "Municipality" : type == ChunkType.STATEOWNED ? "State" : "ERROR";
 													chunk.setType(type);
 													chunk.setOwner(null);
-													chunk.setPrice(0);
+													chunk.price.set(0);
 													chunk.setChanged(time);
 													chunk.getLinkedChunks().forEach(link -> {
 														Chunk ck = StateUtil.getTempChunk(link);
 														ck.setType(type);
 														ck.setOwner(null);
-														ck.setPrice(0);
+														ck.price.set(0);
 														ck.setChanged(time);
 														ck.save();
 														Print.log(StateLogger.player(player) + " gave the linked " + StateLogger.chunk(ck) + " to the " + to + ".");
@@ -1736,39 +1736,6 @@ public class ManagerContainer extends GenericContainer {
 
 		boolean isInfo(){
 			return this == INFO || this == CKINFO;
-		}
-		
-	}
-	
-	public static enum Layer {
-		
-		DISTRICT,
-		MUNICIPALITY,
-		STATE,
-		UNION,
-		COMPANY,
-		PLAYERDATA,
-		CHUNK,
-		PROPERTY;
-
-		boolean isChunk(){
-			return this == CHUNK;
-		}
-
-		boolean isDistrict(){
-			return this == DISTRICT;
-		}
-
-		boolean isMunicipality(){
-			return this == MUNICIPALITY;
-		}
-
-		boolean isState(){
-			return this == STATE;
-		}
-
-		boolean isPlayer(){
-			return this == PLAYERDATA;
 		}
 		
 	}

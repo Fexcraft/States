@@ -132,11 +132,11 @@ public class MunicipalityCmd extends CommandBase {
 						Print.chat(sender, "&7You must be part of a State first!");
 						return;
 					}
-					if(mun.getPrice() <= 0){
+					if(!mun.price.forSale()){
 						Print.chat(sender, "&eMunicipality isn't for sale.");
 						return;
 					}
-					if(mun.getPrice() > ply.getMunicipality().getState().getAccount().getBalance()){
+					if(mun.price.get() > ply.getMunicipality().getState().getAccount().getBalance()){
 						Print.chat(sender, "&eNot enought money on State Account.");
 						return;
 					}
@@ -147,7 +147,7 @@ public class MunicipalityCmd extends CommandBase {
 						Print.chat(sender, "&cState's Bank not found.");
 						return;
 					}
-					if(bank.processAction(Bank.Action.TRANSFER, sender, playerstate.getAccount(), mun.getPrice(), mun.getState().getAccount())){
+					if(bank.processAction(Bank.Action.TRANSFER, sender, playerstate.getAccount(), mun.price.get(), mun.getState().getAccount())){
 						if(mun.isCapital()){
 							if(mun.getState().getMunicipalities().size() > 0){
 								mun.getState().setCapitalId(-1);
@@ -162,7 +162,7 @@ public class MunicipalityCmd extends CommandBase {
 						mun.getCouncil().clear();
 						mun.setChanged(Time.getDate());
 						mun.setHead(null);
-						mun.setPrice(0);
+						mun.price.reset();
 						mun.save();
 						mun.getState().save();
 						StateUtil.announce(server, AnnounceLevel.MUNICIPALITY_ALL, "&6Municipality has been bought!", ply.getMunicipality().getId());
@@ -409,7 +409,7 @@ public class MunicipalityCmd extends CommandBase {
 						newmun.setName(name);
 						newmun.setHead(ply.getUUID());
 						newmun.r_OPEN.set(false);
-						newmun.setPrice(0);
+						newmun.price.reset();
 						newmun.getCitizen().add(ply.getUUID());
 						newmun.setChanged(Time.getDate());
 						newmun.getCouncil().add(ply.getUUID());
@@ -425,7 +425,7 @@ public class MunicipalityCmd extends CommandBase {
 							newdis.setHead(ply.getUUID());
 							newdis.r_CFS.set(false);
 							newdis.setMunicipality(newmun);
-							newdis.setPrice(0);
+							newdis.price.reset();
 							newdis.setType(DistrictType.VILLAGE);
 							newdis.setChanged(Time.getDate());
 							//
@@ -438,7 +438,7 @@ public class MunicipalityCmd extends CommandBase {
 								chunk.setDistrict(newdis); chunk.save();
 								chunk.setType(ChunkType.MUNICIPAL);
 								chunk.setChanged(Time.getDate());
-								chunk.setPrice(0);
+								chunk.price.reset();
 								chunk.setClaimer(ply.getUUID());
 								ply.setMunicipality(newmun);
 								StateUtil.announce(server, "&9New Municipality and District was created!");

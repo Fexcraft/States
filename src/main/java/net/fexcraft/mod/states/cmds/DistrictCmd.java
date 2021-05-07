@@ -150,7 +150,7 @@ public class DistrictCmd extends CommandBase {
 								newdis.setChanged(Time.getDate());
 								newdis.setHead(ply.getUUID());
 								newdis.setMunicipality(ply.getMunicipality());
-								newdis.setPrice(0);
+								newdis.price.reset();
 								newdis.setType(DistrictType.WILDERNESS);
 								newdis.setIcon(States.DEFAULT_ICON);
 								newdis.color.set(0xffffff);

@@ -164,7 +164,7 @@ public class Listener implements IPacketListener<PacketNBTTagCompound> {
 									if(compound.getBoolean("owned")){
 										compound.setString("owner", ck.getOwner());
 									}
-									compound.setLong("price", ck.getPrice());
+									compound.setLong("price", ck.price.get());
 								}
 								list.appendTag(compound);
 							}
@@ -258,7 +258,7 @@ public class Listener implements IPacketListener<PacketNBTTagCompound> {
 						else{
 							Account playeracc = player.getCapability(StatesCapabilities.PLAYER, null).getAccount();
 							Bank playerbank = player.getCapability(StatesCapabilities.PLAYER, null).getBank();
-							if(!playerbank.processAction(Bank.Action.TRANSFER, player, playeracc, ck.getPrice() / 10, States.SERVERACCOUNT)){
+							if(!playerbank.processAction(Bank.Action.TRANSFER, player, playeracc, ck.price.get() / 10, States.SERVERACCOUNT)){
 								return null;
 							}
 						}
@@ -267,7 +267,7 @@ public class Listener implements IPacketListener<PacketNBTTagCompound> {
 					ck.setClaimer(player.getGameProfile().getId());
 					ck.setChanged(Time.getDate());
 					if(dis.getId() != -2){
-						ck.setPrice(0);
+						ck.price.set(0);
 					}
 					ck.save();
 					updateNeighbors(ck);
@@ -281,7 +281,7 @@ public class Listener implements IPacketListener<PacketNBTTagCompound> {
 					if(compound.getBoolean("owned")){
 						compound.setString("owner", ck.getOwner());
 					}
-					compound.setLong("price", ck.getPrice());
+					compound.setLong("price", ck.price.get());
 				}
 			}
 			else{
@@ -327,7 +327,7 @@ public class Listener implements IPacketListener<PacketNBTTagCompound> {
 			if(compound.getBoolean("owned")){
 				compound.setString("owner", ck.getOwner());
 			}
-			compound.setLong("price", ck.getPrice());
+			compound.setLong("price", ck.price.get());
 			return compound;
 		}
 		return null;

@@ -2,7 +2,8 @@ package net.fexcraft.mod.states.guis;
 
 import net.fexcraft.lib.mc.gui.GenericGui;
 import net.fexcraft.lib.mc.utils.Formatter;
-import net.fexcraft.mod.states.guis.ManagerContainer.Layer;
+import net.fexcraft.mod.states.data.root.Layer;
+import net.fexcraft.mod.states.data.sub.Buyable;
 import net.fexcraft.mod.states.guis.ManagerContainer.Mode;
 import net.fexcraft.mod.states.guis.ManagerContainer.ViewMode;
 import net.minecraft.block.material.MapColor;
@@ -258,7 +259,7 @@ public class ManagerGui extends GenericGui<ManagerContainer> {
 						field.setText(I18n.format("states.manager_gui.view.no_mailbox"));
 						break;
 					}
-					case ManagerContainer.NOTFORSALE:{
+					case Buyable.NOTFORSALE:{
 						field.setText(I18n.format("states.manager_gui.view.not_for_sale"));
 						break;
 					}

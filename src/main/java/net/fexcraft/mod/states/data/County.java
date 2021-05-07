@@ -18,15 +18,8 @@ import net.fexcraft.mod.fsmm.api.Account;
 import net.fexcraft.mod.fsmm.api.Bank;
 import net.fexcraft.mod.fsmm.util.DataManager;
 import net.fexcraft.mod.states.States;
-import net.fexcraft.mod.states.data.root.AccountHolder;
-import net.fexcraft.mod.states.data.root.BuyableType;
-import net.fexcraft.mod.states.data.root.ExternalData;
-import net.fexcraft.mod.states.data.root.ExternalDataHolder;
-import net.fexcraft.mod.states.data.root.IconHolder;
-import net.fexcraft.mod.states.data.root.Initiator;
-import net.fexcraft.mod.states.data.root.MailReceiver;
-import net.fexcraft.mod.states.data.root.Ruleable;
-import net.fexcraft.mod.states.data.root.VoteHolder;
+import net.fexcraft.mod.states.data.root.*;
+import net.fexcraft.mod.states.data.sub.Buyable;
 import net.fexcraft.mod.states.data.sub.ColorData;
 import net.fexcraft.mod.states.events.CountyEvent;
 import net.fexcraft.mod.states.util.RuleMap;
@@ -35,12 +28,13 @@ import net.fexcraft.mod.states.util.StateUtil;
 import net.minecraft.util.math.BlockPos;
 import net.minecraftforge.common.MinecraftForge;
 
-public class County implements BuyableType, IconHolder, AccountHolder, MailReceiver, Ruleable, VoteHolder, ExternalDataHolder {
+public class County implements ChildLayer, IconHolder, AccountHolder, MailReceiver, Ruleable, VoteHolder, ExternalDataHolder {
 	
 	private int id;
 	private String name, icon;
 	public ColorData color = new ColorData();
-	private long created, changed, price, citizentax;
+	public Buyable price = new Buyable(this, Layer.COUNTY);
+	private long created, changed, citizentax;
 	private UUID creator, manager;
 	private Account account;
 	private ArrayList<Integer> neighbors, districts, municipalities;
@@ -73,7 +67,7 @@ public class County implements BuyableType, IconHolder, AccountHolder, MailRecei
 		council = JsonUtil.jsonArrayToUUIDArray(JsonUtil.getIfExists(obj, "council", new JsonArray()).getAsJsonArray());
 		state = StateUtil.getState(JsonUtil.getIfExists(obj, "state", -1).intValue());
 		color.load(obj);
-		price = JsonUtil.getIfExists(obj, "price", 0).longValue();
+		price.load(obj);
 		icon = JsonUtil.getIfExists(obj, "icon", States.DEFAULT_ICON);
 		citizentax = JsonUtil.getIfExists(obj, "citizen_tax", 0).longValue();
 		mailbox = obj.has("mailbox") ? BlockPos.fromLong(obj.get("mailbox").getAsLong()) : null;
@@ -151,7 +145,7 @@ public class County implements BuyableType, IconHolder, AccountHolder, MailRecei
 		obj.addProperty("balance", account.getBalance());
 		color.save(obj);
 		//obj.addProperty("open", open);
-		obj.addProperty("price", price);
+		price.save(obj);
 		if(icon != null){ obj.addProperty("icon", icon); }
 		//obj.addProperty("kick_if_bankrupt", kib);
 		obj.addProperty("citizen_tax", citizentax);
@@ -282,16 +276,6 @@ public class County implements BuyableType, IconHolder, AccountHolder, MailRecei
 	}
 
 	@Override
-	public long getPrice(){
-		return price;
-	}
-
-	@Override
-	public void setPrice(long new_price){
-		price = new_price;
-	}
-
-	@Override
 	public String getIcon(){
 		return icon;
 	}
@@ -390,6 +374,16 @@ public class County implements BuyableType, IconHolder, AccountHolder, MailRecei
 	@Override
 	public Map<String, ExternalData> getExternalObjects(){
 		return datas;
+	}
+
+	@Override
+	public int getParentId(){
+		return state.getId();
+	}
+
+	@Override
+	public Layer getParentLayer(){
+		return Layer.STATE;
 	}
 
 }

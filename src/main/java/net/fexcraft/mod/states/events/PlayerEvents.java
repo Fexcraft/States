@@ -1,7 +1,7 @@
 package net.fexcraft.mod.states.events;
 
-import java.util.Arrays;
-import java.util.List;
+import static net.fexcraft.mod.states.data.sub.IconHolder.writeLocPacketIcon;
+
 import java.util.UUID;
 
 import net.fexcraft.lib.common.math.Time;
@@ -18,6 +18,7 @@ import net.fexcraft.mod.states.data.Municipality;
 import net.fexcraft.mod.states.data.State;
 import net.fexcraft.mod.states.data.capabilities.PlayerCapability;
 import net.fexcraft.mod.states.data.capabilities.StatesCapabilities;
+import net.fexcraft.mod.states.data.sub.IconHolder;
 import net.fexcraft.mod.states.impl.SignMailbox;
 import net.fexcraft.mod.states.util.MessageSender;
 import net.fexcraft.mod.states.util.StConfig;
@@ -337,36 +338,16 @@ public class PlayerEvents {
 		NBTTagCompound nbt = new NBTTagCompound();
 		nbt.setString("target_listener", "states:gui");
 		nbt.setString("task", "show_location_update");
-		writeIcon(nbt, chunk == null ? "" : chunk.getDistrict().getMunicipality().getState().getIcon(), 0, "yellow");
-		writeIcon(nbt, chunk == null ? "" : chunk.getDistrict().getMunicipality().getState().getIcon(), 1, "red");
-		writeIcon(nbt, chunk == null ? "" : chunk.getDistrict().getMunicipality().getIcon(), 2, "green");
-		writeIcon(nbt, chunk == null ? "" : chunk.getDistrict().getIcon(), 3, "blue");
+		writeLocPacketIcon(nbt, chunk == null ? null : chunk.getDistrict().getMunicipality().getState().icon, 0, IconHolder.PACKET_COLOURS.get(1));
+		writeLocPacketIcon(nbt, chunk == null ? null : chunk.getDistrict().getMunicipality().getState().icon, 1, IconHolder.PACKET_COLOURS.get(2));
+		writeLocPacketIcon(nbt, chunk == null ? null : chunk.getDistrict().getMunicipality().icon, 2, IconHolder.PACKET_COLOURS.get(0));
+		writeLocPacketIcon(nbt, chunk == null ? null : chunk.getDistrict().icon, 3, IconHolder.PACKET_COLOURS.get(3));
 		nbt.setString("line0", line0 == null ? " " : line0);
 		nbt.setString("line1", line1 == null ? " " : line1);
 		nbt.setString("line2", line2 == null ? " " : line2);
 		nbt.setString("line3", line3 == null ? " " : line3);
 		if(time > 0){ nbt.setInteger("time", time); }
 		PacketHandler.getInstance().sendTo(new PacketNBTTagCompound(nbt), (EntityPlayerMP)player);
-	}
-	
-	private static final List<String> colours = Arrays.asList(new String[]{"green", "yellow", "red", "blue"});
-	
-	private static final void writeIcon(NBTTagCompound compound, String icon, int id, String color){
-		if(icon != null && !icon.equals("")){
-			if(colours.contains(icon)){
-				compound.setString("color_" + id, icon);
-			}
-			else{
-				compound.setString("icon_" + id, icon);
-			}
-		}
-		else if(color == null){
-			compound.setInteger("x_" + id, 64);
-			compound.setInteger("y_" + id, 224);
-		}
-		else{
-			compound.setString("color_" + id, color);
-		}
 	}
 
 }

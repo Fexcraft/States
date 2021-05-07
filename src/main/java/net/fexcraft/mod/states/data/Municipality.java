@@ -24,6 +24,7 @@ import net.fexcraft.mod.states.data.capabilities.PlayerCapability;
 import net.fexcraft.mod.states.data.root.*;
 import net.fexcraft.mod.states.data.sub.Buyable;
 import net.fexcraft.mod.states.data.sub.ColorData;
+import net.fexcraft.mod.states.data.sub.IconHolder;
 import net.fexcraft.mod.states.events.MunicipalityEvent;
 import net.fexcraft.mod.states.util.ForcedChunksManager;
 import net.fexcraft.mod.states.util.RuleMap;
@@ -33,10 +34,11 @@ import net.minecraft.command.ICommandSender;
 import net.minecraft.util.math.BlockPos;
 import net.minecraftforge.common.MinecraftForge;
 
-public class Municipality implements ChildLayer, IconHolder, AccountHolder, MailReceiver, Ruleable, VoteHolder, Abandonable, ExternalDataHolder {
+public class Municipality implements ChildLayer, AccountHolder, MailReceiver, Ruleable, VoteHolder, Abandonable, ExternalDataHolder {
 	
 	private int id;
-	private String name, icon, title;
+	private String name, title;
+	public IconHolder icon = new IconHolder();
 	public ColorData color = new ColorData();
 	public Buyable price = new Buyable(this, Layer.MUNICIPALITY);
 	private long created, changed, citizentax, abandonedat;
@@ -76,7 +78,7 @@ public class Municipality implements ChildLayer, IconHolder, AccountHolder, Mail
 		com_blacklist = JsonUtil.jsonArrayToIntegerArray(JsonUtil.getIfExists(obj, "company_blacklist", new JsonArray()).getAsJsonArray());
 		pl_blacklist = JsonUtil.jsonArrayToUUIDArray(JsonUtil.getIfExists(obj, "player_blacklist", new JsonArray()).getAsJsonArray());
 		price.load(obj);
-		icon = JsonUtil.getIfExists(obj, "icon", States.DEFAULT_ICON);
+		icon.load(obj);
 		citizentax = JsonUtil.getIfExists(obj, "citizen_tax", 0).longValue();
 		mailbox = obj.has("mailbox") ? BlockPos.fromLong(obj.get("mailbox").getAsLong()) : null;
 		abandoned = JsonUtil.getIfExists(obj, "abandoned", false);
@@ -160,7 +162,7 @@ public class Municipality implements ChildLayer, IconHolder, AccountHolder, Mail
 		color.save(obj);
 		//obj.addProperty("open", open);
 		price.save(obj);
-		if(icon != null){ obj.addProperty("icon", icon); }
+		icon.save(obj);
 		//obj.addProperty("kick_if_bankrupt", kib);
 		obj.addProperty("citizen_tax", citizentax);
 		if(mailbox != null) obj.addProperty("mailbox", mailbox.toLong());
@@ -294,16 +296,6 @@ public class Municipality implements ChildLayer, IconHolder, AccountHolder, Mail
 
 	public List<Integer> getCompanyBlacklist(){
 		return com_blacklist;
-	}
-
-	@Override
-	public String getIcon(){
-		return icon;
-	}
-
-	@Override
-	public void setIcon(String url){
-		icon = url;
 	}
 
 	public int getClaimedChunks(){

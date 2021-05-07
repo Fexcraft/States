@@ -18,27 +18,28 @@ import net.fexcraft.mod.states.States;
 import net.fexcraft.mod.states.data.root.ChildLayer;
 import net.fexcraft.mod.states.data.root.ExternalData;
 import net.fexcraft.mod.states.data.root.ExternalDataHolder;
-import net.fexcraft.mod.states.data.root.IconHolder;
 import net.fexcraft.mod.states.data.root.Initiator;
 import net.fexcraft.mod.states.data.root.Layer;
 import net.fexcraft.mod.states.data.root.MailReceiver;
 import net.fexcraft.mod.states.data.root.Ruleable;
 import net.fexcraft.mod.states.data.sub.Buyable;
 import net.fexcraft.mod.states.data.sub.ColorData;
+import net.fexcraft.mod.states.data.sub.IconHolder;
 import net.fexcraft.mod.states.events.DistrictEvent;
 import net.fexcraft.mod.states.util.RuleMap;
 import net.fexcraft.mod.states.util.StateUtil;
 import net.minecraft.util.math.BlockPos;
 import net.minecraftforge.common.MinecraftForge;
 
-public class District implements ChildLayer, IconHolder, MailReceiver, Ruleable, ExternalDataHolder {
+public class District implements ChildLayer, MailReceiver, Ruleable, ExternalDataHolder {
 	
 	private int id, chunks;
 	private DistrictType type;
 	private long created, changed, chunktax;
 	private UUID creator, manager;
 	private ArrayList<Integer> neighbors;
-	private String name, icon;
+	private String name;
+	public IconHolder icon = new IconHolder();
 	public ColorData color = new ColorData();
 	public Buyable price = new Buyable(this, Layer.DISTRICT);
 	private Municipality municipality;
@@ -65,7 +66,7 @@ public class District implements ChildLayer, IconHolder, MailReceiver, Ruleable,
 		manager = obj.has("manager") ? UUID.fromString(obj.get("manager").getAsString()) : null;
 		color.load(obj);
 		price.load(obj);
-		icon = JsonUtil.getIfExists(obj, "icon", States.DEFAULT_ICON);
+		icon.load(obj);
 		chunks = JsonUtil.getIfExists(obj, "chunks", 0).intValue();
 		chunktax = JsonUtil.getIfExists(obj, "chunktax", 0).longValue();
 		mailbox = obj.has("mailbox") ? BlockPos.fromLong(obj.get("mailbox").getAsLong()) : null;
@@ -135,7 +136,7 @@ public class District implements ChildLayer, IconHolder, MailReceiver, Ruleable,
 		color.save(obj);
 		//obj.addProperty("can_foreigners_settle", cfs);
 		price.save(obj);
-		if(icon != null){ obj.addProperty("icon", icon); }
+		icon.save(obj);
 		obj.addProperty("chunks", chunks);
 		if(chunktax > 0){ obj.addProperty("chunktax", chunktax); }
 		//obj.addProperty("unclaim_chunks_if_bankrupt", onbankrupt);
@@ -242,16 +243,6 @@ public class District implements ChildLayer, IconHolder, MailReceiver, Ruleable,
 
 	public void setType(DistrictType new_type){
 		type = new_type;
-	}
-
-	@Override
-	public String getIcon(){
-		return icon;
-	}
-
-	@Override
-	public void setIcon(String url){
-		icon = url;
 	}
 
 	public int getClaimedChunks(){

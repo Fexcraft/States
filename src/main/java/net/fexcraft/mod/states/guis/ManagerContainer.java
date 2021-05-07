@@ -130,7 +130,7 @@ public class ManagerContainer extends GenericContainer {
 				addKey(list, "created", time(dis.getCreated()), ViewMode.NONE);
 				addKey(list, "ruleset", dis.getRulesetTitle(), ViewMode.EDIT);
 				addKey(list, "mailbox", dis.getMailbox() == null ? NOMAILBOX : dis.getMailbox().toString(), ViewMode.RESET);
-				addKey(list, "icon", dis.getIcon(), ViewMode.EDIT);
+				addKey(list, "icon", dis.icon.getn(), ViewMode.EDIT);
 				addKey(list, "explosion", dis.r_ALLOW_EXPLOSIONS.get(), ViewMode.BOOL);
 				break;
 			case MUNICIPALITY:
@@ -162,7 +162,7 @@ public class ManagerContainer extends GenericContainer {
 				addKey(list, "ruleset", mun.getRulesetTitle(), ViewMode.EDIT);
 				addKey(list, "mailbox", mun.getMailbox() == null ? NOMAILBOX : mun.getMailbox().toString(), ViewMode.RESET);
 				addKey(list, "blacklist", mun.getPlayerBlacklist().size(), ViewMode.LIST);
-				addKey(list, "icon", mun.getIcon(), ViewMode.EDIT);
+				addKey(list, "icon", mun.icon.getn(), ViewMode.EDIT);
 				if(!mun.isAbandoned()){
 					addKey(list, "abandoned", mun.isAbandoned(), ViewMode.NONE);
 				}
@@ -187,7 +187,7 @@ public class ManagerContainer extends GenericContainer {
 				addKey(list, "ruleset", state.getRulesetTitle(), ViewMode.EDIT);
 				addKey(list, "mailbox", state.getMailbox() == null ? NOMAILBOX : state.getMailbox().toString(), ViewMode.RESET);
 				addKey(list, "blacklist", state.getBlacklist().size(), ViewMode.LIST);
-				addKey(list, "icon", state.getIcon(), ViewMode.EDIT);
+				addKey(list, "icon", state.icon.getn(), ViewMode.EDIT);
 				break;
 			case UNION:
 				break;
@@ -559,11 +559,11 @@ public class ManagerContainer extends GenericContainer {
 								case "icon":{
 									if(dis.isAuthorized(dis.r_SET_ICON.id, cap.getUUID()).isTrue() || bypass(player)){
 										try{
-											dis.setIcon(value);
+											dis.icon.set(value);
 											dis.setChanged(Time.getDate());
 											dis.save();
 											sendViewData();
-											Print.log(StateLogger.player(player) + " changed icon of " + StateLogger.district(dis) + " to " + dis.getIcon() + ".");
+											Print.log(StateLogger.player(player) + " changed icon of " + StateLogger.district(dis) + " to " + dis.icon.getn() + ".");
 										}
 										catch(Exception e){
 											sendStatus("&2Error: &7" + e.getMessage());
@@ -794,11 +794,11 @@ public class ManagerContainer extends GenericContainer {
 								case "icon":{
 									if(mun.isAuthorized(mun.r_ICON.id, cap.getUUID()).isTrue() || bypass(player)){
 										try{
-											mun.setIcon(value);
+											mun.icon.set(value);
 											mun.setChanged(Time.getDate());
 											mun.save();
 											sendViewData();
-											Print.log(StateLogger.player(player) + " changed icon of " + StateLogger.municipality(mun) + " to " + mun.getIcon() + ".");
+											Print.log(StateLogger.player(player) + " changed icon of " + StateLogger.municipality(mun) + " to " + mun.icon.getn() + ".");
 										}
 										catch(Exception e){
 											sendStatus("&2Error: &7" + e.getMessage());
@@ -1013,11 +1013,11 @@ public class ManagerContainer extends GenericContainer {
 								case "icon":{
 									if(state.isAuthorized(state.r_SET_ICON.id, cap.getUUID()).isTrue() || bypass(player)){
 										try{
-											state.setIcon(value);
+											state.icon.set(value);
 											state.setChanged(Time.getDate());
 											state.save();
 											sendViewData();
-											Print.log(StateLogger.player(player) + " set the icon of " + StateLogger.state(state) + " to " + state.getIcon());
+											Print.log(StateLogger.player(player) + " set the icon of " + StateLogger.state(state) + " to " + state.icon.getn());
 										}
 										catch(Exception e){
 											sendStatus("&2Error: &7" + e.getMessage());

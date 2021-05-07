@@ -152,7 +152,7 @@ public class DistrictCmd extends CommandBase {
 								newdis.setMunicipality(ply.getMunicipality());
 								newdis.price.reset();
 								newdis.setType(DistrictType.WILDERNESS);
-								newdis.setIcon(States.DEFAULT_ICON);
+								newdis.icon.reset();
 								newdis.color.set(0xffffff);
 								chunk.setDistrict(newdis);
 								newdis.getMunicipality().save();

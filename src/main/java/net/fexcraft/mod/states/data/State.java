@@ -22,23 +22,24 @@ import net.fexcraft.mod.states.data.root.AccountHolder;
 import net.fexcraft.mod.states.data.root.ChildLayer;
 import net.fexcraft.mod.states.data.root.ExternalData;
 import net.fexcraft.mod.states.data.root.ExternalDataHolder;
-import net.fexcraft.mod.states.data.root.IconHolder;
 import net.fexcraft.mod.states.data.root.Initiator;
 import net.fexcraft.mod.states.data.root.Layer;
 import net.fexcraft.mod.states.data.root.MailReceiver;
 import net.fexcraft.mod.states.data.root.Ruleable;
 import net.fexcraft.mod.states.data.sub.Buyable;
 import net.fexcraft.mod.states.data.sub.ColorData;
+import net.fexcraft.mod.states.data.sub.IconHolder;
 import net.fexcraft.mod.states.events.StateEvent;
 import net.fexcraft.mod.states.util.RuleMap;
 import net.fexcraft.mod.states.util.StateUtil;
 import net.minecraft.util.math.BlockPos;
 import net.minecraftforge.common.MinecraftForge;
 
-public class State implements ChildLayer, IconHolder, AccountHolder, MailReceiver, Ruleable, ExternalDataHolder {
+public class State implements ChildLayer, AccountHolder, MailReceiver, Ruleable, ExternalDataHolder {
 
 	private int id, capital;
-	private String name, icon;
+	private String name;
+	public IconHolder icon = new IconHolder();
 	public ColorData color = new ColorData();
 	public Buyable price = new Buyable(this, Layer.UNION);
 	private long created, changed;
@@ -74,7 +75,7 @@ public class State implements ChildLayer, IconHolder, AccountHolder, MailReceive
 		color.load(obj);
 		blacklist = JsonUtil.jsonArrayToIntegerArray(JsonUtil.getIfExists(obj, "blacklist", new JsonArray()).getAsJsonArray());
 		price.load(obj);
-		icon = JsonUtil.getIfExists(obj, "icon", States.DEFAULT_ICON);
+		icon.load(obj);
 		chunktaxpercent = JsonUtil.getIfExists(obj, "chunk_tax_percent", 0).byteValue();
 		citizentaxpercent = JsonUtil.getIfExists(obj, "citizen_tax_percent", 0).byteValue();
 		mailbox = obj.has("mailbox") ? BlockPos.fromLong(obj.get("mailbox").getAsLong()) : null;
@@ -148,7 +149,7 @@ public class State implements ChildLayer, IconHolder, AccountHolder, MailReceive
 		color.save(obj);
 		obj.add("blacklist", JsonUtil.getArrayFromIntegerList(blacklist));
 		price.save(obj);
-		if(icon != null){ obj.addProperty("icon", icon); }
+		icon.save(obj);
 		if(chunktaxpercent > 0){
 			obj.addProperty("chunk_tax_percent", chunktaxpercent);
 		}
@@ -262,16 +263,6 @@ public class State implements ChildLayer, IconHolder, AccountHolder, MailReceive
 
 	public List<Integer> getBlacklist(){
 		return blacklist;
-	}
-
-	@Override
-	public String getIcon(){
-		return icon;
-	}
-
-	@Override
-	public void setIcon(String url){
-		icon = url;
 	}
 
 	public byte getChunkTaxPercentage(){

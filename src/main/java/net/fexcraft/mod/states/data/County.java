@@ -4,8 +4,6 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
-import java.util.TreeMap;
 import java.util.UUID;
 
 import com.google.gson.JsonArray;
@@ -20,8 +18,6 @@ import net.fexcraft.mod.fsmm.util.DataManager;
 import net.fexcraft.mod.states.States;
 import net.fexcraft.mod.states.data.root.AccountHolder;
 import net.fexcraft.mod.states.data.root.ChildLayer;
-import net.fexcraft.mod.states.data.root.ExternalData;
-import net.fexcraft.mod.states.data.root.ExternalDataHolder;
 import net.fexcraft.mod.states.data.root.Initiator;
 import net.fexcraft.mod.states.data.root.Layer;
 import net.fexcraft.mod.states.data.root.Ruleable;
@@ -29,6 +25,7 @@ import net.fexcraft.mod.states.data.root.VoteHolder;
 import net.fexcraft.mod.states.data.sub.Buyable;
 import net.fexcraft.mod.states.data.sub.ColorData;
 import net.fexcraft.mod.states.data.sub.Createable;
+import net.fexcraft.mod.states.data.sub.ExternalDataHolder;
 import net.fexcraft.mod.states.data.sub.IconHolder;
 import net.fexcraft.mod.states.data.sub.MailData;
 import net.fexcraft.mod.states.events.CountyEvent;
@@ -37,7 +34,7 @@ import net.fexcraft.mod.states.util.StConfig;
 import net.fexcraft.mod.states.util.StateUtil;
 import net.minecraftforge.common.MinecraftForge;
 
-public class County implements ChildLayer, AccountHolder, Ruleable, VoteHolder, ExternalDataHolder {
+public class County implements ChildLayer, AccountHolder, Ruleable, VoteHolder {
 	
 	private int id;
 	private String name;
@@ -46,13 +43,13 @@ public class County implements ChildLayer, AccountHolder, Ruleable, VoteHolder, 
 	public Buyable price = new Buyable(this, Layer.COUNTY);
 	public MailData mailbox = new MailData();
 	public Createable created = new Createable();
+	public ExternalDataHolder external = new ExternalDataHolder();
 	private long citizentax;
 	private UUID manager;
 	private Account account;
 	private ArrayList<Integer> neighbors, districts, municipalities;
 	private ArrayList<UUID> direct_citizen, council;
 	private State state;
-	private TreeMap<String, ExternalData> datas = new TreeMap<>();
 	//
 	private RuleMap rules = new RuleMap();
 	private String ruleset_name;
@@ -128,13 +125,7 @@ public class County implements ChildLayer, AccountHolder, Ruleable, VoteHolder, 
 				if(rule != null) rule.load(entry.getValue().getAsString());
 			}
 		}
-		if(obj.has("ex-data") && !datas.isEmpty()){
-			JsonObject external = obj.get("ex-data").getAsJsonObject();
-			for(Entry<String, JsonElement> elm : external.entrySet()){
-				ExternalData data = getExternalData(elm.getKey());
-				if(data != null) data.load(elm.getValue());
-			}
-		}
+		external.load(obj);
 	}
 
 	public JsonObject toJsonObject(){
@@ -173,13 +164,7 @@ public class County implements ChildLayer, AccountHolder, Ruleable, VoteHolder, 
 			for(Vote vote : active_votes) array.add(vote.id);
 			obj.add("votes", array);
 		}
-		if(!datas.isEmpty()){
-			JsonObject external = new JsonObject();
-			for(Entry<String, ExternalData> entry : datas.entrySet()){
-				external.add(entry.getKey(), entry.getValue().save());
-			}
-			obj.add("ex-data", external);
-		}
+		external.save(obj);
 		return obj;
 	}
 
@@ -326,21 +311,6 @@ public class County implements ChildLayer, AccountHolder, Ruleable, VoteHolder, 
 
 	public int getChunkLimit(){
 		return direct_citizen.size() * StConfig.CHUNK_PER_CITIZEN;
-	}
-
-	@Override
-	public <T extends ExternalData> T getExternalData(String id){
-		return (T)datas.get(id);
-	}
-
-	@Override
-	public ExternalData setExternalData(String id, ExternalData obj){
-		return datas.put(id, obj);
-	}
-
-	@Override
-	public Map<String, ExternalData> getExternalObjects(){
-		return datas;
 	}
 
 	@Override

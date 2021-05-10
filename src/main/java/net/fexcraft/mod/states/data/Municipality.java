@@ -5,8 +5,6 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
-import java.util.TreeMap;
 import java.util.UUID;
 
 import com.google.gson.JsonArray;
@@ -23,8 +21,6 @@ import net.fexcraft.mod.states.States;
 import net.fexcraft.mod.states.data.capabilities.PlayerCapability;
 import net.fexcraft.mod.states.data.root.AccountHolder;
 import net.fexcraft.mod.states.data.root.ChildLayer;
-import net.fexcraft.mod.states.data.root.ExternalData;
-import net.fexcraft.mod.states.data.root.ExternalDataHolder;
 import net.fexcraft.mod.states.data.root.Initiator;
 import net.fexcraft.mod.states.data.root.Layer;
 import net.fexcraft.mod.states.data.root.Ruleable;
@@ -32,6 +28,7 @@ import net.fexcraft.mod.states.data.sub.Abandonable;
 import net.fexcraft.mod.states.data.sub.Buyable;
 import net.fexcraft.mod.states.data.sub.ColorData;
 import net.fexcraft.mod.states.data.sub.Createable;
+import net.fexcraft.mod.states.data.sub.ExternalDataHolder;
 import net.fexcraft.mod.states.data.sub.IconHolder;
 import net.fexcraft.mod.states.data.sub.MailData;
 import net.fexcraft.mod.states.events.MunicipalityEvent;
@@ -42,7 +39,7 @@ import net.fexcraft.mod.states.util.StateUtil;
 import net.minecraft.command.ICommandSender;
 import net.minecraftforge.common.MinecraftForge;
 
-public class Municipality implements ChildLayer, AccountHolder, Ruleable, ExternalDataHolder {
+public class Municipality implements ChildLayer, AccountHolder, Ruleable {
 	
 	private int id;
 	private String name, title;
@@ -51,6 +48,7 @@ public class Municipality implements ChildLayer, AccountHolder, Ruleable, Extern
 	public Buyable price = new Buyable(this, Layer.MUNICIPALITY);
 	public MailData mailbox = new MailData();
 	public Createable created = new Createable();
+	public ExternalDataHolder external = new ExternalDataHolder();
 	public Abandonable abandon;
 	private long citizentax;
 	private UUID mayor;
@@ -58,7 +56,6 @@ public class Municipality implements ChildLayer, AccountHolder, Ruleable, Extern
 	private ArrayList<Integer> neighbors, districts, com_blacklist;
 	private ArrayList<UUID> citizen, council, pl_blacklist;
 	private State state;
-	private TreeMap<String, ExternalData> datas = new TreeMap<>();
 	//
 	private RuleMap rules = new RuleMap();
 	private String ruleset_name;
@@ -161,13 +158,7 @@ public class Municipality implements ChildLayer, AccountHolder, Ruleable, Extern
 				if(rule != null) rule.load(entry.getValue().getAsString());
 			}
 		}
-		if(obj.has("ex-data") && !datas.isEmpty()){
-			JsonObject external = obj.get("ex-data").getAsJsonObject();
-			for(Entry<String, JsonElement> elm : external.entrySet()){
-				ExternalData data = getExternalData(elm.getKey());
-				if(data != null) data.load(elm.getValue());
-			}
-		}
+		external.load(obj);
 	}
 
 	public JsonObject toJsonObject(){
@@ -207,13 +198,7 @@ public class Municipality implements ChildLayer, AccountHolder, Ruleable, Extern
 			for(Vote vote : active_votes) array.add(vote.id);
 			obj.add("votes", array);
 		}
-		if(!datas.isEmpty()){
-			JsonObject external = new JsonObject();
-			for(Entry<String, ExternalData> entry : datas.entrySet()){
-				external.add(entry.getKey(), entry.getValue().save());
-			}
-			obj.add("ex-data", external);
-		}
+		external.save(obj);
 		return obj;
 	}
 
@@ -414,21 +399,6 @@ public class Municipality implements ChildLayer, AccountHolder, Ruleable, Extern
 
 	public String getTitledName(){
 		return "(" + title + ") " + name;
-	}
-
-	@Override
-	public <T extends ExternalData> T getExternalData(String id){
-		return (T)datas.get(id);
-	}
-
-	@Override
-	public ExternalData setExternalData(String id, ExternalData obj){
-		return datas.put(id, obj);
-	}
-
-	@Override
-	public Map<String, ExternalData> getExternalObjects(){
-		return datas;
 	}
 
 	@Override

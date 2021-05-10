@@ -94,7 +94,7 @@ public class RuleCmd extends CommandBase {
 						return;
 					}
 				}
-				Rule rule = ruleable.getRule(args[2]);
+				Rule rule = ruleable.getRuleHolder().get(args[2]);
 				if(rule == null){
 					Print.chat(sender, "&cRule not found."); return;
 				}
@@ -228,13 +228,13 @@ public class RuleCmd extends CommandBase {
 				Map<String, Rule> rules = null; String ruleset;
 				switch(args[1]){
 					case "mun": case "municipality":{
-						rules = chunk.getMunicipality().getRules(); ruleset = chunk.getMunicipality().getRulesetTitle(); break;
+						rules = chunk.getMunicipality().getRuleHolder().getMap(); ruleset = chunk.getMunicipality().getRulesetTitle(); break;
 					}
 					case "dis": case "district":{
-						rules = chunk.getDistrict().getRules(); ruleset = chunk.getDistrict().getRulesetTitle(); break;
+						rules = chunk.getDistrict().getRuleHolder().getMap(); ruleset = chunk.getDistrict().getRulesetTitle(); break;
 					}
 					case "st": case "state":{
-						rules = chunk.getState().getRules(); ruleset = chunk.getState().getRulesetTitle(); break;
+						rules = chunk.getState().getRuleHolder().getMap(); ruleset = chunk.getState().getRulesetTitle(); break;
 					}
 					default: rules = new HashMap<>(); ruleset = "INVALID LAYER SELECTED"; break;
 				}
@@ -252,13 +252,13 @@ public class RuleCmd extends CommandBase {
 				Rule rule = null;
 				switch(args[1]){
 					case "mun": case "municipality":{
-						rule = chunk.getMunicipality().getRule(args[2]); break;
+						rule = chunk.getMunicipality().getRuleHolder().get(args[2]); break;
 					}
 					case "dis": case "district":{
-						rule = chunk.getDistrict().getRule(args[2]); break;
+						rule = chunk.getDistrict().getRuleHolder().get(args[2]); break;
 					}
 					case "st": case "state":{
-						rule = chunk.getState().getRule(args[2]); break;
+						rule = chunk.getState().getRuleHolder().get(args[2]); break;
 					}
 					default: break;
 				}

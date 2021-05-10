@@ -3,11 +3,9 @@ package net.fexcraft.mod.states.data;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 import java.util.UUID;
 
 import com.google.gson.JsonArray;
-import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 
 import net.fexcraft.lib.common.json.JsonUtil;
@@ -27,8 +25,8 @@ import net.fexcraft.mod.states.data.sub.Createable;
 import net.fexcraft.mod.states.data.sub.ExternalDataHolder;
 import net.fexcraft.mod.states.data.sub.IconHolder;
 import net.fexcraft.mod.states.data.sub.MailData;
+import net.fexcraft.mod.states.data.sub.RuleHolder;
 import net.fexcraft.mod.states.events.StateEvent;
-import net.fexcraft.mod.states.util.RuleMap;
 import net.fexcraft.mod.states.util.StateUtil;
 import net.minecraftforge.common.MinecraftForge;
 
@@ -42,6 +40,7 @@ public class State implements ChildLayer, AccountHolder, Ruleable {
 	public MailData mailbox = new MailData();
 	public Createable created = new Createable();
 	public ExternalDataHolder external = new ExternalDataHolder();
+	public RuleHolder rules = new RuleHolder(this);
 	private UUID leader;
 	private Account account;
 	private ArrayList<Integer> neighbors, municipalities, blacklist;
@@ -49,7 +48,6 @@ public class State implements ChildLayer, AccountHolder, Ruleable {
 	private byte chunktaxpercent, citizentaxpercent;
 	//
 	private String ruleset;
-	private RuleMap rules = new RuleMap();
 	public final Rule r_CREATE_SIGN_SHOP, r_SET_MAILBOX, r_OPEN_MAILBOX, r_CREATE_MUNICIPALITY, r_CLAIM_MUNICIPALITY;
 	public final Rule r_SET_COLOR, r_SET_ICON, r_SET_NAME, r_SET_PRICE, r_SET_LEADER, r_SET_CHUNK_TAX_PERCENT;
 	public final Rule r_EDIT_BL, r_MUN_KICK, r_MUN_INVITE, r_COUNCIL_KICK, r_COUNCIL_INVITE, r_VOTE_LEADER;
@@ -96,14 +94,8 @@ public class State implements ChildLayer, AccountHolder, Ruleable {
 		rules.add(r_SET_RULESET = new Rule("set.ruleset-name", null, false, Initiator.COUNCIL_VOTE, Initiator.INCHARGE));
 		rules.add(r_RESET_HEAD = new Rule("set.leader.none", null, false, Initiator.COUNCIL_VOTE, Initiator.INCHARGE));
 		rules.add(r_CLAIM_MUNICIPALITY = new Rule("claim.municipality", null, false, Initiator.COUNCIL_VOTE, Initiator.CITIZEN_ANY));
-		rules.lock();
-		if(obj.has("rules")){
-			JsonObject rls = obj.get("rules").getAsJsonObject();
-			for(Map.Entry<String, JsonElement> entry : rls.entrySet()){
-				Rule rule = rules.get(entry.getKey());
-				if(rule != null) rule.load(entry.getValue().getAsString());
-			}
-		}
+		rules.getMap().lock();
+		rules.load(obj);
 		//
 		if(obj.has("votes")){
 			ArrayList<Integer> list = JsonUtil.jsonArrayToIntegerArray(obj.get("votes").getAsJsonArray());
@@ -112,13 +104,7 @@ public class State implements ChildLayer, AccountHolder, Ruleable {
 			}
 		}
 		MinecraftForge.EVENT_BUS.post(new StateEvent.Load(this));
-		if(obj.has("ex-rules") && rules.hasExternal()){
-			JsonObject rls = obj.get("ex-rules").getAsJsonObject();
-			for(Map.Entry<String, JsonElement> entry : rls.entrySet()){
-				Rule rule = rules.get(entry.getKey());
-				if(rule != null) rule.load(entry.getValue().getAsString());
-			}
-		}
+		rules.loadEx(obj);
 		external.load(obj);
 	}
 
@@ -145,16 +131,7 @@ public class State implements ChildLayer, AccountHolder, Ruleable {
 		}
 		mailbox.save(obj);
 		obj.addProperty("ruleset", ruleset);
-		{
-			JsonObject rells = new JsonObject();
-			for(Rule rule : rules.values()) if(!rule.isExternal()) rells.addProperty(rule.id, rule.save());
-			obj.add("rules", rells);
-		}
-		if(rules.hasExternal()){
-			JsonObject erells = new JsonObject();
-			for(Rule rule : rules.values()) if(rule.isExternal()) erells.addProperty(rule.id, rule.save());
-			obj.add("ex-rules", erells);
-		}
+		rules.save(obj);
 		if(!active_votes.isEmpty()){
 			JsonArray array = new JsonArray();
 			for(Vote vote : active_votes) array.add(vote.id);
@@ -256,11 +233,6 @@ public class State implements ChildLayer, AccountHolder, Ruleable {
 	}
 
 	@Override
-	public Map<String, Rule> getRules(){
-		return rules;
-	}
-
-	@Override
 	public String getRulesetTitle(){
 		return ruleset;
 	}
@@ -298,6 +270,11 @@ public class State implements ChildLayer, AccountHolder, Ruleable {
 	@Override
 	public Layer getParentLayer(){
 		return Layer.UNION;
+	}
+
+	@Override
+	public RuleHolder getRuleHolder(){
+		return rules;
 	}
 	
 }

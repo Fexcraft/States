@@ -4,11 +4,9 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
-import java.util.Map;
 import java.util.UUID;
 
 import com.google.gson.JsonArray;
-import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 
 import net.fexcraft.lib.common.json.JsonUtil;
@@ -31,9 +29,9 @@ import net.fexcraft.mod.states.data.sub.Createable;
 import net.fexcraft.mod.states.data.sub.ExternalDataHolder;
 import net.fexcraft.mod.states.data.sub.IconHolder;
 import net.fexcraft.mod.states.data.sub.MailData;
+import net.fexcraft.mod.states.data.sub.RuleHolder;
 import net.fexcraft.mod.states.events.MunicipalityEvent;
 import net.fexcraft.mod.states.util.ForcedChunksManager;
-import net.fexcraft.mod.states.util.RuleMap;
 import net.fexcraft.mod.states.util.StConfig;
 import net.fexcraft.mod.states.util.StateUtil;
 import net.minecraft.command.ICommandSender;
@@ -50,6 +48,7 @@ public class Municipality implements ChildLayer, AccountHolder, Ruleable {
 	public Createable created = new Createable();
 	public ExternalDataHolder external = new ExternalDataHolder();
 	public Abandonable abandon;
+	public RuleHolder rules = new RuleHolder(this);
 	private long citizentax;
 	private UUID mayor;
 	private Account account;
@@ -57,7 +56,6 @@ public class Municipality implements ChildLayer, AccountHolder, Ruleable {
 	private ArrayList<UUID> citizen, council, pl_blacklist;
 	private State state;
 	//
-	private RuleMap rules = new RuleMap();
 	private String ruleset_name;
 	public final Rule r_OPEN, r_COLOR, r_ICON, r_SET_NAME, r_SET_PRICE, r_SET_MAYOR, r_SET_CITIZENTAX, r_KIB;
 	public final Rule r_EDIT_BL, r_KICK, r_INVITE, r_COUNCIL_KICK, r_COUNCIL_INVITE, r_VOTE_MAYOR;
@@ -132,14 +130,8 @@ public class Municipality implements ChildLayer, AccountHolder, Ruleable {
 		rules.add(r_SET_RULESET = new Rule("set.ruleset-name", null, false, Initiator.COUNCIL_VOTE, Initiator.INCHARGE));
 		rules.add(r_RESET_MAYOR = new Rule("set.mayor.none", null, false, Initiator.CITIZEN_VOTE, Initiator.HIGHERINCHARGE));
 		rules.add(r_ABANDON = new Rule("abandon", null, true, Initiator.INCHARGE, Initiator.INCHARGE));
-		rules.lock();
-		if(obj.has("rules")){
-			JsonObject rls = obj.get("rules").getAsJsonObject();
-			for(Map.Entry<String, JsonElement> entry : rls.entrySet()){
-				Rule rule = rules.get(entry.getKey());
-				if(rule != null) rule.load(entry.getValue().getAsString());
-			}
-		}
+		rules.getMap().lock();
+		rules.load(obj);
 		//import old settings from old saves
 		if(obj.has("open")){ r_OPEN.set(obj.get("open").getAsBoolean()); }
 		if(obj.has("kick_if_bankrupt")){ r_KIB.set(obj.get("kick_if_bankrupt").getAsBoolean()); }
@@ -151,13 +143,7 @@ public class Municipality implements ChildLayer, AccountHolder, Ruleable {
 			}
 		}
 		MinecraftForge.EVENT_BUS.post(new MunicipalityEvent.Load(this));
-		if(obj.has("ex-rules") && rules.hasExternal()){
-			JsonObject rls = obj.get("ex-rules").getAsJsonObject();
-			for(Map.Entry<String, JsonElement> entry : rls.entrySet()){
-				Rule rule = rules.get(entry.getKey());
-				if(rule != null) rule.load(entry.getValue().getAsString());
-			}
-		}
+		rules.loadEx(obj);
 		external.load(obj);
 	}
 
@@ -183,16 +169,7 @@ public class Municipality implements ChildLayer, AccountHolder, Ruleable {
 		mailbox.save(obj);
 		abandon.save(obj);
 		obj.addProperty("ruleset", ruleset_name);
-		{
-			JsonObject rells = new JsonObject();
-			for(Rule rule : rules.values()) if(!rule.isExternal()) rells.addProperty(rule.id, rule.save());
-			obj.add("rules", rells);
-		}
-		if(rules.hasExternal()){
-			JsonObject erells = new JsonObject();
-			for(Rule rule : rules.values()) if(rule.isExternal()) erells.addProperty(rule.id, rule.save());
-			obj.add("ex-rules", erells);
-		}
+		rules.save(obj);
 		if(!active_votes.isEmpty()){
 			JsonArray array = new JsonArray();
 			for(Vote vote : active_votes) array.add(vote.id);
@@ -357,11 +334,6 @@ public class Municipality implements ChildLayer, AccountHolder, Ruleable {
 	}
 
 	@Override
-	public Map<String, Rule> getRules(){
-		return rules;
-	}
-
-	@Override
 	public String getRulesetTitle(){
 		return ruleset_name;
 	}
@@ -409,6 +381,11 @@ public class Municipality implements ChildLayer, AccountHolder, Ruleable {
 	@Override
 	public Layer getParentLayer(){
 		return Layer.STATE;
+	}
+
+	@Override
+	public RuleHolder getRuleHolder(){
+		return rules;
 	}
 
 }

@@ -4,8 +4,9 @@ import java.util.List;
 import java.util.UUID;
 
 import net.fexcraft.mod.states.data.Rule.Result;
+import net.fexcraft.mod.states.data.sub.RuleHolder;
 
-public interface Ruleable extends RuleHolder, VoteHolder {
+public interface Ruleable extends VoteHolder {
 	
 	public String getRulesetTitle();
 	
@@ -28,11 +29,13 @@ public interface Ruleable extends RuleHolder, VoteHolder {
 	}
 	
 	public default Result isAuthorized(String rule, UUID uuid){
-		return getRule(rule).isAuthorized(this, uuid);
+		return getRuleHolder().get(rule).isAuthorized(this, uuid);
 	}
 	
 	public default Result canRevise(String rule, UUID uuid){
-		return getRule(rule).canRevise(this, uuid);
+		return getRuleHolder().get(rule).canRevise(this, uuid);
 	}
+	
+	public RuleHolder getRuleHolder();
 
 }

@@ -3,11 +3,9 @@ package net.fexcraft.mod.states.data;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 import java.util.UUID;
 
 import com.google.gson.JsonArray;
-import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 
 import net.fexcraft.lib.common.json.JsonUtil;
@@ -23,8 +21,8 @@ import net.fexcraft.mod.states.data.sub.Createable;
 import net.fexcraft.mod.states.data.sub.ExternalDataHolder;
 import net.fexcraft.mod.states.data.sub.IconHolder;
 import net.fexcraft.mod.states.data.sub.MailData;
+import net.fexcraft.mod.states.data.sub.RuleHolder;
 import net.fexcraft.mod.states.events.DistrictEvent;
-import net.fexcraft.mod.states.util.RuleMap;
 import net.fexcraft.mod.states.util.StateUtil;
 import net.minecraftforge.common.MinecraftForge;
 
@@ -42,9 +40,9 @@ public class District implements ChildLayer, Ruleable {
 	public MailData mailbox = new MailData();
 	public Createable created = new Createable();
 	public ExternalDataHolder external = new ExternalDataHolder();
+	public RuleHolder rules = new RuleHolder(this);
 	private Municipality municipality;
 	//
-	private RuleMap rules = new RuleMap();
 	private String ruleset;
 	public final Rule r_CFS, r_ONBANKRUPT, r_SET_MANAGER, r_SET_CHUNKTAX;
 	public final Rule r_SET_TYPE, r_SET_NAME, r_SET_PRICE, r_SET_COLOR, r_SET_ICON;
@@ -83,14 +81,8 @@ public class District implements ChildLayer, Ruleable {
 		rules.add(r_SET_MAILBOX = new Rule("set.mailbox", null, false, Initiator.COUNCIL_VOTE, Initiator.HIGHERINCHARGE));
 		rules.add(r_OPEN_MAILBOX = new Rule("open.mailbox", null, false, Initiator.COUNCIL_VOTE, Initiator.COUNCIL_ANY));
 		rules.add(r_SET_RULESET = new Rule("set.ruleset-name", null, false, Initiator.COUNCIL_ANY, Initiator.INCHARGE));
-		rules.lock();
-		if(obj.has("rules")){
-			JsonObject rls = obj.get("rules").getAsJsonObject();
-			for(Map.Entry<String, JsonElement> entry : rls.entrySet()){
-				Rule rule = rules.get(entry.getKey());
-				if(rule != null) rule.load(entry.getValue().getAsString());
-			}
-		}
+		rules.getMap().lock();
+		rules.load(obj);
 		//import old settings from old saves
 		if(obj.has("can_foreigners_settle")) r_CFS.set(obj.get("can_foreigners_settle").getAsBoolean());
 		if(obj.has("unclaim_chunks_if_bankrupt")) r_ONBANKRUPT.set(obj.get("unclaim_chunks_if_bankrupt").getAsBoolean());
@@ -102,13 +94,7 @@ public class District implements ChildLayer, Ruleable {
 			}
 		}
 		MinecraftForge.EVENT_BUS.post(new DistrictEvent.Load(this));
-		if(obj.has("ex-rules") && rules.hasExternal()){
-			JsonObject rls = obj.get("ex-rules").getAsJsonObject();
-			for(Map.Entry<String, JsonElement> entry : rls.entrySet()){
-				Rule rule = rules.get(entry.getKey());
-				if(rule != null) rule.load(entry.getValue().getAsString());
-			}
-		}
+		rules.loadEx(obj);
 		external.load(obj);
 	}
 
@@ -130,16 +116,7 @@ public class District implements ChildLayer, Ruleable {
 		//obj.addProperty("unclaim_chunks_if_bankrupt", onbankrupt);
 		mailbox.save(obj);
 		obj.addProperty("ruleset", ruleset);
-		{
-			JsonObject rells = new JsonObject();
-			for(Rule rule : rules.values()) if(!rule.isExternal()) rells.addProperty(rule.id, rule.save());
-			obj.add("rules", rells);
-		}
-		if(rules.hasExternal()){
-			JsonObject erells = new JsonObject();
-			for(Rule rule : rules.values()) if(rule.isExternal()) erells.addProperty(rule.id, rule.save());
-			obj.add("ex-rules", erells);
-		}
+		rules.save(obj);
 		if(!active_votes.isEmpty()){
 			JsonArray array = new JsonArray();
 			for(Vote vote : active_votes) array.add(vote.id);
@@ -223,11 +200,6 @@ public class District implements ChildLayer, Ruleable {
 	}
 
 	@Override
-	public Map<String, Rule> getRules(){
-		return rules;
-	}
-
-	@Override
 	public String getRulesetTitle(){
 		return ruleset;
 	}
@@ -275,6 +247,11 @@ public class District implements ChildLayer, Ruleable {
 	@Override
 	public Layer getParentLayer(){
 		return Layer.MUNICIPALITY;
+	}
+
+	@Override
+	public RuleHolder getRuleHolder(){
+		return rules;
 	}
 
 }

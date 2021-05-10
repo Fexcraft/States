@@ -25,7 +25,7 @@ import net.fexcraft.mod.states.util.StateUtil;
 import net.fexcraft.mod.states.util.TaxSystem;
 import net.minecraft.world.World;
 
-public class Chunk implements ChildLayer, Taxable/*, RuleHolder*/ {
+public class Chunk implements ChildLayer, Taxable {
 	
 	private District district;
 	private long edited, lasttaxcheck, ctax;

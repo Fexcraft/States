@@ -11,8 +11,7 @@ import net.fexcraft.lib.mc.utils.Print;
 import net.fexcraft.mod.states.data.Chunk;
 import net.fexcraft.mod.states.data.Rule;
 import net.fexcraft.mod.states.data.root.Initiator;
-import net.fexcraft.mod.states.data.root.RuleHolder;
-import net.fexcraft.mod.states.data.root.Ruleable;
+import net.fexcraft.mod.states.data.sub.RuleHolder;
 import net.fexcraft.mod.states.util.StateUtil;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.nbt.NBTTagCompound;
@@ -33,16 +32,16 @@ public class RulesUIC extends GenericContainer {
 		Chunk chunk = StateUtil.getChunk(player.getPosition());
 		switch(layer){
 			//case 0: holder = chunk; break;
-			case 1: holder = chunk.getDistrict(); break;
-			case 2: holder = chunk.getMunicipality(); break;
-			case 3: holder = chunk.getState(); break;
+			case 1: holder = chunk.getDistrict().getRuleHolder(); break;
+			case 2: holder = chunk.getMunicipality().getRuleHolder(); break;
+			case 3: holder = chunk.getState().getRuleHolder(); break;
 			default: {
 				Print.log("Invalid Layer for Rules GUI"); player.closeScreen(); break;
 			}
 		}
-		Rule[] arr = holder.getRules().values().toArray(new Rule[0]); int j = 0;
+		Rule[] arr = holder.getMap().values().toArray(new Rule[0]); int j = 0;
 		for(int i = 0; i < 16; i++){
-			if((j = i + (page * 16)) >= holder.getRules().size()) break;
+			if((j = i + (page * 16)) >= holder.getMap().size()) break;
 			rules[i] = arr[j]; continue;
 		}
 	}
@@ -62,7 +61,7 @@ public class RulesUIC extends GenericContainer {
 						if(rules[i] == null) break;
 						compound.setString("rule" + i, rules[i].id + "," + rules[i].save());
 					}
-					if(holder instanceof Ruleable) compound.setString("ruleset", ((Ruleable)holder).getRulesetTitle());
+					compound.setString("ruleset", holder.root.getRulesetTitle());
 					send(Side.CLIENT, compound);
 					return;
 				}
@@ -77,17 +76,12 @@ public class RulesUIC extends GenericContainer {
 						passed = true;
 					}
 					else{
-						if(holder instanceof Ruleable){
-							Rule.Result res = ((Ruleable)holder).isAuthorized(rules[i].id, uuid);
-							if(res.isVote()){
-								sendStatus("&bThis needs a vote to change! &7/st-rule");
-								passed = false;
-							}
-							else passed = res.isTrue();
+						Rule.Result res = holder.root.isAuthorized(rules[i].id, uuid);
+						if(res.isVote()){
+							sendStatus("&bThis needs a vote to change! &7/st-rule");
+							passed = false;
 						}
-						else{
-							passed = ((Chunk)holder).isRuleAuthorized(uuid);
-						}
+						else passed = res.isTrue();
 					}
 					if(!passed){
 						sendStatus("&bNo permission to set this rule.");
@@ -100,42 +94,37 @@ public class RulesUIC extends GenericContainer {
 				}
 				case "rev": case "set": {
 					int i = packet.getInteger("rule"); boolean set = packet.getString("cargo").equals("set");
-					if(holder instanceof Ruleable){
-						Ruleable ruleable = (Ruleable)holder; UUID uuid = player.getGameProfile().getId();
-						boolean vote, pass;
-						Rule.Result res;
-						if(set){
-							res = ruleable.isAuthorized(rules[i].id, uuid);
-						}
-						else{
-							res = ruleable.canRevise(rules[i].id, uuid);
-						}
-						vote = res.isVote();
-						pass = res.isTrue();
-						if(pass || StateUtil.isAdmin(player)){
-							try{
-								Initiator init = Initiator.valueOf(packet.getString("value").toUpperCase());
-								if(set && !init.isValidAsSetter(rules[i].isVotable())){
-									sendStatus("&bInvalid Initiator.");
-								}
-								else{
-									if(set) rules[i].setter = init; else rules[i].reviser = init;
-									sendStatus("&aRule " + (set ? "SET" : "REV") + " updated to: " + init.name());
-								}
-							}
-							catch(Exception e){
-								sendStatus("&bError parsing Initiator.");
-							}
-						}
-						else if(vote){
-							sendStatus("&bThis needs a vote to change! &7/st-rule");
-						}
-						else{
-							sendStatus("&bNo permission to revise this.");
-						}
+					UUID uuid = player.getGameProfile().getId();
+					boolean vote, pass;
+					Rule.Result res;
+					if(set){
+						res = holder.root.isAuthorized(rules[i].id, uuid);
 					}
 					else{
-						sendStatus("&aNot applicable for Chunks.");
+						res = holder.root.canRevise(rules[i].id, uuid);
+					}
+					vote = res.isVote();
+					pass = res.isTrue();
+					if(pass || StateUtil.isAdmin(player)){
+						try{
+							Initiator init = Initiator.valueOf(packet.getString("value").toUpperCase());
+							if(set && !init.isValidAsSetter(rules[i].isVotable())){
+								sendStatus("&bInvalid Initiator.");
+							}
+							else{
+								if(set) rules[i].setter = init; else rules[i].reviser = init;
+								sendStatus("&aRule " + (set ? "SET" : "REV") + " updated to: " + init.name());
+							}
+						}
+						catch(Exception e){
+							sendStatus("&bError parsing Initiator.");
+						}
+					}
+					else if(vote){
+						sendStatus("&bThis needs a vote to change! &7/st-rule");
+					}
+					else{
+						sendStatus("&bNo permission to revise this.");
 					}
 					return;
 				}

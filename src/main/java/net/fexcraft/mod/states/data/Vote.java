@@ -393,7 +393,7 @@ public class Vote {
 			text0 = "&7Vote [&9" + id + "&7] for rule change ended. &aChange Accepted.";
 		}
 		text1 = "&7Vote was to change &b" + (type.valueful() ? "value" : type == VoteType.CHANGE_REVISER ? "revider" : "setter") + " &7to &b" + (type.valueful() ? new_value : to.name()) + "&7.";
-		text2 = "&7Rule: &a" + rule; Rule RULE = holder.getRule(rule);
+		text2 = "&7Rule: &a" + rule; Rule RULE = holder.getRuleHolder().get(rule);
 		if(RULE == null){
 			StateUtil.announce(Static.getServer(), level, "&7Vote [&9" + id + "&7] for rule change ended. &4RULE NOT FOUND", range); return;
 		}

@@ -6,7 +6,6 @@ import java.util.List;
 import java.util.UUID;
 
 import net.fexcraft.lib.common.math.Time;
-import net.fexcraft.mod.states.States;
 import net.fexcraft.mod.states.data.sub.IconHolder;
 import net.minecraftforge.common.config.ConfigElement;
 import net.minecraftforge.common.config.Configuration;
@@ -35,6 +34,8 @@ public class StConfig {
 	public static int MAP_UPDATES_PER_SECOND, CHUNK_PER_CITIZEN, NICKNAME_LENGTH, LOADED_CHUNKS_PER_MUNICIPALITY, CHUNKS_FOR_DISTRICT;
 	public static boolean ALLOW_WILDERNESS_ACCESS, STATES_CHAT, ALLOW_MAILBOX_COLLECT;//, FORGE_ADMIN_CHECK;
 	public static String SERVER_ICON = "http://fexcraft.net/files/mod_data/states/default_server_icon.png";
+	public static String DEFAULT_ICON = "http://fexcraft.net/files/mod_data/states/default_icon.png";
+	public static final String BROADCASTER = "http://fexcraft.net/files/mod_data/states/broadcaster_icon.png";
 	public static IconHolder SERVER_ICONHOLDER = new IconHolder(SERVER_ICON);
 	//CLIENT
 	public static boolean SHOW_MINIMAP;
@@ -92,7 +93,7 @@ public class StConfig {
 		BOT_KEY = config.getString("discord_botkey", DEFAULT_CAT, UUID.randomUUID().toString().replace("-", ""), "A key/token so only an authorized bot can send messages to this server. Can be changed as wanted.");
 		BOT_PORT = config.getInt("discord_botport", DEFAULT_CAT, 9910, 8000, Integer.MAX_VALUE, "Port for receiving messages from the bot, set to -1 to disable.");
 		WEBHOOK_BROADCASTER_NAME = config.getString("discord_webhook_broadcaster_name", DEFAULT_CAT, "States Broadcaster", "The \"Server's\" name when sending messages to the webhook which aren't from a player, e.g. on server start/stop.");
-		WEBHOOK_ICON = config.getString("discord_webhook_icon", DEFAULT_CAT, States.DEFAULT_ICON, "Icon for the Server Broadcaster, in discord.");
+		WEBHOOK_ICON = config.getString("discord_webhook_icon", DEFAULT_CAT, BROADCASTER, "Icon for the Server Broadcaster, in discord.");
 		//TRANSIT-ZONES
 		ALLOW_TRANSIT_ZONES = config.getBoolean("allow_temporary_districts", DEFAULT_CAT, true, "If players should be able to claim chunks temporarily.");
 		TRANSIT_ZONE_BOTTOM_LIMIT = config.getInt("temporary_district_bottom_limit", DEFAULT_CAT, 50, 0, 127, "Min Height value to which blocks in Temporary claimed Chunks can be accessed.");
@@ -110,6 +111,7 @@ public class StConfig {
 		CHUNKS_FOR_DISTRICT = config.getInt("chunks_for_district", DEFAULT_CAT, 64, 1, Integer.MAX_VALUE, "Multiplier of chunk claims required to unlock more districts.");
 		SERVER_ICON = config.getString("server_icon", DEFAULT_CAT, SERVER_ICON, "Server Icon to be shown in the Location Update GUI.");
 		SERVER_ICONHOLDER.set(SERVER_ICON);
+		DEFAULT_ICON = config.getString("default_icon", DEFAULT_CAT, DEFAULT_ICON, "Default Dis/Mun/Cou/State Icon to be shown in the Location Update GUI.");
 		//CLIENT
 		SHOW_MINIMAP = config.getBoolean("show_minimap", CLIENT_CAT, true, "If the States Minimap should be shown.");
 		updateWebHook();

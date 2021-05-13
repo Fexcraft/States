@@ -1,6 +1,6 @@
 package net.fexcraft.mod.states.data.sub;
 
-import static net.fexcraft.mod.states.States.DEFAULT_ICON;
+import static net.fexcraft.mod.states.util.StConfig.DEFAULT_ICON;
 
 import java.util.Arrays;
 import java.util.List;

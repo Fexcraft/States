@@ -83,7 +83,6 @@ public class States {
 	//
 	public static final String DEF_UUID = "66e70cb7-1d96-487c-8255-5c2d7a2b6a0e";
 	public static final String CONSOLE_UUID = "f78a4d8d-d51b-4b39-98a3-230f2de0c670";
-	public static final String DEFAULT_ICON = "http://fexcraft.net/files/mod_data/states/default_icon.png";
 	public static Account SERVERACCOUNT;
 	//
 	@Mod.Instance(MODID)

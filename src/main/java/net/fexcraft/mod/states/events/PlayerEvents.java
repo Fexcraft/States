@@ -347,6 +347,7 @@ public class PlayerEvents {
 		writeLocPacketIcon(nbt, chunk == null ? null : chunk.getDistrict().getMunicipality().getState().icon, 1, IconHolder.PACKET_COLOURS.get(2));
 		writeLocPacketIcon(nbt, chunk == null ? null : chunk.getDistrict().getMunicipality().icon, 2, IconHolder.PACKET_COLOURS.get(0));
 		writeLocPacketIcon(nbt, chunk == null ? null : chunk.getDistrict().icon, 3, IconHolder.PACKET_COLOURS.get(3));
+		writeLocPacketIcon(nbt, StConfig.SERVER_ICONHOLDER, 4, IconHolder.PACKET_COLOURS.get(0));
 		nbt.setString("line0", line0 == null ? " " : line0);
 		nbt.setString("line1", line1 == null ? " " : line1);
 		nbt.setString("line2", line2 == null ? " " : line2);

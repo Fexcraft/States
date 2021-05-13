@@ -7,6 +7,7 @@ import java.util.UUID;
 
 import net.fexcraft.lib.common.math.Time;
 import net.fexcraft.mod.states.States;
+import net.fexcraft.mod.states.data.sub.IconHolder;
 import net.minecraftforge.common.config.ConfigElement;
 import net.minecraftforge.common.config.Configuration;
 import net.minecraftforge.fml.client.config.IConfigElement;
@@ -33,6 +34,8 @@ public class StConfig {
 	//LIMITS-OTHER
 	public static int MAP_UPDATES_PER_SECOND, CHUNK_PER_CITIZEN, NICKNAME_LENGTH, LOADED_CHUNKS_PER_MUNICIPALITY, CHUNKS_FOR_DISTRICT;
 	public static boolean ALLOW_WILDERNESS_ACCESS, STATES_CHAT, ALLOW_MAILBOX_COLLECT;//, FORGE_ADMIN_CHECK;
+	public static String SERVER_ICON = "http://fexcraft.net/files/mod_data/states/default_server_icon.png";
+	public static IconHolder SERVER_ICONHOLDER = new IconHolder(SERVER_ICON);
 	//CLIENT
 	public static boolean SHOW_MINIMAP;
 	//
@@ -105,6 +108,8 @@ public class StConfig {
 		ALLOW_MAILBOX_COLLECT = config.getBoolean("allow_mailbox_collect", DEFAULT_CAT, true, "Should players be allowed to use '/mail collect <box-type>'? Allows to collect player mail from non-player mailboxes without being directly nearby or needing permission for the mailbox.");
 		MAP_UPDATES_PER_SECOND = config.getInt("map_updates_per_second", DEFAULT_CAT, 20, 0, 128, "Max amount of Map updates per second.");
 		CHUNKS_FOR_DISTRICT = config.getInt("chunks_for_district", DEFAULT_CAT, 64, 1, Integer.MAX_VALUE, "Multiplier of chunk claims required to unlock more districts.");
+		SERVER_ICON = config.getString("server_icon", DEFAULT_CAT, SERVER_ICON, "Server Icon to be shown in the Location Update GUI.");
+		SERVER_ICONHOLDER.set(SERVER_ICON);
 		//CLIENT
 		SHOW_MINIMAP = config.getBoolean("show_minimap", CLIENT_CAT, true, "If the States Minimap should be shown.");
 		updateWebHook();

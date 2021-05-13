@@ -19,11 +19,11 @@ public class LocationUpdate extends GuiScreen {
 	public static long till = Time.getDate();
 	public static String[] lines = new String[]{ "", "", "", "" };
 	public static final ResourceLocation texture = new ResourceLocation("states:textures/gui/location_gui.png");
-	public static ResourceLocation[] icon = new ResourceLocation[4];
+	public static ResourceLocation[] icon = new ResourceLocation[5];
 	public static int[] icorx = {  3, 35, 105, 81, 62 };
 	public static int[] icory = {  3,  3,   3,  3,  7 };
 	public static int[] icorz = { 32, 24,  32, 24, 16 };
-	public static int[] x = { 32, 64, 0, 96 }, y = { 224, 224, 224, 224 };
+	public static int[] x = { 32, 64, 0, 96, 32 }, y = { 224, 224, 224, 224, 224 };
 	private static Minecraft client;
 	private static final LocationUpdate THIS = new LocationUpdate();
 	
@@ -40,7 +40,7 @@ public class LocationUpdate extends GuiScreen {
 		Tessellator tessellator = Tessellator.getInstance();
         BufferBuilder bufferbuilder = tessellator.getBuffer();
 		//
-        for(int i = 0; i < 4; i++){
+        for(int i = 0; i < 5; i++){
         	if(icon[i] == null){
     			THIS.drawTexturedModalRect(icorx[i], icory[i], x[i], y[i], icorz[i], icorz[i]);
         	}

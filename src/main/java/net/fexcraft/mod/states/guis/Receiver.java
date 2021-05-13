@@ -38,7 +38,7 @@ public class Receiver implements IPacketListener<PacketNBTTagCompound> {
 				LocationUpdate.lines[1] = Formatter.format(packet.nbt.getString("line1"));
 				LocationUpdate.lines[2] = Formatter.format(packet.nbt.getString("line2"));
 				LocationUpdate.lines[3] = Formatter.format(packet.nbt.getString("line3"));
-				for(int i = 0; i < 4; i++){
+				for(int i = 0; i < 5; i++){
 					LocationUpdate.icon[i] = packet.nbt.hasKey("icon_" + i) ? ExternalTextureHelper.get(packet.nbt.getString("icon_" + i)) : null;
 					LocationUpdate.x[i] = packet.nbt.hasKey("x_" + i) ? packet.nbt.getInteger("x_" + i) : 0;
 					LocationUpdate.y[i] = packet.nbt.hasKey("y_"+ i) ? packet.nbt.getInteger("y_" + i) : 0;

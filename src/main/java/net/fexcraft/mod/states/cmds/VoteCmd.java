@@ -132,7 +132,7 @@ public class VoteCmd extends CommandBase {
 				}
 				Print.chat(sender, "&9Vote Target: &7" + vote.targetAsString());
 				vote.summary(sender);
-				boolean canshow = vote.council ? vote.holder.getCouncil().contains(ply.getUUID()) : ((Populated)vote.holder.getLayer()).isCitizen(ply.getUUID());
+				boolean canshow = vote.council ? vote.holder.isInCouncil(ply.getUUID()) : ((Populated)vote.holder.getLayer()).isCitizen(ply.getUUID());
 				if(canshow){
 					if(!vote.votes.containsKey(ply.getUUID().toString())){
 						if(!vote.type.assignment()){

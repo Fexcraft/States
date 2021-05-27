@@ -175,7 +175,7 @@ public class PlayerImpl implements PlayerCapability {
 			Print.chat(sender, "&eYou must assign a new Mayor first, or remove youself as one, before you can leave the Municipality.");
 			return false;
 		}
-		if(municipality.manage.getCouncil().size() < 2 && municipality.manage.getCouncil().contains(getUUID())){
+		if(municipality.manage.getCouncil().size() < 2 && municipality.manage.isInCouncil(getUUID())){
 			Print.chat(sender, "&eYou cannot leave the Municipality as last Council member.");
 			return false;
 		}

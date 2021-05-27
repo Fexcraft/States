@@ -628,7 +628,7 @@ public class ManagerContainer extends GenericContainer {
 											sendStatus("states.manager_gui.view.player_not_found_cache");
 											break;
 										}
-										if(!mun.manage.getCouncil().contains(gp.getId()) && !mun.isCitizen(gp.getId())){
+										if(!mun.manage.isInCouncil(gp.getId()) && !mun.isCitizen(gp.getId())){
 											sendStatus("states.manager_gui.view.player_not_council_or_citizen");
 											break;
 										}
@@ -864,7 +864,7 @@ public class ManagerContainer extends GenericContainer {
 											sendStatus("states.manager_gui.view.player_not_found_cache");
 											break;
 										}
-										if(!state.manage.getCouncil().contains(gp.getId()) && !state.isCitizen(gp.getId())){
+										if(!state.manage.isInCouncil(gp.getId()) && !state.isCitizen(gp.getId())){
 											sendStatus("states.manager_gui.view.player_not_council_or_citizen");
 											break;
 										}
@@ -1329,7 +1329,7 @@ public class ManagerContainer extends GenericContainer {
 									sendStatus(null);
 									return;
 								}
-								if(mun.manage.getCouncil().contains(list_values[index])){
+								if(mun.manage.isInCouncil((UUID)list_values[index])){
 									Print.chat(player, "states.manager_gui.list.cannot_kick_council0");
 									Print.chat(player, "states.manager_gui.list.cannot_kick_council1");
 									sendStatus(null);
@@ -1402,7 +1402,7 @@ public class ManagerContainer extends GenericContainer {
 									sendStatus(null);
 									return;
 								}
-								if(!mun.manage.getCouncil().contains((UUID)list_values[index])){
+								if(!mun.manage.isInCouncil((UUID)list_values[index])){
 									sendStatus("states.manager_gui.list.not_council");
 									return;
 								}
@@ -1422,7 +1422,7 @@ public class ManagerContainer extends GenericContainer {
 									sendStatus(null);
 									return;
 								}
-								if(!state.manage.getCouncil().contains((UUID)list_values[index])){
+								if(!state.manage.isInCouncil((UUID)list_values[index])){
 									sendStatus("states.manager_gui.list.not_council");
 									return;
 								}
@@ -1472,7 +1472,7 @@ public class ManagerContainer extends GenericContainer {
 										sendStatus("states.manager_gui.view.player_not_found_cache");
 										return;
 									}
-									if(mun.manage.getCouncil().contains(prof.getId())){
+									if(mun.manage.isInCouncil(prof.getId())){
 										Print.chat(player, "states.manager_gui.list.cannot_blacklist_council0");
 										Print.chat(player, "states.manager_gui.list.cannot_blacklist_council1");
 										sendStatus(null);
@@ -1611,7 +1611,7 @@ public class ManagerContainer extends GenericContainer {
 									sendStatus("states.manager_gui.view.player_not_found_cache");
 									return;
 								}
-								if(mun.manage.getCouncil().contains(gp.getId())){
+								if(mun.manage.isInCouncil(gp.getId())){
 									sendStatus("states.manager_gui.list.is_council");
 									return;
 								}
@@ -1641,7 +1641,7 @@ public class ManagerContainer extends GenericContainer {
 									sendStatus("states.manager_gui.view.player_not_found_cache");
 									return;
 								}
-								if(state.manage.getCouncil().contains(gp.getId())){
+								if(state.manage.isInCouncil(gp.getId())){
 									sendStatus("states.manager_gui.list.is_council");
 									return;
 								}
@@ -1819,7 +1819,7 @@ public class ManagerContainer extends GenericContainer {
 		boolean isco = chunk.getOwner().equals(uuid.toString());
 		boolean ismn = chunk.getDistrict().manage.getHead() != null && chunk.getDistrict().manage.getHead().equals(uuid);
 		boolean ismy = chunk.getMunicipality().manage.getHead() != null && chunk.getMunicipality().manage.getHead().equals(uuid);
-		boolean isst = chunk.getState().manage.getCouncil().contains(uuid) || (chunk.getState().manage.getHead() != null && chunk.getState().manage.getHead().equals(uuid));
+		boolean isst = chunk.getState().manage.isInCouncil(uuid) || (chunk.getState().manage.getHead() != null && chunk.getState().manage.getHead().equals(uuid));
 		boolean iscm = false;//TODO companies
 		Print.debug(isco, ismn, ismy, isst, iscm);
 		switch(chunk.getType()){
@@ -1856,7 +1856,7 @@ public class ManagerContainer extends GenericContainer {
 		boolean isco = chunk.getOwner().equals(uuid.toString());
 		boolean ismn = chunk.getDistrict().manage.getHead() != null && chunk.getDistrict().manage.getHead().equals(uuid);
 		boolean ismy = chunk.getMunicipality().manage.getHead() != null && chunk.getMunicipality().manage.getHead().equals(uuid);
-		boolean isst = chunk.getState().manage.getCouncil().contains(uuid) || (chunk.getState().manage.getHead() != null && chunk.getState().manage.getHead().equals(uuid));
+		boolean isst = chunk.getState().manage.isInCouncil(uuid) || (chunk.getState().manage.getHead() != null && chunk.getState().manage.getHead().equals(uuid));
 		boolean iscm = false;//TODO companies
 		Print.debug(isco, ismn, ismy, isst, iscm);
 		switch(chunk.getType()){

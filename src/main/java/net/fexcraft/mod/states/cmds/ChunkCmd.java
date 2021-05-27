@@ -438,7 +438,7 @@ public class ChunkCmd extends CommandBase {
 		boolean isco = chunk.getOwner().equals(uuid.toString());
 		boolean ismn = chunk.getDistrict().manage.getHead() != null && chunk.getDistrict().manage.getHead().equals(uuid);
 		boolean ismy = chunk.getMunicipality().manage.getHead() != null && chunk.getMunicipality().manage.getHead().equals(uuid);
-		boolean isst = chunk.getState().manage.getCouncil().contains(uuid) || (chunk.getState().manage.getHead() != null && chunk.getState().manage.getHead().equals(uuid));
+		boolean isst = chunk.getState().manage.isInCouncil(uuid) || (chunk.getState().manage.getHead() != null && chunk.getState().manage.getHead().equals(uuid));
 		boolean iscm = false;//TODO companies
 		Print.debug(isco, ismn, ismy, isst, iscm);
 		switch(chunk.getType()){

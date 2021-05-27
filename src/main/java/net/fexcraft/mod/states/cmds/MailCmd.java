@@ -122,13 +122,13 @@ public class MailCmd extends CommandBase {
 							}
 							case "municipality":{
 								if(!cap.isMayorOf(StateUtil.getMunicipality(Integer.parseInt(loc.getPath())))
-									&& !StateUtil.getMunicipality(Integer.parseInt(loc.getPath())).manage.getCouncil().contains(player.getGameProfile().getId())){
+									&& !StateUtil.getMunicipality(Integer.parseInt(loc.getPath())).manage.isInCouncil(player.getGameProfile().getId())){
 									Print.chat(player, "Your are not Mayor or Council Member to read this."); return;
 								} break;
 							}
 							case "state":{
 								if(!cap.isStateLeaderOf(StateUtil.getState(Integer.parseInt(loc.getPath())))
-									&& !StateUtil.getState(Integer.parseInt(loc.getPath())).manage.getCouncil().contains(player.getGameProfile().getId())){
+									&& !StateUtil.getState(Integer.parseInt(loc.getPath())).manage.isInCouncil(player.getGameProfile().getId())){
 									Print.chat(player, "Your are not State Leader or Council Member to read this."); return;
 								} break;
 							}

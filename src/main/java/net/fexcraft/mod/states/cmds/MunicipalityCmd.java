@@ -97,7 +97,7 @@ public class MunicipalityCmd extends CommandBase {
 			Print.chat(sender, "&7/mun leave");
 			Print.chat(sender, "&7/mun kick <player> <reason>");
 			Print.chat(sender, "&7/mun invite <player> <msg>");
-			if(mun.manage.getCouncil().contains(ply.getUUID()) || StateUtil.isAdmin(player)){
+			if(mun.manage.isInCouncil(ply.getUUID()) || StateUtil.isAdmin(player)){
 				Print.chat(sender, "&8- &5- &8- - - - - -");
 				Print.chat(sender, "&7/mun vote-mayor <player>");
 				Print.chat(sender, "&7/mun leave-council");
@@ -176,7 +176,7 @@ public class MunicipalityCmd extends CommandBase {
 				return;
 			}
 			case "leave-council":{
-				if(!mun.manage.getCouncil().contains(ply.getUUID())){
+				if(!mun.manage.isInCouncil(ply.getUUID())){
 					Print.chat(sender, "&7You are not a council member!");
 					return;
 				}
@@ -239,7 +239,7 @@ public class MunicipalityCmd extends CommandBase {
 					Print.chat(sender, "&cPlayer not found.");
 					return;
 				}
-				if(mun.manage.getCouncil().contains(gp.getId())){
+				if(mun.manage.isInCouncil(gp.getId())){
 					Print.chat(sender, "&9You can not kick council members!");
 					Print.chat(sender, "&cUse &7/mun council kick &c instead!");
 					return;

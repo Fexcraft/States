@@ -45,6 +45,10 @@ public class Manageable implements Loadable {
 		return council == null ? hasHigherInstance() ? getHigherInstance().getCouncil() : null : council;
 	}
 	
+	public boolean isInCouncil(UUID uuid){
+		return council == null ? false : council.contains(uuid);
+	}
+	
 	public UUID getHead(){
 		return head;
 	}

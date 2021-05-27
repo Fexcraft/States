@@ -83,11 +83,11 @@ public class Rule {
 					return Result.FALSE;
 				}
 			}
-			case COUNCIL_ANY: return Result.bool(manage.getCouncil().contains(uuid));
+			case COUNCIL_ANY: return Result.bool(manage.isInCouncil(uuid));
 			case COUNCIL_VOTE:{
 				if(votable_set){
 					if(manage.getCouncil().size() == 1) return Result.bool(manage.getCouncil().get(0).equals(uuid));
-					if(manage.getCouncil().contains(uuid)) return Result.VOTE;
+					if(manage.isInCouncil(uuid)) return Result.VOTE;
 					return Result.FALSE;
 				}
 				else{
@@ -129,7 +129,7 @@ public class Rule {
 			case COUNCIL_ANY: return Result.bool(manage.getCouncil().contains(uuid));
 			case COUNCIL_VOTE:{
 				if(manage.getCouncil().size() == 1) return Result.bool(manage.getCouncil().get(0).equals(uuid));
-				if(manage.getCouncil().contains(uuid)) return Result.VOTE;
+				if(manage.isInCouncil(uuid)) return Result.VOTE;
 				return Result.FALSE;
 			}
 			case INCHARGE: return Result.bool(manage.isHead(uuid));

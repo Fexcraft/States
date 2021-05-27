@@ -153,7 +153,7 @@ public class Vote {
 	/** For assignment-type votes. */
 	public boolean vote(ICommandSender sender, UUID from, UUID vfor){
 		if(!prevote(sender, from, true)) return false;
-		if(!holder.getCouncil().contains(vfor)){
+		if(!holder.isInCouncil(vfor)){
 			Print.chat(sender, "You have to vote for someone in the Council.");
 			return false;
 		}
@@ -271,7 +271,7 @@ public class Vote {
 
 	public boolean isVoter(ICommandSender sender, UUID uuid){
 		if(this.council){
-			if(!holder.getCouncil().contains(uuid)){
+			if(!holder.isInCouncil(uuid)){
 				if(sender != null) Print.chat(sender, "&cYou need to be council member to vote on this!");
 				return false;
 			}

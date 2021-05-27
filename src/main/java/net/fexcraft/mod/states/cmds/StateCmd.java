@@ -77,7 +77,7 @@ public class StateCmd extends CommandBase {
 		if(args.length == 0){
 			Print.chat(sender, "&7/st info");
 			Print.chat(sender, "&7/st rules");
-			if(state.manage.getCouncil().contains(ply.getUUID()) || StateUtil.isAdmin(player)){
+			if(state.manage.isInCouncil(ply.getUUID()) || StateUtil.isAdmin(player)){
 				Print.chat(sender, "&8- &5- &8- - - - - -");
 				Print.chat(sender, "&7/st vote-head <player>");
 				Print.chat(sender, "&7/st leave-council");
@@ -133,7 +133,7 @@ public class StateCmd extends CommandBase {
 				return;
 			}
 			case "leave-council":{
-				if(!state.manage.getCouncil().contains(ply.getUUID())){
+				if(!state.manage.isInCouncil(ply.getUUID())){
 					Print.chat(sender, "&7You are not a council member!");
 					return;
 				}
@@ -220,7 +220,7 @@ public class StateCmd extends CommandBase {
 					if(mun != null && mun.getId() >= 0){
 						Print.chat(sender, "&6Municipality: &7" + mun.getName() + " &8(" + mun.getId() + ");");
 						mun.getResidents().forEach(uuid -> {
-							Print.chat(sender, "&e-> &9" + Static.getPlayerNameByUUID(uuid) + (mun.manage.getCouncil().contains(uuid) ? " &6" + "[CM]" : ""));
+							Print.chat(sender, "&e-> &9" + Static.getPlayerNameByUUID(uuid) + (mun.manage.isInCouncil(uuid) ? " &6" + "[CM]" : ""));
 						});
 					}
 				}

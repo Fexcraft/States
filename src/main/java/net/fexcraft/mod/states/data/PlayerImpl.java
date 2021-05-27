@@ -72,7 +72,7 @@ public class PlayerImpl implements PlayerCapability {
 		this.nick = obj.has("nickname") ? obj.get("nickname").getAsString() : null;
 		this.color = JsonUtil.getIfExists(obj, "color", 2).intValue();
 		Municipality mun = StateUtil.getMunicipality(JsonUtil.getIfExists(obj, "municipality", -1).intValue());
-		this.setMunicipality(mun == null || (mun.getId() >= 0 && !mun.getCitizen().contains(getUUID())) ? StateUtil.getMunicipality(-1) : mun);
+		this.setMunicipality(mun == null || (mun.getId() >= 0 && !mun.isCitizen(getUUID())) ? StateUtil.getMunicipality(-1) : mun);
 		this.account = this.isOnlinePlayer() ? entity.getCapability(FSMMCapabilities.PLAYER, null).getAccount() : DataManager.getAccount("player:" + getUUID().toString(), true, true);
 		this.lasttaxcoll = JsonUtil.getIfExists(obj, "last_tax_collection", 0).longValue();
 		this.customtax = JsonUtil.getIfExists(obj, "custom_tax", 0).longValue();
@@ -91,7 +91,7 @@ public class PlayerImpl implements PlayerCapability {
 	@Override
 	public void setMunicipality(Municipality mun){
 		if(this.municipality != null){
-			this.municipality.getCitizen().remove(this.getUUID());
+			this.municipality.getResidents().remove(this.getUUID());
 			this.municipality.manage.getCouncil().remove(this.getUUID());
 			//
 			for(int id : this.municipality.getDistricts()){
@@ -104,8 +104,8 @@ public class PlayerImpl implements PlayerCapability {
 			}
 		}
 		this.municipality = mun;
-		if(!this.municipality.getCitizen().contains(this.getUUID())){
-			this.municipality.getCitizen().add(this.getUUID());
+		if(!this.municipality.getResidents().contains(this.getUUID())){
+			this.municipality.getResidents().add(this.getUUID());
 		}
 	}
 
@@ -179,7 +179,7 @@ public class PlayerImpl implements PlayerCapability {
 			Print.chat(sender, "&eYou cannot leave the Municipality as last Council member.");
 			return false;
 		}
-		if(municipality.getId() > 0 && municipality.getCitizen().size() == 1){
+		if(municipality.getId() > 0 && municipality.getResidents().size() == 1){
 			Print.chat(sender, "&eYou cannot leave the Municipality as last citizen!");
 			Print.chat(sender, "&eUse &7/mun abandon &einstead or &7/mun claim &eto become Mayor!");
 		}

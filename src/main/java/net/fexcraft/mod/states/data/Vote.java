@@ -21,6 +21,7 @@ import net.fexcraft.mod.states.data.root.AnnounceLevel;
 import net.fexcraft.mod.states.data.root.Initiator;
 import net.fexcraft.mod.states.data.root.Mailbox.MailType;
 import net.fexcraft.mod.states.data.root.Mailbox.RecipientType;
+import net.fexcraft.mod.states.data.root.Populated;
 import net.fexcraft.mod.states.data.sub.Manageable;
 import net.fexcraft.mod.states.util.MailUtil;
 import net.fexcraft.mod.states.util.StateUtil;
@@ -244,7 +245,7 @@ public class Vote {
 			for(String str : votes_for.keySet()){
 				Print.chat(sender, "&a" + percent(votes_for.get(str), summary) + "% &7- &e" + Static.getPlayerNameByUUID(str));
 			}
-			Print.chat(sender, "&6" + votes.size() + " &7votes received of &2" + (council ? holder.getCouncil().size() : ((Municipality)holder.getLayer()).getCitizen().size()) + " &7expected.");
+			Print.chat(sender, "&6" + votes.size() + " &7votes received of &2" + (council ? holder.getCouncil().size() : ((Populated)holder.getLayer()).getAllResidentCount()) + " &7expected.");
 		}
 		else{
 			int agree = 0, disagree = 0;
@@ -253,7 +254,7 @@ public class Vote {
 			}
 			Print.chat(sender, "&e" + percent(agree, votes.size()) + "% &7- &afor the change");
 			Print.chat(sender, "&e" + percent(disagree, votes.size()) + "% &7- &cagainst the change");
-			Print.chat(sender, "&6" + votes.size() + " &7votes received of &2" + (council ? holder.getCouncil().size() : ((Municipality)holder.getLayer()).getCitizen().size()) + " &7expected.");
+			Print.chat(sender, "&6" + votes.size() + " &7votes received of &2" + (council ? holder.getCouncil().size() : ((Populated)holder.getLayer()).getAllResidentCount()) + " &7expected.");
 		}
 		if(ended) Print.chat(sender, "&6&lVOTE ENDED");
 	}
@@ -276,8 +277,8 @@ public class Vote {
 			}
 		}
 		else{
-			if(holder.getLayer() instanceof Municipality == false) return false;
-			if(!((Municipality)holder.getLayer()).getCitizen().contains(uuid)){
+			if(holder.getLayer() instanceof Populated == false) return false;
+			if(!((Populated)holder.getLayer()).isCitizen(uuid)){
 				if(sender != null) Print.chat(sender, "&cYou need to be a citizen to vote on this!");
 				return false;
 			}
@@ -296,7 +297,7 @@ public class Vote {
 	
 	private boolean shouldEnd(ICommandSender sender){
 		if(expired(sender)) return true;
-		if(votes.size() >= (council ? holder.getCouncil().size() : ((Municipality)holder.getLayer()).getCitizen().size())){
+		if(votes.size() >= (council ? holder.getCouncil().size() : ((Populated)holder.getLayer()).getAllResidentCount())){
 			this.end();
 			return true;
 		}
@@ -370,7 +371,7 @@ public class Vote {
 			}
 			StateUtil.announce(Static.getServer(), holder.getLayer() instanceof State ? AnnounceLevel.STATE : AnnounceLevel.MUNICIPALITY,
 				"&7Vote for new Head ended, &a" + Static.getPlayerNameByUUID(most) + " &7 was choosen. [" + percent(mostv, summary) + "%]",holder.getLayer().getId());
-			for(UUID member : council ? holder.getCouncil() : ((Municipality)holder.getLayer()).getCitizen()){
+			for(UUID member : council ? holder.getCouncil() : ((Populated)holder.getLayer()).getAllResidents()){
 				MailUtil.send(null, RecipientType.PLAYER, member, null, "&7Head-Vote with ID &b" + id + "&7 ended!\n&7Detailed info via &e/st-vote status " + id, MailType.SYSTEM);
 			}
 			return;
@@ -420,7 +421,7 @@ public class Vote {
 				}
 			}
 		}
-		for(UUID member : council ? holder.getCouncil() : ((Municipality)holder.getLayer()).getCitizen()){
+		for(UUID member : council ? holder.getCouncil() : ((Municipality)holder.getLayer()).getAllResidents()){
 			MailUtil.send(null, RecipientType.PLAYER, member, null, "&7Rule-Vote with ID &b" + id + "&7 ended!\n&7Detailed info via &e/st-vote status " + id, MailType.SYSTEM);
 		}
 		StateUtil.announce(Static.getServer(), level, text0, range);

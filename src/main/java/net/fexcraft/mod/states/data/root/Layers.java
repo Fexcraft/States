@@ -35,5 +35,13 @@ public enum Layers {
 	public boolean isPlayer(){
 		return this == PLAYERDATA;
 	}
+
+	public boolean isPopulated(){
+		return this == MUNICIPALITY || this == COUNTY || this == STATE;
+	}
+
+	public boolean isManageable(){
+		return isDistrict() || isPopulated();
+	}
 	
 }

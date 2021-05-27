@@ -21,6 +21,7 @@ import net.fexcraft.mod.states.data.root.AccountHolder;
 import net.fexcraft.mod.states.data.root.Initiator;
 import net.fexcraft.mod.states.data.root.Layer;
 import net.fexcraft.mod.states.data.root.Layers;
+import net.fexcraft.mod.states.data.root.Populated;
 import net.fexcraft.mod.states.data.sub.Abandonable;
 import net.fexcraft.mod.states.data.sub.Buyable;
 import net.fexcraft.mod.states.data.sub.ColorData;
@@ -37,7 +38,7 @@ import net.fexcraft.mod.states.util.StateUtil;
 import net.minecraft.command.ICommandSender;
 import net.minecraftforge.common.MinecraftForge;
 
-public class Municipality implements Layer, AccountHolder {
+public class Municipality implements Layer, AccountHolder, Populated {
 	
 	private int id;
 	private String name, title;
@@ -204,10 +205,6 @@ public class Municipality implements Layer, AccountHolder {
 		return districts;
 	}
 
-	public List<UUID> getCitizen(){
-		return citizen;
-	}
-
 	@Override
 	public Account getAccount(){
 		return account;
@@ -330,6 +327,21 @@ public class Municipality implements Layer, AccountHolder {
 	@Override
 	public Layers getLayerType(){
 		return Layers.MUNICIPALITY;
+	}
+
+	@Override
+	public List<UUID> getResidents(){
+		return citizen;
+	}
+
+	@Override
+	public List<UUID> getAllResidents(){
+		return citizen;
+	}
+
+	@Override
+	public boolean isCitizen(UUID uuid){
+		return citizen.contains(uuid);
 	}
 
 }

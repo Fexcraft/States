@@ -220,7 +220,7 @@ public class MunicipalityCmd extends CommandBase {
 				}
 				newvote.save(); newvote.vote(sender, ply.getUUID(), gp.getId()); States.VOTES.put(newvote.id, newvote);
 				StateUtil.announce(null, AnnounceLevel.MUNICIPALITY_ALL, "A new vote to choose a Mayor started!", 0);
-				for(UUID member : newvote.council ? mun.manage.getCouncil() : mun.getCitizen()){
+				for(UUID member : newvote.council ? mun.manage.getCouncil() : mun.getResidents()){
 					MailUtil.send(null, RecipientType.PLAYER, member, null, "&7A new vote to choose a Mayor started!\n&7Detailed info via &e/st-vote status " + newvote.id, MailType.SYSTEM);
 				}
 				return;
@@ -244,7 +244,7 @@ public class MunicipalityCmd extends CommandBase {
 					Print.chat(sender, "&cUse &7/mun council kick &c instead!");
 					return;
 				}
-				if(!mun.getCitizen().contains(gp.getId())){
+				if(!mun.isCitizen(gp.getId())){
 					Print.chat(sender, "That player isn't a citizen of this Municipality.");
 					return;
 				}
@@ -257,7 +257,7 @@ public class MunicipalityCmd extends CommandBase {
 						}
 					}
 				}
-				mun.getCitizen().remove(gp.getId());
+				mun.getResidents().remove(gp.getId());
 				String kickmsg = "You have been kicked from the Municipality (" + mun.getId() + ") for: " + (reason == null ? "No Kick reason given." : reason);
 				PlayerCapability playr = StateUtil.getPlayer(gp.getId(), false);
 				if(playr != null){ playr.setMunicipality(StateUtil.getMunicipality(-1)); }
@@ -320,7 +320,7 @@ public class MunicipalityCmd extends CommandBase {
 					Print.chat(sender, "&cPlayer not found.");
 					return;
 				}
-				if(mun.getCitizen().contains(gp.getId())){
+				if(mun.isCitizen(gp.getId())){
 					Print.chat(sender, "That player is already a citizen of this Municipality.");
 					return;
 				}
@@ -410,7 +410,7 @@ public class MunicipalityCmd extends CommandBase {
 						newmun.manage.setHead(ply.getUUID());
 						newmun.r_OPEN.set(false);
 						newmun.price.reset();
-						newmun.getCitizen().add(ply.getUUID());
+						newmun.getResidents().add(ply.getUUID());
 						newmun.manage.getCouncil().add(ply.getUUID());
 						newmun.setState(ply.getState());
 						//
@@ -497,7 +497,7 @@ public class MunicipalityCmd extends CommandBase {
 						newvote.save();
 						States.VOTES.put(newvote.id, newvote);
 						StateUtil.announce(null, AnnounceLevel.MUNICIPALITY_ALL, "A new vote to abandon the Municipality started!", 0);
-						for(UUID member : newvote.council ? mun.manage.getCouncil() : mun.getCitizen()){
+						for(UUID member : newvote.council ? mun.manage.getCouncil() : mun.getResidents()){
 							MailUtil.send(null, RecipientType.PLAYER, member, null, "&7A new vote to abandon the Municipality started!\n&7Detailed info via &e/st-vote status " + newvote.id, MailType.SYSTEM);
 						}
 					}
@@ -564,7 +564,7 @@ public class MunicipalityCmd extends CommandBase {
 	}
 
 	private boolean isLastCitizen(Municipality mun, PlayerCapability ply){
-		return mun.getCitizen().size() == 1 && mun.getCitizen().contains(ply.getUUID());
+		return mun.getResidentCount() == 1 && mun.isCitizen(ply.getUUID());
 	}
 	
 }

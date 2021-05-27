@@ -4,7 +4,6 @@ import static net.fexcraft.mod.states.guis.GuiHandler.MANAGER_STATE;
 import static net.fexcraft.mod.states.guis.GuiHandler.RULE_EDITOR;
 import static net.fexcraft.mod.states.guis.GuiHandler.openGui;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
@@ -215,12 +214,12 @@ public class StateCmd extends CommandBase {
 				return;
 			}
 			case "citizen":{
-				Print.chat(sender, "&9Citizen: &7" + getCitizens(state).size());
+				Print.chat(sender, "&9Citizen: &7" + state.getAllResidentCount());
 				for(int id : state.getMunicipalities()){
 					Municipality mun = StateUtil.getMunicipality(id);
 					if(mun != null && mun.getId() >= 0){
 						Print.chat(sender, "&6Municipality: &7" + mun.getName() + " &8(" + mun.getId() + ");");
-						mun.getCitizen().forEach(uuid -> {
+						mun.getResidents().forEach(uuid -> {
 							Print.chat(sender, "&e-> &9" + Static.getPlayerNameByUUID(uuid) + (mun.manage.getCouncil().contains(uuid) ? " &6" + "[CM]" : ""));
 						});
 					}
@@ -232,16 +231,6 @@ public class StateCmd extends CommandBase {
 				return;
 			}
 		}
-	}
-
-	private ArrayList<UUID> getCitizens(State state){
-		ArrayList<UUID> list = new ArrayList<UUID>();
-		for(int id : state.getMunicipalities()){
-			Municipality mun = StateUtil.getMunicipality(id);
-			if(mun.getId() == -1){ continue; }
-			list.addAll(mun.getCitizen());
-		}
-		return list;
 	}
 	
 }

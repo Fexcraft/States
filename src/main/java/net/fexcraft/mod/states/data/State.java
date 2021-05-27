@@ -3,6 +3,7 @@ package net.fexcraft.mod.states.data;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
@@ -17,6 +18,7 @@ import net.fexcraft.mod.states.data.root.AccountHolder;
 import net.fexcraft.mod.states.data.root.Initiator;
 import net.fexcraft.mod.states.data.root.Layer;
 import net.fexcraft.mod.states.data.root.Layers;
+import net.fexcraft.mod.states.data.root.Populated;
 import net.fexcraft.mod.states.data.sub.Buyable;
 import net.fexcraft.mod.states.data.sub.ColorData;
 import net.fexcraft.mod.states.data.sub.Createable;
@@ -29,7 +31,7 @@ import net.fexcraft.mod.states.events.StateEvent;
 import net.fexcraft.mod.states.util.StateUtil;
 import net.minecraftforge.common.MinecraftForge;
 
-public class State implements Layer, AccountHolder {
+public class State implements Layer, AccountHolder, Populated {
 
 	private int id, capital;
 	private String name;
@@ -218,6 +220,43 @@ public class State implements Layer, AccountHolder {
 	@Override
 	public Layers getLayerType(){
 		return Layers.STATE;
+	}
+
+	@Override
+	public List<UUID> getResidents(){
+		return StateUtil.NO_RESIDENTS;
+	}
+
+	@Override
+	public List<UUID> getAllResidents(){
+		ArrayList<UUID> list = new ArrayList<UUID>();
+		for(int id : getMunicipalities()){
+			Municipality mun = StateUtil.getMunicipality(id);
+			if(mun.getId() == -1) continue;
+			list.addAll(mun.getResidents());
+		}
+		return list;
+	}
+
+	@Override
+	public int getAllResidentCount(){
+		int count = 0;
+		for(int id : getMunicipalities()){
+			Municipality mun = StateUtil.getMunicipality(id);
+			if(mun.getId() == -1) continue;
+			count += mun.getResidentCount();
+		}
+		return count;
+	}
+
+	@Override
+	public boolean isCitizen(UUID uuid){
+		for(int id : getMunicipalities()){
+			Municipality mun = StateUtil.getMunicipality(id);
+			if(mun.getId() == -1) continue;
+			mun.isCitizen(uuid);
+		}
+		return false;
 	}
 	
 }

@@ -3,7 +3,6 @@ package net.fexcraft.mod.states.guis;
 import static net.fexcraft.mod.states.util.StateUtil.bypass;
 import static net.fexcraft.mod.states.util.StateUtil.translate;
 
-import java.util.ArrayList;
 import java.util.UUID;
 
 import org.apache.commons.lang3.StringUtils;
@@ -29,7 +28,9 @@ import net.fexcraft.mod.states.data.root.AnnounceLevel;
 import net.fexcraft.mod.states.data.root.Layers;
 import net.fexcraft.mod.states.data.root.Mailbox.MailType;
 import net.fexcraft.mod.states.data.root.Mailbox.RecipientType;
+import net.fexcraft.mod.states.data.root.Populated;
 import net.fexcraft.mod.states.data.sub.ColorData;
+import net.fexcraft.mod.states.data.sub.Manageable;
 import net.fexcraft.mod.states.util.MailUtil;
 import net.fexcraft.mod.states.util.Perms;
 import net.fexcraft.mod.states.util.StConfig;
@@ -56,6 +57,8 @@ public class ManagerContainer extends GenericContainer {
 	protected District dis;
 	protected Municipality mun;
 	protected State state;
+	protected Populated pop;
+	protected Manageable manage;
 	protected PlayerCapability cap;
 	//
 	protected String layer_title;
@@ -85,17 +88,21 @@ public class ManagerContainer extends GenericContainer {
 			case COMPANY:
 				//
 				break;
+			case PROPERTY:
+				//
+				break;
 			case DISTRICT:
 				dis = y < -5 ? chunk.getDistrict() : StateUtil.getDistrict(y);
 				break;
 			case MUNICIPALITY:
 				mun = y < -5 ? chunk.getMunicipality() : StateUtil.getMunicipality(y);
-				break;
-			case PROPERTY:
-				//
+				pop = mun;
+				manage = mun.manage;
 				break;
 			case STATE:
 				state = y < -5 ? chunk.getState() : StateUtil.getState(y);
+				pop = state;
+				manage = state.manage;
 				break;
 			case UNION:
 				//
@@ -145,7 +152,7 @@ public class ManagerContainer extends GenericContainer {
 				addKey(list, "price", mun.price.asString(), ViewMode.EDIT);
 				addKey(list, "title", mun.getTitle(), ViewMode.EDIT);
 				addKey(list, "color", mun.color.getString(), ViewMode.EDIT);
-				addKey(list, "citizen", mun.getCitizen().size(), ViewMode.LIST);
+				addKey(list, "citizen", mun.getResidentCount(), ViewMode.LIST);
 				addKey(list, "balance", ggas(mun.getAccount().getBalance()), ViewMode.GOTO);
 				addKey(list, "citizen_tax", mun.getCitizenTax() > 0 ? ggas(mun.getCitizenTax()) : NOTAX, ViewMode.EDIT);
 				addKey(list, "last_edited", time(mun.created.getChanged()), ViewMode.NONE);
@@ -176,7 +183,7 @@ public class ManagerContainer extends GenericContainer {
 				addKey(list, "leader", state.manage.getHead() == null ? NOONE : Static.getPlayerNameByUUID(state.manage.getHead()), ViewMode.EDIT);
 				addKey(list, "price", state.price.asString(), ViewMode.EDIT);
 				addKey(list, "color", state.color.getString(), ViewMode.EDIT);
-				addKey(list, "citizen", getCitizens(state).size(), ViewMode.LIST);
+				addKey(list, "citizen", state.getAllResidentCount(), ViewMode.LIST);
 				addKey(list, "balance", ggas(state.getAccount().getBalance()), ViewMode.GOTO);
 				addKey(list, "chunk_tax", state.getChunkTaxPercentage() + "%", ViewMode.EDIT);
 				addKey(list, "citizen_tax", state.getCitizenTaxPercentage() + "%", ViewMode.EDIT);
@@ -265,14 +272,9 @@ public class ManagerContainer extends GenericContainer {
 				}
 				break;
 			case LIST_CITIZENS:
-				if(layer.isMunicipality()){
-					initListValues(mun.getCitizen().size());
-					for(UUID uuid : mun.getCitizen()) addKey(list, uuid, uuid);
-				}
-				if(layer.isState()){
-					ArrayList<UUID> citizen = getCitizens(state);
-					initListValues(citizen.size());
-					for(UUID uuid : citizen) addKey(list, uuid, uuid);
+				if(layer.isPopulated()){
+					initListValues(pop.getAllResidentCount());
+					for(UUID uuid : pop.getAllResidents()) addKey(list, uuid, uuid);
 				}
 				break;
 			case LIST_COMPONENTS:
@@ -296,13 +298,9 @@ public class ManagerContainer extends GenericContainer {
 				}
 				break;
 			case LIST_COUNCIL:
-				if(layer.isMunicipality()){
-					initListValues(mun.manage.getCouncil().size());
-					for(UUID uuid : mun.manage.getCouncil()) addKey(list, uuid, uuid);
-				}
-				if(layer.isState()){
-					initListValues(state.manage.getCouncil().size());
-					for(UUID uuid : state.manage.getCouncil()) addKey(list, uuid, uuid);
+				if(layer.isManageable()){
+					initListValues(manage.getCouncil().size());
+					for(UUID uuid : manage.getCouncil()) addKey(list, uuid, uuid);
 				}
 				break;
 			case LIST_NEIGHBORS:
@@ -630,7 +628,7 @@ public class ManagerContainer extends GenericContainer {
 											sendStatus("states.manager_gui.view.player_not_found_cache");
 											break;
 										}
-										if(!mun.manage.getCouncil().contains(gp.getId()) && !mun.getCitizen().contains(gp.getId())){
+										if(!mun.manage.getCouncil().contains(gp.getId()) && !mun.isCitizen(gp.getId())){
 											sendStatus("states.manager_gui.view.player_not_council_or_citizen");
 											break;
 										}
@@ -866,7 +864,7 @@ public class ManagerContainer extends GenericContainer {
 											sendStatus("states.manager_gui.view.player_not_found_cache");
 											break;
 										}
-										if(!state.manage.getCouncil().contains(gp.getId()) && !getCitizens(state).contains(gp.getId())){
+										if(!state.manage.getCouncil().contains(gp.getId()) && !state.isCitizen(gp.getId())){
 											sendStatus("states.manager_gui.view.player_not_council_or_citizen");
 											break;
 										}
@@ -1337,11 +1335,11 @@ public class ManagerContainer extends GenericContainer {
 									sendStatus(null);
 									return;
 								}
-								if(!mun.getCitizen().contains(list_values[index])){
+								if(!mun.isCitizen((UUID)list_values[index])){
 									sendStatus("states.manager_gui.list.not_a_citizen");
 									return;
 								}
-								mun.getCitizen().remove(list_values[index]);
+								mun.getResidents().remove(list_values[index]);
 								String kickmsg = translate("states.manager_gui.list_citizens_municipality.rem_msg", mun.getId());
 								PlayerCapability playr = StateUtil.getPlayer((UUID)list_values[index], false);
 								if(playr != null){ playr.setMunicipality(StateUtil.getMunicipality(-1)); }
@@ -1520,7 +1518,7 @@ public class ManagerContainer extends GenericContainer {
 									sendStatus("states.manager_gui.view.player_not_found_cache");
 									return;
 								}
-								if(mun.getCitizen().contains(gp.getId())){
+								if(mun.isCitizen(gp.getId())){
 									sendStatus("states.manager_gui.list.a_citizen");
 									return;
 								}
@@ -1617,7 +1615,7 @@ public class ManagerContainer extends GenericContainer {
 									sendStatus("states.manager_gui.list.is_council");
 									return;
 								}
-								if(!mun.getCitizen().contains(gp.getId())){
+								if(!mun.isCitizen(gp.getId())){
 									sendStatus("states.manager_gui.list.not_a_citizen");
 									return;
 								}
@@ -1647,7 +1645,7 @@ public class ManagerContainer extends GenericContainer {
 									sendStatus("states.manager_gui.list.is_council");
 									return;
 								}
-								if(!getCitizens(state).contains(gp.getId())){
+								if(!state.isCitizen(gp.getId())){
 									sendStatus("states.manager_gui.list.not_a_citizen");
 									return;
 								}
@@ -1798,16 +1796,6 @@ public class ManagerContainer extends GenericContainer {
 			default: break;
 		}
 		return "INVALID_TYPE";
-	}
-
-	public static ArrayList<UUID> getCitizens(State state){
-		ArrayList<UUID> list = new ArrayList<UUID>();
-		for(int id : state.getMunicipalities()){
-			Municipality mun = StateUtil.getMunicipality(id);
-			if(mun.getId() == -1){ continue; }
-			list.addAll(mun.getCitizen());
-		}
-		return list;
 	}
 
 	private boolean isPermitted(Chunk chunk, EntityPlayer player){

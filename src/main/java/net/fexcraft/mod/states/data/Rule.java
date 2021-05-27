@@ -5,8 +5,8 @@ import java.util.UUID;
 import net.fexcraft.lib.mc.utils.Print;
 import net.fexcraft.mod.states.data.root.Initiator;
 import net.fexcraft.mod.states.data.root.Layer;
+import net.fexcraft.mod.states.data.root.Populated;
 import net.fexcraft.mod.states.data.sub.Manageable;
-import net.fexcraft.mod.states.guis.ManagerContainer;
 
 public class Rule {
 	
@@ -64,22 +64,15 @@ public class Rule {
 		switch(setter){
 			case NONE: return Result.FALSE;
 			case CITIZEN_ANY:{
-				if(manage.getLayer() instanceof Municipality){
-					return Result.bool(((Municipality)manage.getLayer()).getCitizen().contains(uuid));
-				}
-				else if(manage.getLayer() instanceof State){//initially not been intended be an option
-					return Result.bool(ManagerContainer.getCitizens((State)manage.getLayer()).contains(uuid));
+				if(manage.getLayer() instanceof Populated){
+					return Result.bool(((Populated)manage.getLayer()).isCitizen(uuid));
 				}
 				else return Result.FALSE;//it shouldn't get this far
 			}
 			case CITIZEN_VOTE:{
 				if(votable_set){
-					if(manage.getLayer() instanceof Municipality){
-						if(((Municipality)manage.getLayer()).getCitizen().contains(uuid)) return Result.VOTE;
-						return Result.FALSE;
-					}
-					else if(manage.getLayer() instanceof State){//initially not been intended be an option
-						if(ManagerContainer.getCitizens((State)manage.getLayer()).contains(uuid)) return Result.VOTE;
+					if(manage.getLayer() instanceof Populated){
+						if(((Populated)manage.getLayer()).isCitizen(uuid)) return Result.VOTE;
 						return Result.FALSE;
 					}
 					else return Result.FALSE;//it shouldn't get this far
@@ -121,21 +114,14 @@ public class Rule {
 		switch(reviser){
 			case NONE: return Result.FALSE;
 			case CITIZEN_ANY:{
-				if(manage.getLayer() instanceof Municipality){
-					return Result.bool(((Municipality)manage.getLayer()).getCitizen().contains(uuid));
-				}
-				else if(manage.getLayer() instanceof State){//initially not been intended be an option
-					return Result.bool(ManagerContainer.getCitizens((State)manage.getLayer()).contains(uuid));
+				if(manage.getLayer() instanceof Populated){
+					return Result.bool(((Populated)manage.getLayer()).isCitizen(uuid));
 				}
 				else return Result.FALSE;
 			}
 			case CITIZEN_VOTE:{
-				if(manage.getLayer() instanceof Municipality){
-					if(((Municipality)manage.getLayer()).getCitizen().contains(uuid)) return Result.VOTE;
-					return Result.FALSE;
-				}
-				else if(manage.getLayer() instanceof State){//initially not been intended be an option
-					if(ManagerContainer.getCitizens((State)manage.getLayer()).contains(uuid)) return Result.VOTE;
+				if(manage.getLayer() instanceof Populated){
+					if(((Populated)manage.getLayer()).isCitizen(uuid)) return Result.VOTE;
 					return Result.FALSE;
 				}
 				else return Result.FALSE;

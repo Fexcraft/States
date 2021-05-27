@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.InputStream;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.TimerTask;
 import java.util.TreeMap;
@@ -44,6 +45,8 @@ import net.minecraft.util.text.TextComponentString;
 import net.minecraftforge.fml.common.FMLCommonHandler;
 
 public class StateUtil extends TimerTask {
+	
+	public static List<UUID> NO_RESIDENTS = Collections.emptyList();
     
     public static @Nullable Chunk getChunk(int x, int z){
         return States.CHUNKS.get(new ChunkPos(x, z));

@@ -11,11 +11,11 @@ import net.fexcraft.lib.mc.utils.Print;
 import net.fexcraft.lib.mc.utils.Static;
 import net.fexcraft.mod.states.States;
 import net.fexcraft.mod.states.data.Chunk;
-import net.fexcraft.mod.states.data.Municipality;
 import net.fexcraft.mod.states.data.Vote;
 import net.fexcraft.mod.states.data.Vote.VoteType;
 import net.fexcraft.mod.states.data.capabilities.PlayerCapability;
 import net.fexcraft.mod.states.data.capabilities.StatesCapabilities;
+import net.fexcraft.mod.states.data.root.Populated;
 import net.fexcraft.mod.states.data.sub.Manageable;
 import net.fexcraft.mod.states.util.AliasLoader;
 import net.fexcraft.mod.states.util.StateUtil;
@@ -132,7 +132,7 @@ public class VoteCmd extends CommandBase {
 				}
 				Print.chat(sender, "&9Vote Target: &7" + vote.targetAsString());
 				vote.summary(sender);
-				boolean canshow = vote.council ? vote.holder.getCouncil().contains(ply.getUUID()) : ((Municipality)vote.holder.getLayer()).getCitizen().contains(ply.getUUID());
+				boolean canshow = vote.council ? vote.holder.getCouncil().contains(ply.getUUID()) : ((Populated)vote.holder.getLayer()).isCitizen(ply.getUUID());
 				if(canshow){
 					if(!vote.votes.containsKey(ply.getUUID().toString())){
 						if(!vote.type.assignment()){

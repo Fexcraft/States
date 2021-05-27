@@ -122,13 +122,13 @@ public class MailCmd extends CommandBase {
 							}
 							case "municipality":{
 								if(!cap.isMayorOf(StateUtil.getMunicipality(Integer.parseInt(loc.getPath())))
-									&& !StateUtil.getMunicipality(Integer.parseInt(loc.getPath())).getCouncil().contains(player.getGameProfile().getId())){
+									&& !StateUtil.getMunicipality(Integer.parseInt(loc.getPath())).manage.getCouncil().contains(player.getGameProfile().getId())){
 									Print.chat(player, "Your are not Mayor or Council Member to read this."); return;
 								} break;
 							}
 							case "state":{
 								if(!cap.isStateLeaderOf(StateUtil.getState(Integer.parseInt(loc.getPath())))
-									&& !StateUtil.getState(Integer.parseInt(loc.getPath())).getCouncil().contains(player.getGameProfile().getId())){
+									&& !StateUtil.getState(Integer.parseInt(loc.getPath())).manage.getCouncil().contains(player.getGameProfile().getId())){
 									Print.chat(player, "Your are not State Leader or Council Member to read this."); return;
 								} break;
 							}
@@ -261,7 +261,7 @@ public class MailCmd extends CommandBase {
 									Print.chat(sender, "&9You are not part of that Municipality.");
 									return;
 								}
-								mun.getCouncil().add(cap.getUUID());
+								mun.manage.getCouncil().add(cap.getUUID());
 								mun.save();
 								StateUtil.announce(server, AnnounceLevel.MUNICIPALITY, cap.getFormattedNickname() + " joined the Coucil of our Municipality!", mun.getId());
 								Print.log(StateLogger.player(player) + " joined to the council of " + StateLogger.municipality(mun) + ".");
@@ -277,7 +277,7 @@ public class MailCmd extends CommandBase {
 									Print.chat(sender, "&6You are not part of that State.");
 									return;
 								}
-								state.getCouncil().add(cap.getUUID());
+								state.manage.getCouncil().add(cap.getUUID());
 								state.save();
 								StateUtil.announce(server, AnnounceLevel.STATE, cap.getFormattedNickname() + " joined the Coucil of our State!", state.getId());
 								Print.log(StateLogger.player(player) + " joined to the council of " + StateLogger.state(state) + ".");
@@ -293,7 +293,7 @@ public class MailCmd extends CommandBase {
 									Print.chat(sender, "&6You must leave your current State first!");
 									return;
 								}
-								if(!cap.getMunicipality().getHead().equals(cap.getUUID())){
+								if(!cap.getMunicipality().manage.getHead().equals(cap.getUUID())){
 									Print.chat(sender, "&7No permission.");
 									return;
 								}

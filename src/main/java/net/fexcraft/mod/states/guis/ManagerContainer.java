@@ -26,7 +26,7 @@ import net.fexcraft.mod.states.data.State;
 import net.fexcraft.mod.states.data.capabilities.PlayerCapability;
 import net.fexcraft.mod.states.data.capabilities.StatesCapabilities;
 import net.fexcraft.mod.states.data.root.AnnounceLevel;
-import net.fexcraft.mod.states.data.root.Layer;
+import net.fexcraft.mod.states.data.root.Layers;
 import net.fexcraft.mod.states.data.root.Mailbox.MailType;
 import net.fexcraft.mod.states.data.root.Mailbox.RecipientType;
 import net.fexcraft.mod.states.data.sub.ColorData;
@@ -51,7 +51,7 @@ public class ManagerContainer extends GenericContainer {
 	//
 	private ManagerGui gui;
 	protected Mode mode;
-	protected Layer layer;
+	protected Layers layer;
 	protected Chunk chunk;
 	protected District dis;
 	protected Municipality mun;
@@ -67,7 +67,7 @@ public class ManagerContainer extends GenericContainer {
 	public ManagerContainer(EntityPlayer player, int layerid, int x, int y, int z){
 		super(player);
 		mode = Mode.values()[x];
-		layer = Layer.values()[layerid];
+		layer = Layers.values()[layerid];
 		Print.debug("CREATED " + player.world.isRemote + " " + layer + "/" + layerid + " " + mode + "/" + x);
 		if(player.world.isRemote){
 			if(layer.isChunk() && mode == Mode.CKINFO) mode = Mode.INFO;
@@ -115,7 +115,7 @@ public class ManagerContainer extends GenericContainer {
 				addKey(list, "id", dis.getId(), ViewMode.NONE);
 				addKey(list, "name", dis.getName(), ViewMode.EDIT);
 				addKey(list, "municipality", dis.getMunicipality().getName() + " (" + dis.getMunicipality().getId() + ")", ViewMode.GOTO);
-				addKey(list, "manager", dis.getHead() == null ? NOONE : Static.getPlayerNameByUUID(dis.getHead()), ViewMode.EDIT);
+				addKey(list, "manager", dis.manage.getHead() == null ? NOONE : Static.getPlayerNameByUUID(dis.manage.getHead()), ViewMode.EDIT);
 				addKey(list, "price", dis.price.asString(), ViewMode.EDIT);
 				addKey(list, "type", dis.getType().name().toLowerCase(), ViewMode.EDIT);
 				addKey(list, "color", dis.color.getString(), ViewMode.EDIT);
@@ -127,7 +127,7 @@ public class ManagerContainer extends GenericContainer {
 				addKey(list, "unifbank", dis.r_ONBANKRUPT.get(), ViewMode.BOOL);
 				addKey(list, "creator", Static.getPlayerNameByUUID(dis.created.getCreator()), ViewMode.NONE);
 				addKey(list, "created", time(dis.created.getCreated()), ViewMode.NONE);
-				addKey(list, "ruleset", dis.getRulesetTitle(), ViewMode.EDIT);
+				addKey(list, "ruleset", dis.manage.getRulesetTitle(), ViewMode.EDIT);
 				addKey(list, "mailbox", dis.mailbox.asString(), ViewMode.RESET);
 				addKey(list, "icon", dis.icon.getn(), ViewMode.EDIT);
 				addKey(list, "explosion", dis.r_ALLOW_EXPLOSIONS.get(), ViewMode.BOOL);
@@ -141,7 +141,7 @@ public class ManagerContainer extends GenericContainer {
 					addKey(list, "abandoned_by", mun.abandon.getBy() == null ? UNKNOWN : Static.getPlayerNameByUUID(mun.abandon.getBy()), ViewMode.NONE);
 				}
 				addKey(list, "state", mun.getState().getName() + " (" + mun.getState().getId() + ")", ViewMode.GOTO);
-				addKey(list, "mayor", mun.getHead() == null ? NOONE : Static.getPlayerNameByUUID(mun.getHead()), ViewMode.EDIT);
+				addKey(list, "mayor", mun.manage.getHead() == null ? NOONE : Static.getPlayerNameByUUID(mun.manage.getHead()), ViewMode.EDIT);
 				addKey(list, "price", mun.price.asString(), ViewMode.EDIT);
 				addKey(list, "title", mun.getTitle(), ViewMode.EDIT);
 				addKey(list, "color", mun.color.getString(), ViewMode.EDIT);
@@ -149,7 +149,7 @@ public class ManagerContainer extends GenericContainer {
 				addKey(list, "balance", ggas(mun.getAccount().getBalance()), ViewMode.GOTO);
 				addKey(list, "citizen_tax", mun.getCitizenTax() > 0 ? ggas(mun.getCitizenTax()) : NOTAX, ViewMode.EDIT);
 				addKey(list, "last_edited", time(mun.created.getChanged()), ViewMode.NONE);
-				addKey(list, "council", mun.getCouncil().size(), ViewMode.LIST);
+				addKey(list, "council", mun.manage.getCouncil().size(), ViewMode.LIST);
 				addKey(list, "districts", mun.getDistricts().size() + " / " + mun.getDistrictLimit(), ViewMode.LIST);
 				addKey(list, "neighbors", mun.getNeighbors().size(), ViewMode.LIST);
 				addKey(list, "opentojoin", mun.r_OPEN.get(), ViewMode.BOOL);
@@ -158,7 +158,7 @@ public class ManagerContainer extends GenericContainer {
 				addKey(list, "creator", Static.getPlayerNameByUUID(mun.created.getCreator()), ViewMode.NONE);
 				addKey(list, "created", time(mun.created.getCreated()), ViewMode.NONE);
 				addKey(list, "forcechunks", mun.getForceLoadedChunks() == null ? NONE : mun.getForceLoadedChunks().size(), ViewMode.NONE);
-				addKey(list, "ruleset", mun.getRulesetTitle(), ViewMode.EDIT);
+				addKey(list, "ruleset", mun.manage.getRulesetTitle(), ViewMode.EDIT);
 				addKey(list, "mailbox", mun.mailbox.asString(), ViewMode.RESET);
 				addKey(list, "blacklist", mun.getPlayerBlacklist().size(), ViewMode.LIST);
 				addKey(list, "icon", mun.icon.getn(), ViewMode.EDIT);
@@ -166,11 +166,14 @@ public class ManagerContainer extends GenericContainer {
 					addKey(list, "abandoned", false, ViewMode.NONE);
 				}
 				break;
+			case COUNTY:
+				//
+				break;
 			case STATE:
 				addKey(list, "id", state.getId(), ViewMode.NONE);
 				addKey(list, "name", state.getName(), ViewMode.EDIT);
 				addKey(list, "capital", StateUtil.getMunicipality(state.getCapitalId()).getName() + " (" + state.getCapitalId() + ")", ViewMode.EDIT);
-				addKey(list, "leader", state.getHead() == null ? NOONE : Static.getPlayerNameByUUID(state.getHead()), ViewMode.EDIT);
+				addKey(list, "leader", state.manage.getHead() == null ? NOONE : Static.getPlayerNameByUUID(state.manage.getHead()), ViewMode.EDIT);
 				addKey(list, "price", state.price.asString(), ViewMode.EDIT);
 				addKey(list, "color", state.color.getString(), ViewMode.EDIT);
 				addKey(list, "citizen", getCitizens(state).size(), ViewMode.LIST);
@@ -178,12 +181,12 @@ public class ManagerContainer extends GenericContainer {
 				addKey(list, "chunk_tax", state.getChunkTaxPercentage() + "%", ViewMode.EDIT);
 				addKey(list, "citizen_tax", state.getCitizenTaxPercentage() + "%", ViewMode.EDIT);
 				addKey(list, "last_edited", time(state.created.getChanged()), ViewMode.NONE);
-				addKey(list, "council", state.getCouncil().size(), ViewMode.LIST);
+				addKey(list, "council", state.manage.getCouncil().size(), ViewMode.LIST);
 				addKey(list, "municipalities", state.getMunicipalities().size(), ViewMode.LIST);
 				addKey(list, "neighbors", state.getNeighbors().size(), ViewMode.LIST);
 				addKey(list, "creator", Static.getPlayerNameByUUID(state.created.getCreator()), ViewMode.NONE);
 				addKey(list, "created", time(state.created.getCreated()), ViewMode.NONE);
-				addKey(list, "ruleset", state.getRulesetTitle(), ViewMode.EDIT);
+				addKey(list, "ruleset", state.manage.getRulesetTitle(), ViewMode.EDIT);
 				addKey(list, "mailbox", state.mailbox.asString(), ViewMode.RESET);
 				addKey(list, "blacklist", state.getBlacklist().size(), ViewMode.LIST);
 				addKey(list, "icon", state.icon.getn(), ViewMode.EDIT);
@@ -294,12 +297,12 @@ public class ManagerContainer extends GenericContainer {
 				break;
 			case LIST_COUNCIL:
 				if(layer.isMunicipality()){
-					initListValues(mun.getCouncil().size());
-					for(UUID uuid : mun.getCouncil()) addKey(list, uuid, uuid);
+					initListValues(mun.manage.getCouncil().size());
+					for(UUID uuid : mun.manage.getCouncil()) addKey(list, uuid, uuid);
 				}
 				if(layer.isState()){
-					initListValues(state.getCouncil().size());
-					for(UUID uuid : state.getCouncil()) addKey(list, uuid, uuid);
+					initListValues(state.manage.getCouncil().size());
+					for(UUID uuid : state.manage.getCouncil()) addKey(list, uuid, uuid);
 				}
 				break;
 			case LIST_NEIGHBORS:
@@ -387,7 +390,7 @@ public class ManagerContainer extends GenericContainer {
 						case DISTRICT:
 							switch(keys[packet.getInteger("button")]){
 								case "name":{
-									if(dis.isAuthorized(dis.r_SET_NAME.id, cap.getUUID()).isTrue() || bypass(player)){
+									if(dis.manage.isAuthorized(dis.r_SET_NAME.id, cap.getUUID()).isTrue() || bypass(player)){
 										value = value.trim();
 										if(value.replace(" ", "").length() < 3){
 											sendStatus("states.manager_gui.view.name_short");
@@ -403,17 +406,17 @@ public class ManagerContainer extends GenericContainer {
 									break;
 								}
 								case "municipality":{
-									openGui(Layer.MUNICIPALITY, Mode.INFO, dis.getMunicipality().getId());
+									openGui(Layers.MUNICIPALITY, Mode.INFO, dis.getMunicipality().getId());
 									break;
 								}
 								case "manager":{
-									if(dis.isAuthorized(dis.r_SET_MANAGER.id, cap.getUUID()).isTrue() || bypass(player)){
+									if(dis.manage.isAuthorized(dis.r_SET_MANAGER.id, cap.getUUID()).isTrue() || bypass(player)){
 										GameProfile gp = Static.getServer().getPlayerProfileCache().getGameProfileForUsername(value);
 										if(gp == null || gp.getId() == null){
 											sendStatus("states.manager_gui.view.player_not_found_cache");
 											break;
 										}
-										dis.setHead(gp.getId());
+										dis.manage.setHead(gp.getId());
 										dis.created.update();
 										dis.save();
 										sendViewData();
@@ -423,7 +426,7 @@ public class ManagerContainer extends GenericContainer {
 									break;
 								}
 								case "price":{
-									if(dis.isAuthorized(dis.r_SET_PRICE.id, cap.getUUID()).isTrue() || bypass(player)){
+									if(dis.manage.isAuthorized(dis.r_SET_PRICE.id, cap.getUUID()).isTrue() || bypass(player)){
 										try{
 											Long price = Long.parseLong(value);
 											if(price < 0){ price = 0l; }
@@ -441,7 +444,7 @@ public class ManagerContainer extends GenericContainer {
 									break;
 								}
 								case "type":{
-									if(dis.isAuthorized(dis.r_SET_TYPE.id, cap.getUUID()).isTrue() || bypass(player)){
+									if(dis.manage.isAuthorized(dis.r_SET_TYPE.id, cap.getUUID()).isTrue() || bypass(player)){
 										try{
 											DistrictType type = DistrictType.valueOf(value.toUpperCase());
 											if(type != null){
@@ -460,7 +463,7 @@ public class ManagerContainer extends GenericContainer {
 									break;
 								}
 								case "color":{
-									if(dis.isAuthorized(dis.r_SET_COLOR.id, cap.getUUID()).isTrue() || bypass(player)){
+									if(dis.manage.isAuthorized(dis.r_SET_COLOR.id, cap.getUUID()).isTrue() || bypass(player)){
 										try{
 											String str = value;
 											if(!ColorData.validString(null, str)){
@@ -481,7 +484,7 @@ public class ManagerContainer extends GenericContainer {
 									break;
 								}
 								case "chunk_tax":{
-									if(dis.isAuthorized(dis.r_SET_CHUNKTAX.id, cap.getUUID()).isTrue() || bypass(player)){
+									if(dis.manage.isAuthorized(dis.r_SET_CHUNKTAX.id, cap.getUUID()).isTrue() || bypass(player)){
 										if(value.equals("reset") || value.equals("disable")){
 											dis.setChunkTax(0);
 											dis.created.update();
@@ -504,11 +507,11 @@ public class ManagerContainer extends GenericContainer {
 									break;
 								}
 								case "neighbors":{
-									openGui(Layer.DISTRICT, Mode.LIST_NEIGHBORS, dis.getId());
+									openGui(Layers.DISTRICT, Mode.LIST_NEIGHBORS, dis.getId());
 									break;
 								}
 								case "canforsettle":{
-									if(dis.isAuthorized(dis.r_CFS.id, cap.getUUID()).isTrue() || bypass(player)){
+									if(dis.manage.isAuthorized(dis.r_CFS.id, cap.getUUID()).isTrue() || bypass(player)){
 										dis.r_CFS.set(!dis.r_CFS.get());
 										dis.created.update();
 										dis.save();
@@ -519,7 +522,7 @@ public class ManagerContainer extends GenericContainer {
 									break;
 								}
 								case "unifbank":{
-									if(dis.isAuthorized(dis.r_ONBANKRUPT.id, cap.getUUID()).isTrue() || bypass(player)){
+									if(dis.manage.isAuthorized(dis.r_ONBANKRUPT.id, cap.getUUID()).isTrue() || bypass(player)){
 										dis.r_ONBANKRUPT.set(!dis.r_ONBANKRUPT.get());
 										dis.created.update();
 										dis.save();
@@ -530,13 +533,13 @@ public class ManagerContainer extends GenericContainer {
 									break;
 								}
 								case "ruleset":{
-									if(dis.isAuthorized(dis.r_SET_RULESET.id, cap.getUUID()).isTrue() || bypass(player)){
+									if(dis.manage.isAuthorized(dis.r_SET_RULESET.id, cap.getUUID()).isTrue() || bypass(player)){
 										value = value.trim();
 										if(value.replace(" ", "").length() < 3){
 											sendStatus("states.manager_gui.view.name_short");
 											break;
 										}
-										dis.setRulesetTitle(value);
+										dis.manage.setRulesetTitle(value);
 										dis.created.update();
 										dis.save();
 										sendViewData();
@@ -546,7 +549,7 @@ public class ManagerContainer extends GenericContainer {
 									break;
 								}
 								case "mailbox":{
-									if(dis.isAuthorized(dis.r_SET_MAILBOX.id, cap.getUUID()).isTrue() || bypass(player)){
+									if(dis.manage.isAuthorized(dis.r_SET_MAILBOX.id, cap.getUUID()).isTrue() || bypass(player)){
 										dis.mailbox.reset();
 										dis.created.update();
 										dis.save();
@@ -557,7 +560,7 @@ public class ManagerContainer extends GenericContainer {
 									break;
 								}
 								case "icon":{
-									if(dis.isAuthorized(dis.r_SET_ICON.id, cap.getUUID()).isTrue() || bypass(player)){
+									if(dis.manage.isAuthorized(dis.r_SET_ICON.id, cap.getUUID()).isTrue() || bypass(player)){
 										try{
 											dis.icon.set(value);
 											dis.created.update();
@@ -573,7 +576,7 @@ public class ManagerContainer extends GenericContainer {
 									break;
 								}
 								case "explosion":{
-									if(dis.isAuthorized(dis.r_ALLOW_EXPLOSIONS.id, cap.getUUID()).isTrue() || bypass(player)){
+									if(dis.manage.isAuthorized(dis.r_ALLOW_EXPLOSIONS.id, cap.getUUID()).isTrue() || bypass(player)){
 										dis.r_ALLOW_EXPLOSIONS.set(!dis.r_ALLOW_EXPLOSIONS.get());
 										dis.created.update();
 										dis.save();
@@ -589,7 +592,7 @@ public class ManagerContainer extends GenericContainer {
 						case MUNICIPALITY:
 							switch(keys[packet.getInteger("button")]){
 								case "name":{
-									if(mun.isAuthorized(mun.r_SET_NAME.id, cap.getUUID()).isTrue() || bypass(player)){
+									if(mun.manage.isAuthorized(mun.r_SET_NAME.id, cap.getUUID()).isTrue() || bypass(player)){
 										value = value.trim();
 										if(value.replace(" ", "").length() < 3){
 											sendStatus("states.manager_gui.view.name_short");
@@ -605,17 +608,17 @@ public class ManagerContainer extends GenericContainer {
 									break;
 								}
 								case "state":{
-									openGui(Layer.STATE, Mode.INFO, mun.getId());
+									openGui(Layers.STATE, Mode.INFO, mun.getId());
 									break;
 								}
 								case "mayor":{
-									if(mun.isAuthorized(mun.r_SET_MAYOR.id, cap.getUUID()).isTrue() || bypass(player)){
+									if(mun.manage.isAuthorized(mun.r_SET_MAYOR.id, cap.getUUID()).isTrue() || bypass(player)){
 										if(value.equals("null") || value.equals("reset")){
-											if(mun.isAuthorized(mun.r_RESET_MAYOR.id, cap.getUUID()).isFalse() && !bypass(player)){
+											if(mun.manage.isAuthorized(mun.r_RESET_MAYOR.id, cap.getUUID()).isFalse() && !bypass(player)){
 												sendStatus(null);
 												return;
 											}
-											mun.setHead(null);
+											mun.manage.setHead(null);
 											mun.save();
 											sendViewData();
 											StateUtil.announce(null, AnnounceLevel.MUNICIPALITY_ALL, translate("states.announce.municipality.mayor_reset"), mun.getId());
@@ -627,11 +630,11 @@ public class ManagerContainer extends GenericContainer {
 											sendStatus("states.manager_gui.view.player_not_found_cache");
 											break;
 										}
-										if(!mun.getCouncil().contains(gp.getId()) && !mun.getCitizen().contains(gp.getId())){
+										if(!mun.manage.getCouncil().contains(gp.getId()) && !mun.getCitizen().contains(gp.getId())){
 											sendStatus("states.manager_gui.view.player_not_council_or_citizen");
 											break;
 										}
-										mun.setHead(gp.getId());
+										mun.manage.setHead(gp.getId());
 										mun.created.update();
 										mun.save();
 										sendViewData();
@@ -641,7 +644,7 @@ public class ManagerContainer extends GenericContainer {
 									break;
 								}
 								case "price":{
-									if(mun.isAuthorized(mun.r_SET_PRICE.id, cap.getUUID()).isTrue() || bypass(player)){
+									if(mun.manage.isAuthorized(mun.r_SET_PRICE.id, cap.getUUID()).isTrue() || bypass(player)){
 										try{
 											Long price = Long.parseLong(value);
 											if(price < 0){ price = 0l; }
@@ -659,7 +662,7 @@ public class ManagerContainer extends GenericContainer {
 									break;
 								}
 								case "title":{
-									if(mun.isAuthorized(mun.r_SET_TITLE.id, cap.getUUID()).isTrue() || bypass(player)){
+									if(mun.manage.isAuthorized(mun.r_SET_TITLE.id, cap.getUUID()).isTrue() || bypass(player)){
 										try{
 											if(value.replaceAll("(&.)", "").length() > 16){
 												sendStatus("states.manager_gui.view.title_too_long");
@@ -679,7 +682,7 @@ public class ManagerContainer extends GenericContainer {
 									break;
 								}
 								case "color":{
-									if(mun.isAuthorized(mun.r_COLOR.id, cap.getUUID()).isTrue() || bypass(player)){
+									if(mun.manage.isAuthorized(mun.r_COLOR.id, cap.getUUID()).isTrue() || bypass(player)){
 										try{
 											String str = value;
 											if(!ColorData.validString(null, str)){
@@ -700,11 +703,11 @@ public class ManagerContainer extends GenericContainer {
 									break;
 								}
 								case "citizen":{
-									openGui(Layer.MUNICIPALITY, Mode.LIST_CITIZENS, mun.getId());
+									openGui(Layers.MUNICIPALITY, Mode.LIST_CITIZENS, mun.getId());
 									break;
 								}
 								case "citizen_tax":{
-									if(mun.isAuthorized(mun.r_SET_CITIZENTAX.id, cap.getUUID()).isTrue() || bypass(player)){
+									if(mun.manage.isAuthorized(mun.r_SET_CITIZENTAX.id, cap.getUUID()).isTrue() || bypass(player)){
 										if(value.equals("reset") || value.equals("disable")){
 											mun.setCitizenTax(0);
 											mun.created.update();
@@ -727,19 +730,19 @@ public class ManagerContainer extends GenericContainer {
 									break;
 								}
 								case "council":{
-									openGui(Layer.MUNICIPALITY, Mode.LIST_COUNCIL, mun.getId());
+									openGui(Layers.MUNICIPALITY, Mode.LIST_COUNCIL, mun.getId());
 									break;
 								}
 								case "districts":{
-									openGui(Layer.MUNICIPALITY, Mode.LIST_COMPONENTS, mun.getId());
+									openGui(Layers.MUNICIPALITY, Mode.LIST_COMPONENTS, mun.getId());
 									break;
 								}
 								case "neighbors":{
-									openGui(Layer.MUNICIPALITY, Mode.LIST_NEIGHBORS, mun.getId());
+									openGui(Layers.MUNICIPALITY, Mode.LIST_NEIGHBORS, mun.getId());
 									break;
 								}
 								case "opentojoin":{
-									if(mun.isAuthorized(mun.r_OPEN.id, cap.getUUID()).isTrue() || bypass(player)){
+									if(mun.manage.isAuthorized(mun.r_OPEN.id, cap.getUUID()).isTrue() || bypass(player)){
 										mun.r_OPEN.set(!mun.r_OPEN.get());
 										mun.created.update();
 										mun.save();
@@ -750,7 +753,7 @@ public class ManagerContainer extends GenericContainer {
 									break;
 								}
 								case "kickbankrupt":{
-									if(mun.isAuthorized(mun.r_KIB.id, cap.getUUID()).isTrue() || bypass(player)){
+									if(mun.manage.isAuthorized(mun.r_KIB.id, cap.getUUID()).isTrue() || bypass(player)){
 										mun.r_KIB.set(!mun.r_KIB.get());
 										mun.created.update();
 										mun.save();
@@ -761,13 +764,13 @@ public class ManagerContainer extends GenericContainer {
 									break;
 								}
 								case "ruleset":{
-									if(mun.isAuthorized(mun.r_SET_RULESET.id, cap.getUUID()).isTrue() || bypass(player)){
+									if(mun.manage.isAuthorized(mun.r_SET_RULESET.id, cap.getUUID()).isTrue() || bypass(player)){
 										value = value.trim();
 										if(value.replace(" ", "").length() < 3){
 											sendStatus("states.manager_gui.view.name_short");
 											break;
 										}
-										mun.setRulesetTitle(value);
+										mun.manage.setRulesetTitle(value);
 										mun.created.update();
 										mun.save();
 										sendViewData();
@@ -777,7 +780,7 @@ public class ManagerContainer extends GenericContainer {
 									break;
 								}
 								case "mailbox":{
-									if(mun.isAuthorized(mun.r_SET_MAILBOX.id, cap.getUUID()).isTrue() || bypass(player)){
+									if(mun.manage.isAuthorized(mun.r_SET_MAILBOX.id, cap.getUUID()).isTrue() || bypass(player)){
 										mun.mailbox.reset();
 										mun.created.update();
 										mun.save();
@@ -788,11 +791,11 @@ public class ManagerContainer extends GenericContainer {
 									break;
 								}
 								case "blacklist":{
-									openGui(Layer.MUNICIPALITY, Mode.LIST_BWLIST, mun.getId());
+									openGui(Layers.MUNICIPALITY, Mode.LIST_BWLIST, mun.getId());
 									break;
 								}
 								case "icon":{
-									if(mun.isAuthorized(mun.r_ICON.id, cap.getUUID()).isTrue() || bypass(player)){
+									if(mun.manage.isAuthorized(mun.r_ICON.id, cap.getUUID()).isTrue() || bypass(player)){
 										try{
 											mun.icon.set(value);
 											mun.created.update();
@@ -812,7 +815,7 @@ public class ManagerContainer extends GenericContainer {
 						case STATE:
 							switch(keys[packet.getInteger("button")]){
 								case "name":{
-									if(state.isAuthorized(state.r_SET_NAME.id, cap.getUUID()).isTrue() || bypass(player)){
+									if(state.manage.isAuthorized(state.r_SET_NAME.id, cap.getUUID()).isTrue() || bypass(player)){
 										if(value.replace(" ", "").length() < 3){
 											sendStatus("states.manager_gui.view.name_short");
 											break;
@@ -827,7 +830,7 @@ public class ManagerContainer extends GenericContainer {
 									break;
 								}
 								case "capital":{
-									if(state.isAuthorized(state.r_SET_CAPITAL.id, cap.getUUID()).isTrue() || bypass(player)){
+									if(state.manage.isAuthorized(state.r_SET_CAPITAL.id, cap.getUUID()).isTrue() || bypass(player)){
 										Municipality mun = StateUtil.getMunicipality(Integer.parseInt(value));
 										if(mun.getId() <= 0 || mun.getState().getId() != state.getId()){
 											sendStatus("states.manager_gui.view.municipality_not_in_state");
@@ -845,13 +848,13 @@ public class ManagerContainer extends GenericContainer {
 									break;
 								}
 								case "leader":{
-									if(state.isAuthorized(state.r_SET_LEADER.id, cap.getUUID()).isTrue() || bypass(player)){
+									if(state.manage.isAuthorized(state.r_SET_LEADER.id, cap.getUUID()).isTrue() || bypass(player)){
 										if(value.equals("null") || value.equals("reset")){
-											if(state.isAuthorized(state.r_RESET_HEAD.id, cap.getUUID()).isFalse() && !bypass(player)){
+											if(state.manage.isAuthorized(state.r_RESET_HEAD.id, cap.getUUID()).isFalse() && !bypass(player)){
 												sendStatus(null);
 												return;
 											}
-											state.setHead(null);
+											state.manage.setHead(null);
 											state.save();
 											sendViewData();
 											StateUtil.announce(null, AnnounceLevel.MUNICIPALITY_ALL, translate("states.announce.state.leader_reset"), state.getId());
@@ -863,11 +866,11 @@ public class ManagerContainer extends GenericContainer {
 											sendStatus("states.manager_gui.view.player_not_found_cache");
 											break;
 										}
-										if(!state.getCouncil().contains(gp.getId()) && !getCitizens(state).contains(gp.getId())){
+										if(!state.manage.getCouncil().contains(gp.getId()) && !getCitizens(state).contains(gp.getId())){
 											sendStatus("states.manager_gui.view.player_not_council_or_citizen");
 											break;
 										}
-										state.setHead(gp.getId());
+										state.manage.setHead(gp.getId());
 										state.created.update();
 										state.save();
 										sendViewData();
@@ -877,7 +880,7 @@ public class ManagerContainer extends GenericContainer {
 									break;
 								}
 								case "price":{
-									if(state.isAuthorized(state.r_SET_PRICE.id, cap.getUUID()).isTrue() || bypass(player)){
+									if(state.manage.isAuthorized(state.r_SET_PRICE.id, cap.getUUID()).isTrue() || bypass(player)){
 										try{
 											Long price = Long.parseLong(value);
 											if(price < 0){ price = 0l; }
@@ -895,7 +898,7 @@ public class ManagerContainer extends GenericContainer {
 									break;
 								}
 								case "color":{
-									if(state.isAuthorized(state.r_SET_COLOR.id, cap.getUUID()).isTrue() || bypass(player)){
+									if(state.manage.isAuthorized(state.r_SET_COLOR.id, cap.getUUID()).isTrue() || bypass(player)){
 										try{
 											String str = value;
 											if(!ColorData.validString(null, str)){
@@ -916,11 +919,11 @@ public class ManagerContainer extends GenericContainer {
 									break;
 								}
 								case "citizen":{
-									openGui(Layer.STATE, Mode.LIST_CITIZENS, state.getId());
+									openGui(Layers.STATE, Mode.LIST_CITIZENS, state.getId());
 									break;
 								}
 								case "chunk_tax":{
-									if(state.isAuthorized(state.r_SET_CHUNK_TAX_PERCENT.id, cap.getUUID()).isTrue() || bypass(player)){
+									if(state.manage.isAuthorized(state.r_SET_CHUNK_TAX_PERCENT.id, cap.getUUID()).isTrue() || bypass(player)){
 										if(value.equals("reset") || value.equals("disable")){
 											state.setChunkTaxPercentage((byte)0);
 											state.created.update();
@@ -945,7 +948,7 @@ public class ManagerContainer extends GenericContainer {
 									break;
 								}
 								case "citizen_tax":{
-									if(state.isAuthorized(state.r_SET_CITIZEN_TAX_PERCENT.id, cap.getUUID()).isTrue() || bypass(player)){
+									if(state.manage.isAuthorized(state.r_SET_CITIZEN_TAX_PERCENT.id, cap.getUUID()).isTrue() || bypass(player)){
 										if(value.equals("reset") || value.equals("disable")){
 											state.setCitizenTaxPercentage((byte)0);
 											state.created.update();
@@ -969,24 +972,24 @@ public class ManagerContainer extends GenericContainer {
 									break;
 								}
 								case "council":{
-									openGui(Layer.STATE, Mode.LIST_COUNCIL, state.getId());
+									openGui(Layers.STATE, Mode.LIST_COUNCIL, state.getId());
 									break;
 								}
 								case "municipalities":{
-									openGui(Layer.STATE, Mode.LIST_COMPONENTS, state.getId());
+									openGui(Layers.STATE, Mode.LIST_COMPONENTS, state.getId());
 									break;
 								}
 								case "neighbors":{
-									openGui(Layer.STATE, Mode.LIST_NEIGHBORS, state.getId());
+									openGui(Layers.STATE, Mode.LIST_NEIGHBORS, state.getId());
 									break;
 								}
 								case "ruleset":{
-									if(state.isAuthorized(state.r_SET_RULESET.id, cap.getUUID()).isTrue() || bypass(player)){
+									if(state.manage.isAuthorized(state.r_SET_RULESET.id, cap.getUUID()).isTrue() || bypass(player)){
 										if(value.replace(" ", "").length() < 3){
 											sendStatus("states.manager_gui.view.name_short");
 											break;
 										}
-										state.setRulesetTitle(value);
+										state.manage.setRulesetTitle(value);
 										state.created.update();
 										state.save();
 										sendViewData();
@@ -996,7 +999,7 @@ public class ManagerContainer extends GenericContainer {
 									break;
 								}
 								case "mailbox":{
-									if(state.isAuthorized(state.r_SET_MAILBOX.id, cap.getUUID()).isTrue() || bypass(player)){
+									if(state.manage.isAuthorized(state.r_SET_MAILBOX.id, cap.getUUID()).isTrue() || bypass(player)){
 										state.mailbox.reset();
 										state.created.update();
 										state.save();
@@ -1007,11 +1010,11 @@ public class ManagerContainer extends GenericContainer {
 									break;
 								}
 								case "blacklist":{
-									openGui(Layer.STATE, Mode.LIST_BWLIST, state.getId());
+									openGui(Layers.STATE, Mode.LIST_BWLIST, state.getId());
 									break;
 								}
 								case "icon":{
-									if(state.isAuthorized(state.r_SET_ICON.id, cap.getUUID()).isTrue() || bypass(player)){
+									if(state.manage.isAuthorized(state.r_SET_ICON.id, cap.getUUID()).isTrue() || bypass(player)){
 										try{
 											state.icon.set(value);
 											state.created.update();
@@ -1063,7 +1066,7 @@ public class ManagerContainer extends GenericContainer {
 									break;
 								}
 								case "municipality":{
-									openGui(Layer.MUNICIPALITY, Mode.INFO, cap.getMunicipality().getId());
+									openGui(Layers.MUNICIPALITY, Mode.INFO, cap.getMunicipality().getId());
 									break;
 								}
 								case "mailbox":{
@@ -1077,7 +1080,7 @@ public class ManagerContainer extends GenericContainer {
 						case CHUNK:
 							switch(keys[packet.getInteger("button")]){
 								case "district":{
-									openGui(Layer.DISTRICT, Mode.INFO, chunk.getDistrict().getId());
+									openGui(Layers.DISTRICT, Mode.INFO, chunk.getDistrict().getId());
 									break;
 								}
 								case "owner":{
@@ -1086,16 +1089,16 @@ public class ManagerContainer extends GenericContainer {
 											//TODO
 											break;
 										case DISTRICT:
-											openGui(Layer.DISTRICT, Mode.INFO, chunk.getDistrict().getId());
+											openGui(Layers.DISTRICT, Mode.INFO, chunk.getDistrict().getId());
 											break;
 										case MUNICIPAL:
 										case NORMAL:
 										case PUBLIC:
-											openGui(Layer.MUNICIPALITY, Mode.INFO, chunk.getMunicipality().getId());
+											openGui(Layers.MUNICIPALITY, Mode.INFO, chunk.getMunicipality().getId());
 											break;
 										case STATEOWNED:
 										case STATEPUBLIC:
-											openGui(Layer.STATE, Mode.INFO, chunk.getState().getId());
+											openGui(Layers.STATE, Mode.INFO, chunk.getState().getId());
 											break;
 										case PRIVATE:
 										default: return;
@@ -1119,7 +1122,7 @@ public class ManagerContainer extends GenericContainer {
 									break;
 								}
 								case "tax":{
-									if(chunk.getDistrict().isAuthorized(chunk.getDistrict().r_SET_CUSTOM_CHUNKTAX.id, cap.getUUID()).isTrue()){
+									if(chunk.getDistrict().manage.isAuthorized(chunk.getDistrict().r_SET_CUSTOM_CHUNKTAX.id, cap.getUUID()).isTrue()){
 										if(value.equals("reset") || value.equals("disable")){
 											chunk.setCustomTax(0);
 											chunk.save();
@@ -1207,16 +1210,16 @@ public class ManagerContainer extends GenericContainer {
 									break;
 								}
 								case "linked_chunks":{
-									openGui(Layer.CHUNK, Mode.LIST_COMPONENTS, chunk.xCoord(), chunk.zCoord());
+									openGui(Layers.CHUNK, Mode.LIST_COMPONENTS, chunk.xCoord(), chunk.zCoord());
 									break;
 								}
 								case "linked_to":{
 									if(chunk.getLink() == null) return;
-									openGui(Layer.CHUNK, Mode.CKINFO, chunk.getLink().x, chunk.getLink().z);
+									openGui(Layers.CHUNK, Mode.CKINFO, chunk.getLink().x, chunk.getLink().z);
 									break;
 								}
 								case "whitelist":{
-									openGui(Layer.CHUNK, Mode.LIST_BWLIST, chunk.xCoord(), chunk.zCoord());
+									openGui(Layers.CHUNK, Mode.LIST_BWLIST, chunk.xCoord(), chunk.zCoord());
 									break;
 								}
 								case "allow_interact":
@@ -1251,15 +1254,15 @@ public class ManagerContainer extends GenericContainer {
 						case LIST_COMPONENTS:
 							if(layer.isChunk()){
 								int[] resloc = chunk.getLinkedChunks().get(packet.getInteger("button"));
-								openGui(Layer.CHUNK, Mode.CKINFO, resloc[0], resloc[1]);
+								openGui(Layers.CHUNK, Mode.CKINFO, resloc[0], resloc[1]);
 								return;
 							}
 							if(layer.isMunicipality()){
-								openGui(Layer.DISTRICT, Mode.INFO, mun.getDistricts().get(packet.getInteger("button")));
+								openGui(Layers.DISTRICT, Mode.INFO, mun.getDistricts().get(packet.getInteger("button")));
 								return;
 							}
 							if(layer.isState()){
-								openGui(Layer.MUNICIPALITY, Mode.INFO, state.getMunicipalities().get(packet.getInteger("button")));
+								openGui(Layers.MUNICIPALITY, Mode.INFO, state.getMunicipalities().get(packet.getInteger("button")));
 								return;
 							}
 							//TODO check if the component is loaded in memory?
@@ -1269,15 +1272,15 @@ public class ManagerContainer extends GenericContainer {
 							break;
 						case LIST_NEIGHBORS:
 							if(layer.isDistrict()){
-								openGui(Layer.DISTRICT, Mode.INFO, dis.getNeighbors().get(packet.getInteger("button")));
+								openGui(Layers.DISTRICT, Mode.INFO, dis.getNeighbors().get(packet.getInteger("button")));
 								return;
 							}
 							if(layer.isMunicipality()){
-								openGui(Layer.MUNICIPALITY, Mode.INFO, mun.getNeighbors().get(packet.getInteger("button")));
+								openGui(Layers.MUNICIPALITY, Mode.INFO, mun.getNeighbors().get(packet.getInteger("button")));
 								return;
 							}
 							if(layer.isState()){
-								openGui(Layer.STATE, Mode.INFO, state.getNeighbors().get(packet.getInteger("button")));
+								openGui(Layers.STATE, Mode.INFO, state.getNeighbors().get(packet.getInteger("button")));
 								return;
 							}
 							//TODO check if the component is loaded in memory?
@@ -1301,7 +1304,7 @@ public class ManagerContainer extends GenericContainer {
 								return;
 							}
 							if(layer.isMunicipality()){
-								if(mun.isAuthorized(mun.r_EDIT_BL.id, cap.getUUID()).isTrue() || bypass(player)){
+								if(mun.manage.isAuthorized(mun.r_EDIT_BL.id, cap.getUUID()).isTrue() || bypass(player)){
 									mun.getPlayerBlacklist().remove(list_values[index]);
 									mun.save();
 									sendListData();
@@ -1312,7 +1315,7 @@ public class ManagerContainer extends GenericContainer {
 								return;
 							}
 							if(layer.isState()){
-								if(state.isAuthorized(state.r_EDIT_BL.id, cap.getUUID()).isTrue() || bypass(player)){
+								if(state.manage.isAuthorized(state.r_EDIT_BL.id, cap.getUUID()).isTrue() || bypass(player)){
 									state.getBlacklist().remove(list_values[index]);
 									state.save();
 									sendListData();
@@ -1324,11 +1327,11 @@ public class ManagerContainer extends GenericContainer {
 							break;
 						case LIST_CITIZENS:
 							if(layer.isMunicipality()){
-								if(!(mun.isAuthorized(mun.r_KICK.id, cap.getUUID()).isTrue() || bypass(player))){
+								if(!(mun.manage.isAuthorized(mun.r_KICK.id, cap.getUUID()).isTrue() || bypass(player))){
 									sendStatus(null);
 									return;
 								}
-								if(mun.getCouncil().contains(list_values[index])){
+								if(mun.manage.getCouncil().contains(list_values[index])){
 									Print.chat(player, "states.manager_gui.list.cannot_kick_council0");
 									Print.chat(player, "states.manager_gui.list.cannot_kick_council1");
 									sendStatus(null);
@@ -1370,7 +1373,7 @@ public class ManagerContainer extends GenericContainer {
 								return;
 							}
 							if(layer.isState()){
-								if(!state.isAuthorized(state.r_MUN_KICK.id, cap.getUUID()).isTrue() || !bypass(player)){
+								if(!state.manage.isAuthorized(state.r_MUN_KICK.id, cap.getUUID()).isTrue() || !bypass(player)){
 									sendStatus(null);
 									return;
 								}
@@ -1397,15 +1400,15 @@ public class ManagerContainer extends GenericContainer {
 							break;
 						case LIST_COUNCIL:
 							if(layer.isMunicipality()){
-								if(!(mun.isAuthorized(mun.r_COUNCIL_KICK.id, cap.getUUID()).isTrue() || bypass(player))){
+								if(!(mun.manage.isAuthorized(mun.r_COUNCIL_KICK.id, cap.getUUID()).isTrue() || bypass(player))){
 									sendStatus(null);
 									return;
 								}
-								if(!mun.getCouncil().contains((UUID)list_values[index])){
+								if(!mun.manage.getCouncil().contains((UUID)list_values[index])){
 									sendStatus("states.manager_gui.list.not_council");
 									return;
 								}
-								mun.getCouncil().remove((UUID)list_values[index]);
+								mun.manage.getCouncil().remove((UUID)list_values[index]);
 								mun.created.update();
 								mun.save();
 								String name = Static.getPlayerNameByUUID((UUID)list_values[index]);
@@ -1417,15 +1420,15 @@ public class ManagerContainer extends GenericContainer {
 								return;
 							}
 							if(layer.isState()){
-								if(!state.isAuthorized(state.r_COUNCIL_KICK.id, cap.getUUID()).isTrue() && !bypass(player)){
+								if(!state.manage.isAuthorized(state.r_COUNCIL_KICK.id, cap.getUUID()).isTrue() && !bypass(player)){
 									sendStatus(null);
 									return;
 								}
-								if(!state.getCouncil().contains((UUID)list_values[index])){
+								if(!state.manage.getCouncil().contains((UUID)list_values[index])){
 									sendStatus("states.manager_gui.list.not_council");
 									return;
 								}
-								state.getCouncil().remove((UUID)list_values[index]);
+								state.manage.getCouncil().remove((UUID)list_values[index]);
 								state.created.update();
 								state.save();
 								String name = Static.getPlayerNameByUUID((UUID)list_values[index]);
@@ -1465,13 +1468,13 @@ public class ManagerContainer extends GenericContainer {
 								return;
 							}
 							if(layer.isMunicipality()){
-								if(mun.isAuthorized(mun.r_EDIT_BL.id, cap.getUUID()).isTrue() || bypass(player)){
+								if(mun.manage.isAuthorized(mun.r_EDIT_BL.id, cap.getUUID()).isTrue() || bypass(player)){
 									GameProfile prof = Static.getServer().getPlayerProfileCache().getGameProfileForUsername(input);
 									if(prof == null){
 										sendStatus("states.manager_gui.view.player_not_found_cache");
 										return;
 									}
-									if(mun.getCouncil().contains(prof.getId())){
+									if(mun.manage.getCouncil().contains(prof.getId())){
 										Print.chat(player, "states.manager_gui.list.cannot_blacklist_council0");
 										Print.chat(player, "states.manager_gui.list.cannot_blacklist_council1");
 										sendStatus(null);
@@ -1491,7 +1494,7 @@ public class ManagerContainer extends GenericContainer {
 								return;
 							}
 							if(layer.isState()){
-								if(state.isAuthorized(state.r_EDIT_BL.id, cap.getUUID()).isTrue() || bypass(player)){
+								if(state.manage.isAuthorized(state.r_EDIT_BL.id, cap.getUUID()).isTrue() || bypass(player)){
 									//TODO company id validation
 									if(!NumberUtils.isCreatable(input)){
 										sendStatus("states.manager_gui.view.not_number");
@@ -1508,7 +1511,7 @@ public class ManagerContainer extends GenericContainer {
 							break;
 						case LIST_CITIZENS:
 							if(layer.isMunicipality()){
-								if(!(mun.isAuthorized(mun.r_INVITE.id, cap.getUUID()).isTrue() || bypass(player))){
+								if(!(mun.manage.isAuthorized(mun.r_INVITE.id, cap.getUUID()).isTrue() || bypass(player))){
 									sendStatus(null);
 									return;
 								}
@@ -1567,7 +1570,7 @@ public class ManagerContainer extends GenericContainer {
 								return;
 							}
 							if(layer.isState()){
-								if(!state.isAuthorized(state.r_MUN_INVITE.id, cap.getUUID()).isTrue() && !bypass(player)){
+								if(!state.manage.isAuthorized(state.r_MUN_INVITE.id, cap.getUUID()).isTrue() && !bypass(player)){
 									sendStatus(null);
 									return;
 								}
@@ -1582,7 +1585,7 @@ public class ManagerContainer extends GenericContainer {
 									sendStatus("states.manager_gui.list_components_state.mun_not_found");
 									return;
 								}
-								if(invtar.getHead() == null){
+								if(invtar.manage.getHead() == null){
 									sendStatus("states.manager_gui.list_components_state.mun_no_mayor");
 									return;
 								}
@@ -1601,7 +1604,7 @@ public class ManagerContainer extends GenericContainer {
 							break;
 						case LIST_COUNCIL:
 							if(layer.isMunicipality()){
-								if(!(mun.isAuthorized(mun.r_COUNCIL_INVITE.id, cap.getUUID()).isTrue() || bypass(player))){
+								if(!(mun.manage.isAuthorized(mun.r_COUNCIL_INVITE.id, cap.getUUID()).isTrue() || bypass(player))){
 									sendStatus(null);
 									return;
 								}
@@ -1610,7 +1613,7 @@ public class ManagerContainer extends GenericContainer {
 									sendStatus("states.manager_gui.view.player_not_found_cache");
 									return;
 								}
-								if(mun.getCouncil().contains(gp.getId())){
+								if(mun.manage.getCouncil().contains(gp.getId())){
 									sendStatus("states.manager_gui.list.is_council");
 									return;
 								}
@@ -1631,7 +1634,7 @@ public class ManagerContainer extends GenericContainer {
 								return;
 							}
 							if(layer.isState()){
-								if(!state.isAuthorized(state.r_COUNCIL_INVITE.id, cap.getUUID()).isTrue() && !bypass(player)){
+								if(!state.manage.isAuthorized(state.r_COUNCIL_INVITE.id, cap.getUUID()).isTrue() && !bypass(player)){
 									sendStatus(null);
 									return;
 								}
@@ -1640,7 +1643,7 @@ public class ManagerContainer extends GenericContainer {
 									sendStatus("states.manager_gui.view.player_not_found_cache");
 									return;
 								}
-								if(state.getCouncil().contains(gp.getId())){
+								if(state.manage.getCouncil().contains(gp.getId())){
 									sendStatus("states.manager_gui.list.is_council");
 									return;
 								}
@@ -1667,16 +1670,16 @@ public class ManagerContainer extends GenericContainer {
 				}
 				case "list_mode_home":{
 					if(layer.isChunk()){
-						openGui(Layer.CHUNK, Mode.CKINFO, chunk.xCoord(), chunk.zCoord());
+						openGui(Layers.CHUNK, Mode.CKINFO, chunk.xCoord(), chunk.zCoord());
 					}
 					if(layer.isDistrict()){
-						openGui(Layer.DISTRICT, Mode.INFO, dis.getId());
+						openGui(Layers.DISTRICT, Mode.INFO, dis.getId());
 					}
 					if(layer.isMunicipality()){
-						openGui(Layer.MUNICIPALITY, Mode.INFO, mun.getId());
+						openGui(Layers.MUNICIPALITY, Mode.INFO, mun.getId());
 					}
 					if(layer.isState()){
-						openGui(Layer.STATE, Mode.INFO, state.getId());
+						openGui(Layers.STATE, Mode.INFO, state.getId());
 					}
 					break;
 				}
@@ -1684,11 +1687,11 @@ public class ManagerContainer extends GenericContainer {
 		}
 	}
 
-	private void openGui(Layer layer, Mode mode, int id){
+	private void openGui(Layers layer, Mode mode, int id){
 		GuiHandler.openGui(player, layer.ordinal() + 2, mode.ordinal(), id, 0);
 	}
 
-	private void openGui(Layer layer, Mode mode, int x, int z){
+	private void openGui(Layers layer, Mode mode, int x, int z){
 		GuiHandler.openGui(player, layer.ordinal() + 2, mode.ordinal(), x, z);
 	}
 
@@ -1826,9 +1829,9 @@ public class ManagerContainer extends GenericContainer {
 		boolean result = false;
 		UUID uuid = player.getGameProfile().getId();
 		boolean isco = chunk.getOwner().equals(uuid.toString());
-		boolean ismn = chunk.getDistrict().getHead() != null && chunk.getDistrict().getHead().equals(uuid);
-		boolean ismy = chunk.getMunicipality().getHead() != null && chunk.getMunicipality().getHead().equals(uuid);
-		boolean isst = chunk.getState().getCouncil().contains(uuid) || (chunk.getState().getHead() != null && chunk.getState().getHead().equals(uuid));
+		boolean ismn = chunk.getDistrict().manage.getHead() != null && chunk.getDistrict().manage.getHead().equals(uuid);
+		boolean ismy = chunk.getMunicipality().manage.getHead() != null && chunk.getMunicipality().manage.getHead().equals(uuid);
+		boolean isst = chunk.getState().manage.getCouncil().contains(uuid) || (chunk.getState().manage.getHead() != null && chunk.getState().manage.getHead().equals(uuid));
 		boolean iscm = false;//TODO companies
 		Print.debug(isco, ismn, ismy, isst, iscm);
 		switch(chunk.getType()){
@@ -1863,9 +1866,9 @@ public class ManagerContainer extends GenericContainer {
 		boolean result = false;
 		UUID uuid = player.getGameProfile().getId();
 		boolean isco = chunk.getOwner().equals(uuid.toString());
-		boolean ismn = chunk.getDistrict().getHead() != null && chunk.getDistrict().getHead().equals(uuid);
-		boolean ismy = chunk.getMunicipality().getHead() != null && chunk.getMunicipality().getHead().equals(uuid);
-		boolean isst = chunk.getState().getCouncil().contains(uuid) || (chunk.getState().getHead() != null && chunk.getState().getHead().equals(uuid));
+		boolean ismn = chunk.getDistrict().manage.getHead() != null && chunk.getDistrict().manage.getHead().equals(uuid);
+		boolean ismy = chunk.getMunicipality().manage.getHead() != null && chunk.getMunicipality().manage.getHead().equals(uuid);
+		boolean isst = chunk.getState().manage.getCouncil().contains(uuid) || (chunk.getState().manage.getHead() != null && chunk.getState().manage.getHead().equals(uuid));
 		boolean iscm = false;//TODO companies
 		Print.debug(isco, ismn, ismy, isst, iscm);
 		switch(chunk.getType()){

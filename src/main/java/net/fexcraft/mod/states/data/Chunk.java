@@ -14,8 +14,8 @@ import net.fexcraft.lib.common.json.JsonUtil;
 import net.fexcraft.lib.common.math.Time;
 import net.fexcraft.lib.mc.utils.Print;
 import net.fexcraft.mod.states.States;
-import net.fexcraft.mod.states.data.root.ChildLayer;
 import net.fexcraft.mod.states.data.root.Layer;
+import net.fexcraft.mod.states.data.root.Layers;
 import net.fexcraft.mod.states.data.root.Taxable;
 import net.fexcraft.mod.states.data.sub.Buyable;
 import net.fexcraft.mod.states.data.sub.Createable;
@@ -25,11 +25,11 @@ import net.fexcraft.mod.states.util.StateUtil;
 import net.fexcraft.mod.states.util.TaxSystem;
 import net.minecraft.world.World;
 
-public class Chunk implements ChildLayer, Taxable {
+public class Chunk implements Layer, Taxable {
 	
 	private District district;
 	private long edited, lasttaxcheck, ctax;
-	public Buyable price = new Buyable(this, Layer.CHUNK);
+	public Buyable price = new Buyable(this);
 	public Createable created = new Createable();
 	private int x, z;
 	private ChunkPos link, pos;
@@ -329,13 +329,18 @@ public class Chunk implements ChildLayer, Taxable {
 	}
 
 	@Override
-	public int getParentId(){
-		return district.getId();
+	public Layer getParent(){
+		return district;
 	}
 
 	@Override
-	public Layer getParentLayer(){
-		return Layer.DISTRICT;
+	public Layers getLayerType(){
+		return Layers.CHUNK;
+	}
+
+	@Override
+	public int getId(){
+		return 0;
 	}
 
 }

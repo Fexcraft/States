@@ -179,8 +179,8 @@ public class TaxSystem extends TimerTask {
 		else cap.onTaxCollected(date);
 	}
 
-	private static String getMayor(Municipality municipality){
-		return municipality.getHead() == null ? municipality.getCouncil().size() <= 0 ? States.CONSOLE_UUID : municipality.getCouncil().get(0).toString() : municipality.getHead().toString();
+	private static String getMayor(Municipality mun){
+		return mun.manage.getHead() == null ? mun.manage.getCouncil().size() <= 0 ? States.CONSOLE_UUID : mun.manage.getCouncil().get(0).toString() : mun.manage.getHead().toString();
 	}
 
 	public static void processChunkTax(long date, Chunk value){

@@ -3,7 +3,6 @@ package net.fexcraft.mod.states.data;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.UUID;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
@@ -15,56 +14,52 @@ import net.fexcraft.mod.fsmm.api.Bank;
 import net.fexcraft.mod.fsmm.util.DataManager;
 import net.fexcraft.mod.states.States;
 import net.fexcraft.mod.states.data.root.AccountHolder;
-import net.fexcraft.mod.states.data.root.ChildLayer;
 import net.fexcraft.mod.states.data.root.Initiator;
 import net.fexcraft.mod.states.data.root.Layer;
-import net.fexcraft.mod.states.data.root.Ruleable;
+import net.fexcraft.mod.states.data.root.Layers;
 import net.fexcraft.mod.states.data.sub.Buyable;
 import net.fexcraft.mod.states.data.sub.ColorData;
 import net.fexcraft.mod.states.data.sub.Createable;
 import net.fexcraft.mod.states.data.sub.ExternalDataHolder;
 import net.fexcraft.mod.states.data.sub.IconHolder;
 import net.fexcraft.mod.states.data.sub.MailData;
+import net.fexcraft.mod.states.data.sub.Manageable;
 import net.fexcraft.mod.states.data.sub.RuleHolder;
 import net.fexcraft.mod.states.events.StateEvent;
 import net.fexcraft.mod.states.util.StateUtil;
 import net.minecraftforge.common.MinecraftForge;
 
-public class State implements ChildLayer, AccountHolder, Ruleable {
+public class State implements Layer, AccountHolder {
 
 	private int id, capital;
 	private String name;
 	public IconHolder icon = new IconHolder();
 	public ColorData color = new ColorData();
-	public Buyable price = new Buyable(this, Layer.UNION);
+	public Buyable price = new Buyable(this);
 	public MailData mailbox = new MailData();
 	public Createable created = new Createable();
 	public ExternalDataHolder external = new ExternalDataHolder();
-	public RuleHolder rules = new RuleHolder(this);
-	private UUID leader;
+	public Manageable manage = new Manageable(this, true, false, "leader");
+	public RuleHolder rules = new RuleHolder();
 	private Account account;
 	private ArrayList<Integer> neighbors, municipalities, blacklist;
-	private ArrayList<UUID> council;
 	private byte chunktaxpercent, citizentaxpercent;
 	//
-	private String ruleset;
 	public final Rule r_CREATE_SIGN_SHOP, r_SET_MAILBOX, r_OPEN_MAILBOX, r_CREATE_MUNICIPALITY, r_CLAIM_MUNICIPALITY;
 	public final Rule r_SET_COLOR, r_SET_ICON, r_SET_NAME, r_SET_PRICE, r_SET_LEADER, r_SET_CHUNK_TAX_PERCENT;
 	public final Rule r_EDIT_BL, r_MUN_KICK, r_MUN_INVITE, r_COUNCIL_KICK, r_COUNCIL_INVITE, r_VOTE_LEADER;
 	public final Rule r_SET_CAPITAL, r_SET_CITIZEN_TAX_PERCENT, r_SET_RULESET, r_RESET_HEAD;
-	private ArrayList<Vote> active_votes = new ArrayList<>();
 
 	public State(int value){
 		id = value;
 		JsonObject obj = StateUtil.getStateJson(value).getAsJsonObject();
 		name = JsonUtil.getIfExists(obj, "name", "Unnamed State");
 		created.load(obj);
-		leader = obj.has("leader") ? UUID.fromString(obj.get("leader").getAsString()) : null;
+		manage.load(obj);
 		account = DataManager.getAccount("state:" + id, false, true).setName(name);
 		capital = JsonUtil.getIfExists(obj, "capital", -1).intValue();
 		neighbors = JsonUtil.jsonArrayToIntegerArray(JsonUtil.getIfExists(obj, "neighbors", new JsonArray()).getAsJsonArray());
 		municipalities = JsonUtil.jsonArrayToIntegerArray(JsonUtil.getIfExists(obj, "municipalities", new JsonArray()).getAsJsonArray());
-		council = JsonUtil.jsonArrayToUUIDArray(JsonUtil.getIfExists(obj, "council", new JsonArray()).getAsJsonArray());
 		color.load(obj);
 		blacklist = JsonUtil.jsonArrayToIntegerArray(JsonUtil.getIfExists(obj, "blacklist", new JsonArray()).getAsJsonArray());
 		price.load(obj);
@@ -72,7 +67,7 @@ public class State implements ChildLayer, AccountHolder, Ruleable {
 		chunktaxpercent = JsonUtil.getIfExists(obj, "chunk_tax_percent", 0).byteValue();
 		citizentaxpercent = JsonUtil.getIfExists(obj, "citizen_tax_percent", 0).byteValue();
 		mailbox.load(obj);
-		ruleset = JsonUtil.getIfExists(obj, "ruleset", "Standard Ruleset");
+		manage.linkRuleHolder(rules);
 		rules.add(r_CREATE_SIGN_SHOP = new Rule("create.sign-shops", null, false, Initiator.INCHARGE, Initiator.COUNCIL_ANY));
 		rules.add(r_SET_MAILBOX = new Rule("set.mailbox", null, false, Initiator.COUNCIL_VOTE, Initiator.INCHARGE));
 		rules.add(r_OPEN_MAILBOX = new Rule("open.mailbox", null, false, Initiator.COUNCIL_VOTE, Initiator.COUNCIL_ANY));
@@ -97,12 +92,6 @@ public class State implements ChildLayer, AccountHolder, Ruleable {
 		rules.getMap().lock();
 		rules.load(obj);
 		//
-		if(obj.has("votes")){
-			ArrayList<Integer> list = JsonUtil.jsonArrayToIntegerArray(obj.get("votes").getAsJsonArray());
-			for(int i : list){
-				Vote vote = StateUtil.getVote(this, i); if(vote == null || vote.expired(null)) continue; active_votes.add(vote);
-			}
-		}
 		MinecraftForge.EVENT_BUS.post(new StateEvent.Load(this));
 		rules.loadEx(obj);
 		external.load(obj);
@@ -113,11 +102,10 @@ public class State implements ChildLayer, AccountHolder, Ruleable {
 		obj.addProperty("id", id);
 		obj.addProperty("name", name);
 		created.save(obj);
-		if(!(leader == null)){ obj.addProperty("leader", leader.toString()); }
+		manage.save(obj);
 		obj.add("neighbors", JsonUtil.getArrayFromIntegerList(neighbors));
 		obj.add("municipalities", JsonUtil.getArrayFromIntegerList(municipalities));
 		obj.addProperty("capital", capital);
-		obj.add("council", JsonUtil.getArrayFromUUIDList(council));
 		obj.addProperty("balance", account.getBalance());
 		color.save(obj);
 		obj.add("blacklist", JsonUtil.getArrayFromIntegerList(blacklist));
@@ -130,13 +118,7 @@ public class State implements ChildLayer, AccountHolder, Ruleable {
 			obj.addProperty("citizen_tax_percent", citizentaxpercent);
 		}
 		mailbox.save(obj);
-		obj.addProperty("ruleset", ruleset);
 		rules.save(obj);
-		if(!active_votes.isEmpty()){
-			JsonArray array = new JsonArray();
-			for(Vote vote : active_votes) array.add(vote.id);
-			obj.add("votes", array);
-		}
 		external.save(obj);
 		return obj;
 	}
@@ -187,10 +169,6 @@ public class State implements ChildLayer, AccountHolder, Ruleable {
 		return account;
 	}
 
-	public List<UUID> getCouncil(){
-		return council;
-	}
-
 	public int getCapitalId(){
 		return capital;
 	}
@@ -233,48 +211,13 @@ public class State implements ChildLayer, AccountHolder, Ruleable {
 	}
 
 	@Override
-	public String getRulesetTitle(){
-		return ruleset;
-	}
-
-	@Override
-	public UUID getHead(){
-		return leader;
-	}
-
-	@Override
-	public void setHead(UUID uuid){
-		leader = uuid;
-	}
-
-	@Override
-	public Ruleable getHigherInstance(){
+	public Layer getParent(){
 		return null;
 	}
 
 	@Override
-	public void setRulesetTitle(String title){
-		ruleset = title;
-	}
-
-	@Override
-	public List<Vote> getActiveVotes(){
-		return active_votes;
-	}
-
-	@Override
-	public int getParentId(){
-		return 0;
-	}
-
-	@Override
-	public Layer getParentLayer(){
-		return Layer.UNION;
-	}
-
-	@Override
-	public RuleHolder getRuleHolder(){
-		return rules;
+	public Layers getLayerType(){
+		return Layers.STATE;
 	}
 	
 }

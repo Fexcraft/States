@@ -2,7 +2,7 @@ package net.fexcraft.mod.states.guis;
 
 import net.fexcraft.lib.mc.gui.GenericGui;
 import net.fexcraft.lib.mc.utils.Formatter;
-import net.fexcraft.mod.states.data.root.Layer;
+import net.fexcraft.mod.states.data.root.Layers;
 import net.fexcraft.mod.states.data.sub.Buyable;
 import net.fexcraft.mod.states.data.sub.MailData;
 import net.fexcraft.mod.states.guis.ManagerContainer.Mode;
@@ -40,8 +40,8 @@ public class ManagerGui extends GenericGui<ManagerContainer> {
 		}
 		else{
 			normallist = container.mode == Mode.LIST_NEIGHBORS;
-			if(container.mode == Mode.LIST_COMPONENTS && container.layer == Layer.MUNICIPALITY) normallist = true;
-			if(container.mode == Mode.LIST_CITIZENS && container.layer == Layer.STATE) normallist = true;
+			if(container.mode == Mode.LIST_COMPONENTS && container.layer == Layers.MUNICIPALITY) normallist = true;
+			if(container.mode == Mode.LIST_CITIZENS && container.layer == Layers.STATE) normallist = true;
 			xSize = 224;
 			ySize = normallist ? 184 : 200;
 			texloc = normallist ? LIST : EDITLIST;

@@ -7,17 +7,11 @@ import com.google.gson.JsonObject;
 
 import net.fexcraft.mod.states.data.Rule;
 import net.fexcraft.mod.states.data.root.Loadable;
-import net.fexcraft.mod.states.data.root.Ruleable;
 import net.fexcraft.mod.states.util.RuleMap;
 
 public class RuleHolder implements Loadable {
 	
 	private RuleMap rules = new RuleMap();
-	public final Ruleable root;
-	
-	public RuleHolder(Ruleable root){
-		this.root = root;
-	}
 	
 	public RuleMap getMap(){
 		return rules;

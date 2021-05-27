@@ -16,7 +16,7 @@ import net.fexcraft.mod.states.data.Vote;
 import net.fexcraft.mod.states.data.Vote.VoteType;
 import net.fexcraft.mod.states.data.capabilities.PlayerCapability;
 import net.fexcraft.mod.states.data.capabilities.StatesCapabilities;
-import net.fexcraft.mod.states.data.root.Ruleable;
+import net.fexcraft.mod.states.data.sub.Manageable;
 import net.fexcraft.mod.states.util.AliasLoader;
 import net.fexcraft.mod.states.util.StateUtil;
 import net.minecraft.command.CommandBase;
@@ -89,16 +89,16 @@ public class VoteCmd extends CommandBase {
 					}
 					return;
 				}
-				Ruleable ruleable = null; String of;
+				Manageable ruleable = null; String of;
 				switch(args[1]){
 					case "dis": case "district":{
-						ruleable = chunk.getDistrict(); of = "&9Dis.: &7" + chunk.getDistrict().getName(); break;
+						ruleable = chunk.getDistrict().manage; of = "&9Dis.: &7" + chunk.getDistrict().getName(); break;
 					}
 					case "mun": case "municipality":{
-						ruleable = chunk.getMunicipality(); of = "&9Mun.: &7" + chunk.getMunicipality().getName(); break;
+						ruleable = chunk.getMunicipality().manage; of = "&9Mun.: &7" + chunk.getMunicipality().getName(); break;
 					}
 					case "st": case "state":{
-						ruleable = chunk.getState(); of = "&9State: &7" + chunk.getState().getName(); break;
+						ruleable = chunk.getState().manage; of = "&9State: &7" + chunk.getState().getName(); break;
 					}
 					default: Print.chat(sender, "&cInvalid Layer specified."); return;
 				}
@@ -132,7 +132,7 @@ public class VoteCmd extends CommandBase {
 				}
 				Print.chat(sender, "&9Vote Target: &7" + vote.targetAsString());
 				vote.summary(sender);
-				boolean canshow = vote.council ? vote.holder.getCouncil().contains(ply.getUUID()) : ((Municipality)vote.holder).getCitizen().contains(ply.getUUID());
+				boolean canshow = vote.council ? vote.holder.getCouncil().contains(ply.getUUID()) : ((Municipality)vote.holder.getLayer()).getCitizen().contains(ply.getUUID());
 				if(canshow){
 					if(!vote.votes.containsKey(ply.getUUID().toString())){
 						if(!vote.type.assignment()){
@@ -221,7 +221,7 @@ public class VoteCmd extends CommandBase {
 				int dis = args.length > 1 ? Integer.parseInt(args[1]) : -1;
 				Vote newvote = new Vote(sender.getEntityWorld().getCapability(StatesCapabilities.WORLD, null).getNewVoteId(),
 					"allow.explosions", ply.getUUID(), Time.getDate(), Time.getDate() + (Time.MIN_MS / 2),
-					StateUtil.getDistrict(dis), VoteType.CHANGE_VALUE, true, null, true);
+					StateUtil.getDistrict(dis).manage, VoteType.CHANGE_VALUE, true, null, true);
 				if(newvote.getVoteFile().exists()){
 					new Exception("Tried to create new Vote with ID '" + newvote.id + "', but savefile already exists."); return;
 				}

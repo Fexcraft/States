@@ -33,7 +33,7 @@ import net.fexcraft.mod.states.data.Vote;
 import net.fexcraft.mod.states.data.capabilities.PlayerCapability;
 import net.fexcraft.mod.states.data.capabilities.StatesCapabilities;
 import net.fexcraft.mod.states.data.root.AnnounceLevel;
-import net.fexcraft.mod.states.data.root.Ruleable;
+import net.fexcraft.mod.states.data.sub.Manageable;
 import net.minecraft.command.ICommandSender;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
@@ -158,7 +158,7 @@ public class StateUtil extends TimerTask {
 		return null;
 	}
 	
-	public static Vote getVote(Ruleable holder, int value){
+	public static Vote getVote(Manageable holder, int value){
 		if(States.VOTES.containsKey(value)){
 			return States.VOTES.get(value);
 		}

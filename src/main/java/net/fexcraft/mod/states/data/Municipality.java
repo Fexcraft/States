@@ -18,10 +18,9 @@ import net.fexcraft.mod.fsmm.util.DataManager;
 import net.fexcraft.mod.states.States;
 import net.fexcraft.mod.states.data.capabilities.PlayerCapability;
 import net.fexcraft.mod.states.data.root.AccountHolder;
-import net.fexcraft.mod.states.data.root.ChildLayer;
 import net.fexcraft.mod.states.data.root.Initiator;
 import net.fexcraft.mod.states.data.root.Layer;
-import net.fexcraft.mod.states.data.root.Ruleable;
+import net.fexcraft.mod.states.data.root.Layers;
 import net.fexcraft.mod.states.data.sub.Abandonable;
 import net.fexcraft.mod.states.data.sub.Buyable;
 import net.fexcraft.mod.states.data.sub.ColorData;
@@ -29,6 +28,7 @@ import net.fexcraft.mod.states.data.sub.Createable;
 import net.fexcraft.mod.states.data.sub.ExternalDataHolder;
 import net.fexcraft.mod.states.data.sub.IconHolder;
 import net.fexcraft.mod.states.data.sub.MailData;
+import net.fexcraft.mod.states.data.sub.Manageable;
 import net.fexcraft.mod.states.data.sub.RuleHolder;
 import net.fexcraft.mod.states.events.MunicipalityEvent;
 import net.fexcraft.mod.states.util.ForcedChunksManager;
@@ -37,31 +37,29 @@ import net.fexcraft.mod.states.util.StateUtil;
 import net.minecraft.command.ICommandSender;
 import net.minecraftforge.common.MinecraftForge;
 
-public class Municipality implements ChildLayer, AccountHolder, Ruleable {
+public class Municipality implements Layer, AccountHolder {
 	
 	private int id;
 	private String name, title;
 	public IconHolder icon = new IconHolder();
 	public ColorData color = new ColorData();
-	public Buyable price = new Buyable(this, Layer.MUNICIPALITY);
+	public Buyable price = new Buyable(this);
 	public MailData mailbox = new MailData();
 	public Createable created = new Createable();
 	public ExternalDataHolder external = new ExternalDataHolder();
 	public Abandonable abandon;
-	public RuleHolder rules = new RuleHolder(this);
+	public Manageable manage = new Manageable(this, true, false, "mayor");
+	public RuleHolder rules = new RuleHolder();
 	private long citizentax;
-	private UUID mayor;
 	private Account account;
 	private ArrayList<Integer> neighbors, districts, com_blacklist;
-	private ArrayList<UUID> citizen, council, pl_blacklist;
+	private ArrayList<UUID> citizen, pl_blacklist;
 	private State state;
 	//
-	private String ruleset_name;
 	public final Rule r_OPEN, r_COLOR, r_ICON, r_SET_NAME, r_SET_PRICE, r_SET_MAYOR, r_SET_CITIZENTAX, r_KIB;
 	public final Rule r_EDIT_BL, r_KICK, r_INVITE, r_COUNCIL_KICK, r_COUNCIL_INVITE, r_VOTE_MAYOR;
 	public final Rule r_CREATE_DISTRICT, r_SET_CHUNKRULES, r_CREATE_SIGN_SHOP, r_SET_MAILBOX, r_OPEN_MAILBOX;
 	public final Rule r_FORCE_LOAD_CHUNKS, r_SET_RULESET, r_RESET_MAYOR, r_ABANDON, r_SET_TITLE;
-	private ArrayList<Vote> active_votes = new ArrayList<>();
 	
 	public Municipality(int id){
 		this.id = id;
@@ -69,12 +67,11 @@ public class Municipality implements ChildLayer, AccountHolder, Ruleable {
 		name = JsonUtil.getIfExists(obj, "name", "Unnamed Place");
 		title = JsonUtil.getIfExists(obj, "title", "Untitled");
 		created.load(obj);
+		manage.load(obj);
 		account = DataManager.getAccount("municipality:" + id, false, true).setName(name);
-		mayor = obj.has("mayor") ? UUID.fromString(obj.get("mayor").getAsString()) : null;
 		neighbors = JsonUtil.jsonArrayToIntegerArray(JsonUtil.getIfExists(obj, "neighbors", new JsonArray()).getAsJsonArray());
 		districts = JsonUtil.jsonArrayToIntegerArray(JsonUtil.getIfExists(obj, "districts", new JsonArray()).getAsJsonArray());
 		citizen = JsonUtil.jsonArrayToUUIDArray(JsonUtil.getIfExists(obj, "citizen", new JsonArray()).getAsJsonArray());
-		council = JsonUtil.jsonArrayToUUIDArray(JsonUtil.getIfExists(obj, "council", new JsonArray()).getAsJsonArray());
 		state = StateUtil.getState(JsonUtil.getIfExists(obj, "state", -1).intValue());
 		color.load(obj);
 		com_blacklist = JsonUtil.jsonArrayToIntegerArray(JsonUtil.getIfExists(obj, "company_blacklist", new JsonArray()).getAsJsonArray());
@@ -84,7 +81,7 @@ public class Municipality implements ChildLayer, AccountHolder, Ruleable {
 		citizentax = JsonUtil.getIfExists(obj, "citizen_tax", 0).longValue();
 		mailbox.load(obj);
 		abandon = new Abandonable(this, mun -> {
-			council.clear();
+			manage.getCouncil().clear();
 			ArrayList<UUID> list = (ArrayList<UUID>)citizen.clone();
 			list.forEach(citizen -> {
 				PlayerCapability cap = StateUtil.getPlayer(citizen, true);
@@ -92,20 +89,20 @@ public class Municipality implements ChildLayer, AccountHolder, Ruleable {
 				cap.save();
 			});
 			citizen.clear();
-			mayor = null;
+			manage.setHead(null);
 			save();
 		}, by -> {
-			council.clear();
-			council.add(by.getUUID());
+			manage.getCouncil().clear();
+			manage.getCouncil().add(by.getUUID());
 			citizen.clear();
 			citizen.add(by.getUUID());
 			setState(by.getState());
 			by.setMunicipality(this);
-			mayor = by.getUUID();
+			manage.setHead(by.getUUID());
 			save();
 		});
 		abandon.load(obj);
-		ruleset_name = JsonUtil.getIfExists(obj, "ruleset", "Standard Ruleset");
+		manage.linkRuleHolder(rules);
 		rules.add(r_SET_NAME = new Rule("set.name", null, false, Initiator.COUNCIL_VOTE, Initiator.INCHARGE));
 		rules.add(r_SET_PRICE = new Rule("set.price", null, false, Initiator.COUNCIL_VOTE, Initiator.INCHARGE));
 		rules.add(r_SET_MAYOR = new Rule("set.mayor", null, true, Initiator.COUNCIL_VOTE, Initiator.INCHARGE));
@@ -136,12 +133,6 @@ public class Municipality implements ChildLayer, AccountHolder, Ruleable {
 		if(obj.has("open")){ r_OPEN.set(obj.get("open").getAsBoolean()); }
 		if(obj.has("kick_if_bankrupt")){ r_KIB.set(obj.get("kick_if_bankrupt").getAsBoolean()); }
 		//
-		if(obj.has("votes")){
-			ArrayList<Integer> list = JsonUtil.jsonArrayToIntegerArray(obj.get("votes").getAsJsonArray());
-			for(int i : list){
-				Vote vote = StateUtil.getVote(this, i); if(vote == null || vote.expired(null)) continue; active_votes.add(vote);
-			}
-		}
 		MinecraftForge.EVENT_BUS.post(new MunicipalityEvent.Load(this));
 		rules.loadEx(obj);
 		external.load(obj);
@@ -153,11 +144,10 @@ public class Municipality implements ChildLayer, AccountHolder, Ruleable {
 		obj.addProperty("name", name);
 		obj.addProperty("title", title);
 		created.save(obj);
-		if(mayor != null) obj.addProperty("mayor", mayor.toString());
+		manage.save(obj);
 		obj.add("neighbors", JsonUtil.getArrayFromIntegerList(neighbors));
 		obj.add("districts", JsonUtil.getArrayFromIntegerList(districts));
 		obj.add("citizen", JsonUtil.getArrayFromUUIDList(citizen));
-		obj.add("council", JsonUtil.getArrayFromUUIDList(council));
 		obj.addProperty("state", state.getId());
 		obj.addProperty("balance", account.getBalance());
 		color.save(obj);
@@ -168,13 +158,7 @@ public class Municipality implements ChildLayer, AccountHolder, Ruleable {
 		obj.addProperty("citizen_tax", citizentax);
 		mailbox.save(obj);
 		abandon.save(obj);
-		obj.addProperty("ruleset", ruleset_name);
 		rules.save(obj);
-		if(!active_votes.isEmpty()){
-			JsonArray array = new JsonArray();
-			for(Vote vote : active_votes) array.add(vote.id);
-			obj.add("votes", array);
-		}
 		external.save(obj);
 		return obj;
 	}
@@ -227,21 +211,6 @@ public class Municipality implements ChildLayer, AccountHolder, Ruleable {
 	@Override
 	public Account getAccount(){
 		return account;
-	}
-
-	@Override
-	public UUID getHead(){
-		return mayor;
-	}
-
-	@Override
-	public void setHead(UUID uuid){
-		mayor = uuid;
-	}
-
-	@Override
-	public List<UUID> getCouncil(){
-		return council;
 	}
 
 	public State getState(){
@@ -333,26 +302,6 @@ public class Municipality implements ChildLayer, AccountHolder, Ruleable {
 		return DataManager.getBank(account.getBankId(), true, true);
 	}
 
-	@Override
-	public String getRulesetTitle(){
-		return ruleset_name;
-	}
-
-	@Override
-	public Ruleable getHigherInstance(){
-		return state;
-	}
-
-	@Override
-	public void setRulesetTitle(String title){
-		ruleset_name = title;
-	}
-
-	@Override
-	public List<Vote> getActiveVotes(){
-		return active_votes;
-	}
-
 	public int getDistrictLimit(){
 		return getClaimedChunks() / StConfig.CHUNKS_FOR_DISTRICT + 1;
 	}
@@ -374,18 +323,13 @@ public class Municipality implements ChildLayer, AccountHolder, Ruleable {
 	}
 
 	@Override
-	public int getParentId(){
-		return state.getId();
+	public Layer getParent(){
+		return state;
 	}
 
 	@Override
-	public Layer getParentLayer(){
-		return Layer.STATE;
-	}
-
-	@Override
-	public RuleHolder getRuleHolder(){
-		return rules;
+	public Layers getLayerType(){
+		return Layers.MUNICIPALITY;
 	}
 
 }

@@ -92,13 +92,13 @@ public class PlayerImpl implements PlayerCapability {
 	public void setMunicipality(Municipality mun){
 		if(this.municipality != null){
 			this.municipality.getCitizen().remove(this.getUUID());
-			this.municipality.getCouncil().remove(this.getUUID());
+			this.municipality.manage.getCouncil().remove(this.getUUID());
 			//
 			for(int id : this.municipality.getDistricts()){
 				District dis = StateUtil.getDistrict(id);
-				if(dis == null || dis.getHead() == null) continue;
-				if(dis.getHead().equals(this.getUUID())){
-					dis.setHead(null);
+				if(dis == null || dis.manage.getHead() == null) continue;
+				if(dis.manage.getHead().equals(this.getUUID())){
+					dis.manage.setHead(null);
 					dis.save();
 				}
 			}
@@ -155,27 +155,27 @@ public class PlayerImpl implements PlayerCapability {
 
 	@Override
 	public boolean isDistrictManagerOf(District district){
-		return district.getHead() != null && district.getHead().equals(getUUID());
+		return district.manage.getHead() != null && district.manage.getHead().equals(getUUID());
 	}
 
 	@Override
 	public boolean isMayorOf(Municipality municipality){
-		return municipality.getHead() != null && municipality.getHead().equals(getUUID());
+		return municipality.manage.getHead() != null && municipality.manage.getHead().equals(getUUID());
 	}
 
 	@Override
 	public boolean isStateLeaderOf(State state){
-		return state.getHead() != null && state.getHead().equals(getUUID());
+		return state.manage.getHead() != null && state.manage.getHead().equals(getUUID());
 	}
 
 	@Override
 	public boolean canLeave(ICommandSender sender){
 		if(municipality == null){ return true; }
-		if(municipality.getHead() != null && municipality.getHead().equals(getUUID())){
+		if(municipality.manage.getHead() != null && municipality.manage.getHead().equals(getUUID())){
 			Print.chat(sender, "&eYou must assign a new Mayor first, or remove youself as one, before you can leave the Municipality.");
 			return false;
 		}
-		if(municipality.getCouncil().size() < 2 && municipality.getCouncil().contains(getUUID())){
+		if(municipality.manage.getCouncil().size() < 2 && municipality.manage.getCouncil().contains(getUUID())){
 			Print.chat(sender, "&eYou cannot leave the Municipality as last Council member.");
 			return false;
 		}

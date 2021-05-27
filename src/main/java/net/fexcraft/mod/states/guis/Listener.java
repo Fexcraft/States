@@ -223,11 +223,11 @@ public class Listener implements IPacketListener<PacketNBTTagCompound> {
 			compound.setString("result", "No permission. (" + (cap == null ? "-1" : "-2") + ")");
 			return compound;
 		}
-		if(dis.getId() != -2 && !dis.isAuthorized(dis.r_CLAIM_CHUNK.id, player.getGameProfile().getId()).isTrue()){
+		if(dis.getId() != -2 && !dis.manage.isAuthorized(dis.r_CLAIM_CHUNK.id, player.getGameProfile().getId()).isTrue()){
 			compound.setString("result", "No permission. (0)");
 			return compound;
 		}
-		if(mode == 1 && !ck.getDistrict().isAuthorized(ck.getDistrict().r_CLAIM_CHUNK.id, player.getGameProfile().getId()).isTrue()){
+		if(mode == 1 && !ck.getDistrict().manage.isAuthorized(ck.getDistrict().r_CLAIM_CHUNK.id, player.getGameProfile().getId()).isTrue()){
 			compound.setString("result", "No permission. (1)");
 			return compound;
 		}

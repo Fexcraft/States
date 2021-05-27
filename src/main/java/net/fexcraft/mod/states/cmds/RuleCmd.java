@@ -16,7 +16,7 @@ import net.fexcraft.mod.states.data.capabilities.PlayerCapability;
 import net.fexcraft.mod.states.data.capabilities.StatesCapabilities;
 import net.fexcraft.mod.states.data.root.AnnounceLevel;
 import net.fexcraft.mod.states.data.root.Initiator;
-import net.fexcraft.mod.states.data.root.Ruleable;
+import net.fexcraft.mod.states.data.sub.Manageable;
 import net.fexcraft.mod.states.util.AliasLoader;
 import net.fexcraft.mod.states.util.StateUtil;
 import net.minecraft.command.CommandBase;
@@ -77,16 +77,16 @@ public class RuleCmd extends CommandBase {
 					Print.chat(sender, "&7/st-rule vote <layer> <rule> <votetype> <value>");
 					Print.chat(sender, "&cMissing Arguments."); return;
 				}
-				Ruleable ruleable = null;
+				Manageable manageable = null;
 				switch(args[1]){
 					case "mun": case "municipality":{
-						ruleable = chunk.getMunicipality(); break;
+						manageable = chunk.getMunicipality().manage; break;
 					}
 					case "dis": case "district":{
-						ruleable = chunk.getDistrict(); break;
+						manageable = chunk.getDistrict().manage; break;
 					}
 					case "st": case "state":{
-						ruleable = chunk.getState(); break;
+						manageable = chunk.getState().manage; break;
 					}
 					default:{
 						Print.chat(sender, "&cInvalid RuleHolder.");
@@ -94,7 +94,7 @@ public class RuleCmd extends CommandBase {
 						return;
 					}
 				}
-				Rule rule = ruleable.getRuleHolder().get(args[2]);
+				Rule rule = manageable.getRuleHolder().get(args[2]);
 				if(rule == null){
 					Print.chat(sender, "&cRule not found."); return;
 				}
@@ -106,7 +106,7 @@ public class RuleCmd extends CommandBase {
 				switch(type){
 					case CHANGE_REVISER:
 					case CHANGE_SETTER:
-						result = ruleable.canRevise(rule.id, ply.getUUID());
+						result = manageable.canRevise(rule.id, ply.getUUID());
 						if(result.isFalse()){
 							Print.chat(sender, "&cNot Authorized to revise this rule."); return;
 						}
@@ -121,12 +121,12 @@ public class RuleCmd extends CommandBase {
 						if(type == VoteType.CHANGE_SETTER && !to.isValidAsSetter(rule.isVotable())){
 							Print.chat(sender, "&b'VOTE' Initiator types are not valid as Setter."); return;
 						}
-						if(ruleable instanceof State && to.isCitizenVote()){
+						if(manageable.getLayer() instanceof State && to.isCitizenVote()){
 							Print.chat(sender, "&b'CITIZEN' Initiator types are not valid for State level."); return;
 						}
 						break;
 					case CHANGE_VALUE:
-						result = ruleable.isAuthorized(rule.id, ply.getUUID());
+						result = manageable.isAuthorized(rule.id, ply.getUUID());
 						if(result.isFalse()){
 							Print.chat(sender, "&cNot Authorized to set the value of this."); return;
 						}
@@ -145,12 +145,12 @@ public class RuleCmd extends CommandBase {
 						case CHANGE_SETTER:{ council = !rule.setter.isCitizenVote(); break; }
 						case CHANGE_VALUE:{ council = !rule.setter.isCitizenVote(); break; }
 					}
-					if(Vote.exists(ruleable, type, rule.id)){
+					if(Vote.exists(manageable, type, rule.id)){
 						Print.chat(sender, "&bThere is already a " + type.name() + " vote ongoing for this rule!");
 						return;
 					}
 					Vote newvote = new Vote(newid, rule.id, ply.getUUID(), Time.getDate(), Time.getDate() + Time.DAY_MS + Time.DAY_MS,
-						ruleable, type, council, type == VoteType.CHANGE_VALUE ? null : type == VoteType.CHANGE_REVISER, type == VoteType.CHANGE_VALUE ? value : to);
+						manageable, type, council, type == VoteType.CHANGE_VALUE ? null : type == VoteType.CHANGE_REVISER, type == VoteType.CHANGE_VALUE ? value : to);
 					if(newvote.getVoteFile().exists()){
 						new Exception("Tried to create new Vote with ID '" + newvote.id + "', but savefile already exists."); return;
 					}
@@ -228,13 +228,13 @@ public class RuleCmd extends CommandBase {
 				Map<String, Rule> rules = null; String ruleset;
 				switch(args[1]){
 					case "mun": case "municipality":{
-						rules = chunk.getMunicipality().getRuleHolder().getMap(); ruleset = chunk.getMunicipality().getRulesetTitle(); break;
+						rules = chunk.getMunicipality().manage.getRuleHolder().getMap(); ruleset = chunk.getMunicipality().manage.getRulesetTitle(); break;
 					}
 					case "dis": case "district":{
-						rules = chunk.getDistrict().getRuleHolder().getMap(); ruleset = chunk.getDistrict().getRulesetTitle(); break;
+						rules = chunk.getDistrict().manage.getRuleHolder().getMap(); ruleset = chunk.getDistrict().manage.getRulesetTitle(); break;
 					}
 					case "st": case "state":{
-						rules = chunk.getState().getRuleHolder().getMap(); ruleset = chunk.getState().getRulesetTitle(); break;
+						rules = chunk.getState().manage.getRuleHolder().getMap(); ruleset = chunk.getState().manage.getRulesetTitle(); break;
 					}
 					default: rules = new HashMap<>(); ruleset = "INVALID LAYER SELECTED"; break;
 				}
@@ -252,13 +252,13 @@ public class RuleCmd extends CommandBase {
 				Rule rule = null;
 				switch(args[1]){
 					case "mun": case "municipality":{
-						rule = chunk.getMunicipality().getRuleHolder().get(args[2]); break;
+						rule = chunk.getMunicipality().manage.getRuleHolder().get(args[2]); break;
 					}
 					case "dis": case "district":{
-						rule = chunk.getDistrict().getRuleHolder().get(args[2]); break;
+						rule = chunk.getDistrict().manage.getRuleHolder().get(args[2]); break;
 					}
 					case "st": case "state":{
-						rule = chunk.getState().getRuleHolder().get(args[2]); break;
+						rule = chunk.getState().manage.getRuleHolder().get(args[2]); break;
 					}
 					default: break;
 				}

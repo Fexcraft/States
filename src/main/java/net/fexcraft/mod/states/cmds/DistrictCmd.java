@@ -99,7 +99,7 @@ public class DistrictCmd extends CommandBase {
 				return;
 			}
 			case "create":{
-				if(ply.getMunicipality().isAuthorized(ply.getMunicipality().r_CREATE_DISTRICT.id, ply.getUUID()).isTrue() || StateUtil.bypass(player)){
+				if(ply.getMunicipality().manage.isAuthorized(ply.getMunicipality().r_CREATE_DISTRICT.id, ply.getUUID()).isTrue() || StateUtil.bypass(player)){
 					if(ply.getMunicipality().getDistricts().size() + 1 > ply.getMunicipality().getDistrictLimit()){
 						Print.chat(sender, "&aYour Municipality reached the limit of possible Districts.");
 						return;
@@ -145,7 +145,7 @@ public class DistrictCmd extends CommandBase {
 								newdis.setClaimedChunks(1);
 								newdis.setName(name);
 								newdis.r_CFS.set(false);
-								newdis.setHead(ply.getUUID());
+								newdis.manage.setHead(ply.getUUID());
 								newdis.setMunicipality(ply.getMunicipality());
 								newdis.price.reset();
 								newdis.setType(DistrictType.WILDERNESS);

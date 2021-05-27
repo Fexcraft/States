@@ -436,9 +436,9 @@ public class ChunkCmd extends CommandBase {
 		boolean result = false;
 		UUID uuid = player.getGameProfile().getId();
 		boolean isco = chunk.getOwner().equals(uuid.toString());
-		boolean ismn = chunk.getDistrict().getHead() != null && chunk.getDistrict().getHead().equals(uuid);
-		boolean ismy = chunk.getMunicipality().getHead() != null && chunk.getMunicipality().getHead().equals(uuid);
-		boolean isst = chunk.getState().getCouncil().contains(uuid) || (chunk.getState().getHead() != null && chunk.getState().getHead().equals(uuid));
+		boolean ismn = chunk.getDistrict().manage.getHead() != null && chunk.getDistrict().manage.getHead().equals(uuid);
+		boolean ismy = chunk.getMunicipality().manage.getHead() != null && chunk.getMunicipality().manage.getHead().equals(uuid);
+		boolean isst = chunk.getState().manage.getCouncil().contains(uuid) || (chunk.getState().manage.getHead() != null && chunk.getState().manage.getHead().equals(uuid));
 		boolean iscm = false;//TODO companies
 		Print.debug(isco, ismn, ismy, isst, iscm);
 		switch(chunk.getType()){

@@ -3,7 +3,6 @@ package net.fexcraft.mod.states.data.sub;
 import com.google.gson.JsonObject;
 
 import net.fexcraft.mod.fsmm.util.Config;
-import net.fexcraft.mod.states.data.root.ChildLayer;
 import net.fexcraft.mod.states.data.root.Layer;
 import net.fexcraft.mod.states.data.root.Loadable;
 import net.fexcraft.mod.states.util.StConfig;
@@ -11,13 +10,11 @@ import net.fexcraft.mod.states.util.StConfig;
 public class Buyable implements Loadable {
 
 	public static final String NOTFORSALE = "not_for_sale";
-	private ChildLayer child;
 	private Layer layer;
 	private long price;
 	
-	public Buyable(ChildLayer child, Layer layer){
+	public Buyable(Layer layer){
 		this.layer = layer;
-		this.child = child;
 	}
 
 	@Override
@@ -31,9 +28,9 @@ public class Buyable implements Loadable {
 	}
 	
 	public long get(){
-		switch(layer){
+		switch(layer.getLayerType()){
 			case CHUNK:{
-				if(child.getParentId() == -1) return StConfig.DEFAULT_CHUNK_PRICE;
+				if(layer.getParent().getId() == -1) return StConfig.DEFAULT_CHUNK_PRICE;
 				break;
 			}
 			default: break;

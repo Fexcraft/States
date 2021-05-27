@@ -78,7 +78,7 @@ public class StateCmd extends CommandBase {
 		if(args.length == 0){
 			Print.chat(sender, "&7/st info");
 			Print.chat(sender, "&7/st rules");
-			if(state.getCouncil().contains(ply.getUUID()) || StateUtil.isAdmin(player)){
+			if(state.manage.getCouncil().contains(ply.getUUID()) || StateUtil.isAdmin(player)){
 				Print.chat(sender, "&8- &5- &8- - - - - -");
 				Print.chat(sender, "&7/st vote-head <player>");
 				Print.chat(sender, "&7/st leave-council");
@@ -100,11 +100,11 @@ public class StateCmd extends CommandBase {
 				return;
 			}
 			case "vote-head":{
-				if(!state.isAuthorized(state.r_VOTE_LEADER.id, ply.getUUID()).isTrue() && !StateUtil.bypass(player)){
+				if(!state.manage.isAuthorized(state.r_VOTE_LEADER.id, ply.getUUID()).isTrue() && !StateUtil.bypass(player)){
 					Print.chat(sender, "&4No permission.");
 					return;
 				}
-				if(state.getHead() != null){
+				if(state.manage.getHead() != null){
 					Print.chat(sender, "&aA vote for a new leader can be only started when there is no leader!");
 					return;
 				}
@@ -116,33 +116,33 @@ public class StateCmd extends CommandBase {
 					Print.chat(sender, "&cPlayer not found in Cache.");
 					break;
 				}
-				if(Vote.exists(state, VoteType.ASSIGNMENT, null)){
+				if(Vote.exists(state.manage, VoteType.ASSIGNMENT, null)){
 					Print.chat(sender, "&bThere is already an assignment vote ongoing!");
 					return;
 				}
 				int newid = sender.getEntityWorld().getCapability(StatesCapabilities.WORLD, null).getNewVoteId();
 				Vote newvote = new Vote(newid, null, ply.getUUID(), Time.getDate(), Time.getDate() + (Time.DAY_MS * 7),
-					state, VoteType.ASSIGNMENT, true, null, null);
+					state.manage, VoteType.ASSIGNMENT, true, null, null);
 				if(newvote.getVoteFile().exists()){
 					new Exception("Tried to create new Vote with ID '" + newvote.id + "', but savefile already exists."); return;
 				}
 				newvote.save(); newvote.vote(sender, ply.getUUID(), gp.getId()); States.VOTES.put(newvote.id, newvote);
 				StateUtil.announce(null, AnnounceLevel.STATE_ALL, "A new vote to choose a State Leader started!", 0);
-				for(UUID member : state.getCouncil()){
+				for(UUID member : state.manage.getCouncil()){
 					MailUtil.send(null, RecipientType.PLAYER, member, null, "&7A new vote to choose a Head of State started!\n&7Detailed info via &e/st-vote status " + newvote.id, MailType.SYSTEM);
 				}
 				return;
 			}
 			case "leave-council":{
-				if(!state.getCouncil().contains(ply.getUUID())){
+				if(!state.manage.getCouncil().contains(ply.getUUID())){
 					Print.chat(sender, "&7You are not a council member!");
 					return;
 				}
-				if(state.getCouncil().size() < 2){
+				if(state.manage.getCouncil().size() < 2){
 					Print.chat(sender, "&9You cannot leave while being the last council member.");
 					return;
 				}
-				state.getCouncil().remove(ply.getUUID());
+				state.manage.getCouncil().remove(ply.getUUID());
 				state.save();
 				StateUtil.announce(server, AnnounceLevel.MUNICIPALITY, ply.getFormattedNickname() + " &9left the State Council!", state.getId());
 				Print.log(StateLogger.player(player) + " left the council of " + StateLogger.state(state) + ".");
@@ -187,10 +187,10 @@ public class StateCmd extends CommandBase {
 					else{
 						newstate.created.create(ply.getUUID());
 						newstate.setName(name);
-						newstate.setHead(ply.getUUID());
+						newstate.manage.setHead(ply.getUUID());
 						newstate.setCapitalId(ply.getMunicipality().getId());
 						newstate.price.reset();
-						newstate.getCouncil().add(ply.getUUID());
+						newstate.manage.getCouncil().add(ply.getUUID());
 						//
 						//Now let's save stuff.
 						long halfprice = price / 2;
@@ -221,7 +221,7 @@ public class StateCmd extends CommandBase {
 					if(mun != null && mun.getId() >= 0){
 						Print.chat(sender, "&6Municipality: &7" + mun.getName() + " &8(" + mun.getId() + ");");
 						mun.getCitizen().forEach(uuid -> {
-							Print.chat(sender, "&e-> &9" + Static.getPlayerNameByUUID(uuid) + (mun.getCouncil().contains(uuid) ? " &6" + "[CM]" : ""));
+							Print.chat(sender, "&e-> &9" + Static.getPlayerNameByUUID(uuid) + (mun.manage.getCouncil().contains(uuid) ? " &6" + "[CM]" : ""));
 						});
 					}
 				}

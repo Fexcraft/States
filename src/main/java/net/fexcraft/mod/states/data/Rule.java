@@ -4,7 +4,8 @@ import java.util.UUID;
 
 import net.fexcraft.lib.mc.utils.Print;
 import net.fexcraft.mod.states.data.root.Initiator;
-import net.fexcraft.mod.states.data.root.Ruleable;
+import net.fexcraft.mod.states.data.root.Layer;
+import net.fexcraft.mod.states.data.sub.Manageable;
 import net.fexcraft.mod.states.guis.ManagerContainer;
 
 public class Rule {
@@ -53,89 +54,101 @@ public class Rule {
 	}
 
 	/** Call to see if this player can SET/APPLY this rule. */
-	public Result isAuthorized(Ruleable holder, UUID uuid){
+	public Result isAuthorized(Layer layer, UUID uuid){
+		if(layer instanceof Manageable == false) return Result.FALSE;
+		else return isAuthorized((Manageable)layer, uuid);
+	}
+
+	/** Call to see if this player can SET/APPLY this rule. */
+	public Result isAuthorized(Manageable manage, UUID uuid){
 		switch(setter){
 			case NONE: return Result.FALSE;
 			case CITIZEN_ANY:{
-				if(holder instanceof Municipality){
-					return Result.bool(((Municipality)holder).getCitizen().contains(uuid));
+				if(manage.getLayer() instanceof Municipality){
+					return Result.bool(((Municipality)manage.getLayer()).getCitizen().contains(uuid));
 				}
-				else if(holder instanceof State){//initially not been intended be an option
-					return Result.bool(ManagerContainer.getCitizens((State)holder).contains(uuid));
+				else if(manage.getLayer() instanceof State){//initially not been intended be an option
+					return Result.bool(ManagerContainer.getCitizens((State)manage.getLayer()).contains(uuid));
 				}
 				else return Result.FALSE;//it shouldn't get this far
 			}
 			case CITIZEN_VOTE:{
 				if(votable_set){
-					if(holder instanceof Municipality){
-						if(((Municipality)holder).getCitizen().contains(uuid)) return Result.VOTE;
+					if(manage.getLayer() instanceof Municipality){
+						if(((Municipality)manage.getLayer()).getCitizen().contains(uuid)) return Result.VOTE;
 						return Result.FALSE;
 					}
-					else if(holder instanceof State){//initially not been intended be an option
-						if(ManagerContainer.getCitizens((State)holder).contains(uuid)) return Result.VOTE;
+					else if(manage.getLayer() instanceof State){//initially not been intended be an option
+						if(ManagerContainer.getCitizens((State)manage.getLayer()).contains(uuid)) return Result.VOTE;
 						return Result.FALSE;
 					}
 					else return Result.FALSE;//it shouldn't get this far
 				}
 				else{
-					Print.log("INVALID STATE OF RULE " + id + " FROM " + holder);
+					Print.log("INVALID STATE OF RULE " + id + " FROM " + manage);
 					Print.log("SETTER IS VOTE TYPE BUT RULE IS NOT A VOTE TYPE");
 					return Result.FALSE;
 				}
 			}
-			case COUNCIL_ANY: return Result.bool(holder.getCouncil().contains(uuid));
+			case COUNCIL_ANY: return Result.bool(manage.getCouncil().contains(uuid));
 			case COUNCIL_VOTE:{
 				if(votable_set){
-					if(holder.getCouncil().size() == 1) return Result.bool(holder.getCouncil().get(0).equals(uuid));
-					if(holder.getCouncil().contains(uuid)) return Result.VOTE;
+					if(manage.getCouncil().size() == 1) return Result.bool(manage.getCouncil().get(0).equals(uuid));
+					if(manage.getCouncil().contains(uuid)) return Result.VOTE;
 					return Result.FALSE;
 				}
 				else{
-					Print.log("INVALID STATE OF RULE " + id + " FROM " + holder);
+					Print.log("INVALID STATE OF RULE " + id + " FROM " + manage);
 					Print.log("SETTER IS VOTE TYPE BUT RULE IS NOT A VOTE TYPE");
 					return Result.FALSE;
 				}
 			}
-			case INCHARGE: return Result.bool(holder.isHead(uuid));
+			case INCHARGE: return Result.bool(manage.isHead(uuid));
 			case HIGHERINCHARGE:
-				return Result.bool(holder.hasHigherInstance() ? holder.getHigherInstance().isHead(uuid) : holder.isHead(uuid));
+				return Result.bool(manage.hasHigherInstance() ? manage.getHigherInstance().isHead(uuid) : manage.isHead(uuid));
 			default: return Result.FALSE;
 		}
 	}
 	
 	/** Call to see if this player can REVISE/MODIFY this rule. */
-	public Result canRevise(Ruleable holder, UUID uuid){
+	public Result canRevise(Layer layer, UUID uuid){
+		if(layer instanceof Manageable == false) return Result.FALSE;
+		else return canRevise((Manageable)layer, uuid);
+	}
+	
+	/** Call to see if this player can REVISE/MODIFY this rule. */
+	public Result canRevise(Manageable manage, UUID uuid){
 		switch(reviser){
 			case NONE: return Result.FALSE;
 			case CITIZEN_ANY:{
-				if(holder instanceof Municipality){
-					return Result.bool(((Municipality)holder).getCitizen().contains(uuid));
+				if(manage.getLayer() instanceof Municipality){
+					return Result.bool(((Municipality)manage.getLayer()).getCitizen().contains(uuid));
 				}
-				else if(holder instanceof State){//initially not been intended be an option
-					return Result.bool(ManagerContainer.getCitizens((State)holder).contains(uuid));
+				else if(manage.getLayer() instanceof State){//initially not been intended be an option
+					return Result.bool(ManagerContainer.getCitizens((State)manage.getLayer()).contains(uuid));
 				}
 				else return Result.FALSE;
 			}
 			case CITIZEN_VOTE:{
-				if(holder instanceof Municipality){
-					if(((Municipality)holder).getCitizen().contains(uuid)) return Result.VOTE;
+				if(manage.getLayer() instanceof Municipality){
+					if(((Municipality)manage.getLayer()).getCitizen().contains(uuid)) return Result.VOTE;
 					return Result.FALSE;
 				}
-				else if(holder instanceof State){//initially not been intended be an option
-					if(ManagerContainer.getCitizens((State)holder).contains(uuid)) return Result.VOTE;
+				else if(manage.getLayer() instanceof State){//initially not been intended be an option
+					if(ManagerContainer.getCitizens((State)manage.getLayer()).contains(uuid)) return Result.VOTE;
 					return Result.FALSE;
 				}
 				else return Result.FALSE;
 			}
-			case COUNCIL_ANY: return Result.bool(holder.getCouncil().contains(uuid));
+			case COUNCIL_ANY: return Result.bool(manage.getCouncil().contains(uuid));
 			case COUNCIL_VOTE:{
-				if(holder.getCouncil().size() == 1) return Result.bool(holder.getCouncil().get(0).equals(uuid));
-				if(holder.getCouncil().contains(uuid)) return Result.VOTE;
+				if(manage.getCouncil().size() == 1) return Result.bool(manage.getCouncil().get(0).equals(uuid));
+				if(manage.getCouncil().contains(uuid)) return Result.VOTE;
 				return Result.FALSE;
 			}
-			case INCHARGE: return Result.bool(holder.isHead(uuid));
+			case INCHARGE: return Result.bool(manage.isHead(uuid));
 			case HIGHERINCHARGE:
-				return Result.bool(holder.hasHigherInstance() ? holder.getHigherInstance().isHead(uuid) : holder.isHead(uuid));
+				return Result.bool(manage.hasHigherInstance() ? manage.getHigherInstance().isHead(uuid) : manage.isHead(uuid));
 			default: return Result.FALSE;
 		}
 	}

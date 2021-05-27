@@ -7,7 +7,7 @@ import com.google.gson.JsonObject;
 
 import net.fexcraft.lib.common.math.Time;
 import net.fexcraft.mod.states.data.capabilities.PlayerCapability;
-import net.fexcraft.mod.states.data.root.ChildLayer;
+import net.fexcraft.mod.states.data.root.Layer;
 import net.fexcraft.mod.states.data.root.Loadable;
 
 public class Abandonable implements Loadable {
@@ -15,11 +15,11 @@ public class Abandonable implements Loadable {
 	private long at;
 	private UUID by;
 	private boolean abandoned;
-	private Consumer<ChildLayer> abandon;
+	private Consumer<Layer> abandon;
 	private Consumer<PlayerCapability> claim;
-	private ChildLayer child;
+	private Layer child;
 	
-	public Abandonable(ChildLayer layer, Consumer<ChildLayer> aban, Consumer<PlayerCapability> clai){
+	public Abandonable(Layer layer, Consumer<Layer> aban, Consumer<PlayerCapability> clai){
 		abandon = aban;
 		claim = clai;
 		child = layer;

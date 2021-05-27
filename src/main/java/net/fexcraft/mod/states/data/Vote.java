@@ -21,14 +21,14 @@ import net.fexcraft.mod.states.data.root.AnnounceLevel;
 import net.fexcraft.mod.states.data.root.Initiator;
 import net.fexcraft.mod.states.data.root.Mailbox.MailType;
 import net.fexcraft.mod.states.data.root.Mailbox.RecipientType;
-import net.fexcraft.mod.states.data.root.Ruleable;
+import net.fexcraft.mod.states.data.sub.Manageable;
 import net.fexcraft.mod.states.util.MailUtil;
 import net.fexcraft.mod.states.util.StateUtil;
 import net.minecraft.command.ICommandSender;
 
 public class Vote {
 	
-	public final Ruleable holder;
+	public final Manageable holder;
 	public VoteType type;
 	public boolean council, new_value, ended;
 	public TreeMap<String, Object> votes = new TreeMap<>();
@@ -39,7 +39,7 @@ public class Vote {
 	public String rule;
 	public Boolean rev;
 	
-	public Vote(Ruleable holder, int id){
+	public Vote(Manageable holder, int id){
 		this.id = id; JsonObject obj = JsonUtil.get(getVoteFile(id));
 		beginner = UUID.fromString(obj.get("by").getAsString());
 		created = obj.get("created").getAsLong();
@@ -47,9 +47,9 @@ public class Vote {
 			String[] arr = obj.get("at").getAsString().split(":");
 			int sid = Integer.parseInt(arr[1]);
 			switch(arr[0]){
-				case "dis": this.holder = StateUtil.getDistrict(sid); break;
-				case "mun": this.holder = StateUtil.getMunicipality(sid); break;
-				case "st": this.holder = StateUtil.getState(sid); break;
+				case "dis": this.holder = StateUtil.getDistrict(sid).manage; break;
+				case "mun": this.holder = StateUtil.getMunicipality(sid).manage; break;
+				case "st": this.holder = StateUtil.getState(sid).manage; break;
 				default: this.holder = null; new Exception("Invalid or Unsupported RULEABLE for Voting."); break;
 			}
 		} else this.holder = holder;
@@ -72,7 +72,7 @@ public class Vote {
 		ended = obj.get("ended").getAsBoolean();
 	}
 	
-	public Vote(int id, String rule, UUID beginner, long created, long expiry, Ruleable target, VoteType type, boolean council, Boolean rev, Object value){
+	public Vote(int id, String rule, UUID beginner, long created, long expiry, Manageable target, VoteType type, boolean council, Boolean rev, Object value){
 		this.id = id; this.beginner = beginner; this.rule = rule; this.created = created; this.expiry = expiry;
 		this.holder = target; this.type = type; this.council = council; this.rev = rev; holder.getActiveVotes().add(this);
 		switch(type){
@@ -104,14 +104,14 @@ public class Vote {
 		obj.addProperty("id", id);
 		obj.addProperty("by", beginner.toString());
 		obj.addProperty("created", created);
-		if(holder instanceof District){
-			obj.addProperty("at", "dis:" + ((District)holder).getId());
+		if(holder.getLayer() instanceof District){
+			obj.addProperty("at", "dis:" + ((District)holder.getLayer()).getId());
 		}
-		else if(holder instanceof Municipality){
-			obj.addProperty("at", "mun:" + ((Municipality)holder).getId());
+		else if(holder.getLayer() instanceof Municipality){
+			obj.addProperty("at", "mun:" + ((Municipality)holder.getLayer()).getId());
 		}
-		else if(holder instanceof State){
-			obj.addProperty("at", "st:" + ((State)holder).getId());
+		else if(holder.getLayer() instanceof State){
+			obj.addProperty("at", "st:" + ((State)holder.getLayer()).getId());
 		}
 		else{
 			new Exception("Invalid or Unsupported RULEABLE for Voting.");
@@ -191,17 +191,17 @@ public class Vote {
 		String typestr = null;
 		switch(type){
 			case ABANDONMENT:
-				typestr = "Abandonement of " + (holder instanceof State ? "State" : "Municipality");
+				typestr = "Abandonement of " + (holder.getLayer() instanceof State ? "State" : "Municipality");
 				break;
 			case ASSIGNMENT:
 				typestr = "Assignment of new ";
-				if(holder instanceof District){
+				if(holder.getLayer() instanceof District){
 					typestr += "Manager";
 				}
-				else if(holder instanceof Municipality){
+				else if(holder.getLayer() instanceof Municipality){
 					typestr += "Mayor";
 				}
-				else if(holder instanceof State){
+				else if(holder.getLayer() instanceof State){
 					typestr += "Head";
 				}
 				else{
@@ -244,7 +244,7 @@ public class Vote {
 			for(String str : votes_for.keySet()){
 				Print.chat(sender, "&a" + percent(votes_for.get(str), summary) + "% &7- &e" + Static.getPlayerNameByUUID(str));
 			}
-			Print.chat(sender, "&6" + votes.size() + " &7votes received of &2" + (council ? holder.getCouncil().size() : ((Municipality)holder).getCitizen().size()) + " &7expected.");
+			Print.chat(sender, "&6" + votes.size() + " &7votes received of &2" + (council ? holder.getCouncil().size() : ((Municipality)holder.getLayer()).getCitizen().size()) + " &7expected.");
 		}
 		else{
 			int agree = 0, disagree = 0;
@@ -253,7 +253,7 @@ public class Vote {
 			}
 			Print.chat(sender, "&e" + percent(agree, votes.size()) + "% &7- &afor the change");
 			Print.chat(sender, "&e" + percent(disagree, votes.size()) + "% &7- &cagainst the change");
-			Print.chat(sender, "&6" + votes.size() + " &7votes received of &2" + (council ? holder.getCouncil().size() : ((Municipality)holder).getCitizen().size()) + " &7expected.");
+			Print.chat(sender, "&6" + votes.size() + " &7votes received of &2" + (council ? holder.getCouncil().size() : ((Municipality)holder.getLayer()).getCitizen().size()) + " &7expected.");
 		}
 		if(ended) Print.chat(sender, "&6&lVOTE ENDED");
 	}
@@ -276,8 +276,8 @@ public class Vote {
 			}
 		}
 		else{
-			if(holder instanceof Municipality == false) return false;
-			if(!((Municipality)holder).getCitizen().contains(uuid)){
+			if(holder.getLayer() instanceof Municipality == false) return false;
+			if(!((Municipality)holder.getLayer()).getCitizen().contains(uuid)){
 				if(sender != null) Print.chat(sender, "&cYou need to be a citizen to vote on this!");
 				return false;
 			}
@@ -287,25 +287,30 @@ public class Vote {
 
 	public boolean expired(ICommandSender sender){
 		if(Time.getDate() >= expiry || ended){
-			if(sender != null) Print.chat(sender, "Vote expired already!"); this.end(); return true;
-		} return false;
+			if(sender != null) Print.chat(sender, "Vote expired already!");
+			this.end();
+			return true;
+		}
+		return false;
 	}
 	
 	private boolean shouldEnd(ICommandSender sender){
-		if(expired(sender)){ return true; }
-		if(votes.size() >= (council ? holder.getCouncil().size() : ((Municipality)holder).getCitizen().size())){
-			this.end(); return true;
-		} return false;
+		if(expired(sender)) return true;
+		if(votes.size() >= (council ? holder.getCouncil().size() : ((Municipality)holder.getLayer()).getCitizen().size())){
+			this.end();
+			return true;
+		}
+		return false;
 	}
 
 	@SuppressWarnings("incomplete-switch")
 	private void end(){
 		if(this.ended) return; ended = true; this.save();
 		if(type.abandonment()){
-			boolean isstate = holder instanceof State;
+			boolean isstate = holder.getLayer() instanceof State;
 			if(votes.size() < (holder.getCouncil().size() / 2) + (holder.getCouncil().size() % 2 == 1 ? 1 : 0)){
 				String string = "&7Vote for new abandonment ended, due to missing votes it got &ccancelled&7.";
-				StateUtil.announce(Static.getServer(), isstate ? AnnounceLevel.STATE_ALL : AnnounceLevel.MUNICIPALITY_ALL, string, isstate ? ((State)holder).getId() : ((Municipality)holder).getId());
+				StateUtil.announce(Static.getServer(), isstate ? AnnounceLevel.STATE_ALL : AnnounceLevel.MUNICIPALITY_ALL, string, holder.getLayer().getId());
 			}
 			int a = 0, d = 0;
 			for(Object obj : votes.values())
@@ -326,7 +331,7 @@ public class Vote {
 				text0 = "&7Vote [&9" + id + "&7] ended. &aAbandonment will be executed.";
 			}
 			AnnounceLevel level = isstate ? AnnounceLevel.STATE_ALL : AnnounceLevel.MUNICIPALITY_ALL;
-			int range = isstate ? ((State)holder).getId() : ((Municipality)holder).getId();
+			int range = holder.getLayer().getId();
 			StateUtil.announce(Static.getServer(), level, text0, range);
 			if(!fail){
 				PlayerCapability cap = StateUtil.getPlayer(beginner, true);
@@ -334,7 +339,7 @@ public class Vote {
 					//TODO ((State)holder)
 				}
 				else{
-					Municipality mun = (Municipality)holder;
+					Municipality mun = (Municipality)holder.getLayer();
 					mun.abandon.abandon(this.beginner);
 					StateUtil.announce(null, "&9A Municipality was voted to be abandoned!");
 					StateUtil.announce(null, "&9Name&0: &7" + mun.getName() + " &3(&6" + mun.getId() + "&3)");
@@ -345,7 +350,7 @@ public class Vote {
 		if(type.assignment()){
 			if(votes.size() < (holder.getCouncil().size() / 2) + (holder.getCouncil().size() % 2 == 1 ? 1 : 0)){
 				String string = "&7Vote for new Head ended, due to missing votes it got &ccancelled&7.";
-				StateUtil.announce(Static.getServer(), holder instanceof State ? AnnounceLevel.STATE_ALL : AnnounceLevel.MUNICIPALITY_ALL, string, holder instanceof State ? ((State)holder).getId() : ((Municipality)holder).getId());
+				StateUtil.announce(Static.getServer(), holder.getLayer() instanceof State ? AnnounceLevel.STATE_ALL : AnnounceLevel.MUNICIPALITY_ALL, string, holder.getLayer().getId());
 			}
 			TreeMap<String, Integer> vots = new TreeMap<>();
 			for(Map.Entry<String, Object> vote : votes.entrySet()){
@@ -363,31 +368,33 @@ public class Vote {
 					mostv = entry.getValue(); most = UUID.fromString(entry.getKey());
 				}
 			}
-			StateUtil.announce(Static.getServer(), holder instanceof State ? AnnounceLevel.STATE : AnnounceLevel.MUNICIPALITY,
-				"&7Vote for new Head ended, &a" + Static.getPlayerNameByUUID(most) + " &7 was choosen. [" + percent(mostv, summary) + "%]",
-				holder instanceof State ? ((State)holder).getId() : ((Municipality)holder).getId());
-
-			for(UUID member : council ? holder.getCouncil() : ((Municipality)holder).getCitizen()){
+			StateUtil.announce(Static.getServer(), holder.getLayer() instanceof State ? AnnounceLevel.STATE : AnnounceLevel.MUNICIPALITY,
+				"&7Vote for new Head ended, &a" + Static.getPlayerNameByUUID(most) + " &7 was choosen. [" + percent(mostv, summary) + "%]",holder.getLayer().getId());
+			for(UUID member : council ? holder.getCouncil() : ((Municipality)holder.getLayer()).getCitizen()){
 				MailUtil.send(null, RecipientType.PLAYER, member, null, "&7Head-Vote with ID &b" + id + "&7 ended!\n&7Detailed info via &e/st-vote status " + id, MailType.SYSTEM);
 			}
 			return;
 		}
-		AnnounceLevel level = holder instanceof District ? AnnounceLevel.DISTRICT : holder instanceof State ? AnnounceLevel.STATE_ALL : AnnounceLevel.MUNICIPALITY_ALL;
-		int range = holder instanceof District ? ((District)holder).getId() : holder instanceof State ? ((State)holder).getId() : ((Municipality)holder).getId();
+		AnnounceLevel level = holder.getLayer() instanceof District ? AnnounceLevel.DISTRICT : holder.getLayer() instanceof State ? AnnounceLevel.STATE_ALL : AnnounceLevel.MUNICIPALITY_ALL;
+		int range = holder.getLayer().getId();
 		int a = 0, d = 0;
-		for(Object obj : votes.values())
+		for(Object obj : votes.values()){
 			if((boolean)obj) a++;
 			else d++;
+		}
 		String text0, text1, text2;
 		boolean fail = false;
 		if(a == 0 && d == 0){
-			text0 = "&7Vote [&9" + id + "&7] for rule change ended without votes."; fail = true;
+			text0 = "&7Vote [&9" + id + "&7] for rule change ended without votes.";
+			fail = true;
 		}
 		else if(a < d){
-			text0 = "&7Vote [&9" + id + "&7] for rule change ended. &cChange Denied."; fail = true;
+			text0 = "&7Vote [&9" + id + "&7] for rule change ended. &cChange Denied.";
+			fail = true;
 		}
 		else if(a == d){
-			text0 = "&7Vote [&9" + id + "&7] for rule change ended, &esame amount of votes&7."; fail = true;
+			text0 = "&7Vote [&9" + id + "&7] for rule change ended, &esame amount of votes&7.";
+			fail = true;
 		}
 		else{
 			text0 = "&7Vote [&9" + id + "&7] for rule change ended. &aChange Accepted.";
@@ -413,7 +420,7 @@ public class Vote {
 				}
 			}
 		}
-		for(UUID member : council ? holder.getCouncil() : ((Municipality)holder).getCitizen()){
+		for(UUID member : council ? holder.getCouncil() : ((Municipality)holder.getLayer()).getCitizen()){
 			MailUtil.send(null, RecipientType.PLAYER, member, null, "&7Rule-Vote with ID &b" + id + "&7 ended!\n&7Detailed info via &e/st-vote status " + id, MailType.SYSTEM);
 		}
 		StateUtil.announce(Static.getServer(), level, text0, range);
@@ -430,14 +437,14 @@ public class Vote {
 	}
 
 	public String targetAsString(){
-		if(holder instanceof District){
-			return "dis:" + ((District)holder).getId();
+		if(holder.getLayer() instanceof District){
+			return "dis:" + ((District)holder.getLayer()).getId();
 		}
-		else if(holder instanceof Municipality){
-			return "mun:" + ((Municipality)holder).getId();
+		else if(holder.getLayer() instanceof Municipality){
+			return "mun:" + ((Municipality)holder.getLayer()).getId();
 		}
-		else if(holder instanceof State){
-			return "st:" + ((State)holder).getId();
+		else if(holder.getLayer() instanceof State){
+			return "st:" + ((State)holder.getLayer()).getId();
 		}
 		else{
 			new Exception("Invalid or Unsupported RULEABLE for Voting.");
@@ -449,7 +456,7 @@ public class Vote {
 		holder.getActiveVotes().remove(this);
 	}
 
-	public static boolean exists(Ruleable holder, VoteType type, String rule){
+	public static boolean exists(Manageable holder, VoteType type, String rule){
 		for(Vote vote : holder.getActiveVotes()){
 			if(vote.type == type){
 				if(type.assignment() || type.abandonment()) return true;

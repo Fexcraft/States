@@ -97,7 +97,7 @@ public class MunicipalityCmd extends CommandBase {
 			Print.chat(sender, "&7/mun leave");
 			Print.chat(sender, "&7/mun kick <player> <reason>");
 			Print.chat(sender, "&7/mun invite <player> <msg>");
-			if(mun.getCouncil().contains(ply.getUUID()) || StateUtil.isAdmin(player)){
+			if(mun.manage.getCouncil().contains(ply.getUUID()) || StateUtil.isAdmin(player)){
 				Print.chat(sender, "&8- &5- &8- - - - - -");
 				Print.chat(sender, "&7/mun vote-mayor <player>");
 				Print.chat(sender, "&7/mun leave-council");
@@ -159,9 +159,9 @@ public class MunicipalityCmd extends CommandBase {
 							}
 						}
 						mun.setState(playerstate);
-						mun.getCouncil().clear();
+						mun.manage.getCouncil().clear();
 						mun.created.update();
-						mun.setHead(null);
+						mun.manage.setHead(null);
 						mun.price.reset();
 						mun.save();
 						mun.getState().save();
@@ -176,15 +176,15 @@ public class MunicipalityCmd extends CommandBase {
 				return;
 			}
 			case "leave-council":{
-				if(!mun.getCouncil().contains(ply.getUUID())){
+				if(!mun.manage.getCouncil().contains(ply.getUUID())){
 					Print.chat(sender, "&7You are not a council member!");
 					return;
 				}
-				if(mun.getCouncil().size() < 2){
+				if(mun.manage.getCouncil().size() < 2){
 					Print.chat(sender, "&9You cannot leave while being the last council member.");
 					return;
 				}
-				mun.getCouncil().remove(ply.getUUID());
+				mun.manage.getCouncil().remove(ply.getUUID());
 				mun.created.update();
 				mun.save();
 				StateUtil.announce(server, AnnounceLevel.MUNICIPALITY, ply.getFormattedNickname() + " &9left the Municipality Council!", mun.getId());
@@ -192,11 +192,11 @@ public class MunicipalityCmd extends CommandBase {
 				return;
 			}
 			case "vote-mayor":{
-				if(!mun.isAuthorized(mun.r_VOTE_MAYOR.id, ply.getUUID()).isTrue() && !StateUtil.bypass(player)){
+				if(!mun.manage.isAuthorized(mun.r_VOTE_MAYOR.id, ply.getUUID()).isTrue() && !StateUtil.bypass(player)){
 					Print.chat(sender, "&4No permission.");
 					return;
 				}
-				if(mun.getHead() != null){
+				if(mun.manage.getHead() != null){
 					Print.chat(sender, "&aA vote for a new mayor can be only started when there is no mayor!");
 					return;
 				}
@@ -208,25 +208,25 @@ public class MunicipalityCmd extends CommandBase {
 					Print.chat(sender, "&cPlayer not found in Cache.");
 					break;
 				}
-				if(Vote.exists(mun, VoteType.ASSIGNMENT, null)){
+				if(Vote.exists(mun.manage, VoteType.ASSIGNMENT, null)){
 					Print.chat(sender, "&bThere is already an assignment vote ongoing!");
 					return;
 				}
 				int newid = sender.getEntityWorld().getCapability(StatesCapabilities.WORLD, null).getNewVoteId();
 				Vote newvote = new Vote(newid, null, ply.getUUID(), Time.getDate(), Time.getDate() + (Time.DAY_MS * 7),
-					mun, VoteType.ASSIGNMENT, !mun.r_VOTE_MAYOR.setter.isCitizenVote(), null, null);
+					mun.manage, VoteType.ASSIGNMENT, !mun.r_VOTE_MAYOR.setter.isCitizenVote(), null, null);
 				if(newvote.getVoteFile().exists()){
 					new Exception("Tried to create new Vote with ID '" + newvote.id + "', but savefile already exists."); return;
 				}
 				newvote.save(); newvote.vote(sender, ply.getUUID(), gp.getId()); States.VOTES.put(newvote.id, newvote);
 				StateUtil.announce(null, AnnounceLevel.MUNICIPALITY_ALL, "A new vote to choose a Mayor started!", 0);
-				for(UUID member : newvote.council ? mun.getCouncil() : mun.getCitizen()){
+				for(UUID member : newvote.council ? mun.manage.getCouncil() : mun.getCitizen()){
 					MailUtil.send(null, RecipientType.PLAYER, member, null, "&7A new vote to choose a Mayor started!\n&7Detailed info via &e/st-vote status " + newvote.id, MailType.SYSTEM);
 				}
 				return;
 			}
 			case "kick":{
-				if(!(mun.isAuthorized(mun.r_KICK.id, ply.getUUID()).isTrue() || StateUtil.bypass(player))){
+				if(!(mun.manage.isAuthorized(mun.r_KICK.id, ply.getUUID()).isTrue() || StateUtil.bypass(player))){
 					Print.chat(sender, "&cNo permission!");
 					return;
 				}
@@ -239,7 +239,7 @@ public class MunicipalityCmd extends CommandBase {
 					Print.chat(sender, "&cPlayer not found.");
 					return;
 				}
-				if(mun.getCouncil().contains(gp.getId())){
+				if(mun.manage.getCouncil().contains(gp.getId())){
 					Print.chat(sender, "&9You can not kick council members!");
 					Print.chat(sender, "&cUse &7/mun council kick &c instead!");
 					return;
@@ -307,7 +307,7 @@ public class MunicipalityCmd extends CommandBase {
 				return;
 			}
 			case "invite":{
-				if(!(mun.isAuthorized(mun.r_INVITE.id, ply.getUUID()).isTrue() || StateUtil.bypass(player))){
+				if(!(mun.manage.isAuthorized(mun.r_INVITE.id, ply.getUUID()).isTrue() || StateUtil.bypass(player))){
 					Print.chat(sender, "&cNo permission!");
 					return;
 				}
@@ -350,7 +350,7 @@ public class MunicipalityCmd extends CommandBase {
 					Print.chat(sender, "&cNo permission.");
 					return;
 				}
-				if(ply.getState().getId() > 0 && !ply.getState().isAuthorized(ply.getState().r_CREATE_MUNICIPALITY.id, ply.getUUID()).isTrue()){
+				if(ply.getState().getId() > 0 && !ply.getState().manage.isAuthorized(ply.getState().r_CREATE_MUNICIPALITY.id, ply.getUUID()).isTrue()){
 					Print.chat(sender, "&cYour State does not allow you to create a new Municipality.");
 					return;
 				}
@@ -407,11 +407,11 @@ public class MunicipalityCmd extends CommandBase {
 					else{
 						newmun.created.create(ply.getUUID());
 						newmun.setName(name);
-						newmun.setHead(ply.getUUID());
+						newmun.manage.setHead(ply.getUUID());
 						newmun.r_OPEN.set(false);
 						newmun.price.reset();
 						newmun.getCitizen().add(ply.getUUID());
-						newmun.getCouncil().add(ply.getUUID());
+						newmun.manage.getCouncil().add(ply.getUUID());
 						newmun.setState(ply.getState());
 						//
 						District newdis = new District(sender.getEntityWorld().getCapability(StatesCapabilities.WORLD, null).getNewDistrictId());
@@ -421,7 +421,7 @@ public class MunicipalityCmd extends CommandBase {
 						else{
 							newdis.created.create(ply.getUUID());
 							newdis.setName("Center");
-							newdis.setHead(ply.getUUID());
+							newdis.manage.setHead(ply.getUUID());
 							newdis.r_CFS.set(false);
 							newdis.setMunicipality(newmun);
 							newdis.price.reset();
@@ -467,7 +467,7 @@ public class MunicipalityCmd extends CommandBase {
 					Print.chat(player, "&cMunicipality is marked as abandoned already.");
 					return;
 				}
-				Rule.Result res = mun.isAuthorized(mun.r_ABANDON.id, ply.getUUID());
+				Rule.Result res = mun.manage.isAuthorized(mun.r_ABANDON.id, ply.getUUID());
 				boolean pass = StateUtil.bypass(player) || isLastCitizen(mun, ply);
 				if(!res.isFalse() || pass){
 					Account munacc = mun.getAccount();
@@ -481,14 +481,14 @@ public class MunicipalityCmd extends CommandBase {
 						Print.chat(player, "&3-> setting a new state capital");
 						Print.chat(player, "&3-> abandoning the state");
 					}
-					if(!pass && mun.isAuthorized(mun.r_ABANDON.id, ply.getUUID()).isVote()){
-						if(Vote.exists(mun, VoteType.ABANDONMENT, null)){
+					if(!pass && mun.manage.isAuthorized(mun.r_ABANDON.id, ply.getUUID()).isVote()){
+						if(Vote.exists(mun.manage, VoteType.ABANDONMENT, null)){
 							Print.chat(sender, "&bThere is already an abandonement vote ongoing!");
 							return;
 						}
 						int newid = sender.getEntityWorld().getCapability(StatesCapabilities.WORLD, null).getNewVoteId();
 						Vote newvote = new Vote(newid, null, ply.getUUID(), Time.getDate(), Time.getDate() + (Time.DAY_MS * 7),
-							mun, VoteType.ABANDONMENT, !mun.r_ABANDON.setter.isCitizenVote(), null, null);
+							mun.manage, VoteType.ABANDONMENT, !mun.r_ABANDON.setter.isCitizenVote(), null, null);
 						if(newvote.getVoteFile().exists()){
 							new Exception("Tried to create new Vote with ID '" + newvote.id + "', but savefile already exists.");
 							return;
@@ -497,7 +497,7 @@ public class MunicipalityCmd extends CommandBase {
 						newvote.save();
 						States.VOTES.put(newvote.id, newvote);
 						StateUtil.announce(null, AnnounceLevel.MUNICIPALITY_ALL, "A new vote to abandon the Municipality started!", 0);
-						for(UUID member : newvote.council ? mun.getCouncil() : mun.getCitizen()){
+						for(UUID member : newvote.council ? mun.manage.getCouncil() : mun.getCitizen()){
 							MailUtil.send(null, RecipientType.PLAYER, member, null, "&7A new vote to abandon the Municipality started!\n&7Detailed info via &e/st-vote status " + newvote.id, MailType.SYSTEM);
 						}
 					}
@@ -531,7 +531,7 @@ public class MunicipalityCmd extends CommandBase {
 					Print.chat(player, "&cMunicipality is not marked as abandoned.");
 					return;
 				}
-				if(ply.getState().isAuthorized(ply.getState().r_CLAIM_MUNICIPALITY.id, ply.getUUID()).isTrue() ||  StateUtil.bypass(player)){
+				if(ply.getState().manage.isAuthorized(ply.getState().r_CLAIM_MUNICIPALITY.id, ply.getUUID()).isTrue() ||  StateUtil.bypass(player)){
 					if(ply.getAccount().getBalance() < MUNICIPALITY_CLAIM_PRICE){
 						Print.chat(player, "&cNot enough money to pay the claim server fee.");
 						return;

@@ -11,7 +11,7 @@ import net.fexcraft.lib.mc.utils.Print;
 import net.fexcraft.mod.states.data.Chunk;
 import net.fexcraft.mod.states.data.Rule;
 import net.fexcraft.mod.states.data.root.Initiator;
-import net.fexcraft.mod.states.data.sub.RuleHolder;
+import net.fexcraft.mod.states.data.sub.Manageable;
 import net.fexcraft.mod.states.util.StateUtil;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.nbt.NBTTagCompound;
@@ -22,7 +22,7 @@ public class RulesUIC extends GenericContainer {
 	
 	protected GenericGui<RulesUIC> gui;
 	protected Rule[] rules = new Rule[16];
-	protected RuleHolder holder;
+	protected Manageable manage;
 	protected int page, layer;
 	protected String ruleset;
 
@@ -32,16 +32,16 @@ public class RulesUIC extends GenericContainer {
 		Chunk chunk = StateUtil.getChunk(player.getPosition());
 		switch(layer){
 			//case 0: holder = chunk; break;
-			case 1: holder = chunk.getDistrict().getRuleHolder(); break;
-			case 2: holder = chunk.getMunicipality().getRuleHolder(); break;
-			case 3: holder = chunk.getState().getRuleHolder(); break;
+			case 1: manage = chunk.getDistrict().manage; break;
+			case 2: manage = chunk.getMunicipality().manage; break;
+			case 3: manage = chunk.getState().manage; break;
 			default: {
 				Print.log("Invalid Layer for Rules GUI"); player.closeScreen(); break;
 			}
 		}
-		Rule[] arr = holder.getMap().values().toArray(new Rule[0]); int j = 0;
+		Rule[] arr = manage.getRuleHolder().getMap().values().toArray(new Rule[0]); int j = 0;
 		for(int i = 0; i < 16; i++){
-			if((j = i + (page * 16)) >= holder.getMap().size()) break;
+			if((j = i + (page * 16)) >= manage.getRuleHolder().getMap().size()) break;
 			rules[i] = arr[j]; continue;
 		}
 	}
@@ -61,7 +61,7 @@ public class RulesUIC extends GenericContainer {
 						if(rules[i] == null) break;
 						compound.setString("rule" + i, rules[i].id + "," + rules[i].save());
 					}
-					compound.setString("ruleset", holder.root.getRulesetTitle());
+					compound.setString("ruleset", manage.getRulesetTitle());
 					send(Side.CLIENT, compound);
 					return;
 				}
@@ -76,7 +76,7 @@ public class RulesUIC extends GenericContainer {
 						passed = true;
 					}
 					else{
-						Rule.Result res = holder.root.isAuthorized(rules[i].id, uuid);
+						Rule.Result res = manage.isAuthorized(rules[i].id, uuid);
 						if(res.isVote()){
 							sendStatus("&bThis needs a vote to change! &7/st-rule");
 							passed = false;
@@ -98,10 +98,10 @@ public class RulesUIC extends GenericContainer {
 					boolean vote, pass;
 					Rule.Result res;
 					if(set){
-						res = holder.root.isAuthorized(rules[i].id, uuid);
+						res = manage.isAuthorized(rules[i].id, uuid);
 					}
 					else{
-						res = holder.root.canRevise(rules[i].id, uuid);
+						res = manage.canRevise(rules[i].id, uuid);
 					}
 					vote = res.isVote();
 					pass = res.isTrue();

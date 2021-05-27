@@ -68,7 +68,7 @@ public class SignShop implements SignCapability.Listener {
 						switch(tileentity.signText[1].getUnformattedText().toLowerCase()){
 							case "district":
 							case "municipality":{
-								if(chunk.getMunicipality().isAuthorized(chunk.getMunicipality().r_CREATE_SIGN_SHOP.id, uuid).isTrue()){
+								if(chunk.getMunicipality().manage.isAuthorized(chunk.getMunicipality().r_CREATE_SIGN_SHOP.id, uuid).isTrue()){
 									account = new ResourceLocation("municipality:" + chunk.getMunicipality().getId());
 								}
 								else{
@@ -78,7 +78,7 @@ public class SignShop implements SignCapability.Listener {
 								break;
 							}
 							case "state":{
-								if(chunk.getState().isAuthorized(chunk.getState().r_CREATE_SIGN_SHOP.id, uuid).isTrue()){
+								if(chunk.getState().manage.isAuthorized(chunk.getState().r_CREATE_SIGN_SHOP.id, uuid).isTrue()){
 									account = new ResourceLocation("state:" + chunk.getMunicipality().getId());
 								}
 								else{

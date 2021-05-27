@@ -4,9 +4,10 @@ import java.util.List;
 import java.util.UUID;
 
 import net.fexcraft.mod.states.data.Rule.Result;
+import net.fexcraft.mod.states.data.Vote;
 import net.fexcraft.mod.states.data.sub.RuleHolder;
 
-public interface Ruleable extends VoteHolder {
+public interface Ruleable {
 	
 	public String getRulesetTitle();
 	
@@ -37,5 +38,7 @@ public interface Ruleable extends VoteHolder {
 	}
 	
 	public RuleHolder getRuleHolder();
+	
+	public List<Vote> getActiveVotes();
 
 }

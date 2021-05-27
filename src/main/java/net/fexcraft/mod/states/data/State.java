@@ -37,7 +37,7 @@ public class State implements Layer, AccountHolder, Populated {
 	private int id, capital;
 	private String name;
 	private Account account;
-	private ArrayList<Integer> municipalities, blacklist;
+	private ArrayList<Integer> counties, blacklist;
 	private byte chunktaxpercent, citizentaxpercent;
 	//
 	public IconHolder icon = new IconHolder();
@@ -64,7 +64,7 @@ public class State implements Layer, AccountHolder, Populated {
 		account = DataManager.getAccount("state:" + id, false, true).setName(name);
 		capital = JsonUtil.getIfExists(obj, "capital", -1).intValue();
 		neighbors.load(obj);
-		municipalities = JsonUtil.jsonArrayToIntegerArray(JsonUtil.getIfExists(obj, "municipalities", new JsonArray()).getAsJsonArray());
+		counties = JsonUtil.jsonArrayToIntegerArray(JsonUtil.getIfExists(obj, "counties", new JsonArray()).getAsJsonArray());
 		color.load(obj);
 		blacklist = JsonUtil.jsonArrayToIntegerArray(JsonUtil.getIfExists(obj, "blacklist", new JsonArray()).getAsJsonArray());
 		price.load(obj);
@@ -109,7 +109,7 @@ public class State implements Layer, AccountHolder, Populated {
 		created.save(obj);
 		manage.save(obj);
 		neighbors.save(obj);
-		obj.add("municipalities", JsonUtil.getArrayFromIntegerList(municipalities));
+		obj.add("county", JsonUtil.getArrayFromIntegerList(counties));
 		obj.addProperty("capital", capital);
 		obj.addProperty("balance", account.getBalance());
 		color.save(obj);
@@ -161,8 +161,8 @@ public class State implements Layer, AccountHolder, Populated {
 		return false;//TODO
 	}
 
-	public List<Integer> getMunicipalities(){
-		return municipalities;
+	public List<Integer> getCounties(){
+		return counties;
 	}
 
 	@Override
@@ -229,10 +229,10 @@ public class State implements Layer, AccountHolder, Populated {
 	@Override
 	public List<UUID> getAllResidents(){
 		ArrayList<UUID> list = new ArrayList<UUID>();
-		for(int id : getMunicipalities()){
-			Municipality mun = StateUtil.getMunicipality(id);
-			if(mun.getId() == -1) continue;
-			list.addAll(mun.getResidents());
+		for(int id : counties){
+			County ct = StateUtil.getCounty(id);
+			if(ct.getId() == -1) continue;
+			list.addAll(ct.getAllResidents());
 		}
 		return list;
 	}
@@ -240,22 +240,32 @@ public class State implements Layer, AccountHolder, Populated {
 	@Override
 	public int getAllResidentCount(){
 		int count = 0;
-		for(int id : getMunicipalities()){
-			Municipality mun = StateUtil.getMunicipality(id);
-			if(mun.getId() == -1) continue;
-			count += mun.getResidentCount();
+		for(int id : counties){
+			County ct = StateUtil.getCounty(id);
+			if(ct.getId() == -1) continue;
+			count += ct.getAllResidentCount();
 		}
 		return count;
 	}
 
 	@Override
 	public boolean isCitizen(UUID uuid){
-		for(int id : getMunicipalities()){
-			Municipality mun = StateUtil.getMunicipality(id);
-			if(mun.getId() == -1) continue;
-			mun.isCitizen(uuid);
+		for(int id : counties){
+			County ct = StateUtil.getCounty(id);
+			if(ct.getId() == -1) continue;
+			if(ct.isCitizen(uuid)) return true;
 		}
 		return false;
+	}
+
+	public List<Integer> getMunicipalities(){
+		ArrayList<Integer> list = new ArrayList<>();
+		for(int id : counties){
+			County ct = StateUtil.getCounty(id);
+			if(ct.getId() == -1) continue;
+			list.addAll(ct.getMunicipalities());
+		}
+		return list;
 	}
 	
 }

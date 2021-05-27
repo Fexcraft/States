@@ -18,6 +18,7 @@ import net.fexcraft.mod.fsmm.util.Config;
 import net.fexcraft.mod.states.data.Chunk;
 import net.fexcraft.mod.states.data.ChunkPos;
 import net.fexcraft.mod.states.data.ChunkType;
+import net.fexcraft.mod.states.data.County;
 import net.fexcraft.mod.states.data.District;
 import net.fexcraft.mod.states.data.DistrictType;
 import net.fexcraft.mod.states.data.Municipality;
@@ -56,6 +57,7 @@ public class ManagerContainer extends GenericContainer {
 	protected Chunk chunk;
 	protected District dis;
 	protected Municipality mun;
+	protected County county;
 	protected State state;
 	protected Populated pop;
 	protected Manageable manage;
@@ -85,12 +87,6 @@ public class ManagerContainer extends GenericContainer {
 					chunk = StateUtil.getTempChunk(y, z);
 				}
 				break;
-			case COMPANY:
-				//
-				break;
-			case PROPERTY:
-				//
-				break;
 			case DISTRICT:
 				dis = y < -5 ? chunk.getDistrict() : StateUtil.getDistrict(y);
 				break;
@@ -105,6 +101,12 @@ public class ManagerContainer extends GenericContainer {
 				manage = state.manage;
 				break;
 			case UNION:
+				//
+				break;
+			case COMPANY:
+				//
+				break;
+			case PROPERTY:
 				//
 				break;
 			default:

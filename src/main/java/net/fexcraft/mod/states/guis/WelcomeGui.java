@@ -79,9 +79,9 @@ public class WelcomeGui extends GuiContainer {
 			buttonList.add(buttons[i] = new Button(i, this.guiLeft + 9, this.guiTop + 48 + (i * 16), 100, 14, " - - - - - "));
 			buttons[i].enabled = buttons[i].visible = true;
 		}
-		buttons[0].displayString = I18n.format("states.welcome_gui.area_view");
-		buttons[1].displayString = I18n.format("states.welcome_gui.district");
-		buttons[2].displayString = I18n.format("states.welcome_gui.municipality");
+		buttons[0].displayString = I18n.format("states.welcome_gui.district");
+		buttons[1].displayString = I18n.format("states.welcome_gui.municipality");
+		buttons[2].displayString = I18n.format("states.welcome_gui.county");
 		buttons[3].displayString = I18n.format("states.welcome_gui.state");
 		buttons[4].displayString = I18n.format("states.welcome_gui.union");
 		buttons[5].displayString = I18n.format("states.welcome_gui.company");

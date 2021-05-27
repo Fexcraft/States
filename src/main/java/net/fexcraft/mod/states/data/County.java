@@ -18,6 +18,7 @@ import net.fexcraft.mod.states.data.root.AccountHolder;
 import net.fexcraft.mod.states.data.root.Initiator;
 import net.fexcraft.mod.states.data.root.Layer;
 import net.fexcraft.mod.states.data.root.Layers;
+import net.fexcraft.mod.states.data.root.Populated;
 import net.fexcraft.mod.states.data.sub.Buyable;
 import net.fexcraft.mod.states.data.sub.ColorData;
 import net.fexcraft.mod.states.data.sub.Createable;
@@ -32,7 +33,7 @@ import net.fexcraft.mod.states.util.StConfig;
 import net.fexcraft.mod.states.util.StateUtil;
 import net.minecraftforge.common.MinecraftForge;
 
-public class County implements Layer, AccountHolder {
+public class County implements Layer, AccountHolder, Populated {
 	
 	private int id;
 	private String name;
@@ -133,17 +134,17 @@ public class County implements Layer, AccountHolder {
 	public void save(){
 		JsonObject obj = toJsonObject();
 		obj.addProperty("last_save", Time.getDate());
-		File file = getMunicipalityFile();
+		File file = getCountyFile();
 		if(!file.getParentFile().exists()){ file.getParentFile().mkdirs(); }
 		JsonUtil.write(file, obj);
 	}
 	
-	public final File getMunicipalityFile(){
-		return getMunicipalityFile(this.getId());
+	public final File getCountyFile(){
+		return getCountyFile(this.getId());
 	}
 
-	public static File getMunicipalityFile(int value){
-		return new File(States.getSaveDirectory(), "municipalitites/" + value + ".json");
+	public static File getCountyFile(int value){
+		return new File(States.getSaveDirectory(), "counties/" + value + ".json");
 	}
 
 	public int getId(){
@@ -181,9 +182,9 @@ public class County implements Layer, AccountHolder {
 	}
 
 	public void setState(State new_state){
-		state.getMunicipalities().removeIf(pre -> pre == this.getId());
+		state.getCounties().removeIf(pre -> pre == this.getId());
 		state = new_state;
-		state.getMunicipalities().add(this.getId());
+		state.getCounties().add(this.getId());
 	}
 
 	public int getClaimedChunks(){
@@ -235,6 +236,45 @@ public class County implements Layer, AccountHolder {
 	@Override
 	public Layers getLayerType(){
 		return Layers.COUNTY;
+	}
+
+	@Override
+	public List<UUID> getResidents(){
+		return citizen;
+	}
+
+	@Override
+	public List<UUID> getAllResidents(){
+		ArrayList<UUID> list = new ArrayList<>();
+		list.addAll(citizen);
+		for(int id : municipalities){
+			Municipality mun = StateUtil.getMunicipality(id);
+			if(mun.getId() == -1) continue;
+			list.addAll(mun.getResidents());
+		}
+		return list;
+	}
+
+	@Override
+	public int getAllResidentCount(){
+		int count = citizen.size();
+		for(int id : municipalities){
+			Municipality mun = StateUtil.getMunicipality(id);
+			if(mun.getId() == -1) continue;
+			count += mun.getResidentCount();
+		}
+		return count;
+	}
+
+	@Override
+	public boolean isCitizen(UUID uuid){
+		if(citizen.contains(uuid)) return true;
+		for(int id : municipalities){
+			Municipality mun = StateUtil.getMunicipality(id);
+			if(mun.getId() == -1) continue;
+			if(mun.isCitizen(uuid)) return true;
+		}
+		return false;
 	}
 
 }

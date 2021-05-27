@@ -10,6 +10,7 @@ import com.google.gson.JsonObject;
 
 import net.fexcraft.mod.states.States;
 import net.fexcraft.mod.states.data.Chunk;
+import net.fexcraft.mod.states.data.County;
 import net.fexcraft.mod.states.data.District;
 import net.fexcraft.mod.states.data.Municipality;
 import net.fexcraft.mod.states.data.State;
@@ -122,5 +123,7 @@ public interface PlayerCapability extends ICommandSender, Taxable, AccountHolder
 	public void setAdminMode(boolean bool);
 	
 	public MailData getMailbox();
+
+	public County getCounty();
 
 }

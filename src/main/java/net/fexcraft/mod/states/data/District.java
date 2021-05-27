@@ -30,6 +30,7 @@ public class District implements Layer {
 	private long chunktax;
 	private String name;
 	private Municipality municipality;
+	private County county;
 	//
 	public IconHolder icon = new IconHolder();
 	public ColorData color = new ColorData();
@@ -53,7 +54,9 @@ public class District implements Layer {
 		manage.load(obj);
 		neighbors.load(obj);
 		name = JsonUtil.getIfExists(obj, "name", "Unnamed District");
-		municipality = StateUtil.getMunicipality(JsonUtil.getIfExists(obj, "municipality", -1).intValue());
+		municipality = obj.has("municipality") ? StateUtil.getMunicipality(JsonUtil.getIfExists(obj, "municipality", -1).intValue()) : null;
+		county = obj.has("county") ?  StateUtil.getCounty(JsonUtil.getIfExists(obj, "county", -1).intValue()) : null;
+		if(county == null && municipality == null) municipality = StateUtil.getMunicipality(-1);
 		color.load(obj);
 		price.load(obj);
 		icon.load(obj);
@@ -96,6 +99,7 @@ public class District implements Layer {
 		manage.save(obj);
 		obj.addProperty("name", name);
 		obj.addProperty("municipality", municipality == null ? -1 : municipality.getId());
+		if(county != null) obj.addProperty("county", county.getId());
 		neighbors.save(obj);
 		color.save(obj);
 		price.save(obj);
@@ -149,9 +153,23 @@ public class District implements Layer {
 	}
 
 	public void setMunicipality(Municipality mun){
-		municipality.getDistricts().removeIf(pre -> pre == this.getId());
+		if(municipality != null) municipality.getDistricts().removeIf(pre -> pre == this.getId());
+		if(county != null) county.getDistricts().removeIf(pre -> pre == this.getId());
 		municipality = mun;
+		county = null;
 		municipality.getDistricts().add(this.getId());
+	}
+	
+	public County getCounty(){
+		return county == null ? municipality.getCounty() : county;
+	}
+
+	public void setCounty(County ct){
+		if(municipality != null) municipality.getDistricts().removeIf(pre -> pre == this.getId());
+		if(county != null) county.getDistricts().removeIf(pre -> pre == this.getId());
+		municipality = null;
+		county = ct;
+		county.getDistricts().add(this.getId());
 	}
 
 	public void setType(DistrictType new_type){
@@ -180,7 +198,7 @@ public class District implements Layer {
 
 	@Override
 	public Layer getParent(){
-		return municipality;
+		return county == null ? municipality : county;
 	}
 
 	@Override

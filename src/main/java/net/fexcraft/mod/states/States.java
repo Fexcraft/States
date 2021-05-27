@@ -150,6 +150,7 @@ public class States {
 		event.registerServerCommand(new RuleCmd());
 		event.registerServerCommand(new StateCmd());
 		event.registerServerCommand(new VoteCmd());
+		event.registerServerCommand(new CountyCmd());
 	}
 	
 	@Mod.EventHandler

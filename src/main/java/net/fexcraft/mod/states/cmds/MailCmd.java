@@ -297,7 +297,7 @@ public class MailCmd extends CommandBase {
 									Print.chat(sender, "&7No permission.");
 									return;
 								}
-								cap.getMunicipality().setState(state);
+								cap.getMunicipality().setState(state);//TODO
 								StateUtil.announce(server, AnnounceLevel.STATE, "Municipality of " + cap.getMunicipality().getName() + " joined our State!", state.getId());
 								Print.log(StateLogger.player(player) + " >>> " + StateLogger.municipality(cap.getMunicipality()) + " joined the State of " + StateLogger.state(state));
 								break;

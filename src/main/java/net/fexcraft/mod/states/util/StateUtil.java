@@ -26,6 +26,7 @@ import net.fexcraft.lib.mc.utils.Static;
 import net.fexcraft.mod.states.States;
 import net.fexcraft.mod.states.data.Chunk;
 import net.fexcraft.mod.states.data.ChunkPos;
+import net.fexcraft.mod.states.data.County;
 import net.fexcraft.mod.states.data.District;
 import net.fexcraft.mod.states.data.Municipality;
 import net.fexcraft.mod.states.data.PlayerImpl;
@@ -33,6 +34,7 @@ import net.fexcraft.mod.states.data.State;
 import net.fexcraft.mod.states.data.Vote;
 import net.fexcraft.mod.states.data.capabilities.PlayerCapability;
 import net.fexcraft.mod.states.data.capabilities.StatesCapabilities;
+import net.fexcraft.mod.states.data.capabilities.WorldCapability;
 import net.fexcraft.mod.states.data.root.AnnounceLevel;
 import net.fexcraft.mod.states.data.sub.Manageable;
 import net.minecraft.command.ICommandSender;
@@ -46,6 +48,7 @@ import net.minecraftforge.fml.common.FMLCommonHandler;
 
 public class StateUtil extends TimerTask {
 	
+	public static WorldCapability CURRENT;
 	public static List<UUID> NO_RESIDENTS = Collections.emptyList();
     
     public static @Nullable Chunk getChunk(int x, int z){
@@ -88,6 +91,8 @@ public class StateUtil extends TimerTask {
     public static Chunk getTempChunk(int[] ckpos){
         return getTempChunk(ckpos[0], ckpos[1]);
     }
+    
+    //
 	
 	public static District getDistrict(int value){
 		return getDistrict(value, true);
@@ -112,6 +117,8 @@ public class StateUtil extends TimerTask {
 		}
 		return null;
 	}
+	
+	//
 
 	public static Municipality getMunicipality(int value){
 		return getMunicipality(value, true);
@@ -137,6 +144,34 @@ public class StateUtil extends TimerTask {
 		return null;
 	}
 	
+	//
+
+	public static County getCounty(int value){
+		return getCounty(value, true);
+	}
+
+	public static County getCounty(int value, boolean bool){
+		if(States.COUNTIES.containsKey(value)){
+			return States.COUNTIES.get(value);
+		}
+		else if(County.getCountyFile(value).exists() || isDefaultAvailable("counties", value)){
+			County county = new County(value);
+			States.COUNTIES.put(value, county);
+			return county;
+		}
+		else return bool ? States.COUNTIES.get(-1) : null;
+	}
+
+	public static County getCountyByName(String name){
+		name = name.toLowerCase().trim();
+		for(County ct : States.COUNTIES.values()){
+			if(ct.getName().toLowerCase().equals(name)) return ct;
+		}
+		return null;
+	}
+	
+	//
+	
 	public static State getState(int value){
 		return getState(value, true);
 	}
@@ -160,6 +195,8 @@ public class StateUtil extends TimerTask {
 		}
 		return null;
 	}
+	
+	//
 	
 	public static Vote getVote(Manageable holder, int value){
 		if(States.VOTES.containsKey(value)){

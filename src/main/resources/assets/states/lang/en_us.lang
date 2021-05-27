@@ -13,9 +13,9 @@ item.states:mail_invite.name=Invite Mail
 item.states:mail_system.name=System Mail
 
 # Welcome GUI
-states.welcome_gui.area_view=Area View
 states.welcome_gui.district=District
 states.welcome_gui.municipality=Municipality
+states.welcome_gui.county=County
 states.welcome_gui.state=State
 states.welcome_gui.union=Union
 states.welcome_gui.company=Company
@@ -28,6 +28,7 @@ states.welcome_msg.welcome_back=&aWelcome back $0&a!
 states.welcome_msg.other_dim=&2You are currently in &7DIM($0)&0.
 states.welcome_msg.district=&2You are currently in a district called &7$0&2.
 states.welcome_msg.municipality=&2Which is part of the &6$1 &7$0&2.
+states.welcome_msg.county=&2Part of the County &7$0&2.
 states.welcome_msg.state=&2In the State of &7$0&2.
 states.welcome_msg.no_mailbox=&6You have &7no mailbox set&6!
 states.welcome_msg.pending_votes=&6You have &7$0 &6votes waiting! &7/st-vote my-votes

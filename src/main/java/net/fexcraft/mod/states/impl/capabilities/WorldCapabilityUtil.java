@@ -7,12 +7,14 @@ import org.apache.commons.io.FilenameUtils;
 import com.google.common.collect.ImmutableMap;
 
 import net.fexcraft.mod.states.States;
+import net.fexcraft.mod.states.data.County;
 import net.fexcraft.mod.states.data.District;
 import net.fexcraft.mod.states.data.Municipality;
 import net.fexcraft.mod.states.data.State;
 import net.fexcraft.mod.states.data.Vote;
 import net.fexcraft.mod.states.data.capabilities.StatesCapabilities;
 import net.fexcraft.mod.states.data.capabilities.WorldCapability;
+import net.fexcraft.mod.states.util.StateUtil;
 import net.minecraft.nbt.NBTBase;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.EnumFacing;
@@ -30,6 +32,7 @@ public class WorldCapabilityUtil implements ICapabilitySerializable<NBTBase>{
 	public WorldCapabilityUtil(net.minecraft.world.World world){
 		instance = StatesCapabilities.WORLD.getDefaultInstance();
 		instance.setWorld(world);
+		StateUtil.CURRENT = instance;
 	}
 
 	@Override
@@ -145,6 +148,18 @@ public class WorldCapabilityUtil implements ICapabilitySerializable<NBTBase>{
 				if(FilenameUtils.isExtension(file.getName(), "json")){ newid++; }
 			}
 			while(Vote.getVoteFile(newid).exists()) newid++;
+			return newid;
+		}
+
+		@Override
+		public int newCountyId(){
+			File folder = new File(States.getSaveDirectory(), "counties/");
+			if(!folder.exists()) folder.mkdirs();
+			int newid = -1;
+			for(File file : folder.listFiles()){
+				if(FilenameUtils.isExtension(file.getName(), "json")){ newid++; }
+			}
+			while(County.getCountyFile(newid).exists()) newid++;
 			return newid;
 		}
 

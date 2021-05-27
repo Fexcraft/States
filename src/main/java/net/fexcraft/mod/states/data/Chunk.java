@@ -287,6 +287,10 @@ public class Chunk implements Layer, Taxable {
 		return district.getMunicipality();
 	}
 	
+	public County getCounty(){
+		return district.getCounty();
+	}
+	
 	public State getState(){
 		return district.getMunicipality().getState();
 	}

@@ -36,6 +36,7 @@ public class PlayerImpl implements PlayerCapability {
 	public MailData mailbox = new MailData();
 	//
 	private Municipality municipality;
+	private County county;
 	private boolean loaded, admin;
 	
 	public PlayerImpl(){}
@@ -58,6 +59,7 @@ public class PlayerImpl implements PlayerCapability {
 		if(nick != null){ obj.addProperty("nickname", nick); }
 		obj.addProperty("color", color);
 		obj.addProperty("municipality", municipality == null ? -1 : municipality.getId());
+		obj.addProperty("county", county == null ? -1 : county.getId());
 		obj.addProperty("last_tax_collection", lasttaxcoll);
 		if(customtax > 0){ obj.addProperty("custom_tax", customtax); }
 		mailbox.save(obj);
@@ -224,7 +226,12 @@ public class PlayerImpl implements PlayerCapability {
 
 	@Override
 	public State getState(){
-		return municipality.getState();
+		return county == null ? municipality.getState() : county.getState();
+	}
+
+	@Override
+	public County getCounty(){
+		return county == null ? municipality.getCounty() : county;
 	}
 
 	@Override

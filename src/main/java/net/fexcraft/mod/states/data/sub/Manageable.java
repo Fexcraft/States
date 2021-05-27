@@ -22,7 +22,7 @@ public class Manageable implements Loadable {
 	//
 	private String ru_title;
 	private ArrayList<UUID> council;
-	private ArrayList<Vote> active_votes;
+	private ArrayList<Vote> active_votes = new ArrayList<>();
 	private RuleHolder rules;
 	private UUID head;
 	

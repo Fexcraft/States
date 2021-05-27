@@ -29,13 +29,13 @@ public class GuiHandler implements IGuiHandler{
 	 * */
 	
 	public static final int WELCOME = 0;
-	//public static final int REGION_VIEW = 1;
 	public static final int RULE_EDITOR = 30;
 	public static final int CLAIM_MAP = 10;
 	public static final int MAILBOX = 20;
 	//
-	public static final int MANAGER_DISTRICT = 2;
-	public static final int MANAGER_MUNICIPALITY = 3;
+	public static final int MANAGER_DISTRICT = 1;
+	public static final int MANAGER_MUNICIPALITY = 2;
+	public static final int MANAGER_COUNTY = 3;
 	public static final int MANAGER_STATE = 4;
 	public static final int MANAGER_COMPANY = 6;
 	public static final int MANAGER_PLAYERDATA = 7;
@@ -44,7 +44,7 @@ public class GuiHandler implements IGuiHandler{
 
 	@Override
 	public Object getServerGuiElement(int ID, EntityPlayer player, World world, int x, int y, int z){
-		if(ID > 1 && ID < 10) return new ManagerContainer(player, ID - 2, x, y, z);
+		if(ID >= 1 && ID < 10) return new ManagerContainer(player, ID - 1, x, y, z);
 		switch(ID){
 			case RULE_EDITOR: return new RulesUIC(player, world, x, y, z);
 			case MAILBOX: return new MailboxUIC(player, world, x, y, z);
@@ -55,7 +55,7 @@ public class GuiHandler implements IGuiHandler{
 
 	@Override
 	public Object getClientGuiElement(int ID, EntityPlayer player, World world, int x, int y, int z){
-		if(ID > 1 && ID < 10) return new ManagerGui(player, ID - 2, x, y, z);
+		if(ID >= 1 && ID < 10) return new ManagerGui(player, ID - 1, x, y, z);
 		switch(ID){
 			case WELCOME: return new WelcomeGui(player, world, x, y, z);
 			//case REGION_VIEW: return new AreaView(player, world, x, y, z);

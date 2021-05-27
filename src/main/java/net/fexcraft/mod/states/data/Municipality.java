@@ -38,7 +38,7 @@ public class Municipality implements Layer, AccountHolder, Populated {
 	private Account account;
 	private ArrayList<Integer> districts, com_blacklist;
 	private ArrayList<UUID> citizen, pl_blacklist;
-	private State state;
+	private County county;
 	//
 	public IconHolder icon = new IconHolder();
 	public ColorData color = new ColorData();
@@ -67,7 +67,18 @@ public class Municipality implements Layer, AccountHolder, Populated {
 		neighbors.load(obj);
 		districts = JsonUtil.jsonArrayToIntegerArray(JsonUtil.getIfExists(obj, "districts", new JsonArray()).getAsJsonArray());
 		citizen = JsonUtil.jsonArrayToUUIDArray(JsonUtil.getIfExists(obj, "citizen", new JsonArray()).getAsJsonArray());
-		state = StateUtil.getState(JsonUtil.getIfExists(obj, "state", -1).intValue());
+		if(!obj.has("county")){
+			State state = StateUtil.getState(JsonUtil.getIfExists(obj, "state", -1).intValue());
+			if(state.getCounties().size() > 0){
+				county = StateUtil.getCounty(state.getCounties().get(0));
+			}
+			else{
+				county = new County(StateUtil.CURRENT.newCountyId());
+				county.setState(state);
+			}
+			setCounty(county);
+		}
+		else county = StateUtil.getCounty(JsonUtil.getIfExists(obj, "county", -1).intValue());
 		color.load(obj);
 		com_blacklist = JsonUtil.jsonArrayToIntegerArray(JsonUtil.getIfExists(obj, "company_blacklist", new JsonArray()).getAsJsonArray());
 		pl_blacklist = JsonUtil.jsonArrayToUUIDArray(JsonUtil.getIfExists(obj, "player_blacklist", new JsonArray()).getAsJsonArray());
@@ -91,7 +102,7 @@ public class Municipality implements Layer, AccountHolder, Populated {
 			manage.getCouncil().add(by.getUUID());
 			citizen.clear();
 			citizen.add(by.getUUID());
-			setState(by.getState());
+			setCounty(by.getCounty());
 			by.setMunicipality(this);
 			manage.setHead(by.getUUID());
 			save();
@@ -143,7 +154,7 @@ public class Municipality implements Layer, AccountHolder, Populated {
 		neighbors.save(obj);
 		obj.add("districts", JsonUtil.getArrayFromIntegerList(districts));
 		obj.add("citizen", JsonUtil.getArrayFromUUIDList(citizen));
-		obj.addProperty("state", state.getId());
+		obj.addProperty("county", county.getId());
 		obj.addProperty("balance", account.getBalance());
 		color.save(obj);
 		//obj.addProperty("open", open);
@@ -200,14 +211,18 @@ public class Municipality implements Layer, AccountHolder, Populated {
 		return account;
 	}
 
-	public State getState(){
-		return state;
+	public County getCounty(){
+		return county;
 	}
 
-	public void setState(State new_state){
-		state.getMunicipalities().removeIf(pre -> pre == this.getId());
-		state = new_state;
-		state.getMunicipalities().add(this.getId());
+	public void setCounty(County new_county){
+		county.getMunicipalities().removeIf(pre -> pre == this.getId());
+		county = new_county;
+		county.getMunicipalities().add(this.getId());
+	}
+
+	public State getState(){
+		return county.getState();
 	}
 
 	public List<UUID> getPlayerBlacklist(){
@@ -311,7 +326,7 @@ public class Municipality implements Layer, AccountHolder, Populated {
 
 	@Override
 	public Layer getParent(){
-		return state;
+		return county;
 	}
 
 	@Override

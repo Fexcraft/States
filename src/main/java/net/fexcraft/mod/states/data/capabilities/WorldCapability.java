@@ -26,6 +26,8 @@ public interface WorldCapability {
 	public int getNewStateId();
 
 	public int getNewVoteId();
+
+	public int newCountyId();
 	
 	public ImmutableMap<Integer, Municipality> getMunicipalities();
 	

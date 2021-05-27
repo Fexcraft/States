@@ -22,11 +22,11 @@ import net.fexcraft.mod.fsmm.util.DataManager;
 import net.fexcraft.mod.states.States;
 import net.fexcraft.mod.states.data.Chunk;
 import net.fexcraft.mod.states.data.ChunkType;
+import net.fexcraft.mod.states.data.County;
 import net.fexcraft.mod.states.data.District;
 import net.fexcraft.mod.states.data.DistrictType;
 import net.fexcraft.mod.states.data.Municipality;
 import net.fexcraft.mod.states.data.Rule;
-import net.fexcraft.mod.states.data.State;
 import net.fexcraft.mod.states.data.Vote;
 import net.fexcraft.mod.states.data.Vote.VoteType;
 import net.fexcraft.mod.states.data.capabilities.PlayerCapability;
@@ -141,13 +141,13 @@ public class MunicipalityCmd extends CommandBase {
 						return;
 					}
 					//
-					State playerstate = ply.getMunicipality().getState();
-					Bank bank = playerstate.getBank();
+					County playercounty = ply.getMunicipality().getCounty();
+					Bank bank = playercounty.getBank();
 					if(bank.isNull()){
 						Print.chat(sender, "&cState's Bank not found.");
 						return;
 					}
-					if(bank.processAction(Bank.Action.TRANSFER, sender, playerstate.getAccount(), mun.price.get(), mun.getState().getAccount())){
+					if(bank.processAction(Bank.Action.TRANSFER, sender, playercounty.getAccount(), mun.price.get(), mun.getState().getAccount())){
 						if(mun.isCapital()){
 							if(mun.getState().getMunicipalities().size() > 0){
 								mun.getState().setCapitalId(-1);
@@ -158,7 +158,7 @@ public class MunicipalityCmd extends CommandBase {
 								StateUtil.announce(server, "&7The state of &6" + mun.getState().getName() + " has been disbanned!");
 							}
 						}
-						mun.setState(playerstate);
+						mun.setCounty(playercounty);
 						mun.manage.getCouncil().clear();
 						mun.created.update();
 						mun.manage.setHead(null);
@@ -166,7 +166,7 @@ public class MunicipalityCmd extends CommandBase {
 						mun.save();
 						mun.getState().save();
 						StateUtil.announce(server, AnnounceLevel.MUNICIPALITY_ALL, "&6Municipality has been bought!", ply.getMunicipality().getId());
-						StateUtil.announce(server, AnnounceLevel.MUNICIPALITY_ALL, "&9Buyer: " + playerstate.getName() + " (" + playerstate.getId() + ");", ply.getMunicipality().getId());
+						StateUtil.announce(server, AnnounceLevel.MUNICIPALITY_ALL, "&9Buyer: " + playercounty.getName() + " (" + playercounty.getId() + ");", ply.getMunicipality().getId());
 						Print.log(StateLogger.player(player) + " bought " + StateLogger.municipality(mun) + ", it is now part of " + StateLogger.state(mun.getState()) + ".");
 					}
 				}
@@ -412,7 +412,7 @@ public class MunicipalityCmd extends CommandBase {
 						newmun.price.reset();
 						newmun.getResidents().add(ply.getUUID());
 						newmun.manage.getCouncil().add(ply.getUUID());
-						newmun.setState(ply.getState());
+						newmun.setCounty(ply.getCounty());
 						//
 						District newdis = new District(sender.getEntityWorld().getCapability(StatesCapabilities.WORLD, null).getNewDistrictId());
 						if(newdis.getDistrictFile().exists() || StateUtil.getDistrict(newdis.getId()).getId() >= 0){

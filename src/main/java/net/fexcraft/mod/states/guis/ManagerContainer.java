@@ -128,7 +128,7 @@ public class ManagerContainer extends GenericContainer {
 				addKey(list, "color", dis.color.getString(), ViewMode.EDIT);
 				addKey(list, "chunk_tax", dis.getChunkTax() > 0 ? ggas(dis.getChunkTax()) : NOTAX, ViewMode.EDIT);
 				addKey(list, "last_edited", time(dis.created.getChanged()), ViewMode.NONE);
-				addKey(list, "neighbors", dis.getNeighbors().size(), ViewMode.LIST);
+				addKey(list, "neighbors", dis.neighbors.size(), ViewMode.LIST);
 				addKey(list, "chunks", dis.getClaimedChunks(), ViewMode.NONE);
 				addKey(list, "canforsettle", dis.r_CFS.get(), ViewMode.BOOL);
 				addKey(list, "unifbank", dis.r_ONBANKRUPT.get(), ViewMode.BOOL);
@@ -158,7 +158,7 @@ public class ManagerContainer extends GenericContainer {
 				addKey(list, "last_edited", time(mun.created.getChanged()), ViewMode.NONE);
 				addKey(list, "council", mun.manage.getCouncil().size(), ViewMode.LIST);
 				addKey(list, "districts", mun.getDistricts().size() + " / " + mun.getDistrictLimit(), ViewMode.LIST);
-				addKey(list, "neighbors", mun.getNeighbors().size(), ViewMode.LIST);
+				addKey(list, "neighbors", mun.neighbors.size(), ViewMode.LIST);
 				addKey(list, "opentojoin", mun.r_OPEN.get(), ViewMode.BOOL);
 				addKey(list, "kickbankrupt", mun.r_KIB.get(), ViewMode.BOOL);
 				addKey(list, "chunks", mun.getClaimedChunks() + "/" + mun.getChunkLimit(), ViewMode.NONE);
@@ -190,7 +190,7 @@ public class ManagerContainer extends GenericContainer {
 				addKey(list, "last_edited", time(state.created.getChanged()), ViewMode.NONE);
 				addKey(list, "council", state.manage.getCouncil().size(), ViewMode.LIST);
 				addKey(list, "municipalities", state.getMunicipalities().size(), ViewMode.LIST);
-				addKey(list, "neighbors", state.getNeighbors().size(), ViewMode.LIST);
+				addKey(list, "neighbors", state.neighbors.size(), ViewMode.LIST);
 				addKey(list, "creator", Static.getPlayerNameByUUID(state.created.getCreator()), ViewMode.NONE);
 				addKey(list, "created", time(state.created.getCreated()), ViewMode.NONE);
 				addKey(list, "ruleset", state.manage.getRulesetTitle(), ViewMode.EDIT);
@@ -305,20 +305,20 @@ public class ManagerContainer extends GenericContainer {
 				break;
 			case LIST_NEIGHBORS:
 				if(layer.isDistrict()){
-					initListValues(dis.getNeighbors().size());
-					for(int id : dis.getNeighbors()){
+					initListValues(dis.neighbors.size());
+					for(int id : dis.neighbors.get()){
 						addKey(list, id, StateUtil.getDistrictName(id));
 					}
 				}
 				if(layer.isMunicipality()){
-					initListValues(mun.getNeighbors().size());
-					for(int id : mun.getNeighbors()){
+					initListValues(mun.neighbors.size());
+					for(int id : mun.neighbors.get()){
 						addKey(list, id, StateUtil.getMunicipalityName(id));
 					}
 				}
 				if(layer.isState()){
-					initListValues(state.getNeighbors().size());
-					for(int id : state.getNeighbors()){
+					initListValues(state.neighbors.size());
+					for(int id : state.neighbors.get()){
 						addKey(list, id, StateUtil.getStateName(id));
 					}
 				}
@@ -1270,15 +1270,15 @@ public class ManagerContainer extends GenericContainer {
 							break;
 						case LIST_NEIGHBORS:
 							if(layer.isDistrict()){
-								openGui(Layers.DISTRICT, Mode.INFO, dis.getNeighbors().get(packet.getInteger("button")));
+								openGui(Layers.DISTRICT, Mode.INFO, dis.neighbors.get(packet.getInteger("button")));
 								return;
 							}
 							if(layer.isMunicipality()){
-								openGui(Layers.MUNICIPALITY, Mode.INFO, mun.getNeighbors().get(packet.getInteger("button")));
+								openGui(Layers.MUNICIPALITY, Mode.INFO, mun.neighbors.get(packet.getInteger("button")));
 								return;
 							}
 							if(layer.isState()){
-								openGui(Layers.STATE, Mode.INFO, state.getNeighbors().get(packet.getInteger("button")));
+								openGui(Layers.STATE, Mode.INFO, state.neighbors.get(packet.getInteger("button")));
 								return;
 							}
 							//TODO check if the component is loaded in memory?

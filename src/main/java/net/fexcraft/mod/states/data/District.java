@@ -1,10 +1,7 @@
 package net.fexcraft.mod.states.data;
 
 import java.io.File;
-import java.util.ArrayList;
-import java.util.List;
 
-import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 
 import net.fexcraft.lib.common.json.JsonUtil;
@@ -20,6 +17,7 @@ import net.fexcraft.mod.states.data.sub.ExternalDataHolder;
 import net.fexcraft.mod.states.data.sub.IconHolder;
 import net.fexcraft.mod.states.data.sub.MailData;
 import net.fexcraft.mod.states.data.sub.Manageable;
+import net.fexcraft.mod.states.data.sub.NeighborData;
 import net.fexcraft.mod.states.data.sub.RuleHolder;
 import net.fexcraft.mod.states.events.DistrictEvent;
 import net.fexcraft.mod.states.util.StateUtil;
@@ -30,8 +28,9 @@ public class District implements Layer {
 	private int id, chunks;
 	private DistrictType type;
 	private long chunktax;
-	private ArrayList<Integer> neighbors;
 	private String name;
+	private Municipality municipality;
+	//
 	public IconHolder icon = new IconHolder();
 	public ColorData color = new ColorData();
 	public Buyable price = new Buyable(this);
@@ -40,7 +39,7 @@ public class District implements Layer {
 	public ExternalDataHolder external = new ExternalDataHolder();
 	public Manageable manage = new Manageable(this, false, true, "manager");
 	public RuleHolder rules = new RuleHolder();
-	private Municipality municipality;
+	public NeighborData neighbors = new NeighborData();
 	//
 	public final Rule r_CFS, r_ONBANKRUPT, r_SET_MANAGER, r_SET_CHUNKTAX;
 	public final Rule r_SET_TYPE, r_SET_NAME, r_SET_PRICE, r_SET_COLOR, r_SET_ICON;
@@ -52,7 +51,7 @@ public class District implements Layer {
 		type = DistrictType.valueOf(JsonUtil.getIfExists(obj, "type", DistrictType.WILDERNESS.name()));
 		created.load(obj);
 		manage.load(obj);
-		neighbors = JsonUtil.jsonArrayToIntegerArray(JsonUtil.getIfExists(obj, "neighbors", new JsonArray()).getAsJsonArray());
+		neighbors.load(obj);
 		name = JsonUtil.getIfExists(obj, "name", "Unnamed District");
 		municipality = StateUtil.getMunicipality(JsonUtil.getIfExists(obj, "municipality", -1).intValue());
 		color.load(obj);
@@ -97,7 +96,7 @@ public class District implements Layer {
 		manage.save(obj);
 		obj.addProperty("name", name);
 		obj.addProperty("municipality", municipality == null ? -1 : municipality.getId());
-		obj.add("neighbors", JsonUtil.getArrayFromIntegerList(neighbors));
+		neighbors.save(obj);
 		color.save(obj);
 		price.save(obj);
 		icon.save(obj);
@@ -135,9 +134,6 @@ public class District implements Layer {
 
 	public DistrictType getType(){
 		return type;
-	}
-	public List<Integer> getNeighbors(){
-		return neighbors;
 	}
 
 	public String getName(){

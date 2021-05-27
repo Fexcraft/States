@@ -22,15 +22,7 @@ import net.fexcraft.mod.states.data.root.Initiator;
 import net.fexcraft.mod.states.data.root.Layer;
 import net.fexcraft.mod.states.data.root.Layers;
 import net.fexcraft.mod.states.data.root.Populated;
-import net.fexcraft.mod.states.data.sub.Abandonable;
-import net.fexcraft.mod.states.data.sub.Buyable;
-import net.fexcraft.mod.states.data.sub.ColorData;
-import net.fexcraft.mod.states.data.sub.Createable;
-import net.fexcraft.mod.states.data.sub.ExternalDataHolder;
-import net.fexcraft.mod.states.data.sub.IconHolder;
-import net.fexcraft.mod.states.data.sub.MailData;
-import net.fexcraft.mod.states.data.sub.Manageable;
-import net.fexcraft.mod.states.data.sub.RuleHolder;
+import net.fexcraft.mod.states.data.sub.*;
 import net.fexcraft.mod.states.events.MunicipalityEvent;
 import net.fexcraft.mod.states.util.ForcedChunksManager;
 import net.fexcraft.mod.states.util.StConfig;
@@ -42,6 +34,12 @@ public class Municipality implements Layer, AccountHolder, Populated {
 	
 	private int id;
 	private String name, title;
+	private long citizentax;
+	private Account account;
+	private ArrayList<Integer> districts, com_blacklist;
+	private ArrayList<UUID> citizen, pl_blacklist;
+	private State state;
+	//
 	public IconHolder icon = new IconHolder();
 	public ColorData color = new ColorData();
 	public Buyable price = new Buyable(this);
@@ -51,11 +49,7 @@ public class Municipality implements Layer, AccountHolder, Populated {
 	public Abandonable abandon;
 	public Manageable manage = new Manageable(this, true, false, "mayor");
 	public RuleHolder rules = new RuleHolder();
-	private long citizentax;
-	private Account account;
-	private ArrayList<Integer> neighbors, districts, com_blacklist;
-	private ArrayList<UUID> citizen, pl_blacklist;
-	private State state;
+	public NeighborData neighbors = new NeighborData();
 	//
 	public final Rule r_OPEN, r_COLOR, r_ICON, r_SET_NAME, r_SET_PRICE, r_SET_MAYOR, r_SET_CITIZENTAX, r_KIB;
 	public final Rule r_EDIT_BL, r_KICK, r_INVITE, r_COUNCIL_KICK, r_COUNCIL_INVITE, r_VOTE_MAYOR;
@@ -70,7 +64,7 @@ public class Municipality implements Layer, AccountHolder, Populated {
 		created.load(obj);
 		manage.load(obj);
 		account = DataManager.getAccount("municipality:" + id, false, true).setName(name);
-		neighbors = JsonUtil.jsonArrayToIntegerArray(JsonUtil.getIfExists(obj, "neighbors", new JsonArray()).getAsJsonArray());
+		neighbors.load(obj);
 		districts = JsonUtil.jsonArrayToIntegerArray(JsonUtil.getIfExists(obj, "districts", new JsonArray()).getAsJsonArray());
 		citizen = JsonUtil.jsonArrayToUUIDArray(JsonUtil.getIfExists(obj, "citizen", new JsonArray()).getAsJsonArray());
 		state = StateUtil.getState(JsonUtil.getIfExists(obj, "state", -1).intValue());
@@ -146,7 +140,7 @@ public class Municipality implements Layer, AccountHolder, Populated {
 		obj.addProperty("title", title);
 		created.save(obj);
 		manage.save(obj);
-		obj.add("neighbors", JsonUtil.getArrayFromIntegerList(neighbors));
+		neighbors.save(obj);
 		obj.add("districts", JsonUtil.getArrayFromIntegerList(districts));
 		obj.add("citizen", JsonUtil.getArrayFromUUIDList(citizen));
 		obj.addProperty("state", state.getId());
@@ -195,10 +189,6 @@ public class Municipality implements Layer, AccountHolder, Populated {
 
 	public boolean isCapital(){
 		return this.getState().getCapitalId() == this.getId();
-	}
-
-	public List<Integer> getNeighbors(){
-		return neighbors;
 	}
 
 	public List<Integer> getDistricts(){

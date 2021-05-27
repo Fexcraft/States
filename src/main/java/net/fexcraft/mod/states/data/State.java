@@ -26,6 +26,7 @@ import net.fexcraft.mod.states.data.sub.ExternalDataHolder;
 import net.fexcraft.mod.states.data.sub.IconHolder;
 import net.fexcraft.mod.states.data.sub.MailData;
 import net.fexcraft.mod.states.data.sub.Manageable;
+import net.fexcraft.mod.states.data.sub.NeighborData;
 import net.fexcraft.mod.states.data.sub.RuleHolder;
 import net.fexcraft.mod.states.events.StateEvent;
 import net.fexcraft.mod.states.util.StateUtil;
@@ -35,6 +36,10 @@ public class State implements Layer, AccountHolder, Populated {
 
 	private int id, capital;
 	private String name;
+	private Account account;
+	private ArrayList<Integer> municipalities, blacklist;
+	private byte chunktaxpercent, citizentaxpercent;
+	//
 	public IconHolder icon = new IconHolder();
 	public ColorData color = new ColorData();
 	public Buyable price = new Buyable(this);
@@ -43,9 +48,7 @@ public class State implements Layer, AccountHolder, Populated {
 	public ExternalDataHolder external = new ExternalDataHolder();
 	public Manageable manage = new Manageable(this, true, false, "leader");
 	public RuleHolder rules = new RuleHolder();
-	private Account account;
-	private ArrayList<Integer> neighbors, municipalities, blacklist;
-	private byte chunktaxpercent, citizentaxpercent;
+	public NeighborData neighbors = new NeighborData();
 	//
 	public final Rule r_CREATE_SIGN_SHOP, r_SET_MAILBOX, r_OPEN_MAILBOX, r_CREATE_MUNICIPALITY, r_CLAIM_MUNICIPALITY;
 	public final Rule r_SET_COLOR, r_SET_ICON, r_SET_NAME, r_SET_PRICE, r_SET_LEADER, r_SET_CHUNK_TAX_PERCENT;
@@ -60,7 +63,7 @@ public class State implements Layer, AccountHolder, Populated {
 		manage.load(obj);
 		account = DataManager.getAccount("state:" + id, false, true).setName(name);
 		capital = JsonUtil.getIfExists(obj, "capital", -1).intValue();
-		neighbors = JsonUtil.jsonArrayToIntegerArray(JsonUtil.getIfExists(obj, "neighbors", new JsonArray()).getAsJsonArray());
+		neighbors.load(obj);
 		municipalities = JsonUtil.jsonArrayToIntegerArray(JsonUtil.getIfExists(obj, "municipalities", new JsonArray()).getAsJsonArray());
 		color.load(obj);
 		blacklist = JsonUtil.jsonArrayToIntegerArray(JsonUtil.getIfExists(obj, "blacklist", new JsonArray()).getAsJsonArray());
@@ -105,7 +108,7 @@ public class State implements Layer, AccountHolder, Populated {
 		obj.addProperty("name", name);
 		created.save(obj);
 		manage.save(obj);
-		obj.add("neighbors", JsonUtil.getArrayFromIntegerList(neighbors));
+		neighbors.save(obj);
 		obj.add("municipalities", JsonUtil.getArrayFromIntegerList(municipalities));
 		obj.addProperty("capital", capital);
 		obj.addProperty("balance", account.getBalance());
@@ -160,10 +163,6 @@ public class State implements Layer, AccountHolder, Populated {
 
 	public List<Integer> getMunicipalities(){
 		return municipalities;
-	}
-
-	public List<Integer> getNeighbors(){
-		return neighbors;
 	}
 
 	@Override

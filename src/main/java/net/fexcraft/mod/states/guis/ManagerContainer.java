@@ -1,7 +1,7 @@
 package net.fexcraft.mod.states.guis;
 
+import static net.fexcraft.mod.states.util.StateTranslator.wrap;
 import static net.fexcraft.mod.states.util.StateUtil.bypass;
-import static net.fexcraft.mod.states.util.StateUtil.translate;
 
 import java.util.UUID;
 
@@ -36,6 +36,7 @@ import net.fexcraft.mod.states.util.MailUtil;
 import net.fexcraft.mod.states.util.Perms;
 import net.fexcraft.mod.states.util.StConfig;
 import net.fexcraft.mod.states.util.StateLogger;
+import net.fexcraft.mod.states.util.StateTranslator;
 import net.fexcraft.mod.states.util.StateUtil;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.nbt.NBTTagCompound;
@@ -621,7 +622,7 @@ public class ManagerContainer extends GenericContainer {
 											mun.manage.setHead(null);
 											mun.save();
 											sendViewData();
-											StateUtil.announce(null, AnnounceLevel.MUNICIPALITY_ALL, translate("states.announce.municipality.mayor_reset"), mun.getId());
+											StateUtil.announce(null, AnnounceLevel.MUNICIPALITY_ALL, "states.announce.municipality.mayor_reset", mun.getId());
 											Print.log(StateLogger.player(player) + " reset mayor of " + StateLogger.municipality(mun) + ".");
 											return;
 										}
@@ -840,7 +841,7 @@ public class ManagerContainer extends GenericContainer {
 										state.created.update();
 										state.save();
 										sendViewData();
-										StateUtil.announce(null, AnnounceLevel.STATE_ALL, translate("states.announce.state.new_capital", mun.getId()), state.getId());
+										StateUtil.announce(null, AnnounceLevel.STATE_ALL, wrap("states.announce.state.new_capital", mun.getId()), state.getId());
 										Print.log(StateLogger.player(player) + " set the capital of " + StateLogger.state(state) + " to " + StateLogger.municipality(mun));
 										return;
 									}
@@ -857,7 +858,7 @@ public class ManagerContainer extends GenericContainer {
 											state.manage.setHead(null);
 											state.save();
 											sendViewData();
-											StateUtil.announce(null, AnnounceLevel.MUNICIPALITY_ALL, translate("states.announce.state.leader_reset"), state.getId());
+											StateUtil.announce(null, AnnounceLevel.MUNICIPALITY_ALL, "states.announce.state.leader_reset", state.getId());
 											Print.log(StateLogger.player(player) + " reset head of " + StateLogger.state(state) + ".");
 											return;
 										}
@@ -1146,7 +1147,7 @@ public class ManagerContainer extends GenericContainer {
 										ChunkType type = ChunkType.get(value.toUpperCase());
 										if(type == null){
 											sendStatus("states.manager_gui.view_chunk.type.not_found0");
-											Print.chat(player, translate("states.manager_gui.view_chunk.type.not_found1"));
+											StateTranslator.send(player, "states.manager_gui.view_chunk.type.not_found1");
 										}
 										else{
 											long time = Time.getDate();
@@ -1195,8 +1196,8 @@ public class ManagerContainer extends GenericContainer {
 													});
 													chunk.save();
 													sendViewData();
-													Print.chat(player, translate("states.manager_gui.view_chunk.type.public0"));
-													Print.chat(player, translate("states.manager_gui.view_chunk.type.public1"));
+													StateTranslator.send(player, "states.manager_gui.view_chunk.type.public0");
+													StateTranslator.send(player, "states.manager_gui.view_chunk.type.public1");
 													Print.log(StateLogger.player(player) + " set the type of " + StateLogger.chunk(chunk) + " to PUBLIC.");
 													break;
 												}
@@ -1342,9 +1343,9 @@ public class ManagerContainer extends GenericContainer {
 									return;
 								}
 								mun.getResidents().remove(list_values[index]);
-								String kickmsg = translate("states.manager_gui.list_citizens_municipality.rem_msg", mun.getId());
+								NBTTagCompound kickmsg = wrap("states.manager_gui.list_citizens_municipality.rem_msg", mun.getId());
 								PlayerCapability playr = StateUtil.getPlayer((UUID)list_values[index], false);
-								if(playr != null){ playr.setMunicipality(StateUtil.getMunicipality(-1)); }
+								if(playr != null) playr.setMunicipality(StateUtil.getMunicipality(-1));
 								MailUtil.send(player, RecipientType.PLAYER, list_values[index].toString(), player.getGameProfile().getId().toString(), kickmsg, MailType.SYSTEM, Time.DAY_MS * 64);
 								Print.log(StateLogger.player(player) + " kicked " + list_values[index].toString() + " from " + StateLogger.municipality(mun) + ".");
 								sendListData();
@@ -1415,7 +1416,7 @@ public class ManagerContainer extends GenericContainer {
 								StateUtil.announce(null, AnnounceLevel.MUNICIPALITY, name + " &9was removed from the Municipality Council!", mun.getId());
 								Print.log(StateLogger.player(player) + " removed " + list_values[index].toString() + " from the council of " + StateLogger.municipality(mun) + ".");
 								//
-								String kickmsg = translate("states.manager_gui.list_council_municipality.rem_msg", mun.getName() + "(" + mun.getId() + ")");
+								NBTTagCompound kickmsg = wrap("states.manager_gui.list_council_municipality.rem_msg", mun.getName() + "(" + mun.getId() + ")");
 								MailUtil.send(player, RecipientType.PLAYER, list_values[index].toString(), player.getGameProfile().getId().toString(), kickmsg, MailType.SYSTEM, Time.DAY_MS * 14);
 								return;
 							}
@@ -1435,7 +1436,7 @@ public class ManagerContainer extends GenericContainer {
 								StateUtil.announce(null, AnnounceLevel.MUNICIPALITY, name + " &9was removed from the State Council!", state.getId());
 								Print.log(StateLogger.player(player) + " removed " + list_values[index].toString() + " from the council of " + StateLogger.state(state) + ".");
 								//
-								String kickmsg = translate("states.manager_gui.list_council_state.rem_msg", state.getName() + "(" + state.getId() + ")");
+								NBTTagCompound kickmsg = wrap("states.manager_gui.list_council_state.rem_msg", state.getName() + "(" + state.getId() + ")");
 								MailUtil.send(player, RecipientType.PLAYER, list_values[index].toString(), player.getGameProfile().getId().toString(), kickmsg, MailType.SYSTEM, Time.DAY_MS * 14);
 								return;
 							}
@@ -1524,7 +1525,7 @@ public class ManagerContainer extends GenericContainer {
 									sendStatus("states.manager_gui.list.a_citizen");
 									return;
 								}
-								String invmsg = translate("states.manager_gui.list_citizens_municipality.add_msg", mun.getName() + " (" + mun.getId() + ")");
+								NBTTagCompound invmsg = wrap("states.manager_gui.list_citizens_municipality.add_msg", mun.getName() + " (" + mun.getId() + ")");
 								NBTTagCompound compound = new NBTTagCompound();
 								compound.setString("type", "municipality");
 								compound.setInteger("id", mun.getId());
@@ -1532,7 +1533,7 @@ public class ManagerContainer extends GenericContainer {
 								compound.setLong("at", Time.getDate());
 								MailUtil.send(player, RecipientType.PLAYER, gp.getId().toString(), player.getGameProfile().getId().toString(), invmsg, MailType.INVITE, Time.DAY_MS * 2, compound);
 								Print.log(StateLogger.player(player) + " invited " + StateLogger.player(gp) + " to join "+ StateLogger.municipality(mun) + ".");
-								Print.chat(player, translate("states.manager_gui.list_citizens_municipality.add_done"));
+								StateTranslator.send(player, "states.manager_gui.list_citizens_municipality.add_done");
 								sendListData();
 								return;
 							}
@@ -1589,7 +1590,7 @@ public class ManagerContainer extends GenericContainer {
 									sendStatus("states.manager_gui.list_components_state.mun_no_mayor");
 									return;
 								}
-								String invmsg = translate("states.manager_gui.list_components_state.add_msg", state.getName() + " (" + state.getId() + ")");
+								NBTTagCompound invmsg = wrap("states.manager_gui.list_components_state.add_msg", state.getName() + " (" + state.getId() + ")");
 								NBTTagCompound compound = new NBTTagCompound();
 								compound.setString("type", "state_municipality");
 								compound.setInteger("id", state.getId());
@@ -1597,7 +1598,7 @@ public class ManagerContainer extends GenericContainer {
 								compound.setLong("at", Time.getDate());
 								MailUtil.send(player, RecipientType.MUNICIPALITY, invtar.getId(), player.getGameProfile().getId().toString(), invmsg, MailType.INVITE, Time.DAY_MS * 12, compound);
 								Print.log(StateLogger.player(player) + " invited " + StateLogger.municipality(invtar) + " to join the State of " + StateLogger.state(state));
-								Print.chat(player, translate("states.manager_gui.list_components_state.add_done"));
+								StateTranslator.send(player, "states.manager_gui.list_components_state.add_done");
 								sendListData();
 								return;
 							}
@@ -1621,7 +1622,7 @@ public class ManagerContainer extends GenericContainer {
 									sendStatus("states.manager_gui.list.not_a_citizen");
 									return;
 								}
-								String invmsg = translate("states.manager_gui.list_council_municipality.add_msg", mun.getName() + "(" + mun.getId() + ")");
+								NBTTagCompound invmsg = wrap("states.manager_gui.list_council_municipality.add_msg", mun.getName() + "(" + mun.getId() + ")");
 								NBTTagCompound compound = new NBTTagCompound();
 								compound.setString("type", "municipality_council");
 								compound.setInteger("id", mun.getId());
@@ -1629,7 +1630,7 @@ public class ManagerContainer extends GenericContainer {
 								compound.setLong("at", Time.getDate());
 								MailUtil.send(player, RecipientType.PLAYER, gp.getId().toString(), player.getGameProfile().getId().toString(), invmsg, MailType.INVITE, Time.DAY_MS * 5, compound);
 								Print.log(StateLogger.player(player) + " invited " + StateLogger.player(gp) + " to the council of " + StateLogger.municipality(mun) + ".");
-								Print.chat(player, translate("states.manager_gui.list_council_municipality.add_done"));
+								StateTranslator.send(player, "states.manager_gui.list_council_municipality.add_done");
 								sendListData();
 								return;
 							}
@@ -1651,14 +1652,14 @@ public class ManagerContainer extends GenericContainer {
 									sendStatus("states.manager_gui.list.not_a_citizen");
 									return;
 								}
-								String invmsg = translate("states.manager_gui.list_council_state.add_msg", state.getName() + " (" + state.getId() + ")");
+								NBTTagCompound invmsg = wrap("states.manager_gui.list_council_state.add_msg", state.getName() + " (" + state.getId() + ")");
 								NBTTagCompound compound = new NBTTagCompound();
 								compound.setString("type", "state_council");
 								compound.setInteger("id", state.getId());
 								compound.setString("from", player.getGameProfile().getId().toString());
 								compound.setLong("at", Time.getDate());
 								MailUtil.send(player, RecipientType.PLAYER, gp.getId().toString(), player.getGameProfile().getId().toString(), invmsg, MailType.INVITE, Time.DAY_MS * 5, compound);
-								Print.chat(player, translate("states.manager_gui.list_council_state.add_done"));
+								StateTranslator.send(player, "states.manager_gui.list_council_state.add_done");
 								Print.log(StateLogger.player(player) + " invited " + StateLogger.player(gp) + " to the council of " + StateLogger.state(state) + ".");
 								return;
 							}
@@ -1688,11 +1689,11 @@ public class ManagerContainer extends GenericContainer {
 	}
 
 	private void openGui(Layers layer, Mode mode, int id){
-		GuiHandler.openGui(player, layer.ordinal() + 2, mode.ordinal(), id, 0);
+		GuiHandler.openGui(player, layer.ordinal() + 1, mode.ordinal(), id, 0);
 	}
 
 	private void openGui(Layers layer, Mode mode, int x, int z){
-		GuiHandler.openGui(player, layer.ordinal() + 2, mode.ordinal(), x, z);
+		GuiHandler.openGui(player, layer.ordinal() + 1, mode.ordinal(), x, z);
 	}
 
 	private void sendStatus(String reason){
@@ -1780,21 +1781,21 @@ public class ManagerContainer extends GenericContainer {
 	public String getLayerListTitle(){
 		switch(mode){
 			case LIST_BWLIST:
-				if(layer.isChunk()) return translate("states.manager_gui.title_whitelist");
-				if(layer.isMunicipality()) return translate("states.manager_gui.title_blacklist");
-				if(layer.isState()) return translate("states.manager_gui.title_blacklist");
+				if(layer.isChunk()) return "states.manager_gui.title_whitelist";
+				if(layer.isMunicipality()) return "states.manager_gui.title_blacklist";
+				if(layer.isState()) return "states.manager_gui.title_blacklist";
 				break;
 			case LIST_CITIZENS:
-				return translate("states.manager_gui.title_citizens");
+				return "states.manager_gui.title_citizens";
 			case LIST_COMPONENTS:
-				if(layer.isChunk()) return translate("states.manager_gui.title_links");
-				if(layer.isMunicipality()) return translate("states.manager_gui.title_ditricts");
-				if(layer.isState()) return translate("states.manager_gui.title_municipalities");
+				if(layer.isChunk()) return "states.manager_gui.title_links";
+				if(layer.isMunicipality()) return "states.manager_gui.title_ditricts";
+				if(layer.isState()) return "states.manager_gui.title_municipalities";
 				break;
 			case LIST_COUNCIL:
-				return translate("states.manager_gui.title_council");
+				return "states.manager_gui.title_council";
 			case LIST_NEIGHBORS:
-				return translate("states.manager_gui.title_neighbors");
+				return "states.manager_gui.title_neighbors";
 			default: break;
 		}
 		return "INVALID_TYPE";
@@ -1807,13 +1808,13 @@ public class ManagerContainer extends GenericContainer {
 	private boolean isPermitted(Chunk chunk, EntityPlayer player, boolean individual){
 		if(chunk.getLink() != null && !individual){
 			ChunkPos link = chunk.getLink();
-			Print.chat(player, translate("states.manager_gui.perm_chunk.linked0", link.x, link.z));
-			Print.chat(player, translate("states.manager_gui.perm_chunk.linked1"));
-			Print.chat(player, translate("states.manager_gui.perm_chunk.linked2"));
+			StateTranslator.send(player, "states.manager_gui.perm_chunk.linked0", link.x, link.z);
+			StateTranslator.send(player, "states.manager_gui.perm_chunk.linked1");
+			StateTranslator.send(player, "states.manager_gui.perm_chunk.linked2");
 			return false;
 		}
 		if(bypass(player)){
-			Print.chat(player, translate("states.manager_gui.perm_admin.bypass"));
+			StateTranslator.send(player, "states.manager_gui.perm_admin.bypass");
 			return true;
 		}
 		boolean result = false;
@@ -1844,13 +1845,13 @@ public class ManagerContainer extends GenericContainer {
 	private boolean isOwner(Chunk chunk2, EntityPlayer player){
 		if(chunk.getLink() != null){
 			ChunkPos link = chunk.getLink();
-			Print.chat(player, translate("states.manager_gui.perm_chunk.linked0", link.x, link.z));
-			Print.chat(player, translate("states.manager_gui.perm_chunk.linked1"));
-			Print.chat(player, translate("states.manager_gui.perm_chunk.linked2"));
+			StateTranslator.send(player, "states.manager_gui.perm_chunk.linked0", link.x, link.z);
+			StateTranslator.send(player, "states.manager_gui.perm_chunk.linked1");
+			StateTranslator.send(player, "states.manager_gui.perm_chunk.linked2");
 			return false;
 		}
 		if(bypass(player)){
-			Print.chat(player, translate("states.manager_gui.perm_admin.bypass"));
+			StateTranslator.send(player, "states.manager_gui.perm_admin.bypass");
 			return true;
 		}
 		boolean result = false;

@@ -138,7 +138,7 @@ public class MailCmd extends CommandBase {
 					String str = stack.getTagCompound().getString("Type");
 					Print.chat(player, "&9From: &7" + Static.getPlayerNameByUUID(stack.getTagCompound().getString("Sender")));
 					Print.chat(player, "&9Type: &7" + str);
-					Print.chat(player, stack.getTagCompound().getString("Content"));
+					Print.chat(player, stack.getTagCompound().getCompoundTag("Content"));
 					Print.chat(player, "&cExpires: &7" + Time.getAsString(stack.getTagCompound().getLong("Expiry")));
 					if(str.toLowerCase().equals("invite") && stack.getTagCompound().hasKey("StatesData")){
 						TextComponentString text = new TextComponentString(Formatter.format("&a&l[ACCEPT] "));

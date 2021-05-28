@@ -31,14 +31,28 @@ public class MailUtil {
 	private static final String PRFX = "[StatesMail]";
 	
 	public static boolean send(ICommandSender ics, RecipientType rectype, Object receiver, String sender, String message, MailType type){
-		return send(ics, rectype, receiver, sender, message, type, Time.DAY_MS * 14);
+		return send(ics, rectype, receiver, sender, StateTranslator.wrap(message), type, Time.DAY_MS * 14);
 	}
 
 	public static boolean send(ICommandSender ics, RecipientType rectype, Object receiver, String sender, String message, MailType type, long expiry){
-		return send(ics, rectype, receiver, sender, message, type, Time.DAY_MS * 14, null);
+		return send(ics, rectype, receiver, sender, StateTranslator.wrap(message), type, Time.DAY_MS * 14, null);
 	}
 
 	public static boolean send(ICommandSender ics, RecipientType rectype, Object receiver, String sender, String message, MailType type, long expiry, NBTTagCompound compound){
+		return send(ics, rectype, receiver, sender, StateTranslator.wrap(message), type, expiry, compound);
+	}
+	
+	//
+	
+	public static boolean send(ICommandSender ics, RecipientType rectype, Object receiver, String sender, NBTTagCompound message, MailType type){
+		return send(ics, rectype, receiver, sender, message, type, Time.DAY_MS * 14);
+	}
+
+	public static boolean send(ICommandSender ics, RecipientType rectype, Object receiver, String sender, NBTTagCompound message, MailType type, long expiry){
+		return send(ics, rectype, receiver, sender, message, type, Time.DAY_MS * 14, null);
+	}
+
+	public static boolean send(ICommandSender ics, RecipientType rectype, Object receiver, String sender, NBTTagCompound message, MailType type, long expiry, NBTTagCompound compound){
 		try{//This was initially intended to run on a separate thread.
 			World world = Static.getServer().getWorld(0);
 			if(world == null){
@@ -139,15 +153,15 @@ public class MailUtil {
 		return false;
 	}
 
-	private static boolean insert(NBTTagCompound com, SignMailbox box, RecipientType rectype, String receiver, String sender, String message, MailType type, long expiry, NBTTagCompound compound){
+	private static boolean insert(NBTTagCompound com, SignMailbox box, RecipientType rectype, String receiver, String sender, NBTTagCompound message, MailType type, long expiry, NBTTagCompound compound){
 		try{
 			ItemStack stack = new ItemStack(MailItem.INSTANCE, 1, type.toMetadata());
 			NBTTagCompound nbt = new NBTTagCompound();
 			nbt.setString("Receiver", rectype.name().toLowerCase() + ":" + receiver);
 			nbt.setString("Sender", sender);
-			nbt.setString("Message", message);
+			nbt.setTag("Message", message);
 			nbt.setString("Type", type.name());
-			nbt.setString("Content", message);
+			nbt.setTag("Content", message);
 			if(compound != null) nbt.setTag("StatesData", compound);
 			if(expiry > 0) nbt.setLong("Expiry", Time.getDate() + expiry);
 			stack.setTagCompound(nbt);
@@ -165,7 +179,7 @@ public class MailUtil {
 		}
 	}
 
-	private static void printFailure(ICommandSender ics, int i, RecipientType rectype, Object receiver, String sender, String message, MailType type, long expiry, NBTTagCompound compound, RecipientType rety, Object rec){
+	private static void printFailure(ICommandSender ics, int i, RecipientType rectype, Object receiver, String sender, NBTTagCompound message, MailType type, long expiry, NBTTagCompound compound, RecipientType rety, Object rec){
 		if(ics != null) Print.chat(ics, "Mail couldn't be sent, see log for details. ERRLVL:(" + i + ");");
 		Print.log(PRFX + " Mailbox for receiver '" + receiver.toString() + (rec == null ? "" : "/" + rec.toString()) + "' not found or errored! Message cannot be sent!");
 		Print.log(PRFX + " Content: " + message);

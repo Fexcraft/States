@@ -292,7 +292,7 @@ public class Chunk implements Layer, Taxable {
 	}
 	
 	public State getState(){
-		return district.getMunicipality().getState();
+		return district.getState();
 	}
 
 	public boolean isRuleAuthorized(UUID uuid){

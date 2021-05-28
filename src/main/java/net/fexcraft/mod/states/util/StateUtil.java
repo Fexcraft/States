@@ -20,7 +20,6 @@ import com.google.gson.JsonObject;
 import com.mojang.authlib.GameProfile;
 
 import net.fexcraft.lib.common.json.JsonUtil;
-import net.fexcraft.lib.mc.utils.Formatter;
 import net.fexcraft.lib.mc.utils.Print;
 import net.fexcraft.lib.mc.utils.Static;
 import net.fexcraft.mod.states.States;
@@ -40,10 +39,10 @@ import net.fexcraft.mod.states.data.sub.Manageable;
 import net.minecraft.command.ICommandSender;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
+import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3d;
-import net.minecraft.util.text.TextComponentString;
 import net.minecraftforge.fml.common.FMLCommonHandler;
 
 public class StateUtil extends TimerTask {
@@ -242,22 +241,39 @@ public class StateUtil extends TimerTask {
 			return gp == null ? null : getPlayer(gp.getId(), loadtemp);
 		}
 	}
+	
+	//
 
 	public static void announce(MinecraftServer server, String string){
-		announce(server, AnnounceLevel.ALL, string, 0);
+		announce(server, AnnounceLevel.ALL, StateTranslator.wrap(string), 0);
 		return;
 	}
 	
 	public static void announce(MinecraftServer server, AnnounceLevel level, String string, int range){
-		announce(server, level, string, range, null);
+		announce(server, level, StateTranslator.wrap(string), range, null);
 	}
 
 	public static void announce(MinecraftServer server, AnnounceLevel level, String string, int range, ICommandSender sender){
+		announce(server, level, StateTranslator.wrap(string), range, sender);
+	}
+	
+	//
+
+	public static void announce(MinecraftServer server, NBTTagCompound wrapped){
+		announce(server, AnnounceLevel.ALL, wrapped, 0);
+		return;
+	}
+	
+	public static void announce(MinecraftServer server, AnnounceLevel level, NBTTagCompound wrapped, int range){
+		announce(server, level, wrapped, range, null);
+	}
+
+	public static void announce(MinecraftServer server, AnnounceLevel level, NBTTagCompound wrapped, int range, ICommandSender sender){
 		server = server == null ? Static.getServer() : server;
 		switch(level){
 			case ALL:
-				server.getPlayerList().sendMessage(new TextComponentString(Formatter.format(string)), true);
-				MessageSender.toWebhook(null, string);
+				server.getPlayerList().getPlayers().forEach(player -> StateTranslator.send(player, wrapped));
+				//TODO MessageSender.toWebhook(null, string);
 				break;
 			case UNION:
 				//TODO doesn't exists yet.
@@ -265,43 +281,59 @@ public class StateUtil extends TimerTask {
 			case STATE:
 				server.getPlayerList().getPlayers().forEach(player -> {
 					PlayerCapability playerdata;
-					if((playerdata = player.getCapability(StatesCapabilities.PLAYER, null)) != null && playerdata.getMunicipality().getState().getId() == range){
-						Print.chat(player, string);
+					if((playerdata = player.getCapability(StatesCapabilities.PLAYER, null)) != null && playerdata.getState().getId() == range){
+						StateTranslator.send(player, wrapped);
 					}
 				});
 				break;
 			case STATE_ALL:
 				server.getPlayerList().getPlayers().forEach(player -> {
-					if(StateUtil.getChunk(player).getDistrict().getMunicipality().getState().getId() == range){
-						Print.chat(player, string);
+					if(StateUtil.getChunk(player).getState().getId() == range){
+						StateTranslator.send(player, wrapped);
+					}
+				});
+				break;
+			case COUNTY:
+				server.getPlayerList().getPlayers().forEach(player -> {
+					PlayerCapability playerdata;
+					if((playerdata = player.getCapability(StatesCapabilities.PLAYER, null)) != null && playerdata.getCounty().getId() == range){
+						StateTranslator.send(player, wrapped);
+					}
+				});
+				break;
+			case COUNTY_ALL:
+				server.getPlayerList().getPlayers().forEach(player -> {
+					if(StateUtil.getChunk(player).getCounty().getId() == range){
+						StateTranslator.send(player, wrapped);
 					}
 				});
 				break;
 			case MUNICIPALITY:
 				server.getPlayerList().getPlayers().forEach(player -> {
 					PlayerCapability playerdata;
-					if((playerdata = player.getCapability(StatesCapabilities.PLAYER, null)) != null && playerdata.getMunicipality().getId() == range){
-						Print.chat(player, string);
+					if((playerdata = player.getCapability(StatesCapabilities.PLAYER, null)) != null && playerdata.getMunicipality() != null && playerdata.getMunicipality().getId() == range){
+						StateTranslator.send(player, wrapped);
 					}
 				});
 				break;
 			case MUNICIPALITY_ALL:
 				server.getPlayerList().getPlayers().forEach(player -> {
-					if(StateUtil.getChunk(player).getDistrict().getMunicipality().getId() == range){
-						Print.chat(player, string);
+					Chunk chunk = StateUtil.getChunk(player);
+					if(chunk.getMunicipality() != null && chunk.getMunicipality().getId() == range){
+						StateTranslator.send(player, wrapped);
 					}
 				});
 				break;
 			case DISTRICT:
 				server.getPlayerList().getPlayers().forEach(player -> {
 					if(StateUtil.getChunk(player).getDistrict().getId() == range){
-						Print.chat(player, string);
+						StateTranslator.send(player, wrapped);
 					}
 				});
 				break;
 			case AREAL:
 				List<EntityPlayerMP> players = getPlayersInRange(server, sender, range);
-				players.forEach(player -> { Print.chat(player, string); });
+				players.forEach(player -> StateTranslator.send(player, wrapped));
 				break;
 			default:
 				break;
@@ -340,7 +372,7 @@ public class StateUtil extends TimerTask {
 
 	public static boolean bypass(EntityPlayer player){
 		if(isAdmin(player)){
-			Print.chat(player, translate("states.manager_gui.perm_admin.bypass"));
+			StateTranslator.send(player, "states.manager_gui.perm_admin.bypass");
 			return true;
 		}
 		else return false;
@@ -488,19 +520,6 @@ public class StateUtil extends TimerTask {
 		States.MUNICIPALITIES.clear();
 		States.COUNTIES.clear();
 		States.STATES.clear();
-	}
-	
-	@SuppressWarnings("deprecation")
-	public static String translate(String key){
-		return net.minecraft.util.text.translation.I18n.translateToLocal(key);
-	}
-	
-	public static String translate(String key, Object... format){
-		String str = translate(key);
-		for(int i = 0; i < format.length; i++){
-			str = str.replace("$" + i, format[i].toString());
-		}
-		return str;
 	}
 	
 	//

@@ -1,5 +1,7 @@
 package net.fexcraft.mod.states.guis;
 
+import static net.fexcraft.mod.states.util.StateTranslator.unwrap;
+
 import net.fexcraft.lib.common.math.Time;
 import net.fexcraft.lib.mc.api.packet.IPacketListener;
 import net.fexcraft.lib.mc.capabilities.FCLCapabilities;
@@ -8,6 +10,7 @@ import net.fexcraft.lib.mc.render.ExternalTextureHelper;
 import net.fexcraft.lib.mc.utils.Formatter;
 import net.fexcraft.lib.mc.utils.Print;
 import net.fexcraft.mod.states.impl.SignMailbox;
+import net.fexcraft.mod.states.util.StateTranslator;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTBase;
@@ -34,10 +37,10 @@ public class Receiver implements IPacketListener<PacketNBTTagCompound> {
 				int t = packet.nbt.hasKey("time") ? packet.nbt.getInteger("time") : 5;
 				LocationUpdate.till = Time.getDate() + (t * 2000);
 				//
-				LocationUpdate.lines[0] = Formatter.format(packet.nbt.getString("line0"));
-				LocationUpdate.lines[1] = Formatter.format(packet.nbt.getString("line1"));
-				LocationUpdate.lines[2] = Formatter.format(packet.nbt.getString("line2"));
-				LocationUpdate.lines[3] = Formatter.format(packet.nbt.getString("line3"));
+				LocationUpdate.lines[0] = packet.nbt.hasKey("line0") ? Formatter.format(unwrap(packet.nbt.getCompoundTag("line0"))) : "";
+				LocationUpdate.lines[1] = packet.nbt.hasKey("line1") ? Formatter.format(unwrap(packet.nbt.getCompoundTag("line1"))) : "";
+				LocationUpdate.lines[2] = packet.nbt.hasKey("line2") ? Formatter.format(unwrap(packet.nbt.getCompoundTag("line2"))) : "";
+				LocationUpdate.lines[3] = packet.nbt.hasKey("line3") ? Formatter.format(unwrap(packet.nbt.getCompoundTag("line3"))) : "";
 				for(int i = 0; i < 5; i++){
 					LocationUpdate.icon[i] = packet.nbt.hasKey("icon_" + i) ? ExternalTextureHelper.get(packet.nbt.getString("icon_" + i)) : null;
 					LocationUpdate.x[i] = packet.nbt.hasKey("x_" + i) ? packet.nbt.getInteger("x_" + i) : 0;
@@ -83,6 +86,10 @@ public class Receiver implements IPacketListener<PacketNBTTagCompound> {
 				SignMailbox box = player.world.getTileEntity(mailbox).getCapability(FCLCapabilities.SIGN_CAPABILITY, null).getListener(SignMailbox.class, SignMailbox.RESLOC);
 				box.getMails().clear(); NBTTagList list = (NBTTagList)packet.nbt.getTag("mails");
 				for(NBTBase base : list) box.getMails().add(new ItemStack((NBTTagCompound)base));
+				return;
+			}
+			case "chat_msg":{
+				StateTranslator.chat((EntityPlayer)objs[0], packet.nbt);
 				return;
 			}
 		}

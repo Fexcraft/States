@@ -1386,7 +1386,7 @@ public class ManagerContainer extends GenericContainer {
 									sendStatus("states.manager_gui.list_components_state.cannot_kick_capital");
 									return;
 								}
-								kicktar.setState(StateUtil.getState(-1));
+								//TODO kicktar.setState(StateUtil.getState(-1));
 								kicktar.created.update();
 								kicktar.save();
 								state.getMunicipalities().removeIf(val -> val == kicktar.getId());

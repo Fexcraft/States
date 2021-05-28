@@ -69,13 +69,9 @@ public class Municipality implements Layer, AccountHolder, Populated {
 		citizen = JsonUtil.jsonArrayToUUIDArray(JsonUtil.getIfExists(obj, "citizen", new JsonArray()).getAsJsonArray());
 		if(!obj.has("county")){
 			State state = StateUtil.getState(JsonUtil.getIfExists(obj, "state", -1).intValue());
-			if(state.getCounties().size() > 0){
-				county = StateUtil.getCounty(state.getCounties().get(0));
-			}
-			else{
-				county = new County(StateUtil.CURRENT.newCountyId());
-				county.setState(state);
-			}
+			county = new County(StateUtil.CURRENT.newCountyId());
+			county.setName(name + " County");
+			county.setState(state);
 			setCounty(county);
 		}
 		else county = StateUtil.getCounty(JsonUtil.getIfExists(obj, "county", -1).intValue());

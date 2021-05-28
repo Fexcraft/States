@@ -335,7 +335,7 @@ public class PlayerEvents {
 			}
 			if(player.getCurrentChunk().getDistrict() != player.getLastChunk().getDistrict()){
 				Chunk chunk = player.getCurrentChunk();
-				sendLocationUpdate(event.player, chunk, chunk.getDistrict().getMunicipality().getState().getName(), chunk.getDistrict().getMunicipality().getName(), chunk.getDistrict().getName(), "placeholder", 0);
+				sendLocationUpdate(event.player, chunk, chunk.getState().getName(), chunk.getCounty().getName(), chunk.getMunicipality() == null ? null : chunk.getMunicipality().getName(), chunk.getDistrict().getName(), 0);
 			}
 		}
 	}
@@ -345,7 +345,7 @@ public class PlayerEvents {
 		nbt.setString("target_listener", "states:gui");
 		nbt.setString("task", "show_location_update");
 		writeLocPacketIcon(nbt, chunk == null ? null : chunk.getDistrict().getMunicipality().getState().icon, 0, IconHolder.PACKET_COLOURS.get(1));
-		writeLocPacketIcon(nbt, chunk == null ? null : chunk.getDistrict().getMunicipality().getState().icon, 1, IconHolder.PACKET_COLOURS.get(2));
+		writeLocPacketIcon(nbt, chunk == null ? null : chunk.getDistrict().getMunicipality().getCounty().icon, 1, IconHolder.PACKET_COLOURS.get(2));
 		writeLocPacketIcon(nbt, chunk == null ? null : chunk.getDistrict().getMunicipality().icon, 2, IconHolder.PACKET_COLOURS.get(0));
 		writeLocPacketIcon(nbt, chunk == null ? null : chunk.getDistrict().icon, 3, IconHolder.PACKET_COLOURS.get(3));
 		writeLocPacketIcon(nbt, StConfig.SERVER_ICONHOLDER, 4, IconHolder.PACKET_COLOURS.get(0));

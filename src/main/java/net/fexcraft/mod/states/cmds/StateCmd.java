@@ -196,7 +196,7 @@ public class StateCmd extends CommandBase {
 						if(halfprice == 0 || bank.processAction(Bank.Action.TRANSFER, sender, ply.getMunicipality().getAccount(), halfprice, States.SERVERACCOUNT)){
 							bank.processAction(Bank.Action.TRANSFER, null, ply.getMunicipality().getAccount(), halfprice, newstate.getAccount());
 							newstate.save(); States.STATES.put(newstate.getId(), newstate);
-							ply.getMunicipality().setState(newstate);
+							//TODO ply.getMunicipality().setState(newstate);
 							ply.getMunicipality().created.update();
 							ply.getMunicipality().save();
 							StateUtil.announce(server, "&9New State was created!");

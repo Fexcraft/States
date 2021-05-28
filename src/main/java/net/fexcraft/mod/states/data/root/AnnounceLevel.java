@@ -7,6 +7,8 @@ public enum AnnounceLevel {
 	UNION_ALL(true),
 	STATE(false),
 	STATE_ALL(true),
+	COUNTY(false),
+	COUNTY_ALL(true),
 	MUNICIPALITY(false),
 	MUNICIPALITY_ALL(true),
 	DISTRICT(true),

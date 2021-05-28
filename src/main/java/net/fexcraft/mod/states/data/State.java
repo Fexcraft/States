@@ -109,7 +109,7 @@ public class State implements Layer, AccountHolder, Populated {
 		created.save(obj);
 		manage.save(obj);
 		neighbors.save(obj);
-		obj.add("county", JsonUtil.getArrayFromIntegerList(counties));
+		obj.add("counties", JsonUtil.getArrayFromIntegerList(counties));
 		obj.addProperty("capital", capital);
 		obj.addProperty("balance", account.getBalance());
 		color.save(obj);

@@ -415,15 +415,26 @@ public class StateUtil extends TimerTask {
 			for(Municipality mun : collM){
 				if(States.DISTRICTS.values().stream().filter(pre -> pre.getMunicipality().getId() == mun.getId()).count() <= 0){
 					States.MUNICIPALITIES.remove(mun.getId());
-					mun.save(); mun.unload();
+					mun.save();
+					mun.unload();
+				}
+			}
+			Print.debug("Scheduled check for inactive counties.");
+			ImmutableList<County> collC = ImmutableList.copyOf(States.COUNTIES.values());
+			for(County ct : collC){
+				if(States.DISTRICTS.values().stream().filter(pre -> pre.getCounty().getId() == ct.getId()).count() <= 0){
+					States.COUNTIES.remove(ct.getId());
+					ct.save();
+					ct.unload();
 				}
 			}
 			Print.debug("Scheduled check for inactive states.");
 			ImmutableList<State> collS = ImmutableList.copyOf(States.STATES.values());
 			for(State state : collS){
-				if(States.MUNICIPALITIES.values().stream().filter(pre -> pre.getState().getId() == state.getId()).count() <= 0){
+				if(States.COUNTIES.values().stream().filter(pre -> pre.getState().getId() == state.getId()).count() <= 0){
 					States.STATES.remove(state.getId());
-					state.save(); state.unload();
+					state.save();
+					state.unload();
 				}
 			}
 			Print.debug("Scheduled check for offline user cache.");
@@ -431,7 +442,8 @@ public class StateUtil extends TimerTask {
 			for(PlayerCapability cap : collP){
 				if(!cap.isOnlinePlayer()){
 					States.PLAYERS.remove(cap.getUUID());
-					cap.save(); cap.unload();
+					cap.save();
+					cap.unload();
 				}
 			}
 			Print.debug("Scheduled check for expired Votes.");
@@ -439,7 +451,8 @@ public class StateUtil extends TimerTask {
 			for(Vote vote : votes){
 				if(vote.expired(null)){
 					States.VOTES.remove(vote.id);
-					vote.save(); vote.unload();
+					vote.save();
+					vote.unload();
 				}
 			}
 		}
@@ -450,14 +463,31 @@ public class StateUtil extends TimerTask {
 	}
 
 	public static final void unloadAll(){
-		for(District dis : States.DISTRICTS.values()){ dis.save(); }
-		for(Municipality mun : States.MUNICIPALITIES.values()){ mun.save(); mun.unload(); }
-		for(State state : States.STATES.values()){ state.save(); state.unload(); }
-		for(Vote vote : States.VOTES.values()){ vote.save(); }
+		for(District dis : States.DISTRICTS.values()){
+			dis.save();
+		}
+		for(Municipality mun : States.MUNICIPALITIES.values()){
+			mun.save();
+			mun.unload();
+		}
+		for(County county : States.COUNTIES.values()){
+			county.save();
+			county.unload();
+		}
+		for(State state : States.STATES.values()){
+			state.save();
+			state.unload();
+		}
+		for(Vote vote : States.VOTES.values()){
+			vote.save();
+		}
 	}
 
 	public static void clearAll(){
-		States.DISTRICTS.clear(); States.MUNICIPALITIES.clear(); States.STATES.clear();
+		States.DISTRICTS.clear();
+		States.MUNICIPALITIES.clear();
+		States.COUNTIES.clear();
+		States.STATES.clear();
 	}
 	
 	@SuppressWarnings("deprecation")
@@ -476,12 +506,18 @@ public class StateUtil extends TimerTask {
 	//
 	
 	public static TreeMap<Integer, String> NAMECACHE_STATE = new TreeMap<>();
+	public static TreeMap<Integer, String> NAMECACHE_COUNTY = new TreeMap<>();
 	public static TreeMap<Integer, String> NAMECACHE_MUNICIPALITY = new TreeMap<>();
 	public static TreeMap<Integer, String> NAMECACHE_DISTRICT = new TreeMap<>();
 	
 	public static String getStateName(int id){
 		State state = States.STATES.get(id);
 		return state == null ? NAMECACHE_STATE.get(id) : state.getName();
+	}
+	
+	public static String getCountyName(int id){
+		County ct = States.COUNTIES.get(id);
+		return ct == null ? NAMECACHE_COUNTY.get(id) : ct.getName();
 	}
 	
 	public static String getMunicipalityName(int id){
@@ -500,9 +536,11 @@ public class StateUtil extends TimerTask {
 			@Override
 			public void run(){
 				NAMECACHE_STATE.clear();
+				NAMECACHE_COUNTY.clear();
 				NAMECACHE_MUNICIPALITY.clear();
 				NAMECACHE_DISTRICT.clear();
 				search(NAMECACHE_STATE, new File(States.getSaveDirectory(), "states/"));
+				search(NAMECACHE_COUNTY, new File(States.getSaveDirectory(), "counties/"));
 				search(NAMECACHE_MUNICIPALITY, new File(States.getSaveDirectory(), "municipalitites/"));
 				search(NAMECACHE_DISTRICT, new File(States.getSaveDirectory(), "districts/"));
 			}

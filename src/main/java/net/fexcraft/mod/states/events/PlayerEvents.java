@@ -4,6 +4,7 @@ import static net.fexcraft.mod.states.data.sub.IconHolder.writeLocPacketIcon;
 
 import java.util.UUID;
 
+import net.fexcraft.lib.common.Static;
 import net.fexcraft.lib.common.math.Time;
 import net.fexcraft.lib.mc.capabilities.FCLCapabilities;
 import net.fexcraft.lib.mc.capabilities.sign.SignCapability;
@@ -77,7 +78,7 @@ public class PlayerEvents {
 		if(player.hasRelevantVotes()) StateTranslator.send(event.player, "states.welcome_msg.pending_votes", player.getRelevantVotes().size()); 
 		Print.chat(event.player, "&e====-====-====-====-====-====" + States.PREFIX);
 		sendLocationUpdate(event.player, null, StateTranslator.wrap("states.welcome_msg.welcome_back", player.getFormattedNickname()), null, null, null, 3);
-		if(UpdateHandler.STATE != null){
+		if(UpdateHandler.STATE != null && !Static.dev()){
 			Print.chat(event.player, UpdateHandler.STATE);
 		}
 		//

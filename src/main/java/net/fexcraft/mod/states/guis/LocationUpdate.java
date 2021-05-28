@@ -36,7 +36,11 @@ public class LocationUpdate extends GuiScreen {
 		if(event.getType() != ElementType.HOTBAR || !shown()) return;
 		if(client == null)client = Minecraft.getMinecraft();
 		ModelBase.bindTexture(texture);
-		THIS.drawTexturedModalRect(0, 0, 0, 0, 140, 38);
+		THIS.drawTexturedModalRect(0, 0, 0, 0, 38, 38);
+		THIS.drawTexturedModalRect(38, 0, 38, 0, 24, 30);
+		THIS.drawTexturedModalRect(62, 4, 62, 4, 16, 22);
+		THIS.drawTexturedModalRect(78, 0, 78, 0, 24, 30);
+		THIS.drawTexturedModalRect(102, 0, 102, 0, 38, 38);
 		Tessellator tessellator = Tessellator.getInstance();
         BufferBuilder bufferbuilder = tessellator.getBuffer();
 		//

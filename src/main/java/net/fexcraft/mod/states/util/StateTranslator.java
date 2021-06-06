@@ -42,7 +42,7 @@ public class StateTranslator {
 	
 	/** Server Side */
 	public static void send(ICommandSender sender, String msg, Object... args){
-		if(sender instanceof EntityPlayer) return;
+		if(sender instanceof EntityPlayer == false) return;
 		send((EntityPlayer)sender, msg, args);
 	}
 

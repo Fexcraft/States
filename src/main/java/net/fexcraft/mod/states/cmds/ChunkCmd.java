@@ -3,6 +3,7 @@ package net.fexcraft.mod.states.cmds;
 import static net.fexcraft.mod.states.guis.GuiHandler.CLAIM_MAP;
 import static net.fexcraft.mod.states.guis.GuiHandler.MANAGER_CHUNK;
 import static net.fexcraft.mod.states.guis.GuiHandler.openGui;
+import static net.fexcraft.mod.states.util.StateTranslator.send;
 
 import java.util.List;
 import java.util.UUID;
@@ -74,22 +75,24 @@ public class ChunkCmd extends CommandBase {
 		}
 		EntityPlayer player = (EntityPlayer)sender.getCommandSenderEntity();
 		if(args.length == 0){
-			Print.chat(sender, "&7/ck claim <args>");
-			Print.chat(sender, "&7/ck reclaim <args>");
-			Print.chat(sender, "&7/ck tempclaim");
-			if(StConfig.ALLOW_CHUNK_UNCLAIM) Print.chat(sender, "&8/ck unclaim");
-			Print.chat(sender, "&7/ck info");
-			Print.chat(sender, "&7/ck map");
-			Print.chat(sender, "&7/ck buy");
-			//Print.chat(sender, "&7/ck link <args>");
-			Print.chat(sender, "&7/ck force-load <true/false>");
-			//Print.chat(sender, "&7/ck queue");
-			Print.chat(sender, "&7/ck types");
-			if(StateUtil.isAdmin(player)){
-				Print.chat(sender, "&cAdmin CMDs");
-				if(!StConfig.ALLOW_CHUNK_UNCLAIM)Print.chat(sender, "&a/ck unclaim");
-				Print.chat(sender, "&a/ck update <option:range>");
-				Print.chat(sender, "&a/ck set-district <id>");
+			boolean admin = StateUtil.isAdmin(player);
+			if(admin)
+				send(sender, "cmd.chunk.help.normal-cmds");
+			send(sender, "cmd.chunk.help.claim");
+			send(sender, "cmd.chunk.help.reclaim");
+			send(sender, "cmd.chunk.help.tempclaim");
+			if(StConfig.ALLOW_CHUNK_UNCLAIM)
+				send(sender, "cmd.chunk.help.unclaim");
+			send(sender, "cmd.chunk.help.info");
+			send(sender, "cmd.chunk.help.map");
+			send(sender, "cmd.chunk.help.buy");
+			send(sender, "cmd.chunk.help.force-load");
+			send(sender, "cmd.chunk.help.types");
+			if(admin){
+				send(sender, "cmd.chunk.help.admin-cmds");
+				if(!StConfig.ALLOW_CHUNK_UNCLAIM)
+					send(sender, "cmd.chunk.help.unclaim");
+				send(sender, "cmd.chunk.help.set-district");
 			}
 			return;
 		}

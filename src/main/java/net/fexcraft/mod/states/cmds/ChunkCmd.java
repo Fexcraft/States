@@ -34,7 +34,6 @@ import net.minecraft.command.CommandException;
 import net.minecraft.command.ICommandSender;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.server.MinecraftServer;
-import net.minecraft.util.math.BlockPos;
 
 public class ChunkCmd extends CommandBase {
 
@@ -151,49 +150,6 @@ public class ChunkCmd extends CommandBase {
 				openGui(player, MANAGER_CHUNK, ManagerContainer.Mode.CKINFO.ordinal(), chunk.xCoord(), chunk.zCoord());
 				return;
 			}
-			case "update":{
-				/*if(hasPerm("chunk.update", player, chunk)){
-					int range = args.length > 1 ? Integer.parseInt(args[1]) : 0;
-					if(range <= 0){
-						ImageCache.update(player.world, player.world.getChunkFromChunkCoords(chunk.xCoord(), chunk.zCoord()));
-						Print.chat(sender, "&9Queued for map update.");
-						Print.log(Print.loggerType.CHUNK, StateLogger.player(player) + " queued " + StateLogger.chunk(chunk) + " for map update.");
-					}
-					else{
-						if(range > 3 && !hasPerm("admin", player, chunk)){
-							Print.chat(sender, "&cNo permission for larger update requests.");
-							return;
-						}
-						int r = (range * 2) + 1;
-						int c = 0;
-						for(int i = 0; i < r; i++){
-							for(int j = 0; j < r; j++){
-								int x = (chunk.xCoord() - range) + i;
-								int z = (chunk.zCoord() - range) + j;
-								Chunk ck = StateUtil.getChunk(x, z);
-								if(ck == null){
-									continue;
-								}
-								c++;
-								ImageCache.update(player.world, player.world.getChunkFromChunkCoords(x, z));
-							}
-						}
-						Print.chat(sender, "&2" + c + " &9chunks queued for map update.");
-						Print.chat(sender, "&9There is &21 &9map mode activated.");
-						Print.log(Print.loggerType.CHUNK, StateLogger.player(player) + " queued " + c + " chunks for map update, with the center being " + StateLogger.chunk(chunk) + ".");
-					}
-				}
-				else{
-					Print.chat(sender, "&cNo Permission.");
-				}*/
-				send(sender, "cmd.feature.disabled");
-				return;
-			}
-			/*case "queue":{
-				Print.chat(sender, "&9There are &2" + ImageCache.getQueue().size() + "&9 chunk map updates queued.");
-				Print.chat(sender, "&9Current Config allows for &3" + StConfig.MAP_UPDATES_PER_SECOND + "&9 map updates per second.");
-				return;
-			}*/
 			case "unclaim":{
 				if(StateUtil.isAdmin(player) || (StConfig.ALLOW_CHUNK_UNCLAIM && playerdata.isMayorOf(chunk.getMunicipality()))){
 					Integer asmun = !StateUtil.isAdmin(player) ? chunk.getMunicipality().getId() : null;
@@ -259,19 +215,6 @@ public class ChunkCmd extends CommandBase {
 			}
 			case "buy":{
 				//TODO add check for companies, based on their type
-				if(args.length >= 3 && args[1].equals("via-sign")){
-					try{
-						chunk = StateUtil.getChunk(BlockPos.fromLong(Long.parseLong(args[2])));
-					}
-					catch(Exception e){
-						Print.chat(sender, "&9Error: &7" + e.getMessage());
-						return;
-					}
-					if(chunk == null){
-						Print.chat(sender, "Chunk couldn't be found, maybe it isn't loaded?");
-						return;
-					}
-				}
 				if(chunk.getDistrict().getId() < 0){
 					Print.chat(sender, "Only claimed chunks can be bought.");
 					return;

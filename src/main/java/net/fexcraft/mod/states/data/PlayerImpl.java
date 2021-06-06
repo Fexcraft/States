@@ -162,7 +162,12 @@ public class PlayerImpl implements PlayerCapability {
 
 	@Override
 	public boolean isMayorOf(Municipality municipality){
-		return municipality.manage.getHead() != null && municipality.manage.getHead().equals(getUUID());
+		return municipality != null && municipality.manage.getHead() != null && municipality.manage.getHead().equals(getUUID());
+	}
+
+	@Override
+	public boolean isCountyManagerOf(County county){
+		return county.manage.getHead() != null && county.manage.getHead().equals(getUUID());
 	}
 
 	@Override

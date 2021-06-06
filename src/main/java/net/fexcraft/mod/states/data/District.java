@@ -10,6 +10,7 @@ import net.fexcraft.mod.states.States;
 import net.fexcraft.mod.states.data.root.Initiator;
 import net.fexcraft.mod.states.data.root.Layer;
 import net.fexcraft.mod.states.data.root.Layers;
+import net.fexcraft.mod.states.data.root.MunCt;
 import net.fexcraft.mod.states.data.sub.Buyable;
 import net.fexcraft.mod.states.data.sub.ColorData;
 import net.fexcraft.mod.states.data.sub.Createable;
@@ -29,8 +30,7 @@ public class District implements Layer {
 	private DistrictType type;
 	private long chunktax;
 	private String name;
-	private Municipality municipality;
-	private County county;
+	private MunCt munct = new MunCt(this);
 	//
 	public IconHolder icon = new IconHolder();
 	public ColorData color = new ColorData();
@@ -54,9 +54,11 @@ public class District implements Layer {
 		manage.load(obj);
 		neighbors.load(obj);
 		name = JsonUtil.getIfExists(obj, "name", "Unnamed District");
-		municipality = obj.has("municipality") ? StateUtil.getMunicipality(JsonUtil.getIfExists(obj, "municipality", -1).intValue()) : null;
-		county = obj.has("county") ?  StateUtil.getCounty(JsonUtil.getIfExists(obj, "county", -1).intValue()) : null;
-		if(county == null && municipality == null) municipality = StateUtil.getMunicipality(-1);
+		munct.municipality = obj.has("municipality") ? StateUtil.getMunicipality(JsonUtil.getIfExists(obj, "municipality", -1).intValue()) : null;
+		munct.county = obj.has("county") ?  StateUtil.getCounty(JsonUtil.getIfExists(obj, "county", -1).intValue()) : null;
+		if(munct.county == null && munct.municipality == null) munct.municipality = StateUtil.getMunicipality(-1);
+		if(munct.county != null) munct.municipality = null;
+		if(munct.municipality != null) munct.mun = true;
 		color.load(obj);
 		price.load(obj);
 		icon.load(obj);
@@ -98,8 +100,8 @@ public class District implements Layer {
 		created.save(obj);
 		manage.save(obj);
 		obj.addProperty("name", name);
-		obj.addProperty("municipality", municipality == null ? -1 : municipality.getId());
-		if(county != null) obj.addProperty("county", county.getId());
+		if(munct.mun) obj.addProperty("municipality", munct.municipality.getId());
+		if(!munct.mun) obj.addProperty("county", munct.county.getId());
 		neighbors.save(obj);
 		color.save(obj);
 		price.save(obj);
@@ -149,27 +151,29 @@ public class District implements Layer {
 	}
 
 	public Municipality getMunicipality(){
-		return municipality;
+		return munct.municipality;
 	}
 
 	public void setMunicipality(Municipality mun){
-		if(municipality != null) municipality.getDistricts().removeIf(pre -> pre == this.getId());
-		if(county != null) county.getDistricts().removeIf(pre -> pre == this.getId());
-		municipality = mun;
-		county = null;
-		municipality.getDistricts().add(this.getId());
+		if(munct.mun) munct.municipality.getDistricts().removeIf(pre -> pre == this.getId());
+		if(!munct.mun) munct.county.getDistricts().removeIf(pre -> pre == this.getId());
+		munct.set(mun);
+		munct.municipality.getDistricts().add(this.getId());
 	}
 	
 	public County getCounty(){
-		return county == null ? municipality.getCounty() : county;
+		return munct.getCounty();
 	}
 
 	public void setCounty(County ct){
-		if(municipality != null) municipality.getDistricts().removeIf(pre -> pre == this.getId());
-		if(county != null) county.getDistricts().removeIf(pre -> pre == this.getId());
-		municipality = null;
-		county = ct;
-		county.getDistricts().add(this.getId());
+		if(munct.mun) munct.municipality.getDistricts().removeIf(pre -> pre == this.getId());
+		if(!munct.mun) munct.county.getDistricts().removeIf(pre -> pre == this.getId());
+		munct.set(ct);
+		munct.county.getDistricts().add(this.getId());
+	}
+
+	public MunCt getMunCt(){
+		return munct;
 	}
 
 	public void setType(DistrictType new_type){
@@ -193,12 +197,12 @@ public class District implements Layer {
 	}
 
 	public State getState(){
-		return municipality.getState();
+		return munct.getCounty().getState();
 	}
 
 	@Override
 	public Layer getParent(){
-		return county == null ? municipality : county;
+		return munct.getParent();
 	}
 
 	@Override

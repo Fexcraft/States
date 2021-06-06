@@ -24,6 +24,7 @@ import net.fexcraft.mod.states.data.ChunkPos;
 import net.fexcraft.mod.states.data.ChunkType;
 import net.fexcraft.mod.states.data.capabilities.PlayerCapability;
 import net.fexcraft.mod.states.data.capabilities.StatesCapabilities;
+import net.fexcraft.mod.states.data.root.MunCt;
 import net.fexcraft.mod.states.guis.ManagerContainer;
 import net.fexcraft.mod.states.util.AliasLoader;
 import net.fexcraft.mod.states.util.StConfig;
@@ -151,17 +152,18 @@ public class ChunkCmd extends CommandBase {
 				return;
 			}
 			case "unclaim":{
-				if(StateUtil.isAdmin(player) || (StConfig.ALLOW_CHUNK_UNCLAIM && playerdata.isMayorOf(chunk.getMunicipality()))){
-					Integer asmun = !StateUtil.isAdmin(player) ? chunk.getMunicipality().getId() : null;
+				boolean admin = StateUtil.isAdmin(player);
+				if(admin || (StConfig.ALLOW_CHUNK_UNCLAIM && (playerdata.isMayorOf(chunk.getMunicipality()) || playerdata.isCountyManagerOf(chunk.getCounty())))){
+					MunCt asmc = admin ? null : chunk.getMunCt();
 					int range = args.length > 1 ? Integer.parseInt(args[1]) : 0;
 					if(range <= 0){
-						if(asmun != null && StConfig.UNCLAIM_CHUNK_PRICE > 0){
-							Bank bank = chunk.getMunicipality().getBank();
-							if(chunk.getMunicipality().getAccount().getBalance() < StConfig.UNCLAIM_CHUNK_PRICE){
-								Print.chat(player, "Municipality does not have enough money to pay the unclaim fee.");
+						if(asmc != null && StConfig.UNCLAIM_CHUNK_PRICE > 0){
+							Bank bank = asmc.getAccountHolder().getBank();
+							if(asmc.getAccountHolder().getAccount().getBalance() < StConfig.UNCLAIM_CHUNK_PRICE){
+								send(sender, "cmd.chunk.unclaim.not_enough_money_for_fee." + asmc.trid());
 								return;
 							}
-							if(!bank.processAction(Action.TRANSFER, player, chunk.getMunicipality().getAccount(), StConfig.UNCLAIM_CHUNK_PRICE, States.SERVERACCOUNT)){
+							if(!bank.processAction(Action.TRANSFER, player, asmc.getAccountHolder().getAccount(), StConfig.UNCLAIM_CHUNK_PRICE, States.SERVERACCOUNT)){
 								return;
 							}
 						}
@@ -170,8 +172,7 @@ public class ChunkCmd extends CommandBase {
 						chunk.setType(ChunkType.NORMAL);
 						chunk.price.reset();
 						chunk.save();
-						//ImageCache.update(player.world, player.world.getChunk(chunk.xCoord(), chunk.zCoord()));
-						Print.chat(sender, "&9Chunk unclaimed and resseted.");
+						send(sender, "cmd.chunk.unclaim.success.single");
 						Print.log(StateLogger.player(player) + " unclaimed " + StateLogger.chunk(chunk) + ".");
 					}
 					else{
@@ -185,15 +186,15 @@ public class ChunkCmd extends CommandBase {
 								if(ck == null){
 									continue;
 								}
-								if(asmun != null){
-									if(ck.getMunicipality().getId() != asmun) continue;
+								if(asmc != null){
+									if(!ck.getMunCt().equals(asmc)) continue;
 									if(StConfig.UNCLAIM_CHUNK_PRICE > 0){
-										Bank bank = chunk.getMunicipality().getBank();
-										if(chunk.getMunicipality().getAccount().getBalance() < StConfig.UNCLAIM_CHUNK_PRICE){
-											Print.chat(player, "Municipality does not have enough money to pay the unclaim fee.");
+										Bank bank = asmc.getAccountHolder().getBank();
+										if(asmc.getAccountHolder().getAccount().getBalance() < StConfig.UNCLAIM_CHUNK_PRICE){
+											send(sender, "cmd.chunk.unclaim.not_enough_money_for_fee." + asmc.trid());
 											break;
 										}
-										if(!bank.processAction(Action.TRANSFER, player, chunk.getMunicipality().getAccount(), StConfig.UNCLAIM_CHUNK_PRICE, States.SERVERACCOUNT)){
+										if(!bank.processAction(Action.TRANSFER, player, asmc.getAccountHolder().getAccount(), StConfig.UNCLAIM_CHUNK_PRICE, States.SERVERACCOUNT)){
 											break;
 										}
 									}
@@ -204,10 +205,9 @@ public class ChunkCmd extends CommandBase {
 								ck.price.reset();
 								ck.save();
 								c++;
-								//ImageCache.update(player.world, player.world.getChunk(x, z));
 							}
 						}
-						Print.chat(sender, "&2" + c + " &9chunks have been resseted.");
+						send(sender, "cmd.chunk.unclaim.success.multiple", c);
 						Print.log(StateLogger.player(player) + " unclaimed " + c + " chunks, with the center being " + StateLogger.chunk(chunk) + ".");
 					}
 				}

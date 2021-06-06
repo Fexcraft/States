@@ -62,6 +62,10 @@ cmd.chunk.types.municipal=&2-> &3municipal
 cmd.chunk.types.countyowned=&2-> &3county owned
 cmd.chunk.types.stateowned=&2-> &3state owned
 cmd.chunk.types.statepublic=&2-> &3state public
+cmd.chunk.unclaim.not_enough_money_for_fee.municipality=Municipality does not have enough money to pay the unclaim fee.
+cmd.chunk.unclaim.not_enough_money_for_fee.county=County does not have enough money to pay the unclaim fee.
+cmd.chunk.unclaim.success.single=&9Chunk unclaimed and reset.
+cmd.chunk.unclaim.success.multiple=&2$0 &9chunks have been reset.
 
 # Announcements
 states.announce.municipality.mayor_reset=&2&oMunicipality mayor was &c&oreset&2&o.

@@ -50,11 +50,13 @@ public interface PlayerCapability extends ICommandSender, Taxable, AccountHolder
 
 	public String getUUIDAsString();
 
+	public boolean isDistrictManagerOf(District district);
+
 	public boolean isMayorOf(Municipality municipality);
 
-	public boolean isStateLeaderOf(State state);
+	public boolean isCountyManagerOf(County county);
 
-	public boolean isDistrictManagerOf(District district);
+	public boolean isStateLeaderOf(State state);
 
 	public boolean canLeave(ICommandSender sender);
 	

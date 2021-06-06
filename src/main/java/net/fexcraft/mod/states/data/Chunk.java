@@ -16,6 +16,7 @@ import net.fexcraft.lib.mc.utils.Print;
 import net.fexcraft.mod.states.States;
 import net.fexcraft.mod.states.data.root.Layer;
 import net.fexcraft.mod.states.data.root.Layers;
+import net.fexcraft.mod.states.data.root.MunCt;
 import net.fexcraft.mod.states.data.root.Taxable;
 import net.fexcraft.mod.states.data.sub.Buyable;
 import net.fexcraft.mod.states.data.sub.Createable;
@@ -289,6 +290,10 @@ public class Chunk implements Layer, Taxable {
 	
 	public County getCounty(){
 		return district.getCounty();
+	}
+
+	public MunCt getMunCt(){
+		return district.getMunCt();
 	}
 	
 	public State getState(){

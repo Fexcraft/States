@@ -33,6 +33,21 @@ states.welcome_msg.state=&2In the State of &7$0&2.
 states.welcome_msg.no_mailbox=&6You have &7no mailbox set&6!
 states.welcome_msg.pending_votes=&6You have &7$0 &6votes waiting! &7/st-vote my-votes
 
+# Commands
+## Chunk
+cmd.chunk.help.claim=&7/ck claim <args>
+cmd.chunk.help.reclaim=&7/ck reclaim <args>
+cmd.chunk.help.tempclaim=&7/ck tempclaim
+cmd.chunk.help.unclaim=&e/ck unclaim
+cmd.chunk.help.info=&7/ck info
+cmd.chunk.help.map=&7/ck map
+cmd.chunk.help.buy=&7/ck buy
+cmd.chunk.help.force-load=&7/ck force-load <true/false>
+cmd.chunk.help.types=&7/ck types
+cmd.chunk.help.admin-cmds=&6# &cAdmin CMDs
+cmd.chunk.help.normal-cmds=&6# &aNormal CMDs
+cmd.chunk.help.set-district=&e/ck set-district <id>
+
 # Announcements
 states.announce.municipality.mayor_reset=&2&oMunicipality mayor was &c&oreset&2&o.
 states.announce.state.new_capital=&6%s&9 is now the new Capital!

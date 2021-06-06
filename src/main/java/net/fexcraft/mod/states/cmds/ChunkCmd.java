@@ -101,11 +101,11 @@ public class ChunkCmd extends CommandBase {
 		switch(args[0]){
 			case "claim": case "reclaim":{
 				if(args.length == 1){
-					Print.chat(sender, "&7/ck claim <district>");
+					send(sender, "cmd.chunk.claim.missing_id");
 					return;
 				}
 				if(!NumberUtils.isCreatable(args[1])){
-					Print.chat(sender, "&7Please enter the numerical district ID as second argument!");
+					send(sender, "cmd.chunk.claim.invalid_id");
 					return;
 				}
 				openGui(player, CLAIM_MAP, Integer.parseInt(args[1]), args[0].equals("claim") ? 0 : 1, 0);
@@ -138,7 +138,7 @@ public class ChunkCmd extends CommandBase {
 					}
 					Print.chat(sender, str + "&0]");
 				}
-				Print.chat(sender, "&4#&7 - null &8| &9#&7 - claimed &8| &2#&7 - not claimed &8| &7+ your position.");
+				send(sender, "cmd.chunk.map.legend");
 				//openGui(player, REGION_VIEW, 0, 0, 0);
 				return;
 			}
@@ -186,7 +186,7 @@ public class ChunkCmd extends CommandBase {
 				else{
 					Print.chat(sender, "&cNo Permission.");
 				}*/
-				Print.debug("&bCurrently disabled.");
+				send(sender, "cmd.feature.disabled");
 				return;
 			}
 			/*case "queue":{
@@ -411,14 +411,14 @@ public class ChunkCmd extends CommandBase {
 				break;
 			}
 			case "types":{
-				Print.chat(sender, "&9Existing chunk types:");
+				send(sender, "cmd.chunk.types");
 				for(ChunkType type : ChunkType.values()){
-					Print.chat(sender, "&2-> &3" + type.name().toLowerCase());
+					send(sender, "cmd.chunk.types." + type.name().toLowerCase());
 				}
 				return;
 			}
 			default:{
-				Print.chat(sender, "Unknown Argument.");
+				send(sender, "cmd.unknown_argument");
 				return;
 			}
 		}

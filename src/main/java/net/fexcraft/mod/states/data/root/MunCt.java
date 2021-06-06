@@ -26,11 +26,15 @@ public class MunCt {
 	}
 
 	public void set(Municipality mun){
-		if(this.mun = (municipality = mun) != null) county = null;
+		municipality = mun;
+		this.mun = true;
+		county = null;
 	}
 
 	public void set(County county){
-		if(!(this.mun = (this.county = county) == null)) municipality = null;
+		this.county = county;
+		this.mun = false;
+		municipality = null;
 	}
 
 	public County getCounty(){

@@ -34,6 +34,8 @@ states.welcome_msg.no_mailbox=&6You have &7no mailbox set&6!
 states.welcome_msg.pending_votes=&6You have &7$0 &6votes waiting! &7/st-vote my-votes
 
 # Commands
+cmd.feature.disabled=&bCurrently disabled.
+cmd.unknown_argument=Unknown Argument.
 ## Chunk
 cmd.chunk.help.claim=&7/ck claim <args>
 cmd.chunk.help.reclaim=&7/ck reclaim <args>
@@ -47,6 +49,19 @@ cmd.chunk.help.types=&7/ck types
 cmd.chunk.help.admin-cmds=&6# &cAdmin CMDs
 cmd.chunk.help.normal-cmds=&6# &aNormal CMDs
 cmd.chunk.help.set-district=&e/ck set-district <id>
+cmd.chunk.claim.missing_id=&7/ck claim <district>
+cmd.chunk.claim.invalid_id=&7Please enter the numerical district ID as second argument!
+cmd.chunk.map.legend=&4#&7 - null &8| &9#&7 - claimed &8| &2#&7 - not claimed &8| &7+ your position.
+cmd.chunk.types=&6Existing chunk types:
+cmd.chunk.types.normal=&2-> &3normal
+cmd.chunk.types.public=&2-> &3public
+cmd.chunk.types.private=&2-> &3private
+cmd.chunk.types.company=&2-> &3company
+cmd.chunk.types.district=&2-> &3district
+cmd.chunk.types.municipal=&2-> &3municipal
+cmd.chunk.types.countyowned=&2-> &3county owned
+cmd.chunk.types.stateowned=&2-> &3state owned
+cmd.chunk.types.statepublic=&2-> &3state public
 
 # Announcements
 states.announce.municipality.mayor_reset=&2&oMunicipality mayor was &c&oreset&2&o.

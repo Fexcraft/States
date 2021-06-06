@@ -8,6 +8,7 @@ public enum ChunkType {
 	COMPANY("#20d400"),//("#008E96"),
 	DISTRICT("#007F7F"),
 	MUNICIPAL("#C1A100"),
+	COUNTYOWNED("#fca000"),
 	STATEOWNED("#A01818"),
 	STATEPUBLIC("#ed4a4a");
 	

@@ -66,6 +66,8 @@ cmd.chunk.unclaim.not_enough_money_for_fee.municipality=Municipality does not ha
 cmd.chunk.unclaim.not_enough_money_for_fee.county=County does not have enough money to pay the unclaim fee.
 cmd.chunk.unclaim.success.single=&9Chunk unclaimed and reset.
 cmd.chunk.unclaim.success.multiple=&2$0 &9chunks have been reset.
+cmd.chunk.buy.not_claimed=Only claimed chunks can be bought.
+cmd.chunk.buy.already_owned=&7&oYou already do own this chunk.
 
 # Announcements
 states.announce.municipality.mayor_reset=&2&oMunicipality mayor was &c&oreset&2&o.

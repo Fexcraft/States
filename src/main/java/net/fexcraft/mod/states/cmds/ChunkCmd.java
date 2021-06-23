@@ -214,13 +214,12 @@ public class ChunkCmd extends CommandBase {
 				return;
 			}
 			case "buy":{
-				//TODO add check for companies, based on their type
 				if(chunk.getDistrict().getId() < 0){
-					Print.chat(sender, "Only claimed chunks can be bought.");
+					send(sender, "cmd.chunk.buy.not_claimed");
 					return;
 				}
-				if(chunk.getType() == ChunkType.PRIVATE && UUID.fromString(chunk.getOwner()).equals(player.getGameProfile().getId())){
-					Print.chat(sender, "&7&oYou already do own this chunk.");
+				if(chunk.getType() == ChunkType.PRIVATE && chunk.getOwner().equals(playerdata.getUUIDAsString())){
+					send(sender, "cmd.chunk.buy.already_owned");
 					return;
 				}
 				if(args.length >= 2 && args[1].equals("company")){

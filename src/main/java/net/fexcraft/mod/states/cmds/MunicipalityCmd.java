@@ -280,7 +280,7 @@ public class MunicipalityCmd extends CommandBase {
 					Print.chat(sender, "You are already part of this municipality.");
 					return;
 				}
-				if(!ply.canLeave(sender)){
+				if(!ply.canLeave(sender, true)){
 					return;
 				}
 				MailUtil.send(sender, RecipientType.MUNICIPALITY, ply.getMunicipality().getId(), sender.getName(), player.getGameProfile().getName() + " left the Municipality. At " + Time.getAsString(-1), MailType.SYSTEM);
@@ -297,7 +297,7 @@ public class MunicipalityCmd extends CommandBase {
 					Print.chat(sender, "You aren't part of any Municipality.");
 					return;
 				}
-				if(!ply.canLeave(sender)){
+				if(!ply.canLeave(sender, true)){
 					return;
 				}
 				MailUtil.send(sender, RecipientType.MUNICIPALITY, ply.getMunicipality().getId(), sender.getName(), player.getGameProfile().getName() + " left the Municipality. At " + Time.getAsString(-1), MailType.SYSTEM);
@@ -358,7 +358,7 @@ public class MunicipalityCmd extends CommandBase {
 					Print.chat(sender, "&cYou must leave your current municipality to create a new one.");
 					return;
 				}*/
-				if(!ply.canLeave(sender)) return;
+				if(!ply.canLeave(sender, true)) return;
 				if(chunk.getDistrict().getId() >= 0){
 					Print.chat(sender, "&cThis chunk is already part of a municipality.");
 					return;

@@ -16,6 +16,7 @@ import net.fexcraft.mod.fsmm.api.FSMMCapabilities;
 import net.fexcraft.mod.fsmm.util.DataManager;
 import net.fexcraft.mod.states.States;
 import net.fexcraft.mod.states.data.capabilities.PlayerCapability;
+import net.fexcraft.mod.states.data.root.MunCt;
 import net.fexcraft.mod.states.data.sub.MailData;
 import net.fexcraft.mod.states.util.Perms;
 import net.fexcraft.mod.states.util.StateUtil;
@@ -35,8 +36,7 @@ public class PlayerImpl implements PlayerCapability {
 	private Chunk last_chunk, current_chunk;
 	public MailData mailbox = new MailData();
 	//
-	private Municipality municipality;
-	private County county;
+	private MunCt munct;
 	private boolean loaded, admin;
 	
 	public PlayerImpl(){}
@@ -58,8 +58,7 @@ public class PlayerImpl implements PlayerCapability {
 		obj.addProperty("uuid", this.getUUIDAsString());
 		if(nick != null){ obj.addProperty("nickname", nick); }
 		obj.addProperty("color", color);
-		obj.addProperty("municipality", municipality == null ? -1 : municipality.getId());
-		obj.addProperty("county", county == null ? -1 : county.getId());
+		munct.save(obj);
 		obj.addProperty("last_tax_collection", lasttaxcoll);
 		if(customtax > 0){ obj.addProperty("custom_tax", customtax); }
 		mailbox.save(obj);
@@ -73,8 +72,9 @@ public class PlayerImpl implements PlayerCapability {
 		JsonObject obj = JsonUtil.get(this.getPlayerFile());
 		this.nick = obj.has("nickname") ? obj.get("nickname").getAsString() : null;
 		this.color = JsonUtil.getIfExists(obj, "color", 2).intValue();
-		Municipality mun = StateUtil.getMunicipality(JsonUtil.getIfExists(obj, "municipality", -1).intValue());
-		this.setMunicipality(mun == null || (mun.getId() >= 0 && !mun.isCitizen(getUUID())) ? StateUtil.getMunicipality(-1) : mun);
+		munct.load(obj);
+		if(munct.mun) setMunicipality(munct.municipality);
+		else setCounty(munct.county);
 		this.account = this.isOnlinePlayer() ? entity.getCapability(FSMMCapabilities.PLAYER, null).getAccount() : DataManager.getAccount("player:" + getUUID().toString(), true, true);
 		this.lasttaxcoll = JsonUtil.getIfExists(obj, "last_tax_collection", 0).longValue();
 		this.customtax = JsonUtil.getIfExists(obj, "custom_tax", 0).longValue();
@@ -87,16 +87,33 @@ public class PlayerImpl implements PlayerCapability {
 
 	@Override
 	public Municipality getMunicipality(){
-		return municipality;
+		return munct.municipality;
 	}
 
 	@Override
 	public void setMunicipality(Municipality mun){
-		if(this.municipality != null){
-			this.municipality.getResidents().remove(this.getUUID());
-			this.municipality.manage.getCouncil().remove(this.getUUID());
+		clearMunCt();
+		munct.set(mun);
+		if(!munct.municipality.getResidents().contains(this.getUUID())){
+			munct.municipality.getResidents().add(this.getUUID());
+		}
+	}
+
+	@Override
+	public void setCounty(County county){
+		clearMunCt();
+		munct.set(county);
+		if(!munct.county.getResidents().contains(this.getUUID())){
+			munct.county.getResidents().add(this.getUUID());
+		}
+	}
+	
+	private void clearMunCt(){
+		if(munct.mun && munct.municipality != null){
+			munct.municipality.getResidents().remove(this.getUUID());
+			munct.municipality.manage.getCouncil().remove(this.getUUID());
 			//
-			for(int id : this.municipality.getDistricts()){
+			for(int id : munct.municipality.getDistricts()){
 				District dis = StateUtil.getDistrict(id);
 				if(dis == null || dis.manage.getHead() == null) continue;
 				if(dis.manage.getHead().equals(this.getUUID())){
@@ -105,9 +122,18 @@ public class PlayerImpl implements PlayerCapability {
 				}
 			}
 		}
-		this.municipality = mun;
-		if(!this.municipality.getResidents().contains(this.getUUID())){
-			this.municipality.getResidents().add(this.getUUID());
+		if(!munct.mun && munct.county != null){
+			munct.county.getResidents().remove(this.getUUID());
+			munct.county.manage.getCouncil().remove(this.getUUID());
+			//
+			for(int id : munct.county.getDistricts()){
+				District dis = StateUtil.getDistrict(id);
+				if(dis == null || dis.manage.getHead() == null) continue;
+				if(dis.manage.getHead().equals(this.getUUID())){
+					dis.manage.setHead(null);
+					dis.save();
+				}
+			}
 		}
 	}
 
@@ -176,19 +202,27 @@ public class PlayerImpl implements PlayerCapability {
 	}
 
 	@Override
-	public boolean canLeave(ICommandSender sender){
-		if(municipality == null){ return true; }
-		if(municipality.manage.getHead() != null && municipality.manage.getHead().equals(getUUID())){
-			Print.chat(sender, "&eYou must assign a new Mayor first, or remove youself as one, before you can leave the Municipality.");
-			return false;
+	public boolean canLeave(ICommandSender sender, boolean mun){//TODO translation
+		if(munct == null || munct.mun != mun) return true;
+		if(mun){
+			if(munct.municipality.manage.getHead() != null && munct.municipality.manage.getHead().equals(getUUID())){
+				Print.chat(sender, "&eYou must assign a new Mayor first, or remove youself as one, before you can leave the Municipality.");
+				return false;
+			}
+			if(munct.municipality.manage.getCouncil().size() < 2 && munct.municipality.manage.isInCouncil(getUUID())){
+				Print.chat(sender, "&eYou cannot leave the Municipality as last Council member.");
+				return false;
+			}
+			if(munct.municipality.getId() > 0 && munct.municipality.getResidents().size() == 1){
+				Print.chat(sender, "&eYou cannot leave the Municipality as last citizen!");
+				Print.chat(sender, "&eUse &7/mun abandon &einstead or &7/mun claim &eto become Mayor!");
+			}
 		}
-		if(municipality.manage.getCouncil().size() < 2 && municipality.manage.isInCouncil(getUUID())){
-			Print.chat(sender, "&eYou cannot leave the Municipality as last Council member.");
-			return false;
-		}
-		if(municipality.getId() > 0 && municipality.getResidents().size() == 1){
-			Print.chat(sender, "&eYou cannot leave the Municipality as last citizen!");
-			Print.chat(sender, "&eUse &7/mun abandon &einstead or &7/mun claim &eto become Mayor!");
+		else{
+			if(munct.county.manage.getHead() != null && munct.county.manage.getHead().equals(getUUID())){
+				Print.chat(sender, "&eYou must assign a new Manager first, or remove youself as one, before you can leave the County.");
+				return false;
+			}
 		}
 		return true;
 	}
@@ -231,12 +265,12 @@ public class PlayerImpl implements PlayerCapability {
 
 	@Override
 	public State getState(){
-		return county == null ? municipality.getState() : county.getState();
+		return munct.getCounty().getState();
 	}
 
 	@Override
 	public County getCounty(){
-		return county == null ? municipality.getCounty() : county;
+		return munct.getCounty();
 	}
 
 	@Override
@@ -311,7 +345,7 @@ public class PlayerImpl implements PlayerCapability {
 		this.last_chunk = player.last_chunk;
 		this.current_chunk = player.current_chunk;
 		this.mailbox = player.mailbox;
-		this.municipality = player.municipality;
+		this.munct = player.munct;
 		this.admin = player.admin;
 	}
 

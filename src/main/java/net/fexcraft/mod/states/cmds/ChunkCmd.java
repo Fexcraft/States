@@ -226,14 +226,12 @@ public class ChunkCmd extends CommandBase {
 					//TODO
 					return;
 				}
-				if(playerdata.getMunicipality().getId() < 0){
-					Print.chat(sender, "&7You must be citizen of a Municipality to be able to buy chunks.");
-					return;
+				if(chunk.getDistrict().getMunCt().mun){
+					
 				}
-				/*if(playerdata.getMunicipality().getState().getId() < 0){
-					Print.chat(sender, "&7You must be citizen of a State to be able to buy chunks.");
-					return;
-				}*/
+				else{
+					
+				}
 				if(chunk.getDistrict().getMunicipality().getId() != playerdata.getMunicipality().getId() && !chunk.getDistrict().r_CFS.get()){
 					Print.chat(sender, "&cYou are not part of this Municipality.");
 					Print.chat(sender, "&cChunks in this District can not be bought by Foreigners.");

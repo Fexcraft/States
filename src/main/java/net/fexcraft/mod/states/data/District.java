@@ -54,11 +54,7 @@ public class District implements Layer {
 		manage.load(obj);
 		neighbors.load(obj);
 		name = JsonUtil.getIfExists(obj, "name", "Unnamed District");
-		munct.municipality = obj.has("municipality") ? StateUtil.getMunicipality(JsonUtil.getIfExists(obj, "municipality", -1).intValue()) : null;
-		munct.county = obj.has("county") ?  StateUtil.getCounty(JsonUtil.getIfExists(obj, "county", -1).intValue()) : null;
-		if(munct.county == null && munct.municipality == null) munct.municipality = StateUtil.getMunicipality(-1);
-		if(munct.county != null) munct.municipality = null;
-		if(munct.municipality != null) munct.mun = true;
+		munct.load(obj);
 		color.load(obj);
 		price.load(obj);
 		icon.load(obj);
@@ -100,8 +96,7 @@ public class District implements Layer {
 		created.save(obj);
 		manage.save(obj);
 		obj.addProperty("name", name);
-		if(munct.mun) obj.addProperty("municipality", munct.municipality.getId());
-		if(!munct.mun) obj.addProperty("county", munct.county.getId());
+		munct.save(obj);
 		neighbors.save(obj);
 		color.save(obj);
 		price.save(obj);

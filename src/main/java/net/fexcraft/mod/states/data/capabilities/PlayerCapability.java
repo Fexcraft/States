@@ -28,6 +28,10 @@ public interface PlayerCapability extends ICommandSender, Taxable, AccountHolder
 	public Municipality getMunicipality();
 	
 	public void setMunicipality(Municipality mun);
+
+	public County getCounty();
+	
+	public void setCounty(County county);
 	
 	public boolean isOnlinePlayer();
 	
@@ -58,7 +62,7 @@ public interface PlayerCapability extends ICommandSender, Taxable, AccountHolder
 
 	public boolean isStateLeaderOf(State state);
 
-	public boolean canLeave(ICommandSender sender);
+	public boolean canLeave(ICommandSender sender, boolean mun);
 	
 	public Chunk getLastChunk();
 	
@@ -125,7 +129,5 @@ public interface PlayerCapability extends ICommandSender, Taxable, AccountHolder
 	public void setAdminMode(boolean bool);
 	
 	public MailData getMailbox();
-
-	public County getCounty();
 
 }

@@ -21,6 +21,8 @@ public class MunCt implements Loadable {
 	public County county;
 	public boolean mun;
 	
+	public MunCt(){}
+	
 	public MunCt(District dis){
 		district = dis;
 	}

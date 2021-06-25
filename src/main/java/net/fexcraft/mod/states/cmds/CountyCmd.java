@@ -415,7 +415,7 @@ public class CountyCmd extends CommandBase {
 							newdis.created.create(ply.getUUID());
 							newdis.setName("Center");
 							newdis.manage.setHead(ply.getUUID());
-							newdis.r_CFS.set(false);
+							newdis.r_OCCB.set(true);
 							newdis.setMunicipality(newmun);
 							newdis.price.reset();
 							newdis.setType(DistrictType.VILLAGE);

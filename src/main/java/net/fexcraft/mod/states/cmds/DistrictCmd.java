@@ -144,7 +144,7 @@ public class DistrictCmd extends CommandBase {
 								newdis.created.create(ply.getUUID());
 								newdis.setClaimedChunks(1);
 								newdis.setName(name);
-								newdis.r_CFS.set(false);
+								newdis.r_OCCB.set(true);
 								newdis.manage.setHead(ply.getUUID());
 								newdis.setMunicipality(ply.getMunicipality());
 								newdis.price.reset();

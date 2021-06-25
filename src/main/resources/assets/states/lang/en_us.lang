@@ -68,6 +68,14 @@ cmd.chunk.unclaim.success.single=&9Chunk unclaimed and reset.
 cmd.chunk.unclaim.success.multiple=&2$0 &9chunks have been reset.
 cmd.chunk.buy.not_claimed=Only claimed chunks can be bought.
 cmd.chunk.buy.already_owned=&7&oYou already do own this chunk.
+cmd.chunk.buy.not_citizen0=&cYou are not citizen of this State.
+cmd.chunk.buy.not_citizen1=&cChunks in this District can only be bought by Citizen.
+cmd.chunk.buy.banned.mun=&cYou banned from buying in this Municipality.
+cmd.chunk.buy.banned.state=&cYou banned from buying in this State.
+cmd.chunk.buy.not_for_sale=&cChunk is not for sale.
+cmd.chunk.buy.invalid_type=&cInvalid Chunk Type! Payment destination unknown.
+cmd.chunk.buy.success=&aChunk bought!
+cmd.chunk.buy.success.linked=&7$0&a linked chunks bought!
 
 # Announcements
 states.announce.municipality.mayor_reset=&2&oMunicipality mayor was &c&oreset&2&o.
@@ -127,7 +135,7 @@ states.manager_gui.view_district.chunk_tax=Chunk Tax
 states.manager_gui.view_district.last_edited=Last Edit
 states.manager_gui.view_district.neighbors=Neighbors
 states.manager_gui.view_district.chunks=Chunks
-states.manager_gui.view_district.canforsettle=Foreign Settlers
+states.manager_gui.view_district.onlycitizenbuy=Only Citi. Can Buy
 states.manager_gui.view_district.unifbank=Unclaim Bankrupt
 states.manager_gui.view_district.creator=Creator
 states.manager_gui.view_district.created=Created

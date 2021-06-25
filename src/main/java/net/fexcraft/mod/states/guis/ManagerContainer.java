@@ -133,7 +133,7 @@ public class ManagerContainer extends GenericContainer {
 				addKey(list, "last_edited", time(dis.created.getChanged()), ViewMode.NONE);
 				addKey(list, "neighbors", dis.neighbors.size(), ViewMode.LIST);
 				addKey(list, "chunks", dis.getClaimedChunks(), ViewMode.NONE);
-				addKey(list, "canforsettle", dis.r_CFS.get(), ViewMode.BOOL);
+				addKey(list, "onlycitizenbuy", dis.r_OCCB.get(), ViewMode.BOOL);
 				addKey(list, "unifbank", dis.r_ONBANKRUPT.get(), ViewMode.BOOL);
 				addKey(list, "creator", Static.getPlayerNameByUUID(dis.created.getCreator()), ViewMode.NONE);
 				addKey(list, "created", time(dis.created.getCreated()), ViewMode.NONE);
@@ -511,13 +511,13 @@ public class ManagerContainer extends GenericContainer {
 									openGui(Layers.DISTRICT, Mode.LIST_NEIGHBORS, dis.getId());
 									break;
 								}
-								case "canforsettle":{
-									if(dis.manage.isAuthorized(dis.r_CFS.id, cap.getUUID()).isTrue() || bypass(player)){
-										dis.r_CFS.set(!dis.r_CFS.get());
+								case "onlycitizenbuy":{
+									if(dis.manage.isAuthorized(dis.r_OCCB.id, cap.getUUID()).isTrue() || bypass(player)){
+										dis.r_OCCB.set(!dis.r_OCCB.get());
 										dis.created.update();
 										dis.save();
 										this.sendViewData();
-										Print.log(StateLogger.player(player) + " changed 'can-foreigners-settle' of " + StateLogger.district(dis) + " to " + dis.r_CFS.get() + ".");
+										Print.log(StateLogger.player(player) + " changed 'only-citizen-can-buy' of " + StateLogger.district(dis) + " to " + dis.r_OCCB.get() + ".");
 									}
 									else sendStatus(null);
 									break;

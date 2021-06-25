@@ -1,6 +1,5 @@
 package net.fexcraft.mod.states.impl.capabilities;
 
-import net.fexcraft.mod.states.data.Municipality;
 import net.fexcraft.mod.states.data.PlayerImpl;
 import net.fexcraft.mod.states.data.capabilities.PlayerCapability;
 import net.fexcraft.mod.states.data.capabilities.StatesCapabilities;
@@ -57,12 +56,12 @@ public class PlayerCapabilityUtil implements ICapabilitySerializable<NBTBase>{
 		@Override
 		public void readNBT(Capability<PlayerCapability> capability, PlayerCapability instance, EnumFacing side, NBTBase nbt){
 			instance.load();
-			if(instance.getMunicipality().getId() == -1){ //Just in case something else broke.
+			/*if(instance.getMunicipality().getId() == -1){ //Just in case something else broke.
 				Municipality mun = instance.getEntityPlayer().getEntityWorld().getCapability(StatesCapabilities.WORLD, null).getMunicipalities().get(((NBTTagInt)nbt).getInt());
 				if(mun != null && mun.getId() != -1){
 					instance.setMunicipality(mun);
 				}
-			}
+			}*/
 		}
 		
 	}

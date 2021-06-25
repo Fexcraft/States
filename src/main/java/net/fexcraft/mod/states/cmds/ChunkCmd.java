@@ -226,27 +226,23 @@ public class ChunkCmd extends CommandBase {
 					//TODO
 					return;
 				}
+				if(chunk.getState().getId() != playerdata.getState().getId() && chunk.getDistrict().r_OCCB.get()){
+					send(sender, "cmd.chunk.buy.not_citizen0");
+					send(sender, "cmd.chunk.buy.not_citizen1");
+					return;
+				}
 				if(chunk.getDistrict().getMunCt().mun){
-					
+					if(chunk.getMunicipality().getPlayerBlacklist().contains(player.getGameProfile().getId())){
+						send(sender, "cmd.chunk.buy.banned.mun");
+						return;
+					}
 				}
-				else{
-					
-				}
-				if(chunk.getDistrict().getMunicipality().getId() != playerdata.getMunicipality().getId() && !chunk.getDistrict().r_CFS.get()){
-					Print.chat(sender, "&cYou are not part of this Municipality.");
-					Print.chat(sender, "&cChunks in this District can not be bought by Foreigners.");
-					return;
-				}
-				if(chunk.getDistrict().getMunicipality().getPlayerBlacklist().contains(player.getGameProfile().getId())){
-					Print.chat(sender, "&cYou are blacklisted in this Municipality.");
-					return;
-				}
-				if(chunk.getDistrict().getMunicipality().getState().getBlacklist().contains(playerdata.getMunicipality().getState().getId())){
-					Print.chat(sender, "&cPlayers from your State can not buy chunks here.");
+				if(chunk.getState().getBlacklist().contains(playerdata.getMunicipality().getState().getId())){
+					send(sender, "cmd.chunk.buy.banned.state");
 					return;
 				}
 				if(!chunk.price.forSale()){
-					Print.chat(sender, "&cChunk isn't for sale.");
+					send(sender, "cmd.chunk.buy.not_for_sale");
 				}
 				else{
 					Account receiver = null;
@@ -259,7 +255,7 @@ public class ChunkCmd extends CommandBase {
 						case MUNICIPAL:
 						case PUBLIC:
 						case NORMAL:{
-							receiver = chunk.getDistrict().getMunicipality().getAccount();
+							receiver = chunk.getMunCt().getAccountHolder().getAccount();
 							break;
 						}
 						case PRIVATE:{
@@ -268,11 +264,15 @@ public class ChunkCmd extends CommandBase {
 						}
 						case STATEPUBLIC:
 						case STATEOWNED:{
-							receiver = chunk.getDistrict().getMunicipality().getState().getAccount();
+							receiver = chunk.getState().getAccount();
+							break;
+						}
+						case COUNTYOWNED:{
+							receiver = chunk.getCounty().getAccount();
 							break;
 						}
 						default:{
-							Print.chat(sender, "&cInvalid Chunk Type! Payment destination unknown.");
+							send(sender, "cmd.chunk.buy.invalid_type");
 							return;
 						}
 					}
@@ -286,7 +286,7 @@ public class ChunkCmd extends CommandBase {
 					chunk.setType(ChunkType.PRIVATE);
 					chunk.created.update(time);
 					chunk.save();
-					Print.chat(sender, "&aChunk bought!");
+					send(sender, "cmd.chunk.buy.success");
 					Print.log(StateLogger.player(player) + " bought the " + StateLogger.chunk(chunk) + "!");
 					if(chunk.getLinkedChunks().size() > 0){
 						for(int[] ckpos : chunk.getLinkedChunks()){
@@ -298,7 +298,7 @@ public class ChunkCmd extends CommandBase {
 							ck.save();
 							Print.log(StateLogger.player(player) + " received the " + StateLogger.chunk(ck) + " which was linked to " + StateLogger.chunk(chunk) + "!");
 						}
-						Print.chat(sender, "&7" + chunk.getLinkedChunks().size() + "&a linked chunks bought!");
+						send(sender, "cmd.chunk.buy.success.linked", chunk.getLinkedChunks().size());
 					}
 				}
 				return;

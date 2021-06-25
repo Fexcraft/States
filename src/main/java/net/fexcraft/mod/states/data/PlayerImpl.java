@@ -36,7 +36,7 @@ public class PlayerImpl implements PlayerCapability {
 	private Chunk last_chunk, current_chunk;
 	public MailData mailbox = new MailData();
 	//
-	private MunCt munct;
+	private MunCt munct = new MunCt();
 	private boolean loaded, admin;
 	
 	public PlayerImpl(){}
@@ -373,6 +373,11 @@ public class PlayerImpl implements PlayerCapability {
 	@Override
 	public MailData getMailbox(){
 		return mailbox;
+	}
+
+	@Override
+	public MunCt getMunCt(){
+		return munct;
 	}
 
 }

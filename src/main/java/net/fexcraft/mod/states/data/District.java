@@ -42,7 +42,7 @@ public class District implements Layer {
 	public RuleHolder rules = new RuleHolder();
 	public NeighborData neighbors = new NeighborData();
 	//
-	public final Rule r_CFS, r_ONBANKRUPT, r_SET_MANAGER, r_SET_CHUNKTAX;
+	public final Rule r_OCCB, r_ONBANKRUPT, r_SET_MANAGER, r_SET_CHUNKTAX;
 	public final Rule r_SET_TYPE, r_SET_NAME, r_SET_PRICE, r_SET_COLOR, r_SET_ICON;
 	public final Rule r_ALLOW_EXPLOSIONS, r_SET_CHUNKRULES, r_SET_CUSTOM_CHUNKTAX;
 	public final Rule r_CLAIM_CHUNK, r_SET_MAILBOX, r_OPEN_MAILBOX, r_SET_RULESET;
@@ -62,7 +62,7 @@ public class District implements Layer {
 		chunktax = JsonUtil.getIfExists(obj, "chunktax", 0).longValue();
 		mailbox.load(obj);
 		manage.linkRuleHolder(rules);
-		rules.add(r_CFS = new Rule("can_foreigners_settle", false, false, Initiator.COUNCIL_ANY, Initiator.INCHARGE));
+		rules.add(r_OCCB = new Rule("only_citizen_can_buy", false, false, Initiator.COUNCIL_ANY, Initiator.INCHARGE));
 		rules.add(r_ONBANKRUPT = new Rule("unclaim_chunks_if_bankrupt", false, false, Initiator.COUNCIL_ANY, Initiator.INCHARGE));
 		rules.add(r_SET_TYPE = new Rule("set.type", null, false, Initiator.COUNCIL_ANY, Initiator.INCHARGE));
 		rules.add(r_SET_NAME = new Rule("set.name", null, false, Initiator.COUNCIL_ANY, Initiator.INCHARGE));
@@ -81,7 +81,7 @@ public class District implements Layer {
 		rules.getMap().lock();
 		rules.load(obj);
 		//import old settings from old saves
-		if(obj.has("can_foreigners_settle")) r_CFS.set(obj.get("can_foreigners_settle").getAsBoolean());
+		if(obj.has("can_foreigners_settle")) r_OCCB.set(!obj.get("can_foreigners_settle").getAsBoolean());
 		if(obj.has("unclaim_chunks_if_bankrupt")) r_ONBANKRUPT.set(obj.get("unclaim_chunks_if_bankrupt").getAsBoolean());
 		//
 		MinecraftForge.EVENT_BUS.post(new DistrictEvent.Load(this));

@@ -16,6 +16,7 @@ import net.fexcraft.mod.states.data.Municipality;
 import net.fexcraft.mod.states.data.State;
 import net.fexcraft.mod.states.data.Vote;
 import net.fexcraft.mod.states.data.root.AccountHolder;
+import net.fexcraft.mod.states.data.root.MunCt;
 import net.fexcraft.mod.states.data.root.Taxable;
 import net.fexcraft.mod.states.data.sub.MailData;
 import net.minecraft.command.ICommandSender;
@@ -32,6 +33,8 @@ public interface PlayerCapability extends ICommandSender, Taxable, AccountHolder
 	public County getCounty();
 	
 	public void setCounty(County county);
+
+	public MunCt getMunCt();
 	
 	public boolean isOnlinePlayer();
 	

@@ -2,8 +2,10 @@
 _A Successor to the FSU "Nations" series._    
 (Wiki: https://github.com/Fexcraft/States/wiki)
 
+### Please note: States is currently in a rework to add the new "Counties" layer.
+
 ### What is "States"?
-Similarly to "Nations" (an old FSU module), it contains a _multi-layer_ protection system.    
+Similarly to the old FSU (Fexcraft Server Utilities) module called at the time "Nations", it contains a _multi-layer_ protection and management system.    
 It is composed of (in order): `Chunk -> District -> Municipality -> State`.    
 
 Players can create a "Municipality" - technically regard it as a "town" which expands.    

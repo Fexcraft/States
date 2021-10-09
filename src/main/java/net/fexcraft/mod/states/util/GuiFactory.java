@@ -25,12 +25,12 @@ public class GuiFactory implements IModGuiFactory {
 	public static class ConfigGui extends GuiConfig {
 
 		public ConfigGui(GuiScreen parent){
-			super(parent, getList(), States.MODID, true, true, "State Settings");
-			titleLine2 = StConfig.getConfig().getConfigFile().getAbsolutePath();
+			super(parent, getList(), States.MODID, false, false, "Mod Settings");
+			titleLine2 = Settings.getConfig().getConfigFile().getAbsolutePath();
 		}
 		
 		public static List<IConfigElement> getList(){
-			return StConfig.getList();
+			return Settings.getList();
 		}
 		
 	}

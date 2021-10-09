@@ -1,16 +1,14 @@
-package net.fexcraft.mod.states.data.sub;
+package net.fexcraft.mod.states.data;
 
-import static net.fexcraft.mod.states.util.StConfig.DEFAULT_ICON;
+import static net.fexcraft.mod.states.util.Settings.DEFAULT_ICON;
 
 import java.util.Arrays;
 import java.util.List;
 
-import com.google.gson.JsonObject;
-
-import net.fexcraft.mod.states.data.root.Loadable;
+import net.fexcraft.app.json.JsonMap;
 import net.minecraft.nbt.NBTTagCompound;
 
-public class IconHolder implements Loadable {
+public class IconHolder implements Saveable {
 	
 	private String icon;
 
@@ -21,13 +19,13 @@ public class IconHolder implements Loadable {
 	}
 
 	@Override
-	public void load(JsonObject obj){
-		icon = obj.has("icon") ? obj.get("icon").getAsString() : DEFAULT_ICON;
+	public void load(JsonMap obj){
+		icon = obj.has("icon") ? obj.get("icon").string_value() : DEFAULT_ICON;
 	}
 
 	@Override
-	public void save(JsonObject obj){
-		if(icon != null && !icon.equals(DEFAULT_ICON)) obj.addProperty("icon", icon);
+	public void save(JsonMap map){
+		if(icon != null && !icon.equals(DEFAULT_ICON)) map.add("icon", icon);
 	}
 	
 	/** Get direct, may be null. */

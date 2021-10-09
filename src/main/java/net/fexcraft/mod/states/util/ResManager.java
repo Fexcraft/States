@@ -1,9 +1,9 @@
 package net.fexcraft.mod.states.util;
 
-import java.util.HashMap;
+import java.util.concurrent.ConcurrentHashMap;
 
-import net.fexcraft.mod.states.data.Chunk_;
-import net.fexcraft.mod.states.data.Chunk_.ChunkKey;
+import net.fexcraft.mod.states.data.chunk.ChunkKey;
+import net.fexcraft.mod.states.data.chunk.Chunk_;
 import net.minecraft.world.chunk.Chunk;
 
 /**
@@ -15,7 +15,8 @@ import net.minecraft.world.chunk.Chunk;
 public class ResManager {
 	
 	public static boolean LOADED;
-	public static HashMap<ChunkKey, Chunk_> CHUNKS = new HashMap<>();
+	public static final String CONSOLE_UUID = "f78a4d8d-d51b-4b39-98a3-230f2de0c670";
+	public static ConcurrentHashMap<ChunkKey, Chunk_> CHUNKS = new ConcurrentHashMap<>();
 
 	public static Chunk_ getChunk(int x, int z){
 		for(Chunk_ ck : CHUNKS.values()){

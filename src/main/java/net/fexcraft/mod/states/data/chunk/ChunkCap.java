@@ -1,4 +1,4 @@
-package net.fexcraft.mod.states.data;
+package net.fexcraft.mod.states.data.chunk;
 
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.world.chunk.Chunk;

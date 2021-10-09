@@ -2,7 +2,7 @@ package net.fexcraft.mod.states;
 
 import java.io.File;
 
-import net.fexcraft.mod.states.data.ChunkCap;
+import net.fexcraft.mod.states.data.chunk.ChunkCap;
 import net.fexcraft.mod.states.db.Database;
 import net.fexcraft.mod.states.db.JsonFileDB;
 import net.fexcraft.mod.states.util.ChunkCapabilityUtil;

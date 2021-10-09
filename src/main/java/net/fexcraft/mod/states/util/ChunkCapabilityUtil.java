@@ -1,9 +1,9 @@
 package net.fexcraft.mod.states.util;
 
-import static net.fexcraft.mod.states.data.ChunkCap.CHUNK;
+import static net.fexcraft.mod.states.data.chunk.ChunkCap.CHUNK;
 
-import net.fexcraft.mod.states.data.ChunkCap;
-import net.fexcraft.mod.states.data.Chunk_;
+import net.fexcraft.mod.states.data.chunk.ChunkCap;
+import net.fexcraft.mod.states.data.chunk.Chunk_;
 import net.minecraft.nbt.NBTBase;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.EnumFacing;

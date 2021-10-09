@@ -1,13 +1,13 @@
 package net.fexcraft.mod.states.db;
 
-import static net.fexcraft.mod.states.util.Settings.SAVE_SPACED_JSON;
-
 import java.io.File;
 
 import net.fexcraft.app.json.JsonHandler;
+import net.fexcraft.app.json.JsonHandler.PrintOption;
 import net.fexcraft.app.json.JsonMap;
 import net.fexcraft.mod.states.States;
 import net.fexcraft.mod.states.data.Saveable;
+import net.fexcraft.mod.states.util.Settings;
 
 public class JsonFileDB implements Database {
 
@@ -17,12 +17,17 @@ public class JsonFileDB implements Database {
 		if(!file.getParentFile().exists()) file.getParentFile().mkdirs();
 		JsonMap map = new JsonMap();
 		type.save(map);
-		JsonHandler.print(file, map, !SAVE_SPACED_JSON, SAVE_SPACED_JSON);
+		JsonHandler.print(file, map, Settings.SAVE_SPACED_JSON ? PrintOption.FLAT : PrintOption.SPACED);
 	}
 
 	@Override
 	public Object load(String table, String id){
 		return JsonHandler.parse(new File(States.STATES_DIR, table + "/" + id + ".json"));
+	}
+
+	@Override
+	public boolean exists(String table, String id){
+		return new File(States.STATES_DIR, table + "/" + id + ".json").exists();
 	}
 
 	@Override

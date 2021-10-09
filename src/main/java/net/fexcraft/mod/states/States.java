@@ -2,11 +2,14 @@ package net.fexcraft.mod.states;
 
 import java.io.File;
 
+import net.fexcraft.mod.states.data.ChunkCap;
 import net.fexcraft.mod.states.db.Database;
 import net.fexcraft.mod.states.db.JsonFileDB;
+import net.fexcraft.mod.states.util.ChunkCapabilityUtil;
 import net.fexcraft.mod.states.util.CrashHook;
 import net.fexcraft.mod.states.util.Settings;
 import net.minecraft.world.World;
+import net.minecraftforge.common.capabilities.CapabilityManager;
 import net.minecraftforge.fml.common.FMLCommonHandler;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.event.FMLInitializationEvent;
@@ -29,6 +32,7 @@ public class States {
 	public void preInit(FMLPreInitializationEvent event){
 		Settings.initialize(event);
 		FMLCommonHandler.instance().registerCrashCallable(new CrashHook());
+		CapabilityManager.INSTANCE.register(ChunkCap.class, new ChunkCapabilityUtil.Storage(), new ChunkCapabilityUtil.Callable());
 	}
 	
 

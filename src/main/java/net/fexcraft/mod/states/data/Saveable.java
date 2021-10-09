@@ -4,8 +4,13 @@ import java.util.Map;
 
 import net.fexcraft.app.json.JsonHandler;
 import net.fexcraft.app.json.JsonMap;
+import net.fexcraft.mod.states.States;
 
 public interface Saveable {
+	
+	public default void save(){
+		States.DB.save(this);
+	}
 
 	public void save(JsonMap map);
 	

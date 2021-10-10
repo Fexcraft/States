@@ -4,6 +4,7 @@ public enum Layers {
 	
 	PROPERTY,
 	CHUNK,
+	COMPANY,
 	DISTRICT,
 	MUNICIPALITY,
 	COUNTY,

@@ -10,8 +10,8 @@ import net.fexcraft.mod.states.data.Saveable;
 public class ChunkLink implements Saveable {
 
 	public ArrayList<ChunkKey> linked;
-	public ChunkKey root;
-	public Chunk_ chunk;
+	public ChunkKey root_key;
+	public Chunk_ chunk, root;
 
 	public ChunkLink(Chunk_ chunk_){
 		chunk = chunk_;
@@ -20,7 +20,7 @@ public class ChunkLink implements Saveable {
 	@Override
 	public void save(JsonMap map){
 		if(linked.isEmpty()) return;
-		if(root.equals(chunk.key)){
+		if(root_key.equals(chunk.key)){
 			JsonArray array = new JsonArray();
 			for(ChunkKey key : linked){
 				array.add(key.toString());
@@ -28,7 +28,7 @@ public class ChunkLink implements Saveable {
 			map.add("linked", array);
 		}
 		else{
-			map.add("linked", root.toString());
+			map.add("linked", root_key.toString());
 		}
 	}
 
@@ -41,7 +41,7 @@ public class ChunkLink implements Saveable {
 			}
 		}
 		else if(map.has("link")){
-			root = new ChunkKey(map.getString("link", null));
+			root_key = new ChunkKey(map.getString("link", null));
 		}
 	}
 

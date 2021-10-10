@@ -8,4 +8,6 @@ public interface Layer {
 		return lay == getLayer();
 	}
 	
+	public Layers getParentLayer();
+	
 }

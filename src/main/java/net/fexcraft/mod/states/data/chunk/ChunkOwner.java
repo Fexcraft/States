@@ -11,7 +11,7 @@ import net.fexcraft.mod.states.data.Saveable;
  * @author Ferdnand Calo' (FEX___96)
  *
  */
-public class LayerOwner implements Saveable {
+public class ChunkOwner implements Saveable {
 	
 	public boolean unowned;
 	public boolean player;

@@ -17,7 +17,7 @@ public class Chunk_ implements Saveable, Layer {
 	public Sellable sell = new Sellable(this);
 	public ChunkLink link = null;
 	public AccessList access = new AccessList();
-	public LayerOwner owner = new LayerOwner();
+	public ChunkOwner owner = new ChunkOwner();
 	public Taxable tax = new Taxable(this);
 
 	public Chunk_(World world, int x, int z){

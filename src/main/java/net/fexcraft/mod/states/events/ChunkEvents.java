@@ -1,5 +1,6 @@
 package net.fexcraft.mod.states.events;
 
+import net.fexcraft.app.json.JsonMap;
 import net.fexcraft.lib.mc.utils.Print;
 import net.fexcraft.mod.fsmm.FSMM;
 import net.fexcraft.mod.states.States;
@@ -29,7 +30,13 @@ public class ChunkEvents {
     	}
     	Chunk_ chunk = new Chunk_(event.getWorld(), event.getChunk().x, event.getChunk().z);
         if(ResManager.CHUNKS.containsKey(chunk.key)) return;
-    	if(States.DB.exists(chunk.saveTable(), chunk.saveId())) chunk.load(States.DB.load(chunk.saveTable(), chunk.saveId()));
+    	if(States.DB.exists(chunk.saveTable(), chunk.saveId())){
+    		chunk.load(States.DB.load(chunk.saveTable(), chunk.saveId()));
+    	}
+    	else{
+    		chunk.load(new JsonMap());
+    		chunk.save();
+    	}
         ResManager.CHUNKS.put(chunk.key, chunk);
     }
     

@@ -79,14 +79,8 @@ dependencies {
     // http://www.gradle.org/docs/current/userguide/artifact_dependencies_tutorial.html
     // http://www.gradle.org/docs/current/userguide/dependency_management.html
 
-	def localrepos = new File(project.projectDir, '/localrepos');
-	if(localrepos.exists()){
-		print "LocalRepos marker exists, using local copies.\n"
-		compile project(':FCL')
-	}
-	else{
-		compile 'com.github.Fexcraft:FCL:1.12.2-SNAPSHOT'
-	}
+	compile project(':FCL')
+	compile project(':FSMM')
 
 }
 

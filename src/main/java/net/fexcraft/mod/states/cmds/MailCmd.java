@@ -204,7 +204,8 @@ public class MailCmd extends CommandBase {
 					else if(stack.getTagCompound() == null || stack.getMetadata() != 3){
 						Print.chat(player, "Item in hand is not an Invite Mail."); return;
 					}
-					else if(!stack.getTagCompound().getString("Receiver").replace("player:", "").equals(player.getGameProfile().getId().toString())){
+					else if(stack.getTagCompound().getString("Receiver").startsWith("player:")
+						&& !stack.getTagCompound().getString("Receiver").replace("player:", "").equals(player.getGameProfile().getId().toString())){
 						Print.chat(player, "Receiver and your UUID do not match.");
 						if(Static.dev()){
 							Print.chat(player, stack.getTagCompound().getString("Receiver"));

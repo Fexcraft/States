@@ -134,15 +134,15 @@ public class PlayerEvents {
 		else return;
 	}
 
-        @SubscribeEvent(priority = EventPriority.HIGHEST)
-        public static void onBlockLeftClick(PlayerInteractEvent.LeftClickBlock event) {
-                if(event.getWorld().isRemote || event.getPlayer().dimension != 0){ return; }
-                if(!checkAccess(event.getWorld(), event.getPos(), event.getState(), event.getPlayer(), false)){
-                        Print.bar(event.getPlayer(), "No permission to break blocks here.");
-                        event.setCanceled(true);
-                }
-                return;
-        }
+	@SubscribeEvent(priority = EventPriority.HIGHEST)
+	public static void onBlockLeftClick(PlayerInteractEvent.LeftClickBlock event) {
+		if(event.getWorld().isRemote || event.getEntityPlayer().dimension != 0){ return; }
+		if(!checkAccess(event.getWorld(), event.getPos(), null, event.getEntityPlayer(), false)){
+			Print.bar(event.getEntityPlayer(), "No permission to break blocks here.");
+			event.setCanceled(true);
+		}
+		return;
+	}
 	
 	@SubscribeEvent(priority = EventPriority.HIGHEST)
 	public static void onBlockBreak0(BlockEvent.BreakEvent event){

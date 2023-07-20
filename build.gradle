@@ -14,7 +14,7 @@ apply plugin: 'eclipse'
 apply plugin: 'maven-publish'
 
 
-version = "1.5.8"
+version = "1.5.9"
 group = "net.fexcraft.mod.states" // http://maven.apache.org/guides/mini/guide-naming-conventions.html
 archivesBaseName = "States"
 def modversion = version;
@@ -59,8 +59,8 @@ minecraft {
 
 dependencies {
     minecraft 'net.minecraftforge:forge:1.12.2-14.23.5.2860'
-	compile project(':FCL')
-	compile project(':FSMM')
+	implementation project(':FCL')
+	implementation project(':FSMM')
 }
 
 jar {

@@ -58,7 +58,7 @@ public class SignShop implements SignCapability.Listener {
 					Print.chat(event.getEntityPlayer(), "Invalid type on line 4.");
 					return false;
 				}
-				tileentity.signText[0] = Formatter.newTextComponentString("&0[&3St&8-&3Shop&0]");
+				tileentity.signText[0] = new TextComponentString(Formatter.format("&0[&3St&8-&3Shop&0]"));
 				TileEntity te = event.getWorld().getTileEntity(getPosAtBack(state, tileentity));
 				EnumFacing facing = state.getBlock() instanceof BlockWallSign ? EnumFacing.byIndex(tileentity.getBlockMetadata()) : null;
 				if(te != null && te.hasCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, facing) && PlayerEvents.checkAccess(te.getWorld(), te.getPos(), te.getWorld().getBlockState(te.getPos()), event.getEntityPlayer(), true)){
@@ -111,7 +111,7 @@ public class SignShop implements SignCapability.Listener {
 					tileentity.signText[1] = new TextComponentString(itemtype.getDisplayName());
 					try{
 						long leng = Long.parseLong(tileentity.signText[2].getUnformattedText());
-						tileentity.signText[2] = Formatter.newTextComponentString(Config.getWorthAsString(leng, true, leng < 10));
+						tileentity.signText[2] = new TextComponentString(Config.getWorthAsString(leng, true, leng < 10));
 						price = leng;
 					}
 					catch(Exception e){

@@ -29,6 +29,7 @@ import net.minecraft.util.EnumFacing;
 import net.minecraft.util.NonNullList;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.text.TextComponentString;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.event.entity.player.PlayerInteractEvent;
 import net.minecraftforge.fml.common.network.NetworkRegistry.TargetPoint;
@@ -93,8 +94,8 @@ public class SignMailbox implements SignCapability.Listener {
 						}
 						if(prof.getId().equals(event.getEntityPlayer().getGameProfile().getId()) || admin){
 							this.reci = prof.getId().toString();
-							tileentity.signText[1] = Formatter.newTextComponentString(prof.getName());
-							tileentity.signText[2] = Formatter.newTextComponentString("");
+							tileentity.signText[1] = new TextComponentString(prof.getName());
+							tileentity.signText[2] = new TextComponentString("");
 						}//TODO municipality check
 						else{
 							Print.chat(event.getEntityPlayer(), "No permission to set mailbox of that player.");
@@ -112,7 +113,7 @@ public class SignMailbox implements SignCapability.Listener {
 						return false;
 					}
 				}
-				tileentity.signText[0] = Formatter.newTextComponentString("&0[&3Mailbox&0]");
+				tileentity.signText[0] = new TextComponentString(Formatter.format("&0[&3Mailbox&0]"));
 				try{
 					switch(type){
 						case "state": chunk.getState().setMailbox(tileentity.getPos()); break;
@@ -222,7 +223,7 @@ public class SignMailbox implements SignCapability.Listener {
 		if(tile.getWorld() == null || tile.getWorld().isRemote) return;
 		mails.removeIf(stack -> stack.isEmpty());
 		if(((TileEntitySign)tile).signText != null){
-			((TileEntitySign)tile).signText[3] = Formatter.newTextComponentString(mails.size() + "");
+			((TileEntitySign)tile).signText[3] = new TextComponentString(mails.size() + "");
 			this.sendUpdate((TileEntitySign)tile);
 		}
 		//

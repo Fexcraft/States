@@ -2,7 +2,6 @@ package net.fexcraft.mod.states.guis;
 
 import net.fexcraft.lib.common.math.RGB;
 import net.fexcraft.lib.common.math.Time;
-import net.fexcraft.lib.tmt.ModelBase;
 import net.minecraft.block.material.MapColor;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiScreen;
@@ -32,7 +31,7 @@ public class LocationUpdate extends GuiScreen {
 	public void displayLocationUpdate(RenderGameOverlayEvent event){
 		if(event.getType() == ElementType.HOTBAR && shown()){
 			if(client == null){ client = Minecraft.getMinecraft(); }
-			ModelBase.bindTexture(texture);
+			client.renderEngine.bindTexture(texture);
 			THIS.drawTexturedModalRect(0, 0, 0, 0, 54, 38);
 			Tessellator tessellator = Tessellator.getInstance();
 	        BufferBuilder bufferbuilder = tessellator.getBuffer();
@@ -79,7 +78,7 @@ public class LocationUpdate extends GuiScreen {
 			}
 			for(int i = 0; i < 3; i++){
 				RGB.glColorReset();
-				ModelBase.bindTexture(texture);
+				client.renderEngine.bindTexture(texture);
 				THIS.drawTexturedModalRect(54, 2 + (12 * i), 55, 2 + (12 * i), client.fontRenderer.getStringWidth(lines[i]) + 4, 10);
 				client.fontRenderer.drawString(lines[i], 56, 3 + (12 * i), MapColor.SNOW.colorValue);
 			}

@@ -135,7 +135,7 @@ public class PlayerImpl implements PlayerCapability {
 
 	@Override
 	public String getFormattedNickname(){
-		return Formatter.format(Formatter.fromInt(color) + (nick == null ? entity.getName() : nick));
+		return Formatter.format("&" + Integer.toHexString(color) + (nick == null ? entity.getName() : nick));
 	}
 
 	@Override

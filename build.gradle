@@ -14,7 +14,7 @@ apply plugin: 'eclipse'
 apply plugin: 'maven-publish'
 
 
-version = "1.5.9"
+version = "1.5.10"
 group = "net.fexcraft.mod.states" // http://maven.apache.org/guides/mini/guide-naming-conventions.html
 archivesBaseName = "States"
 def modversion = version;

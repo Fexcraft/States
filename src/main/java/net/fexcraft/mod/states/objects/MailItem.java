@@ -72,7 +72,7 @@ public class MailItem extends Item {
     public EnumActionResult onItemUse(EntityPlayer player, World world, BlockPos pos, EnumHand hand, EnumFacing facing, float hitX, float hitY, float hitZ){
     	if(world.isRemote) return EnumActionResult.PASS;
     	ItemStack stack = player.getHeldItem(hand);
-    	if(stack.getMetadata() > 1){ Static.getServer().commandManager.executeCommand(player, "/mail read"); }
+    	if(stack.getMetadata() > 1){ Static.getServer().commandManager.executeCommand(player, "/st-mail read"); }
         return EnumActionResult.PASS;
     }
     

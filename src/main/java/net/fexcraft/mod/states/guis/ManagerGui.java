@@ -280,6 +280,7 @@ public class ManagerGui extends GenericGui<ManagerContainer> {
 				}
 				else field.setTextColor(texcol);
 				field.setEnabled(container.view_modes[i] == ViewMode.EDIT);
+				field.setMaxLength(1024);
 				BasicButton button = buttons.get("mode" + j);
 				button.tx = container.view_modes[i].ordinal() * 10;
 				button.ty = 246;

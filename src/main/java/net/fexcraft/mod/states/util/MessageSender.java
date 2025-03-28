@@ -14,7 +14,7 @@ import com.google.gson.JsonObject;
 import com.google.gson.stream.JsonWriter;
 
 import net.fexcraft.lib.common.json.JsonUtil;
-import net.fexcraft.lib.mc.utils.Formatter;
+import net.fexcraft.lib.common.utils.Formatter;
 import net.fexcraft.lib.mc.utils.Print;
 import net.fexcraft.lib.mc.utils.Static;
 import net.fexcraft.mod.states.data.capabilities.PlayerCapability;

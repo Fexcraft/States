@@ -13,7 +13,7 @@ import com.mojang.authlib.GameProfile;
 import net.fexcraft.lib.common.math.Time;
 import net.fexcraft.lib.mc.utils.Print;
 import net.fexcraft.lib.mc.utils.Static;
-import net.fexcraft.mod.fsmm.api.Bank;
+import net.fexcraft.mod.fsmm.data.Bank;
 import net.fexcraft.mod.fsmm.util.Config;
 import net.fexcraft.mod.states.States;
 import net.fexcraft.mod.states.data.Chunk;
@@ -167,7 +167,7 @@ public class StateCmd extends CommandBase {
 					Print.chat(sender, "&9No name for new State Specified.");
 					return;
 				}
-				Bank bank = ply.getMunicipality().getBank();
+				Bank bank = ply.getMunicipality().getAccount().getBank();
 				if(bank == null){
 					Print.chat(sender, "&9Your Municipality Bank couldn't be found.");
 					return;
@@ -195,7 +195,7 @@ public class StateCmd extends CommandBase {
 						//
 						//Now let's save stuff.
 						long halfprice = price / 2;
-						if(halfprice == 0 || bank.processAction(Bank.Action.TRANSFER, sender, ply.getMunicipality().getAccount(), halfprice, States.SERVERACCOUNT)){
+						if(halfprice == 0 || bank.processAction(Bank.Action.TRANSFER, ply.wrapper(), ply.getMunicipality().getAccount(), halfprice, States.SERVERACCOUNT)){
 							bank.processAction(Bank.Action.TRANSFER, null, ply.getMunicipality().getAccount(), halfprice, newstate.getAccount());
 							newstate.save(); States.STATES.put(newstate.getId(), newstate);
 							ply.getMunicipality().setState(newstate);

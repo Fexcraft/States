@@ -9,8 +9,8 @@ import net.fexcraft.lib.mc.api.packet.IPacketListener;
 import net.fexcraft.lib.mc.network.PacketHandler;
 import net.fexcraft.lib.mc.network.packet.PacketNBTTagCompound;
 import net.fexcraft.lib.mc.utils.Print;
-import net.fexcraft.mod.fsmm.api.Account;
-import net.fexcraft.mod.fsmm.api.Bank;
+import net.fexcraft.mod.fsmm.data.Account;
+import net.fexcraft.mod.fsmm.data.Bank;
 import net.fexcraft.mod.fsmm.util.Config;
 import net.fexcraft.mod.states.States;
 import net.fexcraft.mod.states.data.Chunk;
@@ -251,14 +251,14 @@ public class Listener implements IPacketListener<PacketNBTTagCompound> {
 				else{
 					if(price > 0){
 						if(dis.getId() != -2){
-							if(!dis.getMunicipality().getBank().processAction(Bank.Action.TRANSFER, player, dis.getMunicipality().getAccount(), price, States.SERVERACCOUNT)){
+							if(!dis.getMunicipality().getAccount().getBank().processAction(Bank.Action.TRANSFER, cap.wrapper(), dis.getMunicipality().getAccount(), price, States.SERVERACCOUNT)){
 								return null;
 							}
 						}
 						else{
 							Account playeracc = player.getCapability(StatesCapabilities.PLAYER, null).getAccount();
-							Bank playerbank = player.getCapability(StatesCapabilities.PLAYER, null).getBank();
-							if(!playerbank.processAction(Bank.Action.TRANSFER, player, playeracc, ck.getPrice() / 10, States.SERVERACCOUNT)){
+							Bank playerbank = playeracc.getBank();
+							if(!playerbank.processAction(Bank.Action.TRANSFER, cap.wrapper(), playeracc, ck.getPrice() / 10, States.SERVERACCOUNT)){
 								return null;
 							}
 						}

@@ -7,15 +7,16 @@ import static net.fexcraft.mod.states.guis.GuiHandler.openGui;
 import java.util.List;
 import java.util.UUID;
 
+import net.fexcraft.mod.fcl.UniFCL;
+import net.fexcraft.mod.fsmm.data.Account;
+import net.fexcraft.mod.fsmm.data.Bank;
+import net.fexcraft.mod.fsmm.util.DataManager;
+import net.fexcraft.mod.uni.UniEntity;
 import org.apache.commons.lang3.math.NumberUtils;
 
 import net.fexcraft.lib.common.math.Time;
 import net.fexcraft.lib.mc.utils.Print;
 import net.fexcraft.lib.mc.utils.Static;
-import net.fexcraft.mod.fsmm.api.Account;
-import net.fexcraft.mod.fsmm.api.Bank;
-import net.fexcraft.mod.fsmm.api.Bank.Action;
-import net.fexcraft.mod.fsmm.api.FSMMCapabilities;
 import net.fexcraft.mod.fsmm.util.Config;
 import net.fexcraft.mod.states.States;
 import net.fexcraft.mod.states.data.Chunk;
@@ -197,12 +198,12 @@ public class ChunkCmd extends CommandBase {
 					int range = args.length > 1 ? Integer.parseInt(args[1]) : 0;
 					if(range <= 0){
 						if(asmun != null && StConfig.UNCLAIM_CHUNK_PRICE > 0){
-							Bank bank = chunk.getMunicipality().getBank();
+							Bank bank = chunk.getMunicipality().getAccount().getBank();
 							if(chunk.getMunicipality().getAccount().getBalance() < StConfig.UNCLAIM_CHUNK_PRICE){
 								Print.chat(player, "Municipality does not have enough money to pay the unclaim fee.");
 								return;
 							}
-							if(!bank.processAction(Action.TRANSFER, player, chunk.getMunicipality().getAccount(), StConfig.UNCLAIM_CHUNK_PRICE, States.SERVERACCOUNT)){
+							if(!bank.processAction(Bank.Action.TRANSFER, UniEntity.getEntity(player), chunk.getMunicipality().getAccount(), StConfig.UNCLAIM_CHUNK_PRICE, States.SERVERACCOUNT)){
 								return;
 							}
 						}
@@ -230,12 +231,12 @@ public class ChunkCmd extends CommandBase {
 								if(asmun != null){
 									if(ck.getMunicipality().getId() != asmun) continue;
 									if(StConfig.UNCLAIM_CHUNK_PRICE > 0){
-										Bank bank = chunk.getMunicipality().getBank();
+										Bank bank = chunk.getMunicipality().getAccount().getBank();
 										if(chunk.getMunicipality().getAccount().getBalance() < StConfig.UNCLAIM_CHUNK_PRICE){
 											Print.chat(player, "Municipality does not have enough money to pay the unclaim fee.");
 											break;
 										}
-										if(!bank.processAction(Action.TRANSFER, player, chunk.getMunicipality().getAccount(), StConfig.UNCLAIM_CHUNK_PRICE, States.SERVERACCOUNT)){
+										if(!bank.processAction(Bank.Action.TRANSFER, UniEntity.getEntity(player), chunk.getMunicipality().getAccount(), StConfig.UNCLAIM_CHUNK_PRICE, States.SERVERACCOUNT)){
 											break;
 										}
 									}
@@ -322,7 +323,7 @@ public class ChunkCmd extends CommandBase {
 							break;
 						}
 						case PRIVATE:{
-							receiver = player.world.getCapability(FSMMCapabilities.WORLD, null).getAccount("player:" + chunk.getOwner(), true, true);
+							receiver = DataManager.getAccount("player:" + chunk.getOwner(), true, true);
 							break;
 						}
 						case STATEPUBLIC:
@@ -336,7 +337,7 @@ public class ChunkCmd extends CommandBase {
 						}
 					}
 					Account ac_sender = playerdata.getAccount();
-					if(!playerdata.getBank().processAction(Bank.Action.TRANSFER, sender, ac_sender, chunk.getPrice(), receiver)){
+					if(!playerdata.getAccount().getBank().processAction(Bank.Action.TRANSFER, playerdata.wrapper(), ac_sender, chunk.getPrice(), receiver)){
 						return;
 					}
 					long time = Time.getDate();
@@ -403,8 +404,8 @@ public class ChunkCmd extends CommandBase {
 					chunk.getMunicipality().modifyForceloadedChunk(player, chunk.getChunkPos(), bool);
 					Print.log(StateLogger.player(player) + " " + (bool ? "enabled" : "disabled") + " chunk force-loading at " + StateLogger.chunk(chunk) + ", in the District of " + StateLogger.district(chunk.getDistrict()) + ", which is in " + StateLogger.municipality(chunk.getMunicipality()) + ".");
 					//
-					Bank bank = chunk.getMunicipality().getBank();
-					bank.processAction(Bank.Action.TRANSFER, Static.getServer(), chunk.getMunicipality().getAccount(), StConfig.LOADED_CHUNKS_TAX, States.SERVERACCOUNT);
+					Bank bank = chunk.getMunicipality().getAccount().getBank();
+					bank.processAction(Bank.Action.TRANSFER, UniFCL.LOG, chunk.getMunicipality().getAccount(), StConfig.LOADED_CHUNKS_TAX, States.SERVERACCOUNT);
 					return;
 				}
 				break;

@@ -1,9 +1,9 @@
 package net.fexcraft.mod.states.guis.mail;
 
-import net.fexcraft.lib.mc.capabilities.FCLCapabilities;
 import net.fexcraft.lib.mc.gui.GenericContainer;
 import net.fexcraft.lib.mc.gui.GenericGui;
 import net.fexcraft.mod.states.impl.SignMailbox;
+import net.fexcraft.mod.uni.util.FCLCapabilities;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.inventory.Slot;
 import net.minecraft.item.ItemStack;

@@ -5,11 +5,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.ZoneOffset;
-import java.util.Date;
-import java.util.List;
-import java.util.Timer;
-import java.util.TreeMap;
-import java.util.UUID;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
 import net.fexcraft.lib.common.math.Time;
@@ -18,7 +14,10 @@ import net.fexcraft.lib.mc.network.PacketHandler;
 import net.fexcraft.lib.mc.network.handlers.NBTTagCompoundPacketHandler;
 import net.fexcraft.lib.mc.registry.FCLRegistry;
 import net.fexcraft.lib.mc.utils.Static;
-import net.fexcraft.mod.fsmm.api.Account;
+import net.fexcraft.mod.fsmm.data.Account;
+import net.fexcraft.mod.fsmm.data.AccountPermission;
+import net.fexcraft.mod.fsmm.event.ATMEvent;
+import net.fexcraft.mod.fsmm.event.FsmmEvent;
 import net.fexcraft.mod.fsmm.util.DataManager;
 import net.fexcraft.mod.states.cmds.*;
 import net.fexcraft.mod.states.data.Chunk;
@@ -55,11 +54,12 @@ import net.minecraftforge.fml.common.event.FMLServerStartingEvent;
 import net.minecraftforge.fml.common.event.FMLServerStoppingEvent;
 import net.minecraftforge.fml.common.network.NetworkRegistry;
 import net.minecraftforge.fml.relauncher.Side;
+import org.apache.commons.lang3.math.NumberUtils;
 
 @Mod(modid = States.MODID, name = "States", version = States.VERSION, dependencies = "required-after:fcl", /*serverSideOnly = true,*/ guiFactory = "net.fexcraft.mod.states.util.GuiFactory", acceptedMinecraftVersions = "*", acceptableRemoteVersions = "*")
 public class States {
 	
-	public static final String VERSION = "1.5.8";
+	public static final String VERSION = "1.6.0";
 	public static final String MODID = "states";
 	public static final String PREFIX = "&0[&2States&0]";
 	//
@@ -113,6 +113,49 @@ public class States {
 		PacketHandler.getInstance().registerMessage(ImagePacketHandler.Client.class, ImagePacket.class, 29910, Side.CLIENT);
 		PacketHandler.getInstance().registerMessage(ImagePacketHandler.Server.class, ImagePacket.class, 29911, Side.SERVER);
 		UpdateHandler.initialize();
+		//
+		FsmmEvent.addListener(ATMEvent.GatherAccounts.class, e -> {
+			e.getAccountsList().add(new AccountPermission(StateUtil.getState(0).getAccount(), true, true, true, false));
+			e.getAccountsList().add(new AccountPermission(StateUtil.getState(-1).getAccount(), true, true, true, false));
+			e.getAccountsList().add(new AccountPermission(StateUtil.getMunicipality(0).getAccount(), true, true, true, false));
+		});
+		FsmmEvent.addListener(ATMEvent.SearchAccounts.class, e -> {
+			if(!e.getSearchedType().equals("state") && !e.getSearchedType().equals("municipality")){
+				return;
+			}
+			boolean state = e.getSearchedType().equals("state");
+			if(NumberUtils.isCreatable(e.getSearchedId())){
+				int id = Integer.parseInt(e.getSearchedId());
+				if(state){
+					if(States.STATES.containsKey(id)){
+						e.getAccountsMap().put("state:" + id, new AccountPermission(StateUtil.getState(id).getAccount()));
+					}
+					else if(State.getStateFile(id).exists()){
+						e.getAccountsMap().put("state:" + id, new AccountPermission("state:" + id));
+					}
+				}
+				else{
+					if(States.MUNICIPALITIES.containsKey(id)){
+						e.getAccountsMap().put("municipality:" + id, new AccountPermission(StateUtil.getMunicipality(id).getAccount()));
+					}
+					else if(Municipality.getMunicipalityFile(id).exists()){
+						e.getAccountsMap().put("municipality:" + id, new AccountPermission("municipality:" + id));
+					}
+				}
+			}
+			else{
+				for(Map.Entry<Integer, String> entry : StateUtil.NAMECACHE_STATE.entrySet()){
+					if(entry.getValue().toLowerCase().contains(e.getSearchedId())){
+						e.getAccountsMap().put("state:" + entry.getKey(), new AccountPermission("state:" + entry.getKey()));
+					}
+				}
+				for(Map.Entry<Integer, String> entry : StateUtil.NAMECACHE_MUNICIPALITY.entrySet()){
+					if(entry.getValue().toLowerCase().contains(e.getSearchedId())){
+						e.getAccountsMap().put("municipality:" + entry.getKey(), new AccountPermission("municipality:" + entry.getKey()));
+					}
+				}
+			}
+		});
 	}
 	
 	private static File statesdir;

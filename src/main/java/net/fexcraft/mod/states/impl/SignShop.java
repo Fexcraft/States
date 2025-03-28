@@ -2,19 +2,21 @@ package net.fexcraft.mod.states.impl;
 
 import java.util.UUID;
 
+import net.fexcraft.lib.common.utils.Formatter;
 import net.fexcraft.lib.mc.capabilities.sign.SignCapability;
-import net.fexcraft.lib.mc.utils.Formatter;
 import net.fexcraft.lib.mc.utils.Print;
-import net.fexcraft.mod.fsmm.api.Account;
-import net.fexcraft.mod.fsmm.api.Bank;
+import net.fexcraft.mod.fsmm.data.Account;
+import net.fexcraft.mod.fsmm.data.Bank;
 import net.fexcraft.mod.fsmm.util.Config;
 import net.fexcraft.mod.fsmm.util.DataManager;
 import net.fexcraft.mod.states.States;
 import net.fexcraft.mod.states.data.Chunk;
+import net.fexcraft.mod.states.data.capabilities.PlayerCapability;
 import net.fexcraft.mod.states.data.capabilities.StatesCapabilities;
 import net.fexcraft.mod.states.events.PlayerEvents;
 import net.fexcraft.mod.states.util.Perms;
 import net.fexcraft.mod.states.util.StateUtil;
+import net.fexcraft.mod.uni.IDL;
 import net.minecraft.block.BlockWallSign;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.player.EntityPlayer;
@@ -37,7 +39,7 @@ public class SignShop implements SignCapability.Listener {
 	private long price;
 	private boolean active, server;
 	private ItemStack itemtype;
-	private ResourceLocation account;
+	private String account;
 
 	@Override
 	public ResourceLocation getId(){
@@ -69,7 +71,7 @@ public class SignShop implements SignCapability.Listener {
 							case "district":
 							case "municipality":{
 								if(chunk.getMunicipality().isAuthorized(chunk.getMunicipality().r_CREATE_SIGN_SHOP.id, uuid).isTrue()){
-									account = new ResourceLocation("municipality:" + chunk.getMunicipality().getId());
+									account = "municipality:" + chunk.getMunicipality().getId();
 								}
 								else{
 									Print.chat(event.getEntityPlayer(), "&9No permission to Create Municipality Shops.");
@@ -79,7 +81,7 @@ public class SignShop implements SignCapability.Listener {
 							}
 							case "state":{
 								if(chunk.getState().isAuthorized(chunk.getState().r_CREATE_SIGN_SHOP.id, uuid).isTrue()){
-									account = new ResourceLocation("state:" + chunk.getMunicipality().getId());
+									account = "state:" + chunk.getMunicipality().getId();
 								}
 								else{
 									Print.chat(event.getEntityPlayer(), "&9No permission to Create State Shops.");
@@ -90,7 +92,7 @@ public class SignShop implements SignCapability.Listener {
 							case "admin":
 							case "server":{
 								if(Perms.CREATE_SERVER_SIGN_SHOPS.has(event.getEntityPlayer())){
-									account = States.SERVERACCOUNT.getAsResourceLocation();
+									account = States.SERVERACCOUNT.getTypeAndId();
 									server = true;
 								}
 								else{
@@ -106,7 +108,7 @@ public class SignShop implements SignCapability.Listener {
 						}
 					}
 					if(account == null){
-						account = event.getEntityPlayer().getCapability(StatesCapabilities.PLAYER, null).getAccount().getAsResourceLocation();
+						account = event.getEntityPlayer().getCapability(StatesCapabilities.PLAYER, null).getAccount().getTypeAndId();
 					}
 					tileentity.signText[1] = new TextComponentString(itemtype.getDisplayName());
 					try{
@@ -139,13 +141,14 @@ public class SignShop implements SignCapability.Listener {
 						Print.chat(event.getEntityPlayer(), "Shop Account couldn't be loaded.");
 						return true;
 					}
-					Account playeracc = event.getEntityPlayer().getCapability(StatesCapabilities.PLAYER, null).getAccount();
-					Bank playerbank = event.getEntityPlayer().getCapability(StatesCapabilities.PLAYER, null).getBank();
+					PlayerCapability pcap = event.getEntityPlayer().getCapability(StatesCapabilities.PLAYER, null);
+					Account playeracc = pcap.getAccount();
+					Bank playerbank = playeracc.getBank();
 					IItemHandler te_handler = te.getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, facing);
 					IItemHandler pl_handler = event.getEntityPlayer().getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, null);
 					if(tileentity.signText[3].getUnformattedText().toLowerCase().startsWith("buy")){
 						if(hasStack(event.getEntityPlayer(), te_handler, false)){
-							if(playerbank.processAction(Bank.Action.TRANSFER, event.getEntityPlayer(), playeracc, price, shop)){
+							if(playerbank.processAction(Bank.Action.TRANSFER, pcap.wrapper(), playeracc, price, shop)){
 								event.getEntityPlayer().addItemStackToInventory(getStackIfPossible(te_handler, false));
 								Print.bar(event.getEntityPlayer(), "Items bought.");
 							}
@@ -153,7 +156,7 @@ public class SignShop implements SignCapability.Listener {
 					}
 					else if(tileentity.signText[3].getUnformattedText().toLowerCase().startsWith("sell")){
 						if(hasStack(event.getEntityPlayer(), pl_handler, true) && hasSpace(event.getEntityPlayer(), te_handler)){
-							if(DataManager.getBank(shop.getBankId(), true, false).processAction(Bank.Action.TRANSFER, event.getEntityPlayer(), shop, price, playeracc)){
+							if(shop.getBank().processAction(Bank.Action.TRANSFER, pcap.wrapper(), shop, price, playeracc)){
 								addStack(te_handler, getStackIfPossible(pl_handler, true));
 								Print.bar(event.getEntityPlayer(), "Items sold.");
 							}
@@ -164,7 +167,7 @@ public class SignShop implements SignCapability.Listener {
 					}
 				}
 				else{
-					Print.chat(event.getEntityPlayer(), "&9Shop Owner: &7" + account.toString());
+					Print.chat(event.getEntityPlayer(), "&9Shop Owner: &7" + account);
 					Print.chat(event.getEntityPlayer(), "&9Item: &7" + itemtype.getDisplayName());
 					Print.chat(event.getEntityPlayer(), "&9Reg: &7" + itemtype.getItem().getRegistryName().toString());
 					if(itemtype.getMetadata() > 0){
@@ -253,7 +256,7 @@ public class SignShop implements SignCapability.Listener {
 		NBTTagCompound compound = itemtype.writeToNBT(new NBTTagCompound());
 		compound.setLong("sign:price", price);
 		compound.setBoolean("sign:active", active);
-		compound.setString("sign:account", account.toString());
+		compound.setString("sign:account", account);
 		if(server){
 			compound.setBoolean("sign:server", server);
 		}
@@ -271,7 +274,7 @@ public class SignShop implements SignCapability.Listener {
 			itemtype = new ItemStack(compound);
 			price = compound.getInteger("sign:price");
 			active = compound.getBoolean("sign:active");
-			account = new ResourceLocation(compound.getString("sign:account"));
+			account = compound.getString("sign:account");
 			server = compound.hasKey("sign:server") && compound.getBoolean("sign:server");
 		}
 		catch(Exception e){

@@ -5,8 +5,7 @@ import java.util.UUID;
 import java.util.stream.Collectors;
 
 import net.fexcraft.lib.common.math.Time;
-import net.fexcraft.lib.mc.capabilities.FCLCapabilities;
-import net.fexcraft.lib.mc.utils.Formatter;
+import net.fexcraft.lib.common.utils.Formatter;
 import net.fexcraft.lib.mc.utils.Print;
 import net.fexcraft.lib.mc.utils.Static;
 import net.fexcraft.mod.states.States;
@@ -25,6 +24,7 @@ import net.fexcraft.mod.states.util.Perms;
 import net.fexcraft.mod.states.util.StConfig;
 import net.fexcraft.mod.states.util.StateLogger;
 import net.fexcraft.mod.states.util.StateUtil;
+import net.fexcraft.mod.uni.util.FCLCapabilities;
 import net.minecraft.command.CommandBase;
 import net.minecraft.command.CommandException;
 import net.minecraft.command.ICommandSender;

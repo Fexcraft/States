@@ -14,9 +14,8 @@ import com.mojang.authlib.GameProfile;
 import net.fexcraft.lib.common.math.Time;
 import net.fexcraft.lib.mc.utils.Print;
 import net.fexcraft.lib.mc.utils.Static;
-import net.fexcraft.mod.fsmm.api.Account;
-import net.fexcraft.mod.fsmm.api.Bank;
-import net.fexcraft.mod.fsmm.api.Bank.Action;
+import net.fexcraft.mod.fsmm.data.Account;
+import net.fexcraft.mod.fsmm.data.Bank;
 import net.fexcraft.mod.fsmm.util.Config;
 import net.fexcraft.mod.fsmm.util.DataManager;
 import net.fexcraft.mod.states.States;
@@ -142,12 +141,12 @@ public class MunicipalityCmd extends CommandBase {
 					}
 					//
 					State playerstate = ply.getMunicipality().getState();
-					Bank bank = playerstate.getBank();
-					if(bank.isNull()){
+					Bank bank = playerstate.getAccount().getBank();
+					if(bank == null){
 						Print.chat(sender, "&cState's Bank not found.");
 						return;
 					}
-					if(bank.processAction(Bank.Action.TRANSFER, sender, playerstate.getAccount(), mun.getPrice(), mun.getState().getAccount())){
+					if(bank.processAction(Bank.Action.TRANSFER, ply.wrapper(), playerstate.getAccount(), mun.getPrice(), mun.getState().getAccount())){
 						if(mun.isCapital()){
 							if(mun.getState().getMunicipalities().size() > 0){
 								mun.getState().setCapitalId(-1);
@@ -387,8 +386,8 @@ public class MunicipalityCmd extends CommandBase {
 					Print.chat(sender, "&9No name for new Municipality Specified.");
 					return;
 				}
-				Bank bank = ply.getBank();
-				if(bank.isNull()){
+				Bank bank = ply.getAccount().getBank();
+				if(bank == null){
 					Print.chat(sender, "&9Your bank couldn't be found.");
 					return;
 				}
@@ -431,7 +430,7 @@ public class MunicipalityCmd extends CommandBase {
 							//
 							//Now let's save stuff.
 							long halfprice = price / 2;
-							if(halfprice == 0 || bank.processAction(Bank.Action.TRANSFER, sender, ply.getAccount(), halfprice, States.SERVERACCOUNT)){
+							if(halfprice == 0 || bank.processAction(Bank.Action.TRANSFER, ply.wrapper(), ply.getAccount(), halfprice, States.SERVERACCOUNT)){
 								bank.processAction(Bank.Action.TRANSFER, null, ply.getAccount(), halfprice, newmun.getAccount());
 								newmun.save(); States.MUNICIPALITIES.put(newmun.getId(), newmun);
 								newdis.save(); States.DISTRICTS.put(newdis.getId(), newdis);
@@ -505,8 +504,8 @@ public class MunicipalityCmd extends CommandBase {
 						}
 					}
 					else{
-						Bank bank = DataManager.getBank(mun.getAccount().getBankId(), true, false);
-						if(MUNICIPALITY_ABANDONMENT_PRICE <= 0 || bank.processAction(Action.TRANSFER, player, mun.getAccount(), MUNICIPALITY_ABANDONMENT_PRICE, States.SERVERACCOUNT)){
+						Bank bank = mun.getAccount().getBank();
+						if(MUNICIPALITY_ABANDONMENT_PRICE <= 0 || bank.processAction(Bank.Action.TRANSFER, ply.wrapper(), mun.getAccount(), MUNICIPALITY_ABANDONMENT_PRICE, States.SERVERACCOUNT)){
 							mun.setAbandoned(player.getGameProfile().getId());
 							StateUtil.announce(server, "&9A Municipality became abandoned!");
 							StateUtil.announce(server, "&9Name&0: &7" + mun.getName() + " &3(&6" + mun.getId() + "&3)");
@@ -539,8 +538,8 @@ public class MunicipalityCmd extends CommandBase {
 						Print.chat(player, "&cNot enough money to pay the claim server fee.");
 						return;
 					}
-					Bank bank = DataManager.getBank(mun.getAccount().getBankId(), true, false);
-					if(MUNICIPALITY_CLAIM_PRICE <= 0 || bank.processAction(Action.TRANSFER, player, ply.getAccount(), MUNICIPALITY_CLAIM_PRICE, States.SERVERACCOUNT)){
+					Bank bank = mun.getAccount().getBank();
+					if(MUNICIPALITY_CLAIM_PRICE <= 0 || bank.processAction(Bank.Action.TRANSFER, ply.wrapper(), ply.getAccount(), MUNICIPALITY_CLAIM_PRICE, States.SERVERACCOUNT)){
 						mun.getAbandoned(ply);
 						StateUtil.announce(server, "&9A Municipality has been claimed!");
 						StateUtil.announce(server, "&9Name&0: &7" + mun.getName() + " &3(&6" + mun.getId() + "&3)");

@@ -17,6 +17,7 @@ import net.fexcraft.mod.states.data.Vote;
 import net.fexcraft.mod.states.data.root.AccountHolder;
 import net.fexcraft.mod.states.data.root.MailReceiver;
 import net.fexcraft.mod.states.data.root.Taxable;
+import net.fexcraft.mod.uni.world.EntityW;
 import net.minecraft.command.ICommandSender;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.server.MinecraftServer;
@@ -120,5 +121,7 @@ public interface PlayerCapability extends ICommandSender, Taxable, AccountHolder
 	public boolean isAdmin();
 
 	public void setAdminMode(boolean bool);
+
+	public EntityW wrapper();
 
 }

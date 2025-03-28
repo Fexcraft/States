@@ -1,13 +1,13 @@
 package net.fexcraft.mod.states.guis;
 
 import net.fexcraft.lib.common.math.Time;
+import net.fexcraft.lib.common.utils.Formatter;
 import net.fexcraft.lib.mc.api.packet.IPacketListener;
-import net.fexcraft.lib.mc.capabilities.FCLCapabilities;
 import net.fexcraft.lib.mc.network.packet.PacketNBTTagCompound;
 import net.fexcraft.lib.mc.render.ExternalTextureHelper;
-import net.fexcraft.lib.mc.utils.Formatter;
 import net.fexcraft.lib.mc.utils.Print;
 import net.fexcraft.mod.states.impl.SignMailbox;
+import net.fexcraft.mod.uni.util.FCLCapabilities;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTBase;

@@ -4,10 +4,10 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 
 import net.fexcraft.lib.common.json.JsonUtil;
-import net.fexcraft.lib.mc.FCL;
+import net.fexcraft.lib.common.utils.Formatter;
 import net.fexcraft.lib.mc.network.Network;
-import net.fexcraft.lib.mc.utils.Formatter;
 import net.fexcraft.mod.states.States;
+import net.fexcraft.mod.uni.UniReg;
 
 public class UpdateHandler {
 
@@ -24,7 +24,7 @@ public class UpdateHandler {
 				+ "\n" + PREFIX + "&7 Your Installed version: (&c" + States.VERSION + "&7).";
 			}
 		}
-		if(lmcv != null && !lmcv.equals(FCL.mcv)){
+		if(lmcv != null && !lmcv.equals(UniReg.LOADER_VERSION)){
 			if(STATE == null){
 				STATE = PREFIX + "&7 Now avaible for MC " + lmcv + "!";
 			}
@@ -36,7 +36,7 @@ public class UpdateHandler {
 
 	private static void sync(){
 		newversion = JsonUtil.getIfExists(data, "latest_version", States.VERSION);
-		lmcv = JsonUtil.getIfExists(data, "latest_mc_version", FCL.mcv);
+		lmcv = JsonUtil.getIfExists(data, "latest_mc_version", UniReg.LOADER_VERSION);
 	}
 	
 	private static JsonObject data;
@@ -46,13 +46,13 @@ public class UpdateHandler {
 		if(json == null){
 			data = new JsonObject();
 			data.addProperty("latest_version", States.VERSION);
-			data.addProperty("latest_mc_version", FCL.mcv);
+			data.addProperty("latest_mc_version", UniReg.LOADER_VERSION);
 		}
 		else{
 			try{
 				boolean found = false;
 				for(JsonElement elm : json.get("versions").getAsJsonArray()){
-					if(elm.getAsJsonObject().get("version").getAsString().equals(FCL.mcv)){
+					if(elm.getAsJsonObject().get("version").getAsString().equals(UniReg.LOADER_VERSION)){
 						data = elm.getAsJsonObject();
 						found = true; break;
 					}
@@ -60,14 +60,14 @@ public class UpdateHandler {
 				if(!found){
 					data = new JsonObject();
 					data.addProperty("latest_version", States.VERSION);
-					data.addProperty("latest_mc_version", FCL.mcv);
+					data.addProperty("latest_mc_version", UniReg.LOADER_VERSION);
 				}
 			}
 			catch(Exception e){
 				e.printStackTrace();
 				data = new JsonObject();
 				data.addProperty("latest_version", States.VERSION);
-				data.addProperty("latest_mc_version", FCL.mcv);
+				data.addProperty("latest_mc_version", UniReg.LOADER_VERSION);
 			}
 		}
 	}

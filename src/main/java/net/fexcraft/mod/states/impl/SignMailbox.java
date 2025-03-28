@@ -6,10 +6,10 @@ import static net.fexcraft.mod.states.guis.GuiHandler.openGui;
 import java.io.File;
 
 import net.fexcraft.lib.common.math.Time;
+import net.fexcraft.lib.common.utils.Formatter;
 import net.fexcraft.lib.mc.capabilities.sign.SignCapability;
 import net.fexcraft.lib.mc.network.PacketHandler;
 import net.fexcraft.lib.mc.network.packet.PacketNBTTagCompound;
-import net.fexcraft.lib.mc.utils.Formatter;
 import net.fexcraft.lib.mc.utils.Print;
 import net.fexcraft.lib.mc.utils.Static;
 import net.fexcraft.mod.states.States;

@@ -4,11 +4,11 @@ import java.util.List;
 
 import javax.annotation.Nullable;
 
+import net.fexcraft.lib.common.utils.Formatter;
 import org.apache.commons.lang3.math.NumberUtils;
 
 import net.fexcraft.lib.common.math.Time;
 import net.fexcraft.lib.mc.api.registry.fItem;
-import net.fexcraft.lib.mc.utils.Formatter;
 import net.fexcraft.lib.mc.utils.Static;
 import net.fexcraft.mod.states.States;
 import net.minecraft.client.util.ITooltipFlag;

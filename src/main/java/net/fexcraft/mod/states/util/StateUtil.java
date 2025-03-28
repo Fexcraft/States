@@ -11,6 +11,7 @@ import java.util.UUID;
 
 import javax.annotation.Nullable;
 
+import net.fexcraft.lib.common.utils.Formatter;
 import org.apache.commons.lang3.math.NumberUtils;
 
 import com.google.common.collect.ImmutableList;
@@ -19,7 +20,6 @@ import com.google.gson.JsonObject;
 import com.mojang.authlib.GameProfile;
 
 import net.fexcraft.lib.common.json.JsonUtil;
-import net.fexcraft.lib.mc.utils.Formatter;
 import net.fexcraft.lib.mc.utils.Print;
 import net.fexcraft.lib.mc.utils.Static;
 import net.fexcraft.mod.states.States;

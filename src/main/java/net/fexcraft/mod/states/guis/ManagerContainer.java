@@ -201,7 +201,7 @@ public class ManagerContainer extends GenericContainer {
 				addKey(list, "municipality", cap.getMunicipality().getName() + " (" + cap.getMunicipality().getId() + ")", ViewMode.GOTO);
 				addKey(list, "custom_tax", cap.getCustomTax() > 0 ? ggas(cap.getCustomTax()) : NONE, ViewMode.RESET);
 				addKey(list, "balance", ggas(cap.getAccount().getBalance()), ViewMode.GOTO);
-				addKey(list, "bank", cap.getBank().getName(), ViewMode.GOTO);
+				addKey(list, "bank", cap.getAccount().getBank().getName(), ViewMode.GOTO);
 				addKey(list, "mailbox", cap.getMailbox() == null ? NOMAILBOX : cap.getMailbox().toString(), ViewMode.RESET);
 				break;
 			case CHUNK:

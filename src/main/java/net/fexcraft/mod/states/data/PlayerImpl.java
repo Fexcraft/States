@@ -8,17 +8,17 @@ import com.google.gson.JsonObject;
 
 import net.fexcraft.lib.common.json.JsonUtil;
 import net.fexcraft.lib.common.math.Time;
-import net.fexcraft.lib.mc.utils.Formatter;
+import net.fexcraft.lib.common.utils.Formatter;
 import net.fexcraft.lib.mc.utils.Print;
-import net.fexcraft.mod.fsmm.api.Account;
-import net.fexcraft.mod.fsmm.api.Bank;
-import net.fexcraft.mod.fsmm.api.FSMMCapabilities;
+import net.fexcraft.mod.fsmm.data.Account;
 import net.fexcraft.mod.fsmm.util.DataManager;
 import net.fexcraft.mod.states.States;
 import net.fexcraft.mod.states.data.capabilities.PlayerCapability;
 import net.fexcraft.mod.states.util.Perms;
 import net.fexcraft.mod.states.util.StateUtil;
 import net.fexcraft.mod.states.util.TaxSystem;
+import net.fexcraft.mod.uni.UniEntity;
+import net.fexcraft.mod.uni.world.EntityW;
 import net.minecraft.command.ICommandSender;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.util.math.BlockPos;
@@ -73,7 +73,7 @@ public class PlayerImpl implements PlayerCapability {
 		this.color = JsonUtil.getIfExists(obj, "color", 2).intValue();
 		Municipality mun = StateUtil.getMunicipality(JsonUtil.getIfExists(obj, "municipality", -1).intValue());
 		this.setMunicipality(mun == null || (mun.getId() >= 0 && !mun.getCitizen().contains(getUUID())) ? StateUtil.getMunicipality(-1) : mun);
-		this.account = this.isOnlinePlayer() ? entity.getCapability(FSMMCapabilities.PLAYER, null).getAccount() : DataManager.getAccount("player:" + getUUID().toString(), true, true);
+		this.account = DataManager.getAccount("player:" + getUUID().toString(), true, true);
 		this.lasttaxcoll = JsonUtil.getIfExists(obj, "last_tax_collection", 0).longValue();
 		this.customtax = JsonUtil.getIfExists(obj, "custom_tax", 0).longValue();
 		this.mailbox = obj.has("mailbox") ? BlockPos.fromLong(obj.get("mailbox").getAsLong()) : null;
@@ -281,11 +281,6 @@ public class PlayerImpl implements PlayerCapability {
 	}
 
 	@Override
-	public Bank getBank(){
-		return this.isOnlinePlayer() ? entity.getCapability(FSMMCapabilities.PLAYER, null).getBank() : DataManager.getBank(account.getBankId(), true, true);
-	}
-
-	@Override
 	public BlockPos getMailbox(){
 		return mailbox;
 	}
@@ -332,6 +327,11 @@ public class PlayerImpl implements PlayerCapability {
 	public void setAdminMode(boolean bool){
 		admin = bool;
 		save();
+	}
+
+	@Override
+	public EntityW wrapper(){
+		return UniEntity.getEntity(entity);
 	}
 
 }

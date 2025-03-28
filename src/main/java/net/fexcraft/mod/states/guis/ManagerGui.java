@@ -1,7 +1,7 @@
 package net.fexcraft.mod.states.guis;
 
+import net.fexcraft.lib.common.utils.Formatter;
 import net.fexcraft.lib.mc.gui.GenericGui;
-import net.fexcraft.lib.mc.utils.Formatter;
 import net.fexcraft.mod.states.guis.ManagerContainer.Layer;
 import net.fexcraft.mod.states.guis.ManagerContainer.Mode;
 import net.fexcraft.mod.states.guis.ManagerContainer.ViewMode;

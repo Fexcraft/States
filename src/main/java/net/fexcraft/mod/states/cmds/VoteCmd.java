@@ -6,7 +6,7 @@ import java.util.UUID;
 import com.mojang.authlib.GameProfile;
 
 import net.fexcraft.lib.common.math.Time;
-import net.fexcraft.lib.mc.utils.Formatter;
+import net.fexcraft.lib.common.utils.Formatter;
 import net.fexcraft.lib.mc.utils.Print;
 import net.fexcraft.lib.mc.utils.Static;
 import net.fexcraft.mod.states.States;

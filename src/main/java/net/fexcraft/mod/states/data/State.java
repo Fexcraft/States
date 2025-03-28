@@ -14,8 +14,7 @@ import com.google.gson.JsonObject;
 
 import net.fexcraft.lib.common.json.JsonUtil;
 import net.fexcraft.lib.common.math.Time;
-import net.fexcraft.mod.fsmm.api.Account;
-import net.fexcraft.mod.fsmm.api.Bank;
+import net.fexcraft.mod.fsmm.data.Account;
 import net.fexcraft.mod.fsmm.util.DataManager;
 import net.fexcraft.mod.states.States;
 import net.fexcraft.mod.states.data.root.*;
@@ -305,11 +304,6 @@ public class State implements ColorHolder, BuyableType, IconHolder, AccountHolde
 	
 	@Override
 	public void finalize(){ unload(); }
-
-	@Override
-	public Bank getBank(){
-		return DataManager.getBank(account.getBankId(), true, true);
-	}
 
 	@Override
 	public BlockPos getMailbox(){

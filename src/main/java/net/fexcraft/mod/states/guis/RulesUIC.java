@@ -4,9 +4,9 @@ import static net.fexcraft.mod.states.guis.GuiHandler.RULE_EDITOR;
 
 import java.util.UUID;
 
+import net.fexcraft.lib.common.utils.Formatter;
 import net.fexcraft.lib.mc.gui.GenericContainer;
 import net.fexcraft.lib.mc.gui.GenericGui;
-import net.fexcraft.lib.mc.utils.Formatter;
 import net.fexcraft.lib.mc.utils.Print;
 import net.fexcraft.mod.states.data.Chunk;
 import net.fexcraft.mod.states.data.Rule;

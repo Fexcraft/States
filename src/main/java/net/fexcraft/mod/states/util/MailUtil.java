@@ -4,7 +4,6 @@ import java.io.File;
 import java.util.UUID;
 
 import net.fexcraft.lib.common.math.Time;
-import net.fexcraft.lib.mc.capabilities.FCLCapabilities;
 import net.fexcraft.lib.mc.utils.Print;
 import net.fexcraft.lib.mc.utils.Static;
 import net.fexcraft.mod.states.States;
@@ -16,6 +15,7 @@ import net.fexcraft.mod.states.data.root.Mailbox.MailType;
 import net.fexcraft.mod.states.data.root.Mailbox.RecipientType;
 import net.fexcraft.mod.states.impl.SignMailbox;
 import net.fexcraft.mod.states.objects.MailItem;
+import net.fexcraft.mod.uni.util.FCLCapabilities;
 import net.minecraft.command.ICommandSender;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;

@@ -28,6 +28,7 @@ import net.fexcraft.mod.states.data.State;
 import net.fexcraft.mod.states.data.Vote;
 import net.fexcraft.mod.states.data.capabilities.ChunkCapability;
 import net.fexcraft.mod.states.data.capabilities.PlayerCapability;
+import net.fexcraft.mod.states.data.capabilities.StatesCapabilities;
 import net.fexcraft.mod.states.data.capabilities.WorldCapability;
 import net.fexcraft.mod.states.guis.GuiHandler;
 import net.fexcraft.mod.states.guis.Listener;
@@ -40,6 +41,7 @@ import net.fexcraft.mod.states.impl.capabilities.WorldCapabilityUtil;
 import net.fexcraft.mod.states.packets.ImagePacket;
 import net.fexcraft.mod.states.packets.ImagePacketHandler;
 import net.fexcraft.mod.states.util.*;
+import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.world.World;
 import net.minecraftforge.common.ForgeChunkManager;
 import net.minecraftforge.common.MinecraftForge;
@@ -108,16 +110,34 @@ public class States {
 		NBTTagCompoundPacketHandler.addListener(Side.CLIENT, new Receiver());
 		//
 		Perms.init();
-		SERVERACCOUNT = DataManager.getAccount("server:states", false, true).setName("States (Mod) Server Account");
+		DataManager.AFTER_INIT.add(() -> {
+			SERVERACCOUNT = DataManager.getAccount("server:states", false, true).setName("States (Mod) Server Account");
+		});
 		//
 		PacketHandler.getInstance().registerMessage(ImagePacketHandler.Client.class, ImagePacket.class, 29910, Side.CLIENT);
 		PacketHandler.getInstance().registerMessage(ImagePacketHandler.Server.class, ImagePacket.class, 29911, Side.SERVER);
 		UpdateHandler.initialize();
 		//
 		FsmmEvent.addListener(ATMEvent.GatherAccounts.class, e -> {
-			e.getAccountsList().add(new AccountPermission(StateUtil.getState(0).getAccount(), true, true, true, false));
-			e.getAccountsList().add(new AccountPermission(StateUtil.getState(-1).getAccount(), true, true, true, false));
-			e.getAccountsList().add(new AccountPermission(StateUtil.getMunicipality(0).getAccount(), true, true, true, false));
+			PlayerCapability cap = ((EntityPlayer)e.getPlayer().local()).getCapability(StatesCapabilities.PLAYER, null);
+			if(cap.isAdmin()){
+				e.getAccountsList().add(new AccountPermission(SERVERACCOUNT, true, true, true, true));
+				Chunk ck = cap.getCurrentChunk();
+				if(ck.getMunicipality().getId() > -1){
+					e.getAccountsList().add(new AccountPermission(ck.getMunicipality().getAccount(), true, true, true, true));
+				}
+				if(ck.getState().getId() > -1){
+					e.getAccountsList().add(new AccountPermission(ck.getState().getAccount(), true, true, true, true));
+				}
+				e.getAccountsList().add(new AccountPermission(StateUtil.getMunicipality(-1, true).getAccount(), true, true, true, true));
+				e.getAccountsList().add(new AccountPermission(StateUtil.getState(-1, true).getAccount(), true, true, true, true));
+			}
+			if(cap.isMayorOf(cap.getMunicipality())){
+				e.getAccountsList().add(new AccountPermission(cap.getMunicipality().getAccount(), true, true, true, true));
+			}
+			if(cap.isStateLeaderOf(cap.getState())){
+				e.getAccountsList().add(new AccountPermission(cap.getState().getAccount(), true, true, true, true));
+			}
 		});
 		FsmmEvent.addListener(ATMEvent.SearchAccounts.class, e -> {
 			if(!e.getSearchedType().equals("state") && !e.getSearchedType().equals("municipality")){
